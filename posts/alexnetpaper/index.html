@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/alexnetpaper/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/alexnetpaper/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "AlexNet",
+      "headline" : "AlexNet",
+      "description" : "AlexNet在在2012年的ImageNet竞赛中取得了冠军，作为第一个深度卷积网络在该比赛中获得如此好的成绩，AlexNet证实了深度卷积网络的潜力，并引起了研究者们的极大热情。 AlexNet共包含8层，其中前5层为卷积层，后三层为全连接层，最后一个全连接层的输出是1000维，输入softmax产生最终的输出：1000类的标签分布。\n原文链接：AlexNet\n网络架构 输入层 输入图片的大小为224×224，并包含R、G、B三个通道。对于原始的数据，AlexNet进行了数据增强操作。\nLayer1 输入图片：224×224×3（227×227×3） 卷积核：11×11×96 步长(stride)：4 填充(padding)：1 输出大小：54×54×96（55×55×96） 池化：size=3×3，stride =2, padding=0 第一个卷积层使用96个11×11的卷积核对图片进行特征提取，并且经过ReLU、LRN层和最大池化层得到第一层的输出，大小为27×27×96。\nLayer2 输入图片：27×27×96 卷积核：5×5×256 步长(stride)：1 填充(padding)：2 输出大小：27×27×256 池化：size=3×3，stride =2, padding=0 第二个卷积层使用256个5×5的卷积核对图片进行特征提取，并且经过ReLU、LRN层和最大池化层得到第二层的输出，大小为13×13×256。\nLayer3 输入图片：13×13×256 卷积核：3×3×384 步长(stride)：1 填充(padding)：1 输出大小：13×13×384 第三个卷积层使用384个3×3的卷积核对图片进行特征提取，并且经过ReLU非线性激活得到第三层的输出，大小为13×13×384。\nLayer4 输入图片：13×13×384 卷积核：3×3×384 步长(stride)：1 填充(padding)：1 输出大小：13×13×384 第四个卷积层使用384个3×3的卷积核对图片进行特征提取，并且经过ReLU非线性激活得到第四层的输出，大小为13×13×384。\nLayer5 输入图片：13×13×384 卷积核：3×3×256 步长(stride)：1 填充(padding)：1 输出大小：13×13×256 池化：size=3×3，stride =2, padding=0 第五个卷积层使用256个3×3的卷积核对图片进行特征提取，并且经过ReLU非线性激活和池化层得到第五层的输出，大小为6×6×384。\n全连接层 第6、7、8层都为全连接层，并且每层的神经元个数都为4096个，最后经过softmax得到最终1000个类别的分类结果。\nInnovation创新点 ReLU非线性激活 AlexNet是第一个使用ReLU函数作为激活函数的网络，之前使用最多的激活函数是Sigmiod函数，函数图像如下所示。可以看出，Sigmiod函数在输入x的值很大或者很小的时候，其梯度非常小，几乎接近于0，那么在反向传播过程中，由于梯度的链式法则，就会导致网络的浅层得到的梯度为0，无法正常更新权重，因此AlexNet就提出可以使用ReLU函数来解决梯度消失的问题。ReLU函数在输入x大于0时，其梯度一直为1，解决了梯度消失问题，并且在输入x小于0时，输出为0，就使得网络更加稀疏，从而减少了参数的相互依存关系，缓解了过拟合问题。 多GPU 由于当时GPU内存的限制，AlexNet将网络放在2两GPU上进行训练，从网络架构图中可以看出，每一层都是将通道数一份为2，分别放在不同的GPU上，并且规定GPU只能在特定的层进行通信交流。\nLRN 虽然使用ReLU函数不需要再进行标准化，不过实验表明局部响应标准化(Local Response Normalization)有助于泛化。其公式如下： $$ b_{x,y}^{i}=a_{x,y}^{i}\/\\left ( k\u002b\\alpha \\sum_{j=max\\left ( 0,i-n\/2 \\right )}^{min\\left ( N-1,i\u002bn\/2 \\right )}\\left ( a_{x,y}^{j} \\right )^{2}\\right )^{\\beta } $$ 其中, $ a_{x,y}^{i} $表示经过激活函数ReLU得到的特征图对应位置为(x,y)的输出值，$ b_{x,y}^{i} $ 表示经过LRN后的输出值，$ N $ 为卷积核的个数，$k$、$n$、$\\alpha$、$\\beta$为超参数，在该论文中设置的分别为：$k=2$，$n=5$，$\\alpha=10^{-4}$，$\\beta=0.",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-01-12 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-01-12 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/alexnetpaper\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>AlexNet</title>
+  <meta property="og:title" content="AlexNet" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="AlexNet在在2012年的ImageNet竞赛中取得了冠军，作为第一个深度卷积网络在该比赛中获得如此好的成绩，AlexNet证实了深度卷积网络的潜力，并引起了研究者们的极大热情。 AlexNet共包含8层，其中前5层为卷积层，后三层为全连接层，最后一个全连接层的输出是1000维，输入softmax产生最终的输出：1000类的标签分布。
+原文链接：AlexNet
+网络架构 输入层 输入图片的大小为224×224，并包含R、G、B三个通道。对于原始的数据，AlexNet进行了数据增强操作。
+Layer1 输入图片：224×224×3（227×227×3） 卷积核：11×11×96 步长(stride)：4 填充(padding)：1 输出大小：54×54×96（55×55×96） 池化：size=3×3，stride =2, padding=0 第一个卷积层使用96个11×11的卷积核对图片进行特征提取，并且经过ReLU、LRN层和最大池化层得到第一层的输出，大小为27×27×96。
+Layer2 输入图片：27×27×96 卷积核：5×5×256 步长(stride)：1 填充(padding)：2 输出大小：27×27×256 池化：size=3×3，stride =2, padding=0 第二个卷积层使用256个5×5的卷积核对图片进行特征提取，并且经过ReLU、LRN层和最大池化层得到第二层的输出，大小为13×13×256。
+Layer3 输入图片：13×13×256 卷积核：3×3×384 步长(stride)：1 填充(padding)：1 输出大小：13×13×384 第三个卷积层使用384个3×3的卷积核对图片进行特征提取，并且经过ReLU非线性激活得到第三层的输出，大小为13×13×384。
+Layer4 输入图片：13×13×384 卷积核：3×3×384 步长(stride)：1 填充(padding)：1 输出大小：13×13×384 第四个卷积层使用384个3×3的卷积核对图片进行特征提取，并且经过ReLU非线性激活得到第四层的输出，大小为13×13×384。
+Layer5 输入图片：13×13×384 卷积核：3×3×256 步长(stride)：1 填充(padding)：1 输出大小：13×13×256 池化：size=3×3，stride =2, padding=0 第五个卷积层使用256个3×3的卷积核对图片进行特征提取，并且经过ReLU非线性激活和池化层得到第五层的输出，大小为6×6×384。
+全连接层 第6、7、8层都为全连接层，并且每层的神经元个数都为4096个，最后经过softmax得到最终1000个类别的分类结果。
+Innovation创新点 ReLU非线性激活 AlexNet是第一个使用ReLU函数作为激活函数的网络，之前使用最多的激活函数是Sigmiod函数，函数图像如下所示。可以看出，Sigmiod函数在输入x的值很大或者很小的时候，其梯度非常小，几乎接近于0，那么在反向传播过程中，由于梯度的链式法则，就会导致网络的浅层得到的梯度为0，无法正常更新权重，因此AlexNet就提出可以使用ReLU函数来解决梯度消失的问题。ReLU函数在输入x大于0时，其梯度一直为1，解决了梯度消失问题，并且在输入x小于0时，输出为0，就使得网络更加稀疏，从而减少了参数的相互依存关系，缓解了过拟合问题。 多GPU 由于当时GPU内存的限制，AlexNet将网络放在2两GPU上进行训练，从网络架构图中可以看出，每一层都是将通道数一份为2，分别放在不同的GPU上，并且规定GPU只能在特定的层进行通信交流。
+LRN 虽然使用ReLU函数不需要再进行标准化，不过实验表明局部响应标准化(Local Response Normalization)有助于泛化。其公式如下： $$ b_{x,y}^{i}=a_{x,y}^{i}/\left ( k&#43;\alpha \sum_{j=max\left ( 0,i-n/2 \right )}^{min\left ( N-1,i&#43;n/2 \right )}\left ( a_{x,y}^{j} \right )^{2}\right )^{\beta } $$ 其中, $ a_{x,y}^{i} $表示经过激活函数ReLU得到的特征图对应位置为(x,y)的输出值，$ b_{x,y}^{i} $ 表示经过LRN后的输出值，$ N $ 为卷积核的个数，$k$、$n$、$\alpha$、$\beta$为超参数，在该论文中设置的分别为：$k=2$，$n=5$，$\alpha=10^{-4}$，$\beta=0." />
+  <meta name="description" content="AlexNet在在2012年的ImageNet竞赛中取得了冠军，作为第一个深度卷积网络在该比赛中获得如此好的成绩，AlexNet证实了深度卷积网络的潜力，并引起了研究者们的极大热情。 AlexNet共包含8层，其中前5层为卷积层，后三层为全连接层，最后一个全连接层的输出是1000维，输入softmax产生最终的输出：1000类的标签分布。
+原文链接：AlexNet
+网络架构 输入层 输入图片的大小为224×224，并包含R、G、B三个通道。对于原始的数据，AlexNet进行了数据增强操作。
+Layer1 输入图片：224×224×3（227×227×3） 卷积核：11×11×96 步长(stride)：4 填充(padding)：1 输出大小：54×54×96（55×55×96） 池化：size=3×3，stride =2, padding=0 第一个卷积层使用96个11×11的卷积核对图片进行特征提取，并且经过ReLU、LRN层和最大池化层得到第一层的输出，大小为27×27×96。
+Layer2 输入图片：27×27×96 卷积核：5×5×256 步长(stride)：1 填充(padding)：2 输出大小：27×27×256 池化：size=3×3，stride =2, padding=0 第二个卷积层使用256个5×5的卷积核对图片进行特征提取，并且经过ReLU、LRN层和最大池化层得到第二层的输出，大小为13×13×256。
+Layer3 输入图片：13×13×256 卷积核：3×3×384 步长(stride)：1 填充(padding)：1 输出大小：13×13×384 第三个卷积层使用384个3×3的卷积核对图片进行特征提取，并且经过ReLU非线性激活得到第三层的输出，大小为13×13×384。
+Layer4 输入图片：13×13×384 卷积核：3×3×384 步长(stride)：1 填充(padding)：1 输出大小：13×13×384 第四个卷积层使用384个3×3的卷积核对图片进行特征提取，并且经过ReLU非线性激活得到第四层的输出，大小为13×13×384。
+Layer5 输入图片：13×13×384 卷积核：3×3×256 步长(stride)：1 填充(padding)：1 输出大小：13×13×256 池化：size=3×3，stride =2, padding=0 第五个卷积层使用256个3×3的卷积核对图片进行特征提取，并且经过ReLU非线性激活和池化层得到第五层的输出，大小为6×6×384。
+全连接层 第6、7、8层都为全连接层，并且每层的神经元个数都为4096个，最后经过softmax得到最终1000个类别的分类结果。
+Innovation创新点 ReLU非线性激活 AlexNet是第一个使用ReLU函数作为激活函数的网络，之前使用最多的激活函数是Sigmiod函数，函数图像如下所示。可以看出，Sigmiod函数在输入x的值很大或者很小的时候，其梯度非常小，几乎接近于0，那么在反向传播过程中，由于梯度的链式法则，就会导致网络的浅层得到的梯度为0，无法正常更新权重，因此AlexNet就提出可以使用ReLU函数来解决梯度消失的问题。ReLU函数在输入x大于0时，其梯度一直为1，解决了梯度消失问题，并且在输入x小于0时，输出为0，就使得网络更加稀疏，从而减少了参数的相互依存关系，缓解了过拟合问题。 多GPU 由于当时GPU内存的限制，AlexNet将网络放在2两GPU上进行训练，从网络架构图中可以看出，每一层都是将通道数一份为2，分别放在不同的GPU上，并且规定GPU只能在特定的层进行通信交流。
+LRN 虽然使用ReLU函数不需要再进行标准化，不过实验表明局部响应标准化(Local Response Normalization)有助于泛化。其公式如下： $$ b_{x,y}^{i}=a_{x,y}^{i}/\left ( k&#43;\alpha \sum_{j=max\left ( 0,i-n/2 \right )}^{min\left ( N-1,i&#43;n/2 \right )}\left ( a_{x,y}^{j} \right )^{2}\right )^{\beta } $$ 其中, $ a_{x,y}^{i} $表示经过激活函数ReLU得到的特征图对应位置为(x,y)的输出值，$ b_{x,y}^{i} $ 表示经过LRN后的输出值，$ N $ 为卷积核的个数，$k$、$n$、$\alpha$、$\beta$为超参数，在该论文中设置的分别为：$k=2$，$n=5$，$\alpha=10^{-4}$，$\beta=0." />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">AlexNet</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-01-12 00:00:00 UTC">
+                12 Jan 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>AlexNet在在2012年的ImageNet竞赛中取得了冠军，作为第一个深度卷积网络在该比赛中获得如此好的成绩，AlexNet证实了深度卷积网络的潜力，并引起了研究者们的极大热情。
+AlexNet共包含8层，其中前5层为卷积层，后三层为全连接层，最后一个全连接层的输出是1000维，输入softmax产生最终的输出：1000类的标签分布。</p>
+<p>原文链接：<a href="http://www.cs.toronto.edu/~fritz/absps/imagenet.pdf">AlexNet</a></p>
+<h2 id="网络架构">网络架构</h2>
+<p><img src="/img/AlexNet1.PNG" alt=""></p>
+<h4 id="输入层">输入层</h4>
+<p>输入图片的大小为224×224，并包含R、G、B三个通道。对于原始的数据，AlexNet进行了数据增强操作。</p>
+<h4 id="layer1">Layer1</h4>
+<p>输入图片：224×224×3（227×227×3）
+卷积核：11×11×96
+步长(stride)：4
+填充(padding)：1
+输出大小：54×54×96（55×55×96）
+池化：size=3×3，stride =2, padding=0
+第一个卷积层使用96个11×11的卷积核对图片进行特征提取，并且经过ReLU、LRN层和最大池化层得到第一层的输出，大小为27×27×96。</p>
+<h4 id="layer2">Layer2</h4>
+<p>输入图片：27×27×96
+卷积核：5×5×256
+步长(stride)：1
+填充(padding)：2
+输出大小：27×27×256
+池化：size=3×3，stride =2, padding=0
+第二个卷积层使用256个5×5的卷积核对图片进行特征提取，并且经过ReLU、LRN层和最大池化层得到第二层的输出，大小为13×13×256。</p>
+<h4 id="layer3">Layer3</h4>
+<p>输入图片：13×13×256
+卷积核：3×3×384
+步长(stride)：1
+填充(padding)：1
+输出大小：13×13×384
+第三个卷积层使用384个3×3的卷积核对图片进行特征提取，并且经过ReLU非线性激活得到第三层的输出，大小为13×13×384。</p>
+<h4 id="layer4">Layer4</h4>
+<p>输入图片：13×13×384
+卷积核：3×3×384
+步长(stride)：1
+填充(padding)：1
+输出大小：13×13×384
+第四个卷积层使用384个3×3的卷积核对图片进行特征提取，并且经过ReLU非线性激活得到第四层的输出，大小为13×13×384。</p>
+<h4 id="layer5">Layer5</h4>
+<p>输入图片：13×13×384
+卷积核：3×3×256
+步长(stride)：1
+填充(padding)：1
+输出大小：13×13×256
+池化：size=3×3，stride =2, padding=0
+第五个卷积层使用256个3×3的卷积核对图片进行特征提取，并且经过ReLU非线性激活和池化层得到第五层的输出，大小为6×6×384。</p>
+<h4 id="全连接层">全连接层</h4>
+<p>第6、7、8层都为全连接层，并且每层的神经元个数都为4096个，最后经过softmax得到最终1000个类别的分类结果。</p>
+<h2 id="innovation创新点">Innovation创新点</h2>
+<h4 id="relu非线性激活">ReLU非线性激活</h4>
+<p>AlexNet是第一个使用ReLU函数作为激活函数的网络，之前使用最多的激活函数是Sigmiod函数，函数图像如下所示。可以看出，Sigmiod函数在输入x的值很大或者很小的时候，其梯度非常小，几乎接近于0，那么在反向传播过程中，由于梯度的链式法则，就会导致网络的浅层得到的梯度为0，无法正常更新权重，因此AlexNet就提出可以使用ReLU函数来解决梯度消失的问题。ReLU函数在输入x大于0时，其梯度一直为1，解决了梯度消失问题，并且在输入x小于0时，输出为0，就使得网络更加稀疏，从而减少了参数的相互依存关系，缓解了过拟合问题。
+<img src="/img/AlexNet2.png" alt="Sigmoid函数图像">
+<img src="/img/AlexNet3.png" alt="ReLU函数图像"></p>
+<h4 id="多gpu">多GPU</h4>
+<p>由于当时GPU内存的限制，AlexNet将网络放在2两GPU上进行训练，从网络架构图中可以看出，每一层都是将通道数一份为2，分别放在不同的GPU上，并且规定GPU只能在特定的层进行通信交流。</p>
+<h4 id="lrn">LRN</h4>
+<p>虽然使用ReLU函数不需要再进行标准化，不过实验表明局部响应标准化(Local Response Normalization)有助于泛化。其公式如下：
+$$
+b_{x,y}^{i}=a_{x,y}^{i}/\left ( k+\alpha \sum_{j=max\left ( 0,i-n/2 \right )}^{min\left ( N-1,i+n/2 \right )}\left ( a_{x,y}^{j} \right )^{2}\right )^{\beta }
+$$
+其中, $ a_{x,y}^{i} $表示经过激活函数ReLU得到的特征图对应位置为(x,y)的输出值，$ b_{x,y}^{i} $ 表示经过LRN后的输出值，$ N $ 为卷积核的个数，$k$、$n$、$\alpha$、$\beta$为超参数，在该论文中设置的分别为：$k=2$，$n=5$，$\alpha=10^{-4}$，$\beta=0.75$。并且上标$i$和$j$表示当前的通道，即是沿着通道的方向进行相加操作的。</p>
+<h4 id="overlapping-pooling">Overlapping Pooling</h4>
+<p>从网络结构可以看出，与LeNet不同，AlxeNet的最大池化层中的池化窗口大小和步长是不同的，即在池化的时候，每次移动的步长小于池化的窗口长度，这样就会出现重叠，从而缓解过拟合问题。</p>
+<h4 id="防止过拟合">防止过拟合</h4>
+<h5 id="数据增强">数据增强</h5>
+<p>AlexNet对原始数据进行数据增强，从而增加训练的数据量。主要操作有两个，第一个是对图片进行随机剪裁，然后进行水平翻转，第二个是对RGB像素值进行PCA操作，然后对主成分进行高斯扰动。</p>
+<h5 id="dropout">Dropout</h5>
+<p>引入Dropout随机的丢弃一些神经元，以防止过拟合，在AlexNet中，以p=0.5的概率随机丢弃，并且在前两个全连接层中使用Dropout。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

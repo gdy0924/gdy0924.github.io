@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "模型评价指标",
+      "headline" : "模型评价指标",
+      "description" : "对于训练好的模型，我们通常更加关注该模型在未知数据上的性能“好坏”，也就是模型的泛化能力如何。要对模型的泛化性能进行评估，就需要有衡量模型泛化能力的评价标准，即评价指标，或者称为性能度量。针对两种不同的任务类型：分类任务和回归任务，有各自不同的评价指标。\n回归任务 回归任务简单来说就是对连续值进行预测，比如：面积大小、数量多少等，最常用的性能度量是平均绝对误差(MAE)和均方误差(MSE)。\nMAE 平均绝对误差就是计算预测值与真实值之间的距离，公式如下：\n$$ MAE=\\frac{1}{n}\\sum_{i=1}^{n}\\left | y_{i}-\\hat{y_{i}} \\right | $$\nMSE 均方误差就是计算预测值与真实值之间距离的平方和，公式如下：\n$$ MSE=\\frac{1}{n}\\sum_{i=1}^{n}\\left ( y_{i}-\\hat{y_{i}} \\right )^{2} $$\n分类任务 分类任务简单来说就是对离散值进行预测，比如是不是、属不属于、或者属于哪一类，最常用的性能度量是准确率、错误率、精确率、召回率和F1-score等。 在分类任务中，基础指标是混淆矩阵，在混淆矩阵的基础上可以产生精确率、召回率等不同的评价指标。\n混淆矩阵 当把数据集中的正负样本分开来看时，将会产生以下四个指标： TP(True Positive)：真正例，即该样本的真实标签为正类，预测也为正类 TN(True Negative)：真反例，即该样本的真实标签为负类，预测也为负类 FP(False Positive)：假正例，即该样本的真实标签为负类，但预测为正类 FN(False Negative)：假反例，即该样本的真实标签为正类，但预测为负类 将上述四个指标放在一个矩阵中，即可得到混淆矩阵。\n\r真实情况\r预测结果\r\r\r正例\r反例\r\r\r正例\rTP\rFN\r\r\r反例\rFP\rTN\r\r\r错误率(Error Rate) 即分类错误的样本数占样本总数的比例，公式如下：\n$$ ErrorRate=\\frac{FN\u002bFP}{TP\u002bFN\u002bFP\u002bTN} $$\n准确率(Accuracy) 即分类正确的样本数占样本总数的比例，公式如下：\n$$ ACC=\\frac{TP\u002bTN}{TP\u002bFN\u002bFP\u002bTN} $$\n精确率(Precision) 又称查准率，即被预测为正例的样本中真实标签为正例的比例，公式如下：\n$$ P=\\frac{TP}{TP\u002bFP} $$",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2021",
+      "datePublished": "2021-12-11 15:52:51 \u002b0800 CST",
+      "dateModified" : "2021-12-11 15:52:51 \u002b0800 CST",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>模型评价指标</title>
+  <meta property="og:title" content="模型评价指标" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="对于训练好的模型，我们通常更加关注该模型在未知数据上的性能“好坏”，也就是模型的泛化能力如何。要对模型的泛化性能进行评估，就需要有衡量模型泛化能力的评价标准，即评价指标，或者称为性能度量。针对两种不同的任务类型：分类任务和回归任务，有各自不同的评价指标。
+回归任务 回归任务简单来说就是对连续值进行预测，比如：面积大小、数量多少等，最常用的性能度量是平均绝对误差(MAE)和均方误差(MSE)。
+MAE 平均绝对误差就是计算预测值与真实值之间的距离，公式如下：
+$$ MAE=\frac{1}{n}\sum_{i=1}^{n}\left | y_{i}-\hat{y_{i}} \right | $$
+MSE 均方误差就是计算预测值与真实值之间距离的平方和，公式如下：
+$$ MSE=\frac{1}{n}\sum_{i=1}^{n}\left ( y_{i}-\hat{y_{i}} \right )^{2} $$
+分类任务 分类任务简单来说就是对离散值进行预测，比如是不是、属不属于、或者属于哪一类，最常用的性能度量是准确率、错误率、精确率、召回率和F1-score等。 在分类任务中，基础指标是混淆矩阵，在混淆矩阵的基础上可以产生精确率、召回率等不同的评价指标。
+混淆矩阵 当把数据集中的正负样本分开来看时，将会产生以下四个指标： TP(True Positive)：真正例，即该样本的真实标签为正类，预测也为正类 TN(True Negative)：真反例，即该样本的真实标签为负类，预测也为负类 FP(False Positive)：假正例，即该样本的真实标签为负类，但预测为正类 FN(False Negative)：假反例，即该样本的真实标签为正类，但预测为负类 将上述四个指标放在一个矩阵中，即可得到混淆矩阵。
+真实情况预测结果正例反例正例TPFN反例FPTN错误率(Error Rate) 即分类错误的样本数占样本总数的比例，公式如下：
+$$ ErrorRate=\frac{FN&#43;FP}{TP&#43;FN&#43;FP&#43;TN} $$
+准确率(Accuracy) 即分类正确的样本数占样本总数的比例，公式如下：
+$$ ACC=\frac{TP&#43;TN}{TP&#43;FN&#43;FP&#43;TN} $$
+精确率(Precision) 又称查准率，即被预测为正例的样本中真实标签为正例的比例，公式如下：
+$$ P=\frac{TP}{TP&#43;FP} $$" />
+  <meta name="description" content="对于训练好的模型，我们通常更加关注该模型在未知数据上的性能“好坏”，也就是模型的泛化能力如何。要对模型的泛化性能进行评估，就需要有衡量模型泛化能力的评价标准，即评价指标，或者称为性能度量。针对两种不同的任务类型：分类任务和回归任务，有各自不同的评价指标。
+回归任务 回归任务简单来说就是对连续值进行预测，比如：面积大小、数量多少等，最常用的性能度量是平均绝对误差(MAE)和均方误差(MSE)。
+MAE 平均绝对误差就是计算预测值与真实值之间的距离，公式如下：
+$$ MAE=\frac{1}{n}\sum_{i=1}^{n}\left | y_{i}-\hat{y_{i}} \right | $$
+MSE 均方误差就是计算预测值与真实值之间距离的平方和，公式如下：
+$$ MSE=\frac{1}{n}\sum_{i=1}^{n}\left ( y_{i}-\hat{y_{i}} \right )^{2} $$
+分类任务 分类任务简单来说就是对离散值进行预测，比如是不是、属不属于、或者属于哪一类，最常用的性能度量是准确率、错误率、精确率、召回率和F1-score等。 在分类任务中，基础指标是混淆矩阵，在混淆矩阵的基础上可以产生精确率、召回率等不同的评价指标。
+混淆矩阵 当把数据集中的正负样本分开来看时，将会产生以下四个指标： TP(True Positive)：真正例，即该样本的真实标签为正类，预测也为正类 TN(True Negative)：真反例，即该样本的真实标签为负类，预测也为负类 FP(False Positive)：假正例，即该样本的真实标签为负类，但预测为正类 FN(False Negative)：假反例，即该样本的真实标签为正类，但预测为负类 将上述四个指标放在一个矩阵中，即可得到混淆矩阵。
+真实情况预测结果正例反例正例TPFN反例FPTN错误率(Error Rate) 即分类错误的样本数占样本总数的比例，公式如下：
+$$ ErrorRate=\frac{FN&#43;FP}{TP&#43;FN&#43;FP&#43;TN} $$
+准确率(Accuracy) 即分类正确的样本数占样本总数的比例，公式如下：
+$$ ACC=\frac{TP&#43;TN}{TP&#43;FN&#43;FP&#43;TN} $$
+精确率(Precision) 又称查准率，即被预测为正例的样本中真实标签为正例的比例，公式如下：
+$$ P=\frac{TP}{TP&#43;FP} $$" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">模型评价指标</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2021-12-11 15:52:51 CST">
+                11 Dec 2021
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>对于训练好的模型，我们通常更加关注该模型在未知数据上的性能“好坏”，也就是模型的<strong>泛化能力</strong>如何。要对模型的泛化性能进行评估，就需要有衡量模型泛化能力的评价标准，即<strong>评价指标</strong>，或者称为<strong>性能度量</strong>。针对两种不同的任务类型：<strong>分类任务</strong>和<strong>回归任务</strong>，有各自不同的评价指标。</p>
+<h1 id="回归任务">回归任务</h1>
+<p>回归任务简单来说就是对<strong>连续值</strong>进行预测，比如：面积大小、数量多少等，最常用的性能度量是<strong>平均绝对误差</strong>(<em>MAE</em>)和<strong>均方误差</strong>(<em>MSE</em>)。</p>
+<h3 id="mae"><em>MAE</em></h3>
+<p>平均绝对误差就是计算预测值与真实值之间的<strong>距离</strong>，公式如下：</p>
+<p>$$
+MAE=\frac{1}{n}\sum_{i=1}^{n}\left | y_{i}-\hat{y_{i}} \right | 
+$$</p>
+<h3 id="mse"><em>MSE</em></h3>
+<p>均方误差就是计算预测值与真实值之间<strong>距离的平方和</strong>，公式如下：</p>
+<p>$$
+MSE=\frac{1}{n}\sum_{i=1}^{n}\left ( y_{i}-\hat{y_{i}} \right )^{2} 
+$$</p>
+<h1 id="分类任务">分类任务</h1>
+<p>分类任务简单来说就是对<strong>离散值</strong>进行预测，比如是不是、属不属于、或者属于哪一类，最常用的性能度量是<strong>准确率</strong>、<strong>错误率</strong>、<strong>精确率</strong>、<strong>召回率</strong>和<strong>F1-score</strong>等。
+在分类任务中，基础指标是<strong>混淆矩阵</strong>，在混淆矩阵的基础上可以产生精确率、召回率等不同的评价指标。</p>
+<h3 id="混淆矩阵">混淆矩阵</h3>
+<p>当把数据集中的正负样本分开来看时，将会产生以下四个指标：
+<strong>TP</strong>(<em>True Positive</em>)：真正例，即该样本的真实标签为正类，预测也为正类
+<strong>TN</strong>(<em>True Negative</em>)：真反例，即该样本的真实标签为负类，预测也为负类
+<strong>FP</strong>(<em>False Positive</em>)：假正例，即该样本的真实标签为负类，但预测为正类
+<strong>FN</strong>(<em>False Negative</em>)：假反例，即该样本的真实标签为正类，但预测为负类
+将上述四个指标放在一个矩阵中，即可得到混淆矩阵。</p>
+<table width="450px" height="250px" align="center">
+   <tr>
+      <td rowspan="2" align="center">真实情况</td>
+      <td colspan="2" align="center">预测结果</td>
+   </tr>
+   <tr>
+      <td align="center">正例</td>
+      <td align="center">反例</td>
+   </tr>
+   <tr>
+      <td align="center">正例</td>
+      <td align="center">TP</td>
+      <td align="center">FN</td>
+   </tr>
+   <tr>
+      <td align="center">反例</td>
+      <td align="center">FP</td>
+      <td align="center">TN</td>
+   </tr>
+</table>
+<h3 id="错误率error-rate">错误率(<em>Error Rate</em>)</h3>
+<p>即分类错误的样本数占样本总数的比例，公式如下：</p>
+<p>$$ 
+ErrorRate=\frac{FN+FP}{TP+FN+FP+TN} 
+$$</p>
+<h3 id="准确率accuracy">准确率(<em>Accuracy</em>)</h3>
+<p>即分类正确的样本数占样本总数的比例，公式如下：</p>
+<p>$$ 
+ACC=\frac{TP+TN}{TP+FN+FP+TN} 
+$$</p>
+<h3 id="精确率precision">精确率(<em>Precision</em>)</h3>
+<p>又称查准率，即被预测为正例的样本中真实标签为正例的比例，公式如下：</p>
+<p>$$
+P=\frac{TP}{TP+FP} 
+$$</p>
+<h3 id="召回率recall">召回率(<em>Recall</em>)</h3>
+<p>又称查全率，即在所有真实标签为正例的样本中被预测为正例的比例，公式如下：</p>
+<p>$$ 
+R=\frac{TP}{TP+FN} 
+$$</p>
+<h3 id="f1-score">F1-score</h3>
+<p>F1-score综合考虑了精确率和召回率，公式如下：</p>
+<p>$$ 
+F1=\frac{2}{\frac{1}{P}+\frac{1}{R}}=\frac{2\times	P\times	R}{P+R} 
+$$</p>
+<p>其中查准率与查全率是一对矛盾的度量，一般来说查准率越高时，查全率往往偏低；而查全率高时，查准率往往偏低。
+当进行了多次训练或测试时，会产生不止一个混淆矩阵；当在多个数据集上进行训练或测试，也会产生多个混淆矩阵；当进行的不是二分类任务，而是多分类任务时，也会产生许多混淆矩阵。当有<strong>n个混淆矩阵</strong>时，有宏平均和微平均两种计算方法。</p>
+<h3 id="宏平均macro-averaging">宏平均(<em>Macro-averaging</em>)</h3>
+<p>该方法是先在每个混淆矩阵上计算出精确率、召回率和F1-score的值，将其分别记为($ P_{1} $,$R_{1}$,$F1_{1}$)、($P_{2}$,$R_{2}$,$F1_{2}$)&hellip;&hellip;($P_{n}$,$R_{n}$,$F1_{n}$)，再计算其平均值，分别得到宏精确率(<em>macro-P</em>)、宏召回率(<em>macro-R</em>)和宏F1-score(<em>macro-F1</em>)，计算公式如下：</p>
+<p>$$
+macro\frac{\ }{\ }P=\frac{1}{n}\sum_{i=1}^{n}P_{i} 
+$$</p>
+<p>$$
+macro\frac{\ }{\ }R=\frac{1}{n}\sum_{i=1}^{n}R_{i} 
+$$</p>
+<p>$$
+macro\frac{\ }{\ }F1=\frac{1}{n}\sum_{i=1}^{n}F1_{i}
+$$</p>
+<h3 id="微平均micro-averaging">微平均(<em>Micro-averaging</em>)</h3>
+<p>该方法先将各混淆矩阵的对应元素进行平均，得到TP、FP、TN、FN的平均值$ \overline{TP} $、$ \overline{FP} $、$ \overline{TN} $、$ \overline{FN} $，利用得到的平均值分别计算微精确率(<em>micro-P</em>)、微召回率(<em>micro-R</em>)和微F1-score(<em>micro-F1</em>)，公式如下：</p>
+<p>$$
+micro\frac{\ }{\ }P=\frac{\overline{TP}}{\overline{TP}+\overline{FP}} 
+$$</p>
+<p>$$
+micro\frac{\ }{\ }R=\frac{\overline{TP}}{\overline{TP}+\overline{FN}} 
+$$</p>
+<p>$$
+micro\frac{\ }{\ }F1=\frac{2\times micro\frac{\ }{\ }P\times micro\frac{\ }{\ }R}{micro\frac{\ }{\ }P+micro\frac{\ }{\ }R} 
+$$</p>
+<p>因为宏平均是在不同数据对应的混淆矩阵上先进行计算，所以该方法平等对待各个类别，不受数据不平衡的影响，但容易受到识别性高（高召回率、高精确率）的类别影响，当某一类别的召回率和精确率很高或者很低的时候，就会对宏平均结果影响较大；而对于微平均，由于其先将混淆矩阵进行平均，那么数据量很较大的部分就会对结果的影响比较大。
+所以，在多分类问题中，当存在数据不平衡问题时，如果我们更加关注样本量多的类别，则应使用微平均，如果更加关注样本量少的类别，则应使用宏平均。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

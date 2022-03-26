@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tips on XY&#39;s Blog</title>
+    <link>https://gdy0924.github.io/categories/tips/</link>
+    <description>Recent content in Tips on XY&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 24 Jan 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/tips/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>BatchNormalization</title>
+      <link>https://gdy0924.github.io/posts/batchnormalization/</link>
+      <pubDate>Mon, 24 Jan 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/batchnormalization/</guid>
+      <description>批归一化主要用在非线性激活函数层前，它不仅可以加快模型训练时的收敛速度，而且还能够使模型训练过程更加稳定，避免梯度爆炸或者梯度消失，也起到一定的正则化作用，所以在目前的网络中被广泛使用到。
+计算步骤及公式 1、计算均值与方差 首先，对于输入的数值集合$ B= $ $\lbrace$ $ x_{1&amp;hellip;m} $ $\rbrace$，计算其均值$ \mu _{B} $和方差$ \sigma _{B}^{2} $，如下所示： $$ \mu _{B}=\frac{1}{m} \sum_{i=1}^{n} {x_i} $$
+$$ \sigma _{B}^{2} = \frac{1}{m} \sum_{i=1}^{m} (x_i- \mu _{B})^{2} $$
+2、数据标准化 将集合$ B $转化为均值为0、方差为1的正态分布$ \tilde{x_{i}} $，其中$ \epsilon $是引入的一个极小常数，以防止在公式中出现除零的情况 $$ \tilde{x_{i}}=\frac{x_{i}-\mu _{B}}{\sqrt{\sigma _{B}^{2}+\epsilon }} $$
+3、BN 引入可训练参数$ \gamma $和$ \beta $，对数据实现平移和缩放操作，通过引入的两个还原参数，可以使网络学习到原始的特征分布，在一定程度上保留了原始数据的分布 $$ y_{i}=\gamma \tilde{x_{i}}+\beta
+$$
+在全连接层中，BN作用在特征维上，而在卷积层中，BN作用在通道维上，具体来说，就是对feature map的通道方向求均值和方差，即假设batch size=n, feature map的shape= (w, h, c), 则会对c个$nwh $的特征分别求出c个均值和方差。
+预测阶段的BN 在训练阶段，可能没有许多的数据来形成一整个batch，可能只用单个数据来进行测试，这时，单个数据就无法计算上边公式中的均值与方差。 在训练阶段，针对每一个batch使用BN公式计算出的均值 $ \mu= $ $\lbrace$ $\mu ^{1},\mu ^{2},&amp;hellip;,\mu ^{n} $ $\rbrace$ 和 $ \sigma =$ $\lbrace$ $\sigma ^{1},\sigma ^{2},&amp;hellip;,\sigma ^{n} $ $\rbrace$ ，分别计算，其中$ p $是新引入的可调节参数。 $$ \bar{\mu }=p\bar{\mu }+\left ( 1-p \right )\mu ^{t} $$</description>
+    </item>
+    
+    <item>
+      <title>模型评价指标</title>
+      <link>https://gdy0924.github.io/posts/%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87/</link>
+      <pubDate>Sat, 11 Dec 2021 15:52:51 +0800</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87/</guid>
+      <description>对于训练好的模型，我们通常更加关注该模型在未知数据上的性能“好坏”，也就是模型的泛化能力如何。要对模型的泛化性能进行评估，就需要有衡量模型泛化能力的评价标准，即评价指标，或者称为性能度量。针对两种不同的任务类型：分类任务和回归任务，有各自不同的评价指标。
+回归任务 回归任务简单来说就是对连续值进行预测，比如：面积大小、数量多少等，最常用的性能度量是平均绝对误差(MAE)和均方误差(MSE)。
+MAE 平均绝对误差就是计算预测值与真实值之间的距离，公式如下：
+$$ MAE=\frac{1}{n}\sum_{i=1}^{n}\left | y_{i}-\hat{y_{i}} \right | $$
+MSE 均方误差就是计算预测值与真实值之间距离的平方和，公式如下：
+$$ MSE=\frac{1}{n}\sum_{i=1}^{n}\left ( y_{i}-\hat{y_{i}} \right )^{2} $$
+分类任务 分类任务简单来说就是对离散值进行预测，比如是不是、属不属于、或者属于哪一类，最常用的性能度量是准确率、错误率、精确率、召回率和F1-score等。 在分类任务中，基础指标是混淆矩阵，在混淆矩阵的基础上可以产生精确率、召回率等不同的评价指标。
+混淆矩阵 当把数据集中的正负样本分开来看时，将会产生以下四个指标： TP(True Positive)：真正例，即该样本的真实标签为正类，预测也为正类 TN(True Negative)：真反例，即该样本的真实标签为负类，预测也为负类 FP(False Positive)：假正例，即该样本的真实标签为负类，但预测为正类 FN(False Negative)：假反例，即该样本的真实标签为正类，但预测为负类 将上述四个指标放在一个矩阵中，即可得到混淆矩阵。
+真实情况预测结果正例反例正例TPFN反例FPTN错误率(Error Rate) 即分类错误的样本数占样本总数的比例，公式如下：
+$$ ErrorRate=\frac{FN+FP}{TP+FN+FP+TN} $$
+准确率(Accuracy) 即分类正确的样本数占样本总数的比例，公式如下：
+$$ ACC=\frac{TP+TN}{TP+FN+FP+TN} $$
+精确率(Precision) 又称查准率，即被预测为正例的样本中真实标签为正例的比例，公式如下：
+$$ P=\frac{TP}{TP+FP} $$</description>
+    </item>
+    
+  </channel>
+</rss>

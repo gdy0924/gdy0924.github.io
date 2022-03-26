@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Code on XY&#39;s Blog</title>
+    <link>https://gdy0924.github.io/categories/code/</link>
+    <description>Recent content in Code on XY&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 12 Jan 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/code/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>AlexNet</title>
+      <link>https://gdy0924.github.io/posts/alexnetcode/</link>
+      <pubDate>Wed, 12 Jan 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/alexnetcode/</guid>
+      <description>AlexNet在在2012年的ImageNet竞赛中取得了冠军，作为第一个深度卷积网络在该比赛中获得如此好的成绩，AlexNet证实了深度卷积网络的潜力，并引起了研究者们的极大热情。 AlexNet共包含8层，其中前5层为卷积层，后三层为全连接层，最后一个全连接层的输出是1000维，输入softmax产生最终的输出：1000类的标签分布。
+实现 基于pytorch实现的代码如下：
+1 2import torch 3from torch import nn 4from d2l import torch as d2l 5 6net = nn.Sequential( 7 nn.Conv2d(1,96,kernel_size=11,stride=4,padding=1),nn.ReLU(), 8 nn.MaxPool2d(kernel_size=3,stride=2), 9 nn.Conv2d(96,256,kernel_size=5,padding=2),nn.ReLU(), 10 nn.MaxPool2d(kernel_size=3,stride=2), 11 nn.Conv2d(256,384,kernel_size=3,padding=1),nn.ReLU(), 12 nn.Conv2d(384,384,kernel_size=3,padding=1),nn.ReLU(), 13 nn.Conv2d(384,256,kernel_size=3,padding=1),nn.ReLU(), 14 nn.MaxPool2d(kernel_size=3,stride=2),nn.Flatten(), 15 nn.Linear(6400,4096),nn.ReLU(),nn.Dropout(p=0.5), 16 nn.Linear(4096,4096),nn.ReLU(),nn.Dropout(p=0.5), 17 nn.Linear(4096,10)) 18 19X = torch.randn(1,1,224,224) 20for layer in net: 21 X=layer(X) 22 print(layer.__class__.__name__,&amp;#39;output shape:\t&amp;#39;,X.shape) 23 24batch_size=128 25train_iter,test_iter = d2l.load_data_fashion_mnist(batch_size,resize=224) 26 27def evaluate_accuracy_gpu(net,data_iter,device=None): 28 if isinstance(net, nn.Module): 29 net.eval() 30 if not device: 31 device = next(iter(net.</description>
+    </item>
+    
+    <item>
+      <title>LeNet</title>
+      <link>https://gdy0924.github.io/posts/lenetcode/</link>
+      <pubDate>Sun, 26 Dec 2021 20:58:21 +0800</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/lenetcode/</guid>
+      <description>LeNet是很简单的一个经典卷积神经网络，主要用于手写数字识别，所以是一个多分类任务，并且是十个类别。
+实现 基于pytorch实现的代码如下：
+1 2import torch 3from torch import nn 4from d2l import torch as d2l 5 6class Reshape(torch.nn.Module): 7 def forward(self,x): 8 return x.view(-1,1,28,28) 9 10net = torch.nn.Sequential( 11 Reshape(),nn.Conv2d(1,6,kernel_size=5,padding=2),nn.Sigmoid(), 12 nn.AvgPool2d(kernel_size=2,stride=2), 13 nn.Conv2d(6,16,kernel_size=5),nn.Sigmoid(), 14 nn.AvgPool2d(kernel_size=2,stride=2),nn.Flatten(), 15 nn.Linear(16*5*5,120),nn.Sigmoid(), 16 nn.Linear(120,84),nn.Sigmoid(), 17 nn.Linear(84,10)) 18 19X = torch.rand(size=(1,1,28,28),dtype=torch.float32) 20for layer in net: 21 X = layer(X) 22 print(layer.__class__.__name__,&amp;#39;output shape：\t&amp;#39;,X.shape) 23 24batch_size=256 25train_iter,test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size) 26 27def evaluate_accuracy_gpu(net,data_iter,device=None): 28 if isinstance(net, nn.Module): 29 net.</description>
+    </item>
+    
+  </channel>
+</rss>
