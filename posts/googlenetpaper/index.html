@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/googlenetpaper/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/googlenetpaper/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "GoogleNet",
+      "headline" : "GoogleNet",
+      "description" : "GoogLeNet获得了2014年ILSVRC比赛分类任务的冠军，其利用Inception模块，在加深网络深度的同时，减少了参数量，从而减少计算资源的利用。\nGoogLeNetV1 原文链接：GoogleNetV1\nAbstract  提出一种名为“Inception”的深度卷积神经网络架构，可以增加网络的深度和宽度，同时保持计算量不变，从而提高网络精度。\nIntroduction  随着深度学习的发展，卷积网络在图像领域发展迅速，算法的效率，特别是计算量和内存的使用，变得越来越重要，在该网络中，我们也考虑到了这一方面。我们提出了一种更加高效的深度神经网络架构，名为“Inception module”，直接增加了网络的深度。\nMotivation and High Level Considerations  提高深度神经网络性能的最直接的方法是增加网络的规模，包括：网络的深度（层数）和宽度（每一层的单元数量）。但存在两个问题：\n（1）更大的尺寸通常意味着大量的参数，这使得扩大后的网络更容易发生过拟合，特别是在训练集有限的情况下；\n（2）网络的扩大伴随着计算资源的使用显著增加，如果增加的部分使用效率较低（例如，如果大多数权重最终接近于零），那么就会浪费大量的计算。\n解决上述问题的根本方法是：将完全连接转换成稀疏连接，一方面模拟了生物系统，另一方面，有研究证明了稀疏网络的有效性。\n之前的研究为了打破网络对称性和提高学习能力，都使用了随机稀疏连接，但是，计算机软硬件对非均匀稀疏数据的计算效率很差，所以在AlexNet中又重新使用了全连接层，目的是为了更好地优化并行运算。\n因此，需要一种网络结构，既能保持网络结构的稀疏性，又能利用密集矩阵的高计算性能，提出“Inception”结构来实现此目的。\nArchitectural Details 上图是提出的最原始的基本结构：\n（1）采用不同大小的卷积核实现不同大小的感受野，在模块最后进行拼接实现不同尺度特征的融合；\n（2）卷积核大小采用1、3和5，是为了方便对齐，即在设定卷积步长stride=1后，只要分别设定padding=0、1、2，不同卷积核操作之后得到的特征图大小就相同，方面最后的拼接操作；\n（3）由于pooling操作被证明很有效，因此引入了池化分支；\n（4）网络越到后面，特征越抽象，而且每个特征所涉及的感受野也更大了，因此随着层数的增加，3x3和5x5卷积的比例会增加。\n上述模块存在一个大问题，在该结构中，即使具有大量卷积核的卷积层中，少量的5×5卷积也会带来巨大的计算量，并且由于卷积结果与池化结果进行合并，因此从上一个模块到下一个模块，输出通道肯定要增加。\n因此提出了改进的模块，在计算量大的地方引入降维操作，即在3×3和5×5卷积操作之前，先利用1×1卷积进行通道数的减少，从而减少网络参数，在减少计算量的同时，做一定的正则化，同时还引入了更多的非线性变换。改进的模块如下所示： 该结构的好处是：\n（1）允许在每个阶段显著增加单元的数量，而不会导致计算复杂性的不受控制的爆炸；\n（2）与直觉相一致，即视觉信息应该在不同的尺度上进行处理，然后进行聚合，以便下一阶段可以同时从不同的尺度上提取特征。\nGoogLeNet 上图为完整的GoogLeNet网络结构，由于技术的原因，先进行传统的卷积层，只在较高的层开始使用Inception模块，其特点如下：\n（1）该网络有22层深（如果加上池化层，是27层）；\n（2）实验发现，用平均池化代替全连接层能够提高精度，因此使用了average pooling，同时使用dropout，但是依旧在网络最后添加了一个额外的全连接层，主要是为了更加方便地调整和微调网络；\n（3）由于网络的深度相对较大，因此需要解决梯度回传的问题，在网络中间的层，额外添加了两个辅助的softmax用于向前传导梯度，在训练过程中，它们的损失以折扣权值加到网络的总损失中（辅助分类器的损失加权为0.3），在测试时这两个额外的softmax会被去掉，辅助分类器的结构如下：\n（a）5×5大小的平均池化，stride=3；\n（b）1×1×128卷积操作，用于降维和非线性激活； （c）1024个神经元的全连接层； （d）p=70%的Dropout； （e）以Softmax损失作为分类器的线性层，分类数为1000。\nConclusions  通过构建密集的块结构来近似最优的稀疏结构，从而达到提高性能而又不大量增加计算量的目的，是一个可行的方法，通过实验也证明了Inception模块的优势。\nGoogleNetV2 原文链接：GoogleNetV2\nInception V2学习了VGGNet，用两个3×3的卷积代替5×5的大卷积（用以降低参数量并减轻过拟合），还提出了著名的BatchNormalization方法。BN是一个非常有效的正则化方法，可以让大型卷积网络的训练速度加快很多倍，同时收敛后的分类准确率也可以得到大幅提高（详见BatchNormalization）。\nGoogleNetV3 原文链接：GoogleNetV2\nGeneral Design Principles  提出一些基于使用卷积网络的各种架构选择的设计原则，包含一定的推测，不过经过实验证明基本是有效的：\n（1）avoid representational bottlenecks 避免表征瓶颈：（特别是在网络浅层）信息流前向传播过程中显然不能经过高度压缩的层，即表征瓶颈，从输入到输出，特征图的宽和高基本都会逐渐变小，但是不能一下子就变得很小；\n（2）higher dimensional representations 高维特征： 高维特征更容易区分和处理，从而会加快训练；\n（3）spatial aggregation 空间聚合： 空间聚合可以在低维嵌入上进行，而不会造成太多或任何表征能力的损失，同时还可以提高速度，比如在进行3x3卷积之前，可以对输入先进行降维而不会产生严重的后果；",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-03-30 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-03-30 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/googlenetpaper\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>GoogleNet</title>
+  <meta property="og:title" content="GoogleNet" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="GoogLeNet获得了2014年ILSVRC比赛分类任务的冠军，其利用Inception模块，在加深网络深度的同时，减少了参数量，从而减少计算资源的利用。
+GoogLeNetV1 原文链接：GoogleNetV1
+Abstract  提出一种名为“Inception”的深度卷积神经网络架构，可以增加网络的深度和宽度，同时保持计算量不变，从而提高网络精度。
+Introduction  随着深度学习的发展，卷积网络在图像领域发展迅速，算法的效率，特别是计算量和内存的使用，变得越来越重要，在该网络中，我们也考虑到了这一方面。我们提出了一种更加高效的深度神经网络架构，名为“Inception module”，直接增加了网络的深度。
+Motivation and High Level Considerations  提高深度神经网络性能的最直接的方法是增加网络的规模，包括：网络的深度（层数）和宽度（每一层的单元数量）。但存在两个问题：
+（1）更大的尺寸通常意味着大量的参数，这使得扩大后的网络更容易发生过拟合，特别是在训练集有限的情况下；
+（2）网络的扩大伴随着计算资源的使用显著增加，如果增加的部分使用效率较低（例如，如果大多数权重最终接近于零），那么就会浪费大量的计算。
+解决上述问题的根本方法是：将完全连接转换成稀疏连接，一方面模拟了生物系统，另一方面，有研究证明了稀疏网络的有效性。
+之前的研究为了打破网络对称性和提高学习能力，都使用了随机稀疏连接，但是，计算机软硬件对非均匀稀疏数据的计算效率很差，所以在AlexNet中又重新使用了全连接层，目的是为了更好地优化并行运算。
+因此，需要一种网络结构，既能保持网络结构的稀疏性，又能利用密集矩阵的高计算性能，提出“Inception”结构来实现此目的。
+Architectural Details 上图是提出的最原始的基本结构：
+（1）采用不同大小的卷积核实现不同大小的感受野，在模块最后进行拼接实现不同尺度特征的融合；
+（2）卷积核大小采用1、3和5，是为了方便对齐，即在设定卷积步长stride=1后，只要分别设定padding=0、1、2，不同卷积核操作之后得到的特征图大小就相同，方面最后的拼接操作；
+（3）由于pooling操作被证明很有效，因此引入了池化分支；
+（4）网络越到后面，特征越抽象，而且每个特征所涉及的感受野也更大了，因此随着层数的增加，3x3和5x5卷积的比例会增加。
+上述模块存在一个大问题，在该结构中，即使具有大量卷积核的卷积层中，少量的5×5卷积也会带来巨大的计算量，并且由于卷积结果与池化结果进行合并，因此从上一个模块到下一个模块，输出通道肯定要增加。
+因此提出了改进的模块，在计算量大的地方引入降维操作，即在3×3和5×5卷积操作之前，先利用1×1卷积进行通道数的减少，从而减少网络参数，在减少计算量的同时，做一定的正则化，同时还引入了更多的非线性变换。改进的模块如下所示： 该结构的好处是：
+（1）允许在每个阶段显著增加单元的数量，而不会导致计算复杂性的不受控制的爆炸；
+（2）与直觉相一致，即视觉信息应该在不同的尺度上进行处理，然后进行聚合，以便下一阶段可以同时从不同的尺度上提取特征。
+GoogLeNet 上图为完整的GoogLeNet网络结构，由于技术的原因，先进行传统的卷积层，只在较高的层开始使用Inception模块，其特点如下：
+（1）该网络有22层深（如果加上池化层，是27层）；
+（2）实验发现，用平均池化代替全连接层能够提高精度，因此使用了average pooling，同时使用dropout，但是依旧在网络最后添加了一个额外的全连接层，主要是为了更加方便地调整和微调网络；
+（3）由于网络的深度相对较大，因此需要解决梯度回传的问题，在网络中间的层，额外添加了两个辅助的softmax用于向前传导梯度，在训练过程中，它们的损失以折扣权值加到网络的总损失中（辅助分类器的损失加权为0.3），在测试时这两个额外的softmax会被去掉，辅助分类器的结构如下：
+（a）5×5大小的平均池化，stride=3；
+（b）1×1×128卷积操作，用于降维和非线性激活； （c）1024个神经元的全连接层； （d）p=70%的Dropout； （e）以Softmax损失作为分类器的线性层，分类数为1000。
+Conclusions  通过构建密集的块结构来近似最优的稀疏结构，从而达到提高性能而又不大量增加计算量的目的，是一个可行的方法，通过实验也证明了Inception模块的优势。
+GoogleNetV2 原文链接：GoogleNetV2
+Inception V2学习了VGGNet，用两个3×3的卷积代替5×5的大卷积（用以降低参数量并减轻过拟合），还提出了著名的BatchNormalization方法。BN是一个非常有效的正则化方法，可以让大型卷积网络的训练速度加快很多倍，同时收敛后的分类准确率也可以得到大幅提高（详见BatchNormalization）。
+GoogleNetV3 原文链接：GoogleNetV2
+General Design Principles  提出一些基于使用卷积网络的各种架构选择的设计原则，包含一定的推测，不过经过实验证明基本是有效的：
+（1）avoid representational bottlenecks 避免表征瓶颈：（特别是在网络浅层）信息流前向传播过程中显然不能经过高度压缩的层，即表征瓶颈，从输入到输出，特征图的宽和高基本都会逐渐变小，但是不能一下子就变得很小；
+（2）higher dimensional representations 高维特征： 高维特征更容易区分和处理，从而会加快训练；
+（3）spatial aggregation 空间聚合： 空间聚合可以在低维嵌入上进行，而不会造成太多或任何表征能力的损失，同时还可以提高速度，比如在进行3x3卷积之前，可以对输入先进行降维而不会产生严重的后果；" />
+  <meta name="description" content="GoogLeNet获得了2014年ILSVRC比赛分类任务的冠军，其利用Inception模块，在加深网络深度的同时，减少了参数量，从而减少计算资源的利用。
+GoogLeNetV1 原文链接：GoogleNetV1
+Abstract  提出一种名为“Inception”的深度卷积神经网络架构，可以增加网络的深度和宽度，同时保持计算量不变，从而提高网络精度。
+Introduction  随着深度学习的发展，卷积网络在图像领域发展迅速，算法的效率，特别是计算量和内存的使用，变得越来越重要，在该网络中，我们也考虑到了这一方面。我们提出了一种更加高效的深度神经网络架构，名为“Inception module”，直接增加了网络的深度。
+Motivation and High Level Considerations  提高深度神经网络性能的最直接的方法是增加网络的规模，包括：网络的深度（层数）和宽度（每一层的单元数量）。但存在两个问题：
+（1）更大的尺寸通常意味着大量的参数，这使得扩大后的网络更容易发生过拟合，特别是在训练集有限的情况下；
+（2）网络的扩大伴随着计算资源的使用显著增加，如果增加的部分使用效率较低（例如，如果大多数权重最终接近于零），那么就会浪费大量的计算。
+解决上述问题的根本方法是：将完全连接转换成稀疏连接，一方面模拟了生物系统，另一方面，有研究证明了稀疏网络的有效性。
+之前的研究为了打破网络对称性和提高学习能力，都使用了随机稀疏连接，但是，计算机软硬件对非均匀稀疏数据的计算效率很差，所以在AlexNet中又重新使用了全连接层，目的是为了更好地优化并行运算。
+因此，需要一种网络结构，既能保持网络结构的稀疏性，又能利用密集矩阵的高计算性能，提出“Inception”结构来实现此目的。
+Architectural Details 上图是提出的最原始的基本结构：
+（1）采用不同大小的卷积核实现不同大小的感受野，在模块最后进行拼接实现不同尺度特征的融合；
+（2）卷积核大小采用1、3和5，是为了方便对齐，即在设定卷积步长stride=1后，只要分别设定padding=0、1、2，不同卷积核操作之后得到的特征图大小就相同，方面最后的拼接操作；
+（3）由于pooling操作被证明很有效，因此引入了池化分支；
+（4）网络越到后面，特征越抽象，而且每个特征所涉及的感受野也更大了，因此随着层数的增加，3x3和5x5卷积的比例会增加。
+上述模块存在一个大问题，在该结构中，即使具有大量卷积核的卷积层中，少量的5×5卷积也会带来巨大的计算量，并且由于卷积结果与池化结果进行合并，因此从上一个模块到下一个模块，输出通道肯定要增加。
+因此提出了改进的模块，在计算量大的地方引入降维操作，即在3×3和5×5卷积操作之前，先利用1×1卷积进行通道数的减少，从而减少网络参数，在减少计算量的同时，做一定的正则化，同时还引入了更多的非线性变换。改进的模块如下所示： 该结构的好处是：
+（1）允许在每个阶段显著增加单元的数量，而不会导致计算复杂性的不受控制的爆炸；
+（2）与直觉相一致，即视觉信息应该在不同的尺度上进行处理，然后进行聚合，以便下一阶段可以同时从不同的尺度上提取特征。
+GoogLeNet 上图为完整的GoogLeNet网络结构，由于技术的原因，先进行传统的卷积层，只在较高的层开始使用Inception模块，其特点如下：
+（1）该网络有22层深（如果加上池化层，是27层）；
+（2）实验发现，用平均池化代替全连接层能够提高精度，因此使用了average pooling，同时使用dropout，但是依旧在网络最后添加了一个额外的全连接层，主要是为了更加方便地调整和微调网络；
+（3）由于网络的深度相对较大，因此需要解决梯度回传的问题，在网络中间的层，额外添加了两个辅助的softmax用于向前传导梯度，在训练过程中，它们的损失以折扣权值加到网络的总损失中（辅助分类器的损失加权为0.3），在测试时这两个额外的softmax会被去掉，辅助分类器的结构如下：
+（a）5×5大小的平均池化，stride=3；
+（b）1×1×128卷积操作，用于降维和非线性激活； （c）1024个神经元的全连接层； （d）p=70%的Dropout； （e）以Softmax损失作为分类器的线性层，分类数为1000。
+Conclusions  通过构建密集的块结构来近似最优的稀疏结构，从而达到提高性能而又不大量增加计算量的目的，是一个可行的方法，通过实验也证明了Inception模块的优势。
+GoogleNetV2 原文链接：GoogleNetV2
+Inception V2学习了VGGNet，用两个3×3的卷积代替5×5的大卷积（用以降低参数量并减轻过拟合），还提出了著名的BatchNormalization方法。BN是一个非常有效的正则化方法，可以让大型卷积网络的训练速度加快很多倍，同时收敛后的分类准确率也可以得到大幅提高（详见BatchNormalization）。
+GoogleNetV3 原文链接：GoogleNetV2
+General Design Principles  提出一些基于使用卷积网络的各种架构选择的设计原则，包含一定的推测，不过经过实验证明基本是有效的：
+（1）avoid representational bottlenecks 避免表征瓶颈：（特别是在网络浅层）信息流前向传播过程中显然不能经过高度压缩的层，即表征瓶颈，从输入到输出，特征图的宽和高基本都会逐渐变小，但是不能一下子就变得很小；
+（2）higher dimensional representations 高维特征： 高维特征更容易区分和处理，从而会加快训练；
+（3）spatial aggregation 空间聚合： 空间聚合可以在低维嵌入上进行，而不会造成太多或任何表征能力的损失，同时还可以提高速度，比如在进行3x3卷积之前，可以对输入先进行降维而不会产生严重的后果；" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">GoogleNet</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-03-30 00:00:00 UTC">
+                30 Mar 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>    GoogLeNet获得了2014年ILSVRC比赛分类任务的冠军，其利用Inception模块，在加深网络深度的同时，减少了参数量，从而减少计算资源的利用。</p>
+<h1 id="googlenetv1">GoogLeNetV1</h1>
+<p>原文链接：<a href="https://arxiv.org/pdf/1409.4842.pdf">GoogleNetV1</a></p>
+<h2 id="abstract">Abstract</h2>
+<p>    提出一种名为“<em>Inception</em>”的深度卷积神经网络架构，可以增加网络的深度和宽度，同时保持计算量不变，从而提高网络精度。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    随着深度学习的发展，卷积网络在图像领域发展迅速，算法的效率，特别是计算量和内存的使用，变得越来越重要，在该网络中，我们也考虑到了这一方面。我们提出了一种更加高效的深度神经网络架构，名为“<em>Inception module</em>”，直接增加了网络的深度。</p>
+<h2 id="motivation-and-high-level-considerations">Motivation and High Level Considerations</h2>
+<p>    提高深度神经网络性能的最直接的方法是增加网络的规模，包括：网络的深度（层数）和宽度（每一层的单元数量）。但存在两个问题：<br>
+    （1）更大的尺寸通常意味着大量的参数，这使得扩大后的网络更容易发生过拟合，特别是在训练集有限的情况下；<br>
+    （2）网络的扩大伴随着计算资源的使用显著增加，如果增加的部分使用效率较低（例如，如果大多数权重最终接近于零），那么就会浪费大量的计算。<br>
+    解决上述问题的根本方法是：将完全连接转换成稀疏连接，一方面模拟了生物系统，另一方面，有研究证明了稀疏网络的有效性。<br>
+之前的研究为了打破网络对称性和提高学习能力，都使用了随机稀疏连接，但是，计算机软硬件对非均匀稀疏数据的计算效率很差，所以在AlexNet中又重新使用了全连接层，目的是为了更好地优化并行运算。<br>
+    因此，需要一种网络结构，既能保持网络结构的稀疏性，又能利用密集矩阵的高计算性能，提出“<em>Inception</em>”结构来实现此目的。</p>
+<h2 id="architectural-details">Architectural Details</h2>
+<p><img src="/img/GoogleNetV1-1.PNG" alt="">
+上图是提出的最原始的基本结构：<br>
+    （1）采用不同大小的卷积核实现不同大小的感受野，在模块最后进行拼接实现不同尺度特征的融合；<br>
+    （2）卷积核大小采用1、3和5，是为了方便对齐，即在设定卷积步长stride=1后，只要分别设定padding=0、1、2，不同卷积核操作之后得到的特征图大小就相同，方面最后的拼接操作；<br>
+    （3）由于pooling操作被证明很有效，因此引入了池化分支；<br>
+    （4）网络越到后面，特征越抽象，而且每个特征所涉及的感受野也更大了，因此随着层数的增加，3x3和5x5卷积的比例会增加。<br>
+    上述模块存在一个大问题，在该结构中，即使具有大量卷积核的卷积层中，少量的5×5卷积也会带来巨大的计算量，并且由于卷积结果与池化结果进行合并，因此从上一个模块到下一个模块，输出通道肯定要增加。<br>
+    因此提出了改进的模块，在计算量大的地方引入降维操作，即在3×3和5×5卷积操作之前，先利用1×1卷积进行通道数的减少，从而减少网络参数，在减少计算量的同时，做一定的正则化，同时还引入了更多的非线性变换。改进的模块如下所示：
+<img src="/img/GoogleNetV1-2.PNG" alt="">
+    该结构的好处是：<br>
+（1）允许在每个阶段显著增加单元的数量，而不会导致计算复杂性的不受控制的爆炸；<br>
+（2）与直觉相一致，即视觉信息应该在不同的尺度上进行处理，然后进行聚合，以便下一阶段可以同时从不同的尺度上提取特征。</p>
+<h2 id="googlenet">GoogLeNet</h2>
+<p><img src="/img/GoogleNetV1-3.jpg" alt="">
+    上图为完整的GoogLeNet网络结构，由于技术的原因，先进行传统的卷积层，只在较高的层开始使用<em>Inception</em>模块，其特点如下：<br>
+    （1）该网络有22层深（如果加上池化层，是27层）；<br>
+    （2）实验发现，用平均池化代替全连接层能够提高精度，因此使用了average pooling，同时使用dropout，但是依旧在网络最后添加了一个额外的全连接层，主要是为了更加方便地调整和微调网络；<br>
+    （3）由于网络的深度相对较大，因此需要解决梯度回传的问题，在网络中间的层，额外添加了两个辅助的softmax用于向前传导梯度，在训练过程中，它们的损失以折扣权值加到网络的总损失中（辅助分类器的损失加权为0.3），在测试时这两个额外的softmax会被去掉，辅助分类器的结构如下：<br>
+        （a）5×5大小的平均池化，stride=3；<br>
+        （b）1×1×128卷积操作，用于降维和非线性激活； <br>
+        （c）1024个神经元的全连接层； <br>
+        （d）p=70%的Dropout； <br>
+        （e）以Softmax损失作为分类器的线性层，分类数为1000。</p>
+<h2 id="conclusions">Conclusions</h2>
+<p>    通过构建密集的块结构来近似最优的稀疏结构，从而达到提高性能而又不大量增加计算量的目的，是一个可行的方法，通过实验也证明了<em>Inception</em>模块的优势。</p>
+<h1 id="googlenetv2">GoogleNetV2</h1>
+<p>原文链接：<a href="https://arxiv.org/pdf/1512.00567.pdf">GoogleNetV2</a></p>
+<p>Inception V2学习了VGGNet，用两个3×3的卷积代替5×5的大卷积（用以降低参数量并减轻过拟合），还提出了著名的BatchNormalization方法。BN是一个非常有效的正则化方法，可以让大型卷积网络的训练速度加快很多倍，同时收敛后的分类准确率也可以得到大幅提高（详见BatchNormalization）。</p>
+<h1 id="googlenetv3">GoogleNetV3</h1>
+<p>原文链接：<a href="https://arxiv.org/pdf/1512.00567.pdf">GoogleNetV2</a></p>
+<h2 id="general-design-principles">General Design Principles</h2>
+<p>    提出一些基于使用卷积网络的各种架构选择的设计原则，包含一定的推测，不过经过实验证明基本是有效的：<br>
+    （1）<em><strong>avoid representational bottlenecks</strong></em> 避免表征瓶颈：（特别是在网络浅层）信息流前向传播过程中显然不能经过高度压缩的层，即表征瓶颈，从输入到输出，特征图的宽和高基本都会逐渐变小，但是不能一下子就变得很小；<br>
+    （2）<em><strong>higher dimensional representations</strong></em> 高维特征： 高维特征更容易区分和处理，从而会加快训练；<br>
+    （3）<em><strong>spatial aggregation</strong></em> 空间聚合： 空间聚合可以在低维嵌入上进行，而不会造成太多或任何表征能力的损失，同时还可以提高速度，比如在进行3x3卷积之前，可以对输入先进行降维而不会产生严重的后果；<br>
+    （3）<em><strong>balance the width and depth of the network</strong></em> 平衡网络的宽度和深度： 通过平衡每个模块内卷积核的数量和网络的深度，可以达到网络的最佳性能，增加网络的宽度和深度有助于提高更高质量的网络，然而，如果两者同时增加，则可以达到不增加计算量的最优改进；</p>
+<h2 id="factorizing-convolutions-with-large-filtersize">Factorizing Convolutions with Large FilterSize</h2>
+<h3 id="factorization-into-smaller-convolutions">Factorization into smaller convolutions</h3>
+<p>    使用更大的卷积核（例如5×5或7×7）进行卷积，在计算方面往往过于昂贵。因此提出利用更小的卷积核代替大卷积核，即利用两个3×3的大小的卷积核代替一个5×5大小的卷积核，三个3×3大小的卷积核代替一个7×7大小的卷积核。并且通过实验证明，这种方法不会造成表征缺失，同时引入了更多的非线性从而提高了性能。</p>
+<h3 id="spatial-factorization-into-asymmetric-convolutions">Spatial Factorization into Asymmetric Convolutions</h3>
+<p>    那么可以想到是否可以将3×3大小的卷积核分解的更小，例如2×2大小的卷积核，但是实验证明，非对称性卷积核效果更好，例如n×1大小。可以先使用3×1卷积，再使用1×3卷积，相当于滑动一个与3×3卷积具有相同感受野的两层网络，如图所示：
+<img src="/img/GoogleNetV3-1.PNG" alt="">
+    理论上，我们可以进一步论证，可以用1×n卷积和n×1卷积代替任何n×n卷积，经过实验发现，在网络的前期使用这种分解效果并不好，在中等大小的特征图上使用效果才会更好（对于mxm大小的特征图，建议m在12到20之间）。</p>
+<h2 id="efficient-grid-size-reduction">Efficient Grid Size Reduction</h2>
+<p><img src="/img/GoogleNetV3-2.PNG" alt="">
+    一般情况下，如果想让特征图缩小，可以有如下两种方式：先池化再作Inception卷积，或者先作Inception卷积再作池化。但是先作pooling（池化）会导致特征表示遇到瓶颈（特征缺失），先作Inception卷积会带来更大的计算量很大。为了同时保持特征表示且降低计算量，将卷积和池化操作并行执行，如下图所示：
+<img src="/img/GoogleNetV3-3.PNG" alt=""></p>
+<h2 id="googlenetv3-1">GoogleNetV3</h2>
+<p>    如图所示，对原始的<em>Inception</em>模块进行了改进：
+<img src="/img/GoogleNetV3-4.jpg" alt="">
+<img src="/img/GoogleNetV3-5.PNG" alt="">
+    （1）将一个较大的二维卷积拆成两个较小的一维卷积，比如将7×7卷积拆成1×7卷积和7×1卷积，或者将3×3卷积拆成1×3卷积和3×1卷积；<br>
+    （2）优化了Inception Module的结构，现在Inception Module有35×35、17×17和8×8三种不同结构，Inception V3除了在Inception Module中使用分支，还在分支中使用了分支。</p>
+<h1 id="googlenetv4">GoogleNetV4</h1>
+<p>Inception V4将<em>Inception</em>模块与残差连接进行结合，ResNet结构大大地加深了网络深度，还极大地提升了训练速度，同时性能也有提升。因此，Inception V4主要利用残差连接（Residual Connection）来改进V3结构，如下图所示：
+<img src="/img/GoogleNetV4-1.png" alt=""></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

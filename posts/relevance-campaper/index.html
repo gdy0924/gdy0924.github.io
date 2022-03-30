@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/code/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/code/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/relevance-campaper/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/relevance-campaper/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Code",
-      "headline" : "Code",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "Relevance-CAM",
+      "headline" : "Relevance-CAM",
+      "description" : "原文链接：Relevance-CAM\nAbstract  目前在深度学习的可解释性领域，一种主要的常见的是基于类激活映射(Class Activation Mapping, CAM)的方法，常用在卷积网络的最后一层。在本文中，提出了一种相关加权类激活映射(Relevance-weighted Class Activation Mapping, Relevance-CAM)，以解决基于梯度的CAM在梯度消失方面的问题，并且该方法在网络的任意一层都可以应用。\nIntroduction  随着深度神经网络的不断发展，可解释网络也被广泛研究，其方法主要分为基于类激活映射(CAM)的和基于分解的。基于CAM的方法通过全局平均池化得到每个通道的权重，接着利用最后一层卷积的特征图进行加权线性求和操作得到可视化的结果。但是该方法只能用在最后一层，且必须用到全局平均池化和全连接层。基于梯度的CAM，Grad-CAM和 Grad-CAM\u002b\u002b 对其进行改进，使用梯度作为权重。层相关性传播(Layer-wise Relevance Propagation, LRP)是基于分解的方法。LRP通过特定的传播规则将最终的输出分数向后传播，重新分配到输入图像中，从而解决了梯度消失的问题。 Contributions 1、提出了Relevance-CAM，解决了梯度消失的问题，同时在中间层也可以工作； 2、通过可视化热图，展示了我们所提出的方法优于其他方法； 3、通过Average Drop、Average Increase和Intersection over Union三种客观数值证明我们所提出的方法优于其他方法； 4、我们通过实验发现，即使在浅层，网络也可以提取到类特定信息。\nBackground CAM 原文链接：CAM 类激活映射(CAM)通过全局平均池化层获得权重，接着将最后一个卷积层的特征图进行线性加权求和，如下图所示。但是该方法有很大的局限性，只能用于最后一层的可视化，并且要在原网络的基础上增加全局平均池化层。 Grad-CAM 原文链接：Grad-CAM Grad-CAM改变了权重计算的方法，利用最后输出分数对某一层特征图的梯度作为权重，以解决CAM所存在的问题。 其计算公式如下：\n$$ L_{Grad-CAM}^{c}=\\sum_k\\alpha _k^{c}A_k $$\n$$ \\alpha _k^{c}=GP\\left ( \\frac{\\partial y^{c}}{\\partial A_k} \\right ) $$\n其中，$ A_k $是第$ k $个通道的特征图，$ y^{c} $是类别$ c $对应的得分，$\\alpha _{k}^{c}$ 代表权重，GP()表示全局平均函数。\nLayer-wise Relevance Propagation(LRP) 原文链接：LRP LRP通过分层地将相关性分数从输出传播到输入图像，从而获得原始图像中每个像素的相关性分数，并且传播过程满足守恒且分数恒不小于零，如下所示： $$ \\forall x:f_{c}\\left ( x \\right )=\\sum_{p}R_{p}^{l}\\left ( x \\right ) $$",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,31 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-03-30 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-03-30 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/code\/",
+      "datePublished": "2022-03-27 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-03-27 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/relevance-campaper\/",
       "keywords" : [  ]
   }
 </script>
-<title>Code</title>
-  <meta property="og:title" content="Code" />
+<title>Relevance-CAM</title>
+  <meta property="og:title" content="Relevance-CAM" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="原文链接：Relevance-CAM
+Abstract  目前在深度学习的可解释性领域，一种主要的常见的是基于类激活映射(Class Activation Mapping, CAM)的方法，常用在卷积网络的最后一层。在本文中，提出了一种相关加权类激活映射(Relevance-weighted Class Activation Mapping, Relevance-CAM)，以解决基于梯度的CAM在梯度消失方面的问题，并且该方法在网络的任意一层都可以应用。
+Introduction  随着深度神经网络的不断发展，可解释网络也被广泛研究，其方法主要分为基于类激活映射(CAM)的和基于分解的。基于CAM的方法通过全局平均池化得到每个通道的权重，接着利用最后一层卷积的特征图进行加权线性求和操作得到可视化的结果。但是该方法只能用在最后一层，且必须用到全局平均池化和全连接层。基于梯度的CAM，Grad-CAM和 Grad-CAM&#43;&#43; 对其进行改进，使用梯度作为权重。层相关性传播(Layer-wise Relevance Propagation, LRP)是基于分解的方法。LRP通过特定的传播规则将最终的输出分数向后传播，重新分配到输入图像中，从而解决了梯度消失的问题。 Contributions 1、提出了Relevance-CAM，解决了梯度消失的问题，同时在中间层也可以工作； 2、通过可视化热图，展示了我们所提出的方法优于其他方法； 3、通过Average Drop、Average Increase和Intersection over Union三种客观数值证明我们所提出的方法优于其他方法； 4、我们通过实验发现，即使在浅层，网络也可以提取到类特定信息。
+Background CAM 原文链接：CAM 类激活映射(CAM)通过全局平均池化层获得权重，接着将最后一个卷积层的特征图进行线性加权求和，如下图所示。但是该方法有很大的局限性，只能用于最后一层的可视化，并且要在原网络的基础上增加全局平均池化层。 Grad-CAM 原文链接：Grad-CAM Grad-CAM改变了权重计算的方法，利用最后输出分数对某一层特征图的梯度作为权重，以解决CAM所存在的问题。 其计算公式如下：
+$$ L_{Grad-CAM}^{c}=\sum_k\alpha _k^{c}A_k $$
+$$ \alpha _k^{c}=GP\left ( \frac{\partial y^{c}}{\partial A_k} \right ) $$
+其中，$ A_k $是第$ k $个通道的特征图，$ y^{c} $是类别$ c $对应的得分，$\alpha _{k}^{c}$ 代表权重，GP()表示全局平均函数。
+Layer-wise Relevance Propagation(LRP) 原文链接：LRP LRP通过分层地将相关性分数从输出传播到输入图像，从而获得原始图像中每个像素的相关性分数，并且传播过程满足守恒且分数恒不小于零，如下所示： $$ \forall x:f_{c}\left ( x \right )=\sum_{p}R_{p}^{l}\left ( x \right ) $$" />
+  <meta name="description" content="原文链接：Relevance-CAM
+Abstract  目前在深度学习的可解释性领域，一种主要的常见的是基于类激活映射(Class Activation Mapping, CAM)的方法，常用在卷积网络的最后一层。在本文中，提出了一种相关加权类激活映射(Relevance-weighted Class Activation Mapping, Relevance-CAM)，以解决基于梯度的CAM在梯度消失方面的问题，并且该方法在网络的任意一层都可以应用。
+Introduction  随着深度神经网络的不断发展，可解释网络也被广泛研究，其方法主要分为基于类激活映射(CAM)的和基于分解的。基于CAM的方法通过全局平均池化得到每个通道的权重，接着利用最后一层卷积的特征图进行加权线性求和操作得到可视化的结果。但是该方法只能用在最后一层，且必须用到全局平均池化和全连接层。基于梯度的CAM，Grad-CAM和 Grad-CAM&#43;&#43; 对其进行改进，使用梯度作为权重。层相关性传播(Layer-wise Relevance Propagation, LRP)是基于分解的方法。LRP通过特定的传播规则将最终的输出分数向后传播，重新分配到输入图像中，从而解决了梯度消失的问题。 Contributions 1、提出了Relevance-CAM，解决了梯度消失的问题，同时在中间层也可以工作； 2、通过可视化热图，展示了我们所提出的方法优于其他方法； 3、通过Average Drop、Average Increase和Intersection over Union三种客观数值证明我们所提出的方法优于其他方法； 4、我们通过实验发现，即使在浅层，网络也可以提取到类特定信息。
+Background CAM 原文链接：CAM 类激活映射(CAM)通过全局平均池化层获得权重，接着将最后一个卷积层的特征图进行线性加权求和，如下图所示。但是该方法有很大的局限性，只能用于最后一层的可视化，并且要在原网络的基础上增加全局平均池化层。 Grad-CAM 原文链接：Grad-CAM Grad-CAM改变了权重计算的方法，利用最后输出分数对某一层特征图的梯度作为权重，以解决CAM所存在的问题。 其计算公式如下：
+$$ L_{Grad-CAM}^{c}=\sum_k\alpha _k^{c}A_k $$
+$$ \alpha _k^{c}=GP\left ( \frac{\partial y^{c}}{\partial A_k} \right ) $$
+其中，$ A_k $是第$ k $个通道的特征图，$ y^{c} $是类别$ c $对应的得分，$\alpha _{k}^{c}$ 代表权重，GP()表示全局平均函数。
+Layer-wise Relevance Propagation(LRP) 原文链接：LRP LRP通过分层地将相关性分数从输出传播到输入图像，从而获得原始图像中每个像素的相关性分数，并且传播过程满足守恒且分数恒不小于零，如下所示： $$ \forall x:f_{c}\left ( x \right )=\sum_{p}R_{p}^{l}\left ( x \right ) $$" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +117,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,73 +150,156 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term">Code</h1>
-        <div id="posts-list">
-          <section>
-            <h1 class="site-date-catalog">2022</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-03-30 00:00:00 UTC">Mar 30</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/googlenetcode/">GoogleNet</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-03-29 00:00:00 UTC">Mar 29</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/vggcode/">VGG</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-01-12 00:00:00 UTC">Jan 12</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/alexnetcode/">AlexNet</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          <section>
-            <h1 class="site-date-catalog">2021</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2021-12-26 20:58:21 CST">Dec 26</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/lenetcode/">LeNet</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">Relevance-CAM</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-03-27 00:00:00 UTC">
+                27 Mar 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>原文链接：<a href="https://openaccess.thecvf.com/content/CVPR2021/papers/Lee_Relevance-CAM_Your_Model_Already_Knows_Where_To_Look_CVPR_2021_paper.pdf">Relevance-CAM</a></p>
+<h2 id="abstract">Abstract</h2>
+<p>    目前在深度学习的可解释性领域，一种主要的常见的是基于类激活映射(<em>Class Activation Mapping</em>, CAM)的方法，常用在卷积网络的最后一层。在本文中，提出了一种相关加权类激活映射(<em>Relevance-weighted Class Activation Mapping</em>, Relevance-CAM)，以解决基于梯度的CAM在梯度消失方面的问题，并且该方法在网络的任意一层都可以应用。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    随着深度神经网络的不断发展，可解释网络也被广泛研究，其方法主要分为基于类激活映射(CAM)的和基于分解的。基于CAM的方法通过全局平均池化得到每个通道的权重，接着利用最后一层卷积的特征图进行加权线性求和操作得到可视化的结果。但是该方法只能用在最后一层，且必须用到全局平均池化和全连接层。基于梯度的CAM，Grad-CAM和 Grad-CAM++ 对其进行改进，使用梯度作为权重。层相关性传播(<em>Layer-wise Relevance Propagation</em>, LRP)是基于分解的方法。LRP通过特定的传播规则将最终的输出分数向后传播，重新分配到输入图像中，从而解决了梯度消失的问题。
+<em><strong>Contributions</strong></em>
+1、提出了Relevance-CAM，解决了梯度消失的问题，同时在中间层也可以工作；
+2、通过可视化热图，展示了我们所提出的方法优于其他方法；
+3、通过Average Drop、Average Increase和Intersection over Union三种客观数值证明我们所提出的方法优于其他方法；
+4、我们通过实验发现，即使在浅层，网络也可以提取到类特定信息。</p>
+<h2 id="background">Background</h2>
+<h3 id="cam">CAM</h3>
+<p>原文链接：<a href="https://arxiv.org/pdf/1512.04150.pdf">CAM</a> <br>
+    类激活映射(CAM)通过全局平均池化层获得权重，接着将最后一个卷积层的特征图进行线性加权求和，如下图所示。但是该方法有很大的局限性，只能用于最后一层的可视化，并且要在原网络的基础上增加全局平均池化层。
+<img src="/img/CAM.PNG" alt=""></p>
+<h3 id="grad-cam">Grad-CAM</h3>
+<p>原文链接：<a href="https://arxiv.org/pdf/1610.02391.pdf">Grad-CAM</a> <br>
+    Grad-CAM改变了权重计算的方法，利用最后输出分数对某一层特征图的梯度作为权重，以解决CAM所存在的问题。
+<img src="/img/Grad-CAM.PNG" alt="">
+其计算公式如下：</p>
+<p>$$
+L_{Grad-CAM}^{c}=\sum_k\alpha _k^{c}A_k
+$$</p>
+<p>$$
+\alpha _k^{c}=GP\left ( \frac{\partial y^{c}}{\partial A_k} \right )
+$$</p>
+<p>其中，$ A_k $是第$ k $个通道的特征图，$ y^{c} $是类别$ c $对应的得分，$\alpha _{k}^{c}$ 代表权重，GP()表示全局平均函数。</p>
+<h3 id="layer-wise-relevance-propagationlrp">Layer-wise Relevance Propagation(LRP)</h3>
+<p>原文链接：<a href="https://arxiv.org/pdf/1604.00825.pdf">LRP</a> <br>
+    LRP通过分层地将相关性分数从输出传播到输入图像，从而获得原始图像中每个像素的相关性分数，并且传播过程满足守恒且分数恒不小于零，如下所示：
+$$
+\forall x:f_{c}\left ( x \right )=\sum_{p}R_{p}^{l}\left ( x \right )
+$$</p>
+<p>$$
+\forall x:R_{p}\left ( x \right )\geq 0
+$$
+其中，$R_{p}^{l}\left ( x \right )$是第$l$层上像素$p$的相关性分数。相关性分数就可以表示某个像素对输出分数的贡献值。<br>
+LRP的计算过程如下：
+<img src="/img/LRP.png" alt="">
+$$
+f\left ( x \right )=\cdots =\sum_{d\in l+1}R_{d}^{\left (l+1  \right )}=\sum_{d\in l}R_{d}^{\left (l  \right )}=\cdots =\sum_{d}R_{d}^{\left (1  \right )}
+$$</p>
+<p>$$
+z_{ij}=x_{i}w_{ij}
+$$</p>
+<p>$$
+z_{j}=\sum_{i}z_{ij}+b_{j}
+$$</p>
+<p>$$
+R_{i\leftarrow j}^{\left (l,l+1  \right )}=\frac{z_{ij}}{z_{j}}\cdot R_{j}^{\left (l+1  \right )}
+$$</p>
+<p>$$
+R_{i}^{\left (l  \right )}=\sum_{j}R_{i\leftarrow j}^{\left ( l,l+1 \right )}
+$$
+    简单来说，就是上一神经元的相关性分数$R_{j}^{\left (l+1  \right )} $乘以比值$\frac{z_{ij}}{z_{j}}$得到权重边的分数$R_{i\leftarrow j}^{\left (l,l+1  \right )}$，连接到上一层某一神经元的所有权重边的分数相加，得到该神经元的相关性分数$R_{i}^{\left (l  \right )}$。</p>
+<h3 id="contrastive-layer-wise-relevance-propagationclrp">Contrastive Layer-wise Relevance Propagation(CLRP)</h3>
+<p>原文连接：<a href="https://arxiv.org/pdf/1812.02100.pdf">CLRP</a> <br>
+    CLRP是在LRP的基础上，解决了LRP的结果对目标类的灵敏度低这一问题。CLRP从目标类的相关性分数中减去非目标类的相关性分数，得到最终的相关性分数。</p>
+<h3 id="gradient-issue">Gradient Issue</h3>
+<h4 id="noisiness-and-discontinuity">Noisiness and discontinuity</h4>
+<p>    随着网络深度的增加，梯度会逐渐变得有噪声和不连续，出现梯度消失、爆炸的现象，同时梯度也可能会变得不连续，因此利用梯度作为权重不是很好的方法。</p>
+<h4 id="explanation-to-sensitivity">Explanation to sensitivity</h4>
+<p>    在Grad-CAM方法中，存在False Confidence问题，以下图为例，对应于“头部”部分的激活图获得最高的权重，但将其他部分遮盖、仅保留权重较高的部分输入网络，最终得到的类别对应得分是最低的。因此，将梯度作为权重无法很好的体现激活图对网络输出的贡献高低。</p>
+<h4 id="relevance-score">Relevance Score</h4>
+<p>    相反，LRP方法对梯度问题具有鲁棒性。基于以上原因，我们将LRP的相关性分数作为类激活映射的加权成分。</p>
+<h2 id="relevance-weighted-class-activation-map">Relevance-weighted Class Activation Map</h2>
+<p>    我们将通过LRP获得的相关性分数作为相应特征图的加权分量，流程如图所示：
+<img src="/img/Relevance-CAM.PNG" alt="">
+    其计算公式如下所示：</p>
+<p>$$
+\alpha_{k}^{\left ( c,i \right )}=\sum_{x,y}R_{k}^{\left ( c,i \right )}\left ( x,y \right )
+$$</p>
+<p>$$
+L_{Relevance-CAM}^{\left ( c,i \right )}=\sum_k\alpha _k^{\left ( c,i \right )}A_K^{c}
+$$</p>
+<p>其中，$R_{k}^{\left ( c,i \right )}$表示通过LRP方法得到的类别c的第i层特征图k的相关性图，$\alpha _{k}^{\left ( c,i \right )}$是权重，通过对相关性图进行全局平均池化计算得到。</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>    在本文中提出了 Relevance-CAM，可以用于深度网络的任意一层，并且解决了其他方法所具有的问题，如破碎梯度问题和假置信度，并且发现，即使在网络浅层，也可以提取出类的特定特征。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -221,6 +319,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

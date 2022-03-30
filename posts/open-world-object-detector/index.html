@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/open-world-object-detector/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/open-world-object-detector/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "Open World Object Detector",
+      "headline" : "Open World Object Detector",
+      "description" : "原文链接：ORE\nAbstract  开放世界对象检测（Open World Object Detector）模型的任务是：识别未知的（unknown）对象， 即没有明确监督标签；当相应的标签逐步被接收到时，可学习到未知对象的类别，并且不忘记之前学习到的标签。以上是该论文提出的问题，并引入了一个新的模型：ORE（Open World Object Detector），该模型基于对比聚类和基于能量的位置对象识别。\nIntroduction  深度学习中目标检测任务是识别和定位图像中的物体。现有的研究都有一个强有力的假设：要检测的所有类别都在训练阶段给出。当上述假设不存在，那么就有两个具有挑战性的问题：测试图像可能包含未知类别，这些对象应被归为未知类（unknown）；当关于未知类别的对象信息可用时，模型应该逐步学习这些新的类别。该论文提出了一个新的问题：一个模型应该能够将未知对象识别为未知类，在训练数据阶段以统一的方式逐步学习和识别他们。\ncontributions 1、引入一个新的问题Open World Object Detector；\n2、提出一种新方法ORE，基于对比聚类，一个未知提议网络和基于能量的未知类识别；\n3、提出一个新的全面的实验设置；\n4、所提出的方法在增量目标检测上取得了最优异的成绩。\nRelated Work Open Set Classification  虽然这种模型可以识别出未知的实例，但它们不能在多个训练过程中以增量的方式动态地更新自己，即无法学习未知类别。\nOpen World Classification  这种模型可以识别已知类和未知类的对象，并在提供未知的新标签时自适应地改进自己，但是他们没有在图像分类基准上进行测试。\nOpen Set Detection  一些研究发现传统物体检测模型经常将未知类别的物体识别成已知的某一类别，因此其处理方式通常为：1. 新增一个background类别 2. 去除未知类别的物体。但是上述两个方法都不能在真实动态环境中使用。\nOpen World Object Detection  在任意时刻$t$，我们已知类别表示为$K^{t}= \\lbrace 1,2,\u0026hellip;,C \\rbrace \\subset N^{\u002b}$（共$C$个类别），其中$N^{\u002b}$代表正整数的集合，同时假设存在一组未知类别$U=\\lbrace C\u002b1,\u0026hellip; \\rbrace$，在推理过程中可能会遇到。已知类别$K_{t}$在数据集$D^{t}=\\lbrace X^{t},Y^{t} \\rbrace$中被标记，其中$X$、$Y$分别表示输入图像和标签。输入图像集由$M$张训练图像组成，$X^{t}=\\lbrace I_{1},\u0026hellip;,I_{M} \\rbrace$以及每张图像对应的标签集$Y^{t}=\\lbrace Y_{1},\u0026hellip;,Y_{M} \\rbrace$。每个$Y_{i}=\\lbrace y_{1},y_{2},\u0026hellip;,y_{K} \\rbrace$代表$K$个对象实例的类别标签和定位（即一张图像上有$K$个被标记的对象实例），并且$y_{k}=\\left [ l_{k},x_{k},y_{k},w_{k},h_{k} \\right ]$，其中$l_{k}$代表类别，$ x_{k}$，$y_{k}$、$w_{k}$、$h_{k}$分别代表 bounding box的中心坐标、宽和高。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-03-29 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-03-29 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/open-world-object-detector\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>Open World Object Detector</title>
+  <meta property="og:title" content="Open World Object Detector" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="原文链接：ORE
+Abstract  开放世界对象检测（Open World Object Detector）模型的任务是：识别未知的（unknown）对象， 即没有明确监督标签；当相应的标签逐步被接收到时，可学习到未知对象的类别，并且不忘记之前学习到的标签。以上是该论文提出的问题，并引入了一个新的模型：ORE（Open World Object Detector），该模型基于对比聚类和基于能量的位置对象识别。
+Introduction  深度学习中目标检测任务是识别和定位图像中的物体。现有的研究都有一个强有力的假设：要检测的所有类别都在训练阶段给出。当上述假设不存在，那么就有两个具有挑战性的问题：测试图像可能包含未知类别，这些对象应被归为未知类（unknown）；当关于未知类别的对象信息可用时，模型应该逐步学习这些新的类别。该论文提出了一个新的问题：一个模型应该能够将未知对象识别为未知类，在训练数据阶段以统一的方式逐步学习和识别他们。
+contributions 1、引入一个新的问题Open World Object Detector；
+2、提出一种新方法ORE，基于对比聚类，一个未知提议网络和基于能量的未知类识别；
+3、提出一个新的全面的实验设置；
+4、所提出的方法在增量目标检测上取得了最优异的成绩。
+Related Work Open Set Classification  虽然这种模型可以识别出未知的实例，但它们不能在多个训练过程中以增量的方式动态地更新自己，即无法学习未知类别。
+Open World Classification  这种模型可以识别已知类和未知类的对象，并在提供未知的新标签时自适应地改进自己，但是他们没有在图像分类基准上进行测试。
+Open Set Detection  一些研究发现传统物体检测模型经常将未知类别的物体识别成已知的某一类别，因此其处理方式通常为：1. 新增一个background类别 2. 去除未知类别的物体。但是上述两个方法都不能在真实动态环境中使用。
+Open World Object Detection  在任意时刻$t$，我们已知类别表示为$K^{t}= \lbrace 1,2,&amp;hellip;,C \rbrace \subset N^{&#43;}$（共$C$个类别），其中$N^{&#43;}$代表正整数的集合，同时假设存在一组未知类别$U=\lbrace C&#43;1,&amp;hellip; \rbrace$，在推理过程中可能会遇到。已知类别$K_{t}$在数据集$D^{t}=\lbrace X^{t},Y^{t} \rbrace$中被标记，其中$X$、$Y$分别表示输入图像和标签。输入图像集由$M$张训练图像组成，$X^{t}=\lbrace I_{1},&amp;hellip;,I_{M} \rbrace$以及每张图像对应的标签集$Y^{t}=\lbrace Y_{1},&amp;hellip;,Y_{M} \rbrace$。每个$Y_{i}=\lbrace y_{1},y_{2},&amp;hellip;,y_{K} \rbrace$代表$K$个对象实例的类别标签和定位（即一张图像上有$K$个被标记的对象实例），并且$y_{k}=\left [ l_{k},x_{k},y_{k},w_{k},h_{k} \right ]$，其中$l_{k}$代表类别，$ x_{k}$，$y_{k}$、$w_{k}$、$h_{k}$分别代表 bounding box的中心坐标、宽和高。" />
+  <meta name="description" content="原文链接：ORE
+Abstract  开放世界对象检测（Open World Object Detector）模型的任务是：识别未知的（unknown）对象， 即没有明确监督标签；当相应的标签逐步被接收到时，可学习到未知对象的类别，并且不忘记之前学习到的标签。以上是该论文提出的问题，并引入了一个新的模型：ORE（Open World Object Detector），该模型基于对比聚类和基于能量的位置对象识别。
+Introduction  深度学习中目标检测任务是识别和定位图像中的物体。现有的研究都有一个强有力的假设：要检测的所有类别都在训练阶段给出。当上述假设不存在，那么就有两个具有挑战性的问题：测试图像可能包含未知类别，这些对象应被归为未知类（unknown）；当关于未知类别的对象信息可用时，模型应该逐步学习这些新的类别。该论文提出了一个新的问题：一个模型应该能够将未知对象识别为未知类，在训练数据阶段以统一的方式逐步学习和识别他们。
+contributions 1、引入一个新的问题Open World Object Detector；
+2、提出一种新方法ORE，基于对比聚类，一个未知提议网络和基于能量的未知类识别；
+3、提出一个新的全面的实验设置；
+4、所提出的方法在增量目标检测上取得了最优异的成绩。
+Related Work Open Set Classification  虽然这种模型可以识别出未知的实例，但它们不能在多个训练过程中以增量的方式动态地更新自己，即无法学习未知类别。
+Open World Classification  这种模型可以识别已知类和未知类的对象，并在提供未知的新标签时自适应地改进自己，但是他们没有在图像分类基准上进行测试。
+Open Set Detection  一些研究发现传统物体检测模型经常将未知类别的物体识别成已知的某一类别，因此其处理方式通常为：1. 新增一个background类别 2. 去除未知类别的物体。但是上述两个方法都不能在真实动态环境中使用。
+Open World Object Detection  在任意时刻$t$，我们已知类别表示为$K^{t}= \lbrace 1,2,&amp;hellip;,C \rbrace \subset N^{&#43;}$（共$C$个类别），其中$N^{&#43;}$代表正整数的集合，同时假设存在一组未知类别$U=\lbrace C&#43;1,&amp;hellip; \rbrace$，在推理过程中可能会遇到。已知类别$K_{t}$在数据集$D^{t}=\lbrace X^{t},Y^{t} \rbrace$中被标记，其中$X$、$Y$分别表示输入图像和标签。输入图像集由$M$张训练图像组成，$X^{t}=\lbrace I_{1},&amp;hellip;,I_{M} \rbrace$以及每张图像对应的标签集$Y^{t}=\lbrace Y_{1},&amp;hellip;,Y_{M} \rbrace$。每个$Y_{i}=\lbrace y_{1},y_{2},&amp;hellip;,y_{K} \rbrace$代表$K$个对象实例的类别标签和定位（即一张图像上有$K$个被标记的对象实例），并且$y_{k}=\left [ l_{k},x_{k},y_{k},w_{k},h_{k} \right ]$，其中$l_{k}$代表类别，$ x_{k}$，$y_{k}$、$w_{k}$、$h_{k}$分别代表 bounding box的中心坐标、宽和高。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">Open World Object Detector</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-03-29 00:00:00 UTC">
+                29 Mar 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>原文链接：<a href="https://arxiv.org/pdf/2103.02603.pdf">ORE</a></p>
+<h2 id="abstract">Abstract</h2>
+<p>    开放世界对象检测（Open World Object Detector）模型的任务是：识别未知的（unknown）对象， 即没有明确监督标签；当相应的标签逐步被接收到时，可学习到未知对象的类别，并且不忘记之前学习到的标签。以上是该论文提出的问题，并引入了一个新的模型：ORE（<strong>O</strong>pen Wo<strong>r</strong>ld Object D<strong>e</strong>tector），该模型基于对比聚类和基于能量的位置对象识别。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    深度学习中目标检测任务是识别和定位图像中的物体。现有的研究都有一个强有力的假设：要检测的所有类别都在训练阶段给出。当上述假设不存在，那么就有两个具有挑战性的问题：测试图像可能包含未知类别，这些对象应被归为未知类（unknown）；当关于未知类别的对象信息可用时，模型应该逐步学习这些新的类别。该论文提出了一个新的问题：一个模型应该能够将未知对象识别为未知类，在训练数据阶段以统一的方式逐步学习和识别他们。</p>
+<p><em><strong>contributions</strong></em> <br>
+1、引入一个新的问题Open World Object Detector；<br>
+2、提出一种新方法ORE，基于对比聚类，一个未知提议网络和基于能量的未知类识别；<br>
+3、提出一个新的全面的实验设置；<br>
+4、所提出的方法在增量目标检测上取得了最优异的成绩。</p>
+<h2 id="related-work">Related Work</h2>
+<h3 id="open-set-classification">Open Set Classification</h3>
+<p>    虽然这种模型可以识别出未知的实例，但它们不能在多个训练过程中以增量的方式动态地更新自己，即无法学习未知类别。</p>
+<h3 id="open-world-classification">Open World Classification</h3>
+<p>    这种模型可以识别已知类和未知类的对象，并在提供未知的新标签时自适应地改进自己，但是他们没有在图像分类基准上进行测试。</p>
+<h3 id="open-set-detection">Open Set Detection</h3>
+<p>    一些研究发现传统物体检测模型经常将未知类别的物体识别成已知的某一类别，因此其处理方式通常为：1. 新增一个background类别 2. 去除未知类别的物体。但是上述两个方法都不能在真实动态环境中使用。</p>
+<h2 id="open-world-object-detection">Open World Object Detection</h2>
+<p>    在任意时刻$t$，我们已知类别表示为$K^{t}= \lbrace 1,2,&hellip;,C \rbrace \subset N^{+}$（共$C$个类别），其中$N^{+}$代表正整数的集合，同时假设存在一组未知类别$U=\lbrace C+1,&hellip; \rbrace$，在推理过程中可能会遇到。已知类别$K_{t}$在数据集$D^{t}=\lbrace X^{t},Y^{t} \rbrace$中被标记，其中$X$、$Y$分别表示输入图像和标签。输入图像集由$M$张训练图像组成，$X^{t}=\lbrace I_{1},&hellip;,I_{M} \rbrace$以及每张图像对应的标签集$Y^{t}=\lbrace Y_{1},&hellip;,Y_{M} \rbrace$。每个$Y_{i}=\lbrace y_{1},y_{2},&hellip;,y_{K} \rbrace$代表$K$个对象实例的类别标签和定位（即一张图像上有$K$个被标记的对象实例），并且$y_{k}=\left [ l_{k},x_{k},y_{k},w_{k},h_{k} \right ]$，其中$l_{k}$代表类别，$ x_{k}$，$y_{k}$、$w_{k}$、$h_{k}$分别代表 bounding box的中心坐标、宽和高。<br>
+    对象检测模型$M_{C}$，可以检测所有属于已知类的$C$类对象，还可以识别出新的或者没有见过的类别实例，将其分别为未知类（unknown），并赋予标签（$0$）。然后将未知实例集$U^{t}$给人类用户标注$n$类感兴趣的类别，并提供相应的训练样本。模型利用新的数据逐步更新自己（无需重新在整个训练集上训练），从而生成新的模型$M_{C+n}$，对于该模型的已知类就变成了$K_{t+1}=K_{t}+\lbrace C+1,&hellip;,C+n \rbrace$。模型不断循环迭代，用新的数据自适应的更新自己。</p>
+<h2 id="ore-open-world-object-detector">ORE: Open World Object Detector</h2>
+<p>    该模型能够在没有明确监督的情况下识别未知实例，并且根据未知实例的新标签对模型进行更新（不从头开始训练），同时不忘记之前的已知类别。<br>
+    在检测模型的潜在空间中学习清晰的类间区分有两个好处：第一，它帮助模型识别一个未知实例的特征表示与其他已知实例的区别，这有助于将一个未知实例识别为新实例。第二，它促进了学习新的类实例的特征表示，而不与潜在空间中的前一个类重叠，这有助于在不遗忘的情况下逐步学习。因此，提出了对比聚类的（contrastive clustering）方法。<br>
+    为了实现对比聚类对未知实例进行聚类，我们需要知道未知实例是什么，但是手动标记潜在的无线未知类集的一小子集不可行，因此提出一种基于RPN网络的自动标记机制，对未知实例进行伪标记。<br>
+    选择Faster R-CNN作为基础检测模型，有两个阶段，第一个阶段是由RPN提出proposal区域，第二个阶段针对每个proposal区域的边界框进行分类和调整。由RoI头部生成的特征用于对比聚类，RPN和分类头分别用于自动标记和识别未知数。</p>
+<p><img src="/img/ORE1.PNG" alt="最上面一行：在每个增量学习步骤中，模型识别未知对象(表示为“？)，并逐步标记为（蓝色圆圈），并添加到现有的知识库（绿色圆圈）中。底部一行：我们的开放世界目标检测模型使用基于能量的分类头和RPN来识别潜在的未知对象。"></p>
+<h3 id="contrastive-clustering对比聚类">Contrastive Clustering对比聚类</h3>
+<p>    该部分的任务时使同一类的实例被迫保持近距离，而不同类的实例将被推到很远的距离。对于每个类别$i\in K^{t}$，我们维护一个prototype向量$p_{i}$。RoI头部生成生成类别的特征向量$f_{c}$，对于类别c的对象，我们定义对比损失：
+$$
+L_{cont}(f_{c})=\sum_{i=0}^{c}l(f_{c},p_{i})
+$$</p>
+<p>$$
+l(f_{c},p_{i})=
+\begin{matrix}
+D(f_{c},p_{i}) i=c \
+max \left ( 0, \Delta -D(f_{c},p_{i}) \right )<br>
+\end{matrix}
+$$
+其中$D$是任意距离函数，$\Delta $定义了相似和不同项目的距离。最小化这种损失将确保在潜在空间中实现所期望的类别分离。<br>
+    每个类对应的特征向量的平均值被用来初始化prototype向量集：$P=\lbrace p_{0},&hellip;,p_{C} \rbrace$，随着网络的训练，由于特征在变化，因此prototype向量集也在逐渐变化。每个类别维护一个固定长度的队列$q_{i}$，存储相关特征，$F_{store}=\lbrace q_{0},..,q_{C} \rbrace$。</p>
+<h3 id="auto-labelling-unknowns-with-rpn">Auto-labelling Unknowns with RPN</h3>
+<p>    我们利用区域提案网络(RPN)将图像中的一些对象标记为潜在的未知类别。给定一个输入图像，RPN为前景和背景实例生成一组边界框预测，以及相应的分数。我们将那些得分高，但不与ground truth重叠的proposal标记为潜在的未知类别。简单地说，我们选择top-k个背景proposal，作为未知类别。</p>
+<h3 id="energy-based-unknown-identifier">Energy Based Unknown Identifier</h3>
+<p>    该部分是基于EBMs模型的。给定潜在空间$F$的特征$f$和其对应的label$l$，学习寻找一个能量函数$E$，该公式输出单个标量，用来表示观测变量$F$和可能的输出变量集$L$之间的兼容性。EBMs为分布内的数据分配底能量值，分布外的数据分配高能量值，用能量值来判断一个样本是否来自未知的类别。
+$$
+E(f)=-T log \int_{{l}'}exp(-\frac{E(f,{l}')}{T})
+$$
+    网络经过softmax层之后的输出与类别相应的能量值的吉布斯分布（Gibbs distribution）之间存在关系，因此可以将Faster RCNN的分类头转换成能量值：<br>
+$$
+E(f;g)=-T log \sum_{i=1}^{c}exp\left ( \frac{g_{i}(f)}{T} \right )
+$$
+    其中，$g_{i}(f)$为网络分类头$g()$第$i$个分类logit（最终的全连接层的输出，即经过softmax之前的输出）。利用上述公式，就可以利用某个类别$i$所对应的特征$f$来直接得到其对应的能量值。
+<img src="/img/ORE2.PNG" alt="">
+    由上图可以看出，已知类别和未知类别之间能量等级有一个很清晰的区分，因此分别对已知类别和未知类别的能量值进行建模，得到$\xi _{kn}(f)$和$\xi _{unk}(f)$，利用该分布可以判断对象是否为未知类别，即如果$\xi _{kn}(f)&lt; \xi _{unk}(f)$，那么该预测的对象就是一个未知类。</p>
+<h3 id="alleviating-forgetting">Alleviating Forgetting</h3>
+<p>    该任务最重要一点就是可以迭代的学习新的未知类别，在不从头重新训练的情况下，不遗忘之前的类别（即之前的训练数据不再出现）。已经存在一些研究用来缓解遗忘，也有一些研究表明，针对该问题，相比于复杂的方法，一种贪婪的reply样本选择策略能取得很好的效果。之后也有研究证明，存储少量的样本和reply是有效的。因此本文采用比较简单的方法来缓解遗忘。即存储样本集合（并保证该样本集各类别样本数目均衡），并在每一个增量步骤后利用存储的样本微调模型，并且确保在样本集合中每个类别至少有$N_{ex}$个样本。</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>    引入了ORE问题和解决该问题的检测模型，该目标检测器能够将未知对象标记为未知类，并逐渐学习未知对象标签。关键创新点包括一个用于未知检测的基于能量的分类模型，一个用于开放世界学习的对比聚类方法。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

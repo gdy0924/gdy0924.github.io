@@ -3,7 +3,7 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://gdy0924.github.io/categories/</loc>
-    <lastmod>2022-03-15T00:00:00+00:00</lastmod>
+    <lastmod>2022-03-30T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -15,11 +15,20 @@
                 href="https://gdy0924.github.io/categories/"
                 />
   </url><url>
+    <loc>https://gdy0924.github.io/categories/code/</loc>
+    <lastmod>2022-03-30T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/googlenetcode/</loc>
+    <lastmod>2022-03-30T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/googlenetpaper/</loc>
+    <lastmod>2022-03-30T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://gdy0924.github.io/categories/paper/</loc>
-    <lastmod>2022-03-15T00:00:00+00:00</lastmod>
+    <lastmod>2022-03-30T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/</loc>
-    <lastmod>2022-03-15T00:00:00+00:00</lastmod>
+    <lastmod>2022-03-30T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -31,11 +40,8 @@
                 href="https://gdy0924.github.io/posts/"
                 />
   </url><url>
-    <loc>https://gdy0924.github.io/posts/resnet1/</loc>
-    <lastmod>2022-03-15T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://gdy0924.github.io/</loc>
-    <lastmod>2022-03-15T00:00:00+00:00</lastmod>
+    <lastmod>2022-03-30T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -47,6 +53,21 @@
                 href="https://gdy0924.github.io/"
                 />
   </url><url>
+    <loc>https://gdy0924.github.io/posts/open-world-object-detector/</loc>
+    <lastmod>2022-03-29T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/vggcode/</loc>
+    <lastmod>2022-03-29T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/vggpaper/</loc>
+    <lastmod>2022-03-29T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/relevance-campaper/</loc>
+    <lastmod>2022-03-27T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/resnet1/</loc>
+    <lastmod>2022-03-15T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://gdy0924.github.io/posts/batchnormalization/</loc>
     <lastmod>2022-01-24T00:00:00+00:00</lastmod>
   </url><url>
@@ -57,9 +78,6 @@
     <lastmod>2022-01-12T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/alexnetpaper/</loc>
-    <lastmod>2022-01-12T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://gdy0924.github.io/categories/code/</loc>
     <lastmod>2022-01-12T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/lenetcode/</loc>

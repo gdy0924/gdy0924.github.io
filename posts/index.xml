@@ -6,7 +6,128 @@
     <description>Recent content in Posts on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 15 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 30 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>GoogleNet</title>
+      <link>https://gdy0924.github.io/posts/googlenetcode/</link>
+      <pubDate>Wed, 30 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/googlenetcode/</guid>
+      <description>GoogLeNet获得了2014年ILSVRC比赛分类任务的冠军，其利用Inception模块，在加深网络深度的同时，减少了参数量，从而减少计算资源的利用。
+实现 基于pytorch实现的代码如下：
+1import torch 2import torch.nn as nn 3import torch.nn.functional as F 4 5#卷积+BN+ReLu 6class BasicConv2d(nn.Module): 7 def __init__(self, in_channels, out_channals, **kwargs): 8 super(BasicConv2d, self).__init__() 9 self.conv = nn.Conv2d(in_channels, out_channals, **kwargs) 10 self.bn = nn.BatchNorm2d(out_channals) 11 12 def forward(self, x): 13 x = self.conv(x) 14 x = self.bn(x) 15 return F.relu(x) 16 17# Inception模块 18class Inception(nn.Module): 19 #（输入通道数，1×1卷积的输出通道数，3×3卷积的降维通道数，3×3卷积的输出通道数， 20 #5×5卷积的降维通道数，5×5卷积的输出通道数，池化通道数） 21 def __init__(self, in_planes,n1x1, n3x3red, n3x3, n5x5red, n5x5, pool_planes): 22 super(Inception, self).</description>
+    </item>
+    
+    <item>
+      <title>GoogleNet</title>
+      <link>https://gdy0924.github.io/posts/googlenetpaper/</link>
+      <pubDate>Wed, 30 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/googlenetpaper/</guid>
+      <description>GoogLeNet获得了2014年ILSVRC比赛分类任务的冠军，其利用Inception模块，在加深网络深度的同时，减少了参数量，从而减少计算资源的利用。
+GoogLeNetV1 原文链接：GoogleNetV1
+Abstract  提出一种名为“Inception”的深度卷积神经网络架构，可以增加网络的深度和宽度，同时保持计算量不变，从而提高网络精度。
+Introduction  随着深度学习的发展，卷积网络在图像领域发展迅速，算法的效率，特别是计算量和内存的使用，变得越来越重要，在该网络中，我们也考虑到了这一方面。我们提出了一种更加高效的深度神经网络架构，名为“Inception module”，直接增加了网络的深度。
+Motivation and High Level Considerations  提高深度神经网络性能的最直接的方法是增加网络的规模，包括：网络的深度（层数）和宽度（每一层的单元数量）。但存在两个问题：
+（1）更大的尺寸通常意味着大量的参数，这使得扩大后的网络更容易发生过拟合，特别是在训练集有限的情况下；
+（2）网络的扩大伴随着计算资源的使用显著增加，如果增加的部分使用效率较低（例如，如果大多数权重最终接近于零），那么就会浪费大量的计算。
+解决上述问题的根本方法是：将完全连接转换成稀疏连接，一方面模拟了生物系统，另一方面，有研究证明了稀疏网络的有效性。
+之前的研究为了打破网络对称性和提高学习能力，都使用了随机稀疏连接，但是，计算机软硬件对非均匀稀疏数据的计算效率很差，所以在AlexNet中又重新使用了全连接层，目的是为了更好地优化并行运算。
+因此，需要一种网络结构，既能保持网络结构的稀疏性，又能利用密集矩阵的高计算性能，提出“Inception”结构来实现此目的。
+Architectural Details 上图是提出的最原始的基本结构：
+（1）采用不同大小的卷积核实现不同大小的感受野，在模块最后进行拼接实现不同尺度特征的融合；
+（2）卷积核大小采用1、3和5，是为了方便对齐，即在设定卷积步长stride=1后，只要分别设定padding=0、1、2，不同卷积核操作之后得到的特征图大小就相同，方面最后的拼接操作；
+（3）由于pooling操作被证明很有效，因此引入了池化分支；
+（4）网络越到后面，特征越抽象，而且每个特征所涉及的感受野也更大了，因此随着层数的增加，3x3和5x5卷积的比例会增加。
+上述模块存在一个大问题，在该结构中，即使具有大量卷积核的卷积层中，少量的5×5卷积也会带来巨大的计算量，并且由于卷积结果与池化结果进行合并，因此从上一个模块到下一个模块，输出通道肯定要增加。
+因此提出了改进的模块，在计算量大的地方引入降维操作，即在3×3和5×5卷积操作之前，先利用1×1卷积进行通道数的减少，从而减少网络参数，在减少计算量的同时，做一定的正则化，同时还引入了更多的非线性变换。改进的模块如下所示： 该结构的好处是：
+（1）允许在每个阶段显著增加单元的数量，而不会导致计算复杂性的不受控制的爆炸；
+（2）与直觉相一致，即视觉信息应该在不同的尺度上进行处理，然后进行聚合，以便下一阶段可以同时从不同的尺度上提取特征。
+GoogLeNet 上图为完整的GoogLeNet网络结构，由于技术的原因，先进行传统的卷积层，只在较高的层开始使用Inception模块，其特点如下：
+（1）该网络有22层深（如果加上池化层，是27层）；
+（2）实验发现，用平均池化代替全连接层能够提高精度，因此使用了average pooling，同时使用dropout，但是依旧在网络最后添加了一个额外的全连接层，主要是为了更加方便地调整和微调网络；
+（3）由于网络的深度相对较大，因此需要解决梯度回传的问题，在网络中间的层，额外添加了两个辅助的softmax用于向前传导梯度，在训练过程中，它们的损失以折扣权值加到网络的总损失中（辅助分类器的损失加权为0.3），在测试时这两个额外的softmax会被去掉，辅助分类器的结构如下：
+（a）5×5大小的平均池化，stride=3；
+（b）1×1×128卷积操作，用于降维和非线性激活； （c）1024个神经元的全连接层； （d）p=70%的Dropout； （e）以Softmax损失作为分类器的线性层，分类数为1000。
+Conclusions  通过构建密集的块结构来近似最优的稀疏结构，从而达到提高性能而又不大量增加计算量的目的，是一个可行的方法，通过实验也证明了Inception模块的优势。
+GoogleNetV2 原文链接：GoogleNetV2
+Inception V2学习了VGGNet，用两个3×3的卷积代替5×5的大卷积（用以降低参数量并减轻过拟合），还提出了著名的BatchNormalization方法。BN是一个非常有效的正则化方法，可以让大型卷积网络的训练速度加快很多倍，同时收敛后的分类准确率也可以得到大幅提高（详见BatchNormalization）。
+GoogleNetV3 原文链接：GoogleNetV2
+General Design Principles  提出一些基于使用卷积网络的各种架构选择的设计原则，包含一定的推测，不过经过实验证明基本是有效的：
+（1）avoid representational bottlenecks 避免表征瓶颈：（特别是在网络浅层）信息流前向传播过程中显然不能经过高度压缩的层，即表征瓶颈，从输入到输出，特征图的宽和高基本都会逐渐变小，但是不能一下子就变得很小；
+（2）higher dimensional representations 高维特征： 高维特征更容易区分和处理，从而会加快训练；
+（3）spatial aggregation 空间聚合： 空间聚合可以在低维嵌入上进行，而不会造成太多或任何表征能力的损失，同时还可以提高速度，比如在进行3x3卷积之前，可以对输入先进行降维而不会产生严重的后果；</description>
+    </item>
+    
+    <item>
+      <title>Open World Object Detector</title>
+      <link>https://gdy0924.github.io/posts/open-world-object-detector/</link>
+      <pubDate>Tue, 29 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/open-world-object-detector/</guid>
+      <description>原文链接：ORE
+Abstract  开放世界对象检测（Open World Object Detector）模型的任务是：识别未知的（unknown）对象， 即没有明确监督标签；当相应的标签逐步被接收到时，可学习到未知对象的类别，并且不忘记之前学习到的标签。以上是该论文提出的问题，并引入了一个新的模型：ORE（Open World Object Detector），该模型基于对比聚类和基于能量的位置对象识别。
+Introduction  深度学习中目标检测任务是识别和定位图像中的物体。现有的研究都有一个强有力的假设：要检测的所有类别都在训练阶段给出。当上述假设不存在，那么就有两个具有挑战性的问题：测试图像可能包含未知类别，这些对象应被归为未知类（unknown）；当关于未知类别的对象信息可用时，模型应该逐步学习这些新的类别。该论文提出了一个新的问题：一个模型应该能够将未知对象识别为未知类，在训练数据阶段以统一的方式逐步学习和识别他们。
+contributions 1、引入一个新的问题Open World Object Detector；
+2、提出一种新方法ORE，基于对比聚类，一个未知提议网络和基于能量的未知类识别；
+3、提出一个新的全面的实验设置；
+4、所提出的方法在增量目标检测上取得了最优异的成绩。
+Related Work Open Set Classification  虽然这种模型可以识别出未知的实例，但它们不能在多个训练过程中以增量的方式动态地更新自己，即无法学习未知类别。
+Open World Classification  这种模型可以识别已知类和未知类的对象，并在提供未知的新标签时自适应地改进自己，但是他们没有在图像分类基准上进行测试。
+Open Set Detection  一些研究发现传统物体检测模型经常将未知类别的物体识别成已知的某一类别，因此其处理方式通常为：1. 新增一个background类别 2. 去除未知类别的物体。但是上述两个方法都不能在真实动态环境中使用。
+Open World Object Detection  在任意时刻$t$，我们已知类别表示为$K^{t}= \lbrace 1,2,&amp;hellip;,C \rbrace \subset N^{+}$（共$C$个类别），其中$N^{+}$代表正整数的集合，同时假设存在一组未知类别$U=\lbrace C+1,&amp;hellip; \rbrace$，在推理过程中可能会遇到。已知类别$K_{t}$在数据集$D^{t}=\lbrace X^{t},Y^{t} \rbrace$中被标记，其中$X$、$Y$分别表示输入图像和标签。输入图像集由$M$张训练图像组成，$X^{t}=\lbrace I_{1},&amp;hellip;,I_{M} \rbrace$以及每张图像对应的标签集$Y^{t}=\lbrace Y_{1},&amp;hellip;,Y_{M} \rbrace$。每个$Y_{i}=\lbrace y_{1},y_{2},&amp;hellip;,y_{K} \rbrace$代表$K$个对象实例的类别标签和定位（即一张图像上有$K$个被标记的对象实例），并且$y_{k}=\left [ l_{k},x_{k},y_{k},w_{k},h_{k} \right ]$，其中$l_{k}$代表类别，$ x_{k}$，$y_{k}$、$w_{k}$、$h_{k}$分别代表 bounding box的中心坐标、宽和高。</description>
+    </item>
+    
+    <item>
+      <title>VGG</title>
+      <link>https://gdy0924.github.io/posts/vggcode/</link>
+      <pubDate>Tue, 29 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/vggcode/</guid>
+      <description>VGG
+实现 基于pytorch实现的代码如下：
+1import torch.nn as nn 2import torch.nn.functional as F 3from torchsummary import summary 4 5class VGG(nn.Module): 6 &amp;#34;&amp;#34;&amp;#34; 7VGG builder 8&amp;#34;&amp;#34;&amp;#34; 9 def __init__(self, arch: object, num_classes=1000) -&amp;gt; object: 10 super(VGG, self).__init__() 11 self.in_channels = 3 12 self.conv3_64 = self.__make_layer(64, arch[0]) 13 self.conv3_128 = self.__make_layer(128, arch[1]) 14 self.conv3_256 = self.__make_layer(256, arch[2]) 15 self.conv3_512a = self.__make_layer(512, arch[3]) 16 self.conv3_512b = self.__make_layer(512, arch[4]) 17 self.fc1 = nn.Linear(7*7*512, 4096) 18 self.bn1 = nn.</description>
+    </item>
+    
+    <item>
+      <title>VGG</title>
+      <link>https://gdy0924.github.io/posts/vggpaper/</link>
+      <pubDate>Tue, 29 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/vggpaper/</guid>
+      <description>原文链接：VGG
+VGG网络获得了2014年ILSVRC比赛的分类任务的亚军和定位任务的冠军，其主要贡献是通过更小的卷积核堆叠构建更深层的网络。 Abstract  该论文研究了卷积网络深度对精度的影响，通过使用小的卷积核（大小为3×3）加深网络的深度，将深度增加到了16-19层，并取得了不错的效果。
+Introduction  卷积神经网络在大规模图像核视频识别方面取得了巨大成功。在该论文中，我们关注卷积网络的另一个方面——网络的深度。通过添加更多的卷积层来增加网络的深度，并且使用的卷积核大小很小。
+ConvNet Configurations Architecture  输入为224×224大小的RGB图像，每层都使用3×3大小的卷积核提取特征，固定步长为1，填充为1，以保证卷积前后的特征图大小相同。最大池化的大小为2×2，步长也为2，即特征图缩小一半，并且不是所有的卷积层后边都跟池化层。
+卷积层后跟着三个全连接层，前两个有4096个通道，最后一个有1000个通道（因为比赛中的类别数是1000），最后一层是Softmax层。
+每一层后都跟着非线性激活层，并且我们没有用到（除了一个架构）AlexNet所提出的LRN层，通过实验发现LRN层并没有提高ILSVRC数据集上的性能，但却导致了内存消耗和计算时间的增加。
+Configurations 从图中可以看出，不同网络的架构是相同的，除了深度不同，从11层的网络（8层卷积和3个FC层）到19层网络（16层卷积和3个FC层）。通道数由最开始的64，每次操作都使通道数增加一倍，直到512层。由于卷积核小，因此虽然网络很深，但其网络参数没有很多。
+Discussion  不同于之前的网络，我们没有在网络第一层使用较大的感受野，如11×11或7×7，而是利用小的感受野（大小为3×3）贯穿整个网络结构。可以看出，两个3×3大小的感受野堆叠起来的感受野与一个5×5大小的感受野相同，三个3×3大小的感受野堆叠起来的感受野与一个7×7大小的感受野相同。使用三个3×3大小的感受野代替一个7×7大小的感受野的好处有：（1）三层感受野就引入了三次非线性变换，因此增加了网络的非线性表达能力；（2）三个3×3大小的感受野共有27个参数，而一个7×7大小的感受野有49个参数，因此可以减少网络的参数数量，可以看作对网络做了相应的正则化。
+在16层的网络中，我们使用得到了1×1的卷积核，在不改变感受野的前提下增加了非线性，同时输入通道核输出通道是相同的。
+GoogleNet与我们的相似之处就是它是基于较深的网络（22层）和小卷积核（除了3×3，他们还用到了1×1和5×5）。他们的网络结构比我们更加复杂 ，并且在第一层就将图像分辨率降低了很多，以减少计算量。
+Classification Framework Training  使用具有动量的小批量梯度下降算法，Dropout，对输入图像进行随机剪裁、随机水平翻转和随机RGB颜色位移等操作。
+考虑了两种训练图像尺寸S的方法：
+（1）单尺寸训练：在实验中，使用两种尺寸大小验证模型，S=256和S=384。给定一个卷积网络，我们首先使用S=256训练网络。为了加快S=384网络的训练，我们使用S=256预训练的权值初始化；
+（2）多尺寸训练：每个训练图像在一定范围内$\left [ S_{min},S_{max} \right ]$随机采样S，其中，$S_{min}=256,S_{max}=512$。我们通过微调单尺度模型来训练多尺度模型，并使用固定的S=384进行预训练。
+Testing  在测试阶段，首先将输入图像缩放至最小的尺寸$Q$，同时$Q$并不一定等于训练中的$S$，在训练阶段，每个$S$对应的网络，使用多个不同的$Q$对其进行测试。接着将网络最后三层的全连接层改为卷积层，第一个FC层改为7×7×4096的卷积层，第二个改为1×1×4096，第三个改为1×1×1000，可以看出，最终的通道数对应的是分类数。通过改为卷积层，可以接受输入大小不同的图片，只是最终得到的特征图的大小不同，但其通道数依旧对应分类数，可以通过对最终的特征图进行空间平均（求和，sum-pooled）得到Softmax输入之前的分数。我们还通过图像的水平翻转来增加测试集，将原始图像和翻转图像的Softmax分数进行平均，以获得图像的最终分数。 Conclusion  提出了比较深的卷积网络（19个权重层）用于大尺度的图像分类，实验结果表明，更深层的网络有利于提高分类精度。</description>
+    </item>
+    
+    <item>
+      <title>Relevance-CAM</title>
+      <link>https://gdy0924.github.io/posts/relevance-campaper/</link>
+      <pubDate>Sun, 27 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/relevance-campaper/</guid>
+      <description>原文链接：Relevance-CAM
+Abstract  目前在深度学习的可解释性领域，一种主要的常见的是基于类激活映射(Class Activation Mapping, CAM)的方法，常用在卷积网络的最后一层。在本文中，提出了一种相关加权类激活映射(Relevance-weighted Class Activation Mapping, Relevance-CAM)，以解决基于梯度的CAM在梯度消失方面的问题，并且该方法在网络的任意一层都可以应用。
+Introduction  随着深度神经网络的不断发展，可解释网络也被广泛研究，其方法主要分为基于类激活映射(CAM)的和基于分解的。基于CAM的方法通过全局平均池化得到每个通道的权重，接着利用最后一层卷积的特征图进行加权线性求和操作得到可视化的结果。但是该方法只能用在最后一层，且必须用到全局平均池化和全连接层。基于梯度的CAM，Grad-CAM和 Grad-CAM++ 对其进行改进，使用梯度作为权重。层相关性传播(Layer-wise Relevance Propagation, LRP)是基于分解的方法。LRP通过特定的传播规则将最终的输出分数向后传播，重新分配到输入图像中，从而解决了梯度消失的问题。 Contributions 1、提出了Relevance-CAM，解决了梯度消失的问题，同时在中间层也可以工作； 2、通过可视化热图，展示了我们所提出的方法优于其他方法； 3、通过Average Drop、Average Increase和Intersection over Union三种客观数值证明我们所提出的方法优于其他方法； 4、我们通过实验发现，即使在浅层，网络也可以提取到类特定信息。
+Background CAM 原文链接：CAM 类激活映射(CAM)通过全局平均池化层获得权重，接着将最后一个卷积层的特征图进行线性加权求和，如下图所示。但是该方法有很大的局限性，只能用于最后一层的可视化，并且要在原网络的基础上增加全局平均池化层。 Grad-CAM 原文链接：Grad-CAM Grad-CAM改变了权重计算的方法，利用最后输出分数对某一层特征图的梯度作为权重，以解决CAM所存在的问题。 其计算公式如下：
+$$ L_{Grad-CAM}^{c}=\sum_k\alpha _k^{c}A_k $$
+$$ \alpha _k^{c}=GP\left ( \frac{\partial y^{c}}{\partial A_k} \right ) $$
+其中，$ A_k $是第$ k $个通道的特征图，$ y^{c} $是类别$ c $对应的得分，$\alpha _{k}^{c}$ 代表权重，GP()表示全局平均函数。
+Layer-wise Relevance Propagation(LRP) 原文链接：LRP LRP通过分层地将相关性分数从输出传播到输入图像，从而获得原始图像中每个像素的相关性分数，并且传播过程满足守恒且分数恒不小于零，如下所示： $$ \forall x:f_{c}\left ( x \right )=\sum_{p}R_{p}^{l}\left ( x \right ) $$</description>
+    </item>
+    
     <item>
       <title>ResNet（待补充）</title>
       <link>https://gdy0924.github.io/posts/resnet1/</link>

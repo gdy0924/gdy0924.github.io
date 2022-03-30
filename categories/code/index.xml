@@ -6,7 +6,29 @@
     <description>Recent content in Code on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 12 Jan 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/code/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 30 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/code/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>GoogleNet</title>
+      <link>https://gdy0924.github.io/posts/googlenetcode/</link>
+      <pubDate>Wed, 30 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/googlenetcode/</guid>
+      <description>GoogLeNet获得了2014年ILSVRC比赛分类任务的冠军，其利用Inception模块，在加深网络深度的同时，减少了参数量，从而减少计算资源的利用。
+实现 基于pytorch实现的代码如下：
+1import torch 2import torch.nn as nn 3import torch.nn.functional as F 4 5#卷积+BN+ReLu 6class BasicConv2d(nn.Module): 7 def __init__(self, in_channels, out_channals, **kwargs): 8 super(BasicConv2d, self).__init__() 9 self.conv = nn.Conv2d(in_channels, out_channals, **kwargs) 10 self.bn = nn.BatchNorm2d(out_channals) 11 12 def forward(self, x): 13 x = self.conv(x) 14 x = self.bn(x) 15 return F.relu(x) 16 17# Inception模块 18class Inception(nn.Module): 19 #（输入通道数，1×1卷积的输出通道数，3×3卷积的降维通道数，3×3卷积的输出通道数， 20 #5×5卷积的降维通道数，5×5卷积的输出通道数，池化通道数） 21 def __init__(self, in_planes,n1x1, n3x3red, n3x3, n5x5red, n5x5, pool_planes): 22 super(Inception, self).</description>
+    </item>
+    
+    <item>
+      <title>VGG</title>
+      <link>https://gdy0924.github.io/posts/vggcode/</link>
+      <pubDate>Tue, 29 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/vggcode/</guid>
+      <description>VGG
+实现 基于pytorch实现的代码如下：
+1import torch.nn as nn 2import torch.nn.functional as F 3from torchsummary import summary 4 5class VGG(nn.Module): 6 &amp;#34;&amp;#34;&amp;#34; 7VGG builder 8&amp;#34;&amp;#34;&amp;#34; 9 def __init__(self, arch: object, num_classes=1000) -&amp;gt; object: 10 super(VGG, self).__init__() 11 self.in_channels = 3 12 self.conv3_64 = self.__make_layer(64, arch[0]) 13 self.conv3_128 = self.__make_layer(128, arch[1]) 14 self.conv3_256 = self.__make_layer(256, arch[2]) 15 self.conv3_512a = self.__make_layer(512, arch[3]) 16 self.conv3_512b = self.__make_layer(512, arch[4]) 17 self.fc1 = nn.Linear(7*7*512, 4096) 18 self.bn1 = nn.</description>
+    </item>
+    
     <item>
       <title>AlexNet</title>
       <link>https://gdy0924.github.io/posts/alexnetcode/</link>
