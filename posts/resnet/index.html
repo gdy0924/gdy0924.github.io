@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/resnet/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/resnet/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "ResNet",
+      "headline" : "ResNet",
+      "description" : "ResNet 原文连接：ResNet\nAbstract  更深的网络往往更难被训练，因此提出残差学习模块，在简化网络训练的同时，加深网络的深度，可以达到152层。\nIntroduction  深度卷积神经网络为图像分类带来了一系列突破。深度神经网络以端到端、多层的方式集成了由低到高的特征表示，并且特征的“级别”可以通过堆叠层的数量（深度）来增加。有研究表明，网络深度是至关重要的。\n深度增加的同时，会带来一个问题，即梯度消失\/爆炸。然而，这个问题已经被归一化初始化和中间归一化层所解决，这使得具有几十层的网络开始收敛于反向传播的随机梯度下降(SGD)。\n当更深层次的网络能够开始收敛时，出现网络退化的问题，即随着网络深度的增加，精度达到饱和，然后迅速下降。但这种网络退化不是由过拟合引起的，是由于在适当的深度模型中添加更多的层会导致更高的训练误差。\n训练精度的下降表明，并不是所有的结构都同样容易进行优化。通过构造更深的模型，有一个解决方案：增加的层是恒等映射（ identity mappings），而其他层是从浅层复制过来的。这表明，一个更深的模型不会比它较浅的模型产生更高的训练误差。\n在本文中，引入深度残差学习框架解决网络退化问题，我们不是希望每几个堆叠层直接匹配所需的映射$H(x)$，而是匹配$F(x)$的另一个映射，即残差映射$H(x)-x$，那么原始的映射就变成了$F(x)\u002bx$。在极端情况下，如果一个恒等映射是最优的，那么将残差推到零要比用一堆非线性层来拟合一个恒等映射更容易。\n公式$F(x)\u002bx$可用Shortcut Connection实现，并且Shortcut Connection只需实现恒等映射，既不增加额外参数也不增加计算量。\n我们在ImageNe上进行了全面的实验来证明退化问题，并评估我们的方法，得到：（1）深度残差网很容易优化，但对应的“普通”网络（简单的堆叠层）表现出更高的训练误差；（2）深度残差网可以很容易地从大大增加的深度中获得精度，产生的结果比以前的网络更好得多\nRelated Work Residual Representations  残差表示作为一种重构或预处理方法是有效的。首先，在图像识别任务中的VLAD （矢量量化），有研究表明编码残差矢量比编码原始矢量更有效；其次，在低级视觉和计算机图形学中，需要求解部分微分方程，也被证明这些求解器比没有考虑残差性质的标准求解器收敛得快得多。\nShortcut Connections  训练多层感知机（MLP）的早期实践是添加一个线性层来连接网络的输入和输出。在一些研究中，某些中间层直接连接到辅助分类器，用于解决梯度消失\/爆炸（如GoogleNet）。\n同时，Highway Networks（下图）实现了带有门控单元的shortcut connection，需要参数控制，而 ResNet没有，这样就不会增加额外参数。（Highway Networks相当于对输入一部分进行处理（和传统神经网络相同），一部分直接通过）另外Highway Networks并没有精度与网络深度的显著提高（没有超过100层）。 Deep Residual Learning Residual Learning  假设存在映射$H(x)$，我们不是期望堆叠的层映射近似$H(x)$，而是让这些层近似于一个残差函数$F(x):=H(x)-x$。原来的映射就变成了$F(x)\u002bx$，虽然这两种形式都应该能够渐近地近似于所期望的函数，但从之前的研究可以看出，其学习的容易程度可能是不同的，残差收敛速度更快并且效果更好。（其主要思想是将堆叠的非线性层从，拟合原来的最优解映射输出$H(x)$，变成去，拟合输出和输入的差$F(x) = H(x) - x$，此时原最优解映射$H(x)$就可以改写成$F(x) \u002b x$。而作者认为这两种表达的效果相同，但是优化的难度却并不相同，）\n正如之前说的那样，如果增加的层可以构造成恒等映射，那么更深的模型的训练误差应该不大于对应较浅的模型。而通过多个非线性层逼近恒等映射是存在困难的，因此，通过残差学习重构，如果恒等映射是最优的，模型就可以简单地将多个非线性层的权值（即$F(x)$）推向零，以接近恒等映射。但在实际情况下，恒等映射不太可能是最优的。\nIdentity Mapping by Shortcuts  残差块的公式定义和结构图如下所示： $$ y=F(x,\\lbrace W_{i} \\rbrace)\u002bx $$ 其中，$x$和$y$是输入与输出，函数$F(x,\\lbrace W_{i} \\rbrace)$是要学习的残差映射。对应图中的两层的例子。$x$和$F(X)$通过Shortcut Connection和元素级相加实现的。公式中的Shortcut Connection不会引入额外的参数也不引入计算复杂度。同时$x$和$F(X)$的维度必须相同，如果不相同，通过$W_{s}$实现维度匹配： $$ y=F(x,\\lbrace W_{i} \\rbrace)\u002bW_{s}x $$ 残差函数$F$的形式是灵活的。本文实验涉及两层或三层的函数$F$，也可能有更多的层。但如果只有一层，类似于线性层：$y=W_{1}x\u002bx$，，从实验可以看出没有效果。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-04-05 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-04-05 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/resnet\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>ResNet</title>
+  <meta property="og:title" content="ResNet" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="ResNet 原文连接：ResNet
+Abstract  更深的网络往往更难被训练，因此提出残差学习模块，在简化网络训练的同时，加深网络的深度，可以达到152层。
+Introduction  深度卷积神经网络为图像分类带来了一系列突破。深度神经网络以端到端、多层的方式集成了由低到高的特征表示，并且特征的“级别”可以通过堆叠层的数量（深度）来增加。有研究表明，网络深度是至关重要的。
+深度增加的同时，会带来一个问题，即梯度消失/爆炸。然而，这个问题已经被归一化初始化和中间归一化层所解决，这使得具有几十层的网络开始收敛于反向传播的随机梯度下降(SGD)。
+当更深层次的网络能够开始收敛时，出现网络退化的问题，即随着网络深度的增加，精度达到饱和，然后迅速下降。但这种网络退化不是由过拟合引起的，是由于在适当的深度模型中添加更多的层会导致更高的训练误差。
+训练精度的下降表明，并不是所有的结构都同样容易进行优化。通过构造更深的模型，有一个解决方案：增加的层是恒等映射（ identity mappings），而其他层是从浅层复制过来的。这表明，一个更深的模型不会比它较浅的模型产生更高的训练误差。
+在本文中，引入深度残差学习框架解决网络退化问题，我们不是希望每几个堆叠层直接匹配所需的映射$H(x)$，而是匹配$F(x)$的另一个映射，即残差映射$H(x)-x$，那么原始的映射就变成了$F(x)&#43;x$。在极端情况下，如果一个恒等映射是最优的，那么将残差推到零要比用一堆非线性层来拟合一个恒等映射更容易。
+公式$F(x)&#43;x$可用Shortcut Connection实现，并且Shortcut Connection只需实现恒等映射，既不增加额外参数也不增加计算量。
+我们在ImageNe上进行了全面的实验来证明退化问题，并评估我们的方法，得到：（1）深度残差网很容易优化，但对应的“普通”网络（简单的堆叠层）表现出更高的训练误差；（2）深度残差网可以很容易地从大大增加的深度中获得精度，产生的结果比以前的网络更好得多
+Related Work Residual Representations  残差表示作为一种重构或预处理方法是有效的。首先，在图像识别任务中的VLAD （矢量量化），有研究表明编码残差矢量比编码原始矢量更有效；其次，在低级视觉和计算机图形学中，需要求解部分微分方程，也被证明这些求解器比没有考虑残差性质的标准求解器收敛得快得多。
+Shortcut Connections  训练多层感知机（MLP）的早期实践是添加一个线性层来连接网络的输入和输出。在一些研究中，某些中间层直接连接到辅助分类器，用于解决梯度消失/爆炸（如GoogleNet）。
+同时，Highway Networks（下图）实现了带有门控单元的shortcut connection，需要参数控制，而 ResNet没有，这样就不会增加额外参数。（Highway Networks相当于对输入一部分进行处理（和传统神经网络相同），一部分直接通过）另外Highway Networks并没有精度与网络深度的显著提高（没有超过100层）。 Deep Residual Learning Residual Learning  假设存在映射$H(x)$，我们不是期望堆叠的层映射近似$H(x)$，而是让这些层近似于一个残差函数$F(x):=H(x)-x$。原来的映射就变成了$F(x)&#43;x$，虽然这两种形式都应该能够渐近地近似于所期望的函数，但从之前的研究可以看出，其学习的容易程度可能是不同的，残差收敛速度更快并且效果更好。（其主要思想是将堆叠的非线性层从，拟合原来的最优解映射输出$H(x)$，变成去，拟合输出和输入的差$F(x) = H(x) - x$，此时原最优解映射$H(x)$就可以改写成$F(x) &#43; x$。而作者认为这两种表达的效果相同，但是优化的难度却并不相同，）
+正如之前说的那样，如果增加的层可以构造成恒等映射，那么更深的模型的训练误差应该不大于对应较浅的模型。而通过多个非线性层逼近恒等映射是存在困难的，因此，通过残差学习重构，如果恒等映射是最优的，模型就可以简单地将多个非线性层的权值（即$F(x)$）推向零，以接近恒等映射。但在实际情况下，恒等映射不太可能是最优的。
+Identity Mapping by Shortcuts  残差块的公式定义和结构图如下所示： $$ y=F(x,\lbrace W_{i} \rbrace)&#43;x $$ 其中，$x$和$y$是输入与输出，函数$F(x,\lbrace W_{i} \rbrace)$是要学习的残差映射。对应图中的两层的例子。$x$和$F(X)$通过Shortcut Connection和元素级相加实现的。公式中的Shortcut Connection不会引入额外的参数也不引入计算复杂度。同时$x$和$F(X)$的维度必须相同，如果不相同，通过$W_{s}$实现维度匹配： $$ y=F(x,\lbrace W_{i} \rbrace)&#43;W_{s}x $$ 残差函数$F$的形式是灵活的。本文实验涉及两层或三层的函数$F$，也可能有更多的层。但如果只有一层，类似于线性层：$y=W_{1}x&#43;x$，，从实验可以看出没有效果。" />
+  <meta name="description" content="ResNet 原文连接：ResNet
+Abstract  更深的网络往往更难被训练，因此提出残差学习模块，在简化网络训练的同时，加深网络的深度，可以达到152层。
+Introduction  深度卷积神经网络为图像分类带来了一系列突破。深度神经网络以端到端、多层的方式集成了由低到高的特征表示，并且特征的“级别”可以通过堆叠层的数量（深度）来增加。有研究表明，网络深度是至关重要的。
+深度增加的同时，会带来一个问题，即梯度消失/爆炸。然而，这个问题已经被归一化初始化和中间归一化层所解决，这使得具有几十层的网络开始收敛于反向传播的随机梯度下降(SGD)。
+当更深层次的网络能够开始收敛时，出现网络退化的问题，即随着网络深度的增加，精度达到饱和，然后迅速下降。但这种网络退化不是由过拟合引起的，是由于在适当的深度模型中添加更多的层会导致更高的训练误差。
+训练精度的下降表明，并不是所有的结构都同样容易进行优化。通过构造更深的模型，有一个解决方案：增加的层是恒等映射（ identity mappings），而其他层是从浅层复制过来的。这表明，一个更深的模型不会比它较浅的模型产生更高的训练误差。
+在本文中，引入深度残差学习框架解决网络退化问题，我们不是希望每几个堆叠层直接匹配所需的映射$H(x)$，而是匹配$F(x)$的另一个映射，即残差映射$H(x)-x$，那么原始的映射就变成了$F(x)&#43;x$。在极端情况下，如果一个恒等映射是最优的，那么将残差推到零要比用一堆非线性层来拟合一个恒等映射更容易。
+公式$F(x)&#43;x$可用Shortcut Connection实现，并且Shortcut Connection只需实现恒等映射，既不增加额外参数也不增加计算量。
+我们在ImageNe上进行了全面的实验来证明退化问题，并评估我们的方法，得到：（1）深度残差网很容易优化，但对应的“普通”网络（简单的堆叠层）表现出更高的训练误差；（2）深度残差网可以很容易地从大大增加的深度中获得精度，产生的结果比以前的网络更好得多
+Related Work Residual Representations  残差表示作为一种重构或预处理方法是有效的。首先，在图像识别任务中的VLAD （矢量量化），有研究表明编码残差矢量比编码原始矢量更有效；其次，在低级视觉和计算机图形学中，需要求解部分微分方程，也被证明这些求解器比没有考虑残差性质的标准求解器收敛得快得多。
+Shortcut Connections  训练多层感知机（MLP）的早期实践是添加一个线性层来连接网络的输入和输出。在一些研究中，某些中间层直接连接到辅助分类器，用于解决梯度消失/爆炸（如GoogleNet）。
+同时，Highway Networks（下图）实现了带有门控单元的shortcut connection，需要参数控制，而 ResNet没有，这样就不会增加额外参数。（Highway Networks相当于对输入一部分进行处理（和传统神经网络相同），一部分直接通过）另外Highway Networks并没有精度与网络深度的显著提高（没有超过100层）。 Deep Residual Learning Residual Learning  假设存在映射$H(x)$，我们不是期望堆叠的层映射近似$H(x)$，而是让这些层近似于一个残差函数$F(x):=H(x)-x$。原来的映射就变成了$F(x)&#43;x$，虽然这两种形式都应该能够渐近地近似于所期望的函数，但从之前的研究可以看出，其学习的容易程度可能是不同的，残差收敛速度更快并且效果更好。（其主要思想是将堆叠的非线性层从，拟合原来的最优解映射输出$H(x)$，变成去，拟合输出和输入的差$F(x) = H(x) - x$，此时原最优解映射$H(x)$就可以改写成$F(x) &#43; x$。而作者认为这两种表达的效果相同，但是优化的难度却并不相同，）
+正如之前说的那样，如果增加的层可以构造成恒等映射，那么更深的模型的训练误差应该不大于对应较浅的模型。而通过多个非线性层逼近恒等映射是存在困难的，因此，通过残差学习重构，如果恒等映射是最优的，模型就可以简单地将多个非线性层的权值（即$F(x)$）推向零，以接近恒等映射。但在实际情况下，恒等映射不太可能是最优的。
+Identity Mapping by Shortcuts  残差块的公式定义和结构图如下所示： $$ y=F(x,\lbrace W_{i} \rbrace)&#43;x $$ 其中，$x$和$y$是输入与输出，函数$F(x,\lbrace W_{i} \rbrace)$是要学习的残差映射。对应图中的两层的例子。$x$和$F(X)$通过Shortcut Connection和元素级相加实现的。公式中的Shortcut Connection不会引入额外的参数也不引入计算复杂度。同时$x$和$F(X)$的维度必须相同，如果不相同，通过$W_{s}$实现维度匹配： $$ y=F(x,\lbrace W_{i} \rbrace)&#43;W_{s}x $$ 残差函数$F$的形式是灵活的。本文实验涉及两层或三层的函数$F$，也可能有更多的层。但如果只有一层，类似于线性层：$y=W_{1}x&#43;x$，，从实验可以看出没有效果。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">ResNet</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-04-05 00:00:00 UTC">
+                05 Apr 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <h1 id="resnet">ResNet</h1>
+<p>原文连接：<a href="https://arxiv.org/pdf/1512.03385.pdf">ResNet</a></p>
+<h2 id="abstract">Abstract</h2>
+<p>    更深的网络往往更难被训练，因此提出残差学习模块，在简化网络训练的同时，加深网络的深度，可以达到152层。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    深度卷积神经网络为图像分类带来了一系列突破。深度神经网络以端到端、多层的方式集成了由低到高的特征表示，并且特征的“级别”可以通过堆叠层的数量（深度）来增加。有研究表明，网络深度是至关重要的。<br>
+    深度增加的同时，会带来一个问题，即梯度消失/爆炸。然而，这个问题已经被归一化初始化和中间归一化层所解决，这使得具有几十层的网络开始收敛于反向传播的随机梯度下降(SGD)。<br>
+    当更深层次的网络能够开始收敛时，出现网络退化的问题，即随着网络深度的增加，精度达到饱和，然后迅速下降。但这种网络退化不是由过拟合引起的，是由于在适当的深度模型中添加更多的层会导致更高的训练误差。<br>
+    训练精度的下降表明，并不是所有的结构都同样容易进行优化。通过构造更深的模型，有一个解决方案：增加的层是恒等映射（ identity mappings），而其他层是从浅层复制过来的。这表明，一个更深的模型不会比它较浅的模型产生更高的训练误差。<br>
+    在本文中，引入深度残差学习框架解决网络退化问题，我们不是希望每几个堆叠层直接匹配所需的映射$H(x)$，而是匹配$F(x)$的另一个映射，即残差映射$H(x)-x$，那么原始的映射就变成了$F(x)+x$。在极端情况下，如果一个恒等映射是最优的，那么将残差推到零要比用一堆非线性层来拟合一个恒等映射更容易。<br>
+    公式$F(x)+x$可用Shortcut Connection实现，并且Shortcut Connection只需实现恒等映射，既不增加额外参数也不增加计算量。<br>
+    我们在ImageNe上进行了全面的实验来证明退化问题，并评估我们的方法，得到：（1）深度残差网很容易优化，但对应的“普通”网络（简单的堆叠层）表现出更高的训练误差；（2）深度残差网可以很容易地从大大增加的深度中获得精度，产生的结果比以前的网络更好得多</p>
+<h2 id="related-work">Related Work</h2>
+<h3 id="residual-representations">Residual Representations</h3>
+<p>    残差表示作为一种重构或预处理方法是有效的。首先，在图像识别任务中的VLAD （矢量量化），有研究表明编码残差矢量比编码原始矢量更有效；其次，在低级视觉和计算机图形学中，需要求解部分微分方程，也被证明这些求解器比没有考虑残差性质的标准求解器收敛得快得多。</p>
+<h3 id="shortcut-connections">Shortcut Connections</h3>
+<p>    训练多层感知机（MLP）的早期实践是添加一个线性层来连接网络的输入和输出。在一些研究中，某些中间层直接连接到辅助分类器，用于解决梯度消失/爆炸（如GoogleNet）。<br>
+    同时，Highway Networks（下图）实现了带有门控单元的shortcut connection，需要参数控制，而 ResNet没有，这样就不会增加额外参数。（Highway Networks相当于对输入一部分进行处理（和传统神经网络相同），一部分直接通过）另外Highway Networks并没有精度与网络深度的显著提高（没有超过100层）。
+<img src="/img/resnet1.PNG" alt=""></p>
+<h2 id="deep-residual-learning">Deep Residual Learning</h2>
+<h3 id="residual-learning">Residual Learning</h3>
+<p>    假设存在映射$H(x)$，我们不是期望堆叠的层映射近似$H(x)$，而是让这些层近似于一个残差函数$F(x):=H(x)-x$。原来的映射就变成了$F(x)+x$，虽然这两种形式都应该能够渐近地近似于所期望的函数，但从之前的研究可以看出，其学习的容易程度可能是不同的，残差收敛速度更快并且效果更好。（其主要思想是将堆叠的非线性层从，拟合原来的最优解映射输出$H(x)$，变成去，拟合输出和输入的差$F(x) = H(x) - x$，此时原最优解映射$H(x)$就可以改写成$F(x) + x$。而作者认为这两种表达的效果相同，但是优化的难度却并不相同，）<br>
+    正如之前说的那样，如果增加的层可以构造成恒等映射，那么更深的模型的训练误差应该不大于对应较浅的模型。而通过多个非线性层逼近恒等映射是存在困难的，因此，通过残差学习重构，如果恒等映射是最优的，模型就可以简单地将多个非线性层的权值（即$F(x)$）推向零，以接近恒等映射。但在实际情况下，恒等映射不太可能是最优的。</p>
+<h3 id="identity-mapping-by-shortcuts">Identity Mapping by Shortcuts</h3>
+<p>    残差块的公式定义和结构图如下所示：
+$$
+y=F(x,\lbrace W_{i} \rbrace)+x
+$$
+<img src="/img/resnet2.png" alt="">
+    其中，$x$和$y$是输入与输出，函数$F(x,\lbrace W_{i} \rbrace)$是要学习的残差映射。对应图中的两层的例子。$x$和$F(X)$通过Shortcut Connection和元素级相加实现的。公式中的Shortcut Connection不会引入额外的参数也不引入计算复杂度。同时$x$和$F(X)$的维度必须相同，如果不相同，通过$W_{s}$实现维度匹配：
+$$
+y=F(x,\lbrace W_{i} \rbrace)+W_{s}x
+$$
+    残差函数$F$的形式是灵活的。本文实验涉及两层或三层的函数$F$，也可能有更多的层。但如果只有一层，类似于线性层：$y=W_{1}x+x$，，从实验可以看出没有效果。</p>
+<h3 id="network-architectures">Network Architectures</h3>
+<p>    在普通网络和残差网络都进行了各种测试，并观察到了一样的现象。
+<img src="/img/resnet3.jpg" alt=""></p>
+<h4 id="plain-network">Plain Network</h4>
+<p>    Baseline如上图中间所示，主要是收到VGG的启发，卷积核大多使用3×3，并遵循两个规则：（1）对于输出特征图大小相同的层，使用相同数量的卷积核，即通道数不变；（2）如果特征图大小减半，卷积核的数量将增加一倍，即通道数加倍。通过步幅为2的卷积层直接实现下采样，以一个全局平均池化层和一个具有softmax的1000维全连接层结束，卷积层总数为34层。相比于VGG，参数量核计算量小了很多。</p>
+<h4 id="residual-network">Residual Network</h4>
+<p>    在Plain Network基础上，加入Shortcut Connection，如图右边所示，将其转化为残差网络。公式1的恒等映射在输入和输出维度相同时，可以直接使用。当尺寸增加时（虚线），有两种方式：（1）使用零填充控制feature map的大小，一般要先做一个下采样，可以采用stride=2的池化，该方法不会增加参数；（2）使用1×1的卷积来升维或者降采样，该方法会增加参数，也会增加计算量。</p>
+<h3 id="implementation">Implementation</h3>
+<p>    从一幅图像或其水平翻转中随机采样大小224×224的图片，使用颜色增强操作，在卷积之后和relu之前使用BN，batch size为256，使用dropout。</p>
+<h2 id="experiments">Experiments</h2>
+<h3 id="deeper-bottleneck-architectures">Deeper Bottleneck Architectures.</h3>
+<p>    为了实际计算的考虑，提出了一种Bottleneck的结构块来代替常规的Resedual block，如第二张图的右边所示，它像Inception网络那样通过使用1x1卷积来缩减或扩张特征图的维度，这种Bottleneck的模型结构只是为了节省模型训练时间而加以改进设计出来的，对模型准确率并无影响。<br>
+    ResNet不同网络深度的架构如下图所示：
+<img src="/img/resnet4.jpg" alt=""></p>
+<h1 id="resnetv2preresnet">ResNetV2(PreResNet)</h1>
+<p>原文链接：<a href="https://arxiv.org/pdf/1603.05027.pdf">ResNetV2</a><br>
+    PreResNet主要是调整了residual模块中各层的顺序。 preResNet比较了ReLU和BN的摆放位置不同，比较两者的效果。相比经典residual模块(a)，(b)将BN共享会更加影响信息的短路传播，使网络更难训练、性能也更差；(c)直接将ReLU移到BN后会使该分支的输出始终非负，使网络表示能力下降；(d)将ReLU提前解决了(e)的非负问题，但ReLU无法享受BN的效果；(e)将ReLU和BN都提前解决了(d)的问题。preResNet的短路连接(e)能更加直接的传递信息，进而取得了比ResNet更好的性能。
+<img src="/img/resnetV2.PNG" alt=""></p>
+<h1 id="resnext">ResNeXt</h1>
+<p>原文链接：<a href="https://arxiv.org/pdf/1611.05431.pdf">ResNeXt</a></p>
+<h2 id="abstract-1">Abstract</h2>
+<p>    提出了一个简单的，高度模块化的用于图像分类的网络架构。通过重复一个构建块来搭建，它聚合了一组具有相同结构的转换。引入了一个新的维度，“基数”<em>cardinality</em>（转换集的大小），作为除了深度和宽度的维度之外的一个维度。实验表明，增加基数也能够提高分类精度。此外，增加基数比更深入或更广泛更有效。</p>
+<h2 id="introduction-1">Introduction</h2>
+<p>    与传统的手工设计的特征相比，神经网络从大规模数据中学习到的特征在训练过程中需要最少的人工参与，并且可以转移到各种识别任务中。然而，人类的努力已经转向了设计更好的网络架构来学习表示。<br>
+    随着超参数（通道数、卷积核大小、步幅等）数量的不断增加，架构的设计变得越来越困难，特别是当有很多层次的时候。VGG展示了一种简单而有效的构建非常深的网络的策略：堆放相同形状的block。该策略由ResNets继承，它堆积具有相同拓扑的模块。这个简单的规则减少了超参数的自由选择，而深度则是神经网络中的一个基本维度。此外，我们认为，这一规则的简单性可能会降低使超参数过度适应特定数据集的风险。VGGnets和ResNets的鲁棒性已经被各种视觉识别任务和涉及语音和语言等非视觉任务所证明。<br>
+    与VGG不同，Inception model已经证明了精心设计的拓扑能够在低理论复杂性下实现引人注目的精度。Inception model随着时间的推移而发展，但一个重要的共同特性是split-transform-merge。在一个Inception model中，输入被分割成几个低维embeddings（通过1×1卷积），由一组卷积核（3×3,5×5等）实现转换，并通过连接进行合并。Inception module的split-transform-merge思想有望接近大型和密集层的表示能力，并且计算复杂度相当低。<br>
+    尽管有良好的准确性，Inception model的实现伴随着一系列复杂的因素——卷积核的数量和大小是为每个单独的快所量身定制的，模块是分阶段定制的。适应新的数据集/任务会比较困难，特别是当有许多因素和超参数需要设计时。<br>
+    在本文中，我们提出了一种采用VGG/ResNets重复层的策略，以一种简单、可扩展的方式利用split-transform-merge策略。我们的网络中的一个模块执行一组卷积转换，每个卷积转换都在一个低维embedding上实现，其输出通过求和聚合。如下图所示：
+<img src="/img/resnext1.PNG" alt=""></p>
+<h2 id="related-work-1">Related Work</h2>
+<h3 id="multi-branch-convolutional-networks">Multi-branch convolutional networks</h3>
+<p>    Inception model是一种成功的多分支架构，其中每个分支都是精心定制的。ResNets可以被认为是一种双分支网络，其中一个分支是恒等映射。</p>
+<h3 id="grouped-convolutions">Grouped convolutions</h3>
+<p>    分组卷积可以追溯到AlexNet，即将模型分布在两个gpu上。目前，几乎没有证据表明利用分组卷积来提高准确性。分组卷积的一种特殊情况是通道卷积，其中组的数量等于通道的数量。通道卷积是中可分离卷积的一种。</p>
+<h3 id="compressing-convolutional-networks">Compressing convolutional networks</h3>
+<p>    分解（在空间或通道上）是一种被广泛采用的技术，以减少深度卷积网络的冗余性，并加速/压缩网络。</p>
+<h3 id="ensembling">Ensembling</h3>
+<p>    对一组独立训练的网络进行平均是提高精度的有效解决方案，我们的方法利用连接来聚合一组卷积转换。但将我们的方法视为集合是不精确的，因为要集合的成员是联合训练的，而不是独立训练的。</p>
+<h2 id="method">Method</h2>
+<h3 id="template">Template</h3>
+<p>    我们遵循VGG/ResNets的高度模块化的设计。我们的网络由一堆residual blocks组成。这些块具有相同的拓扑结构，并遵循两个规则：（1）如果特征图大小相同，那么共享相同的超参数，即通道数和卷积核大小相同；（2）特征图大小减半时，通道数增加一倍。有了上述两条规则，只需要设计一个block模块，网络中的所有模块都可以相应地确定。</p>
+<h3 id="revisiting-simple-neurons">Revisiting Simple Neurons</h3>
+<p>    神经网络中最简单的神经元内积（加权和），可由下面公式和图表示：
+$$
+\sum_{i=1}^{D}w_{i}x_{i}
+$$
+<img src="/img/resnext2.PNG" alt="">
+    其中，$X=[x_{1},x_{2},&hellip;,x_{D}]$是输入到神经元的具有d个通道的输入向量，$w_{i}$是第$i$个通道的权重。上述操作可以看作split-transform-merge：（1）split：$X$被分为低维的embedding$x_{i}$；（2）transform：$w_{i}x_{i}$；（3）merge：$\sum_{i=1}^{D}$。</p>
+<h3 id="aggregated-transformations">Aggregated Transformations</h3>
+<p><img src="/img/resnext3.PNG" alt="">
+    将聚合转换定义为：
+$$
+F(x)=\sum_{i=1}^{C}T_{i}(x)
+$$
+    其中，$T_{i}(x)$可以是任意的函数，将$x$转换成一个低维embedding，再进行操作。$C$是要聚合的一组转换的大小，我们称之为基数cardinality。与$D$类似，但不需要等于$D$，可以是任意的数。在本文中，我们将$T_{i}$设置为bottleneck架构，$T_{i}$前的1×1卷积实现低维embedding。如第一张图的右边所示。<br>
+    在上述公式的基础上添加残差，得到：
+$$
+y=x+\sum_{i=1}^{C}T_{i}(x)
+$$
+    Relation to Inception-ResNet：包含残差中的分支和连接合并。<br>
+    Relation to Grouped Convolutions：在分组卷积中，输入和输出通道被分为C组，在每组内分别进行卷积。(分组卷积是介于普通卷积核深度可分离卷积的一种折中方案，不是彻底的将每个channel都要单独赋予一个独立的卷积核也不是整个Feature Map使用同一个卷积核。)<br>
+    下图展示了ResNet-50和ResNeXt-50的结构。
+<img src="/img/resnext4.PNG" alt=""></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/shufflenet/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/shufflenet/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "ShuffleNet",
+      "headline" : "ShuffleNet",
+      "description" : "ShuffleNet 原文链接：ShuffleNet\nAbstract  引入了一种计算效率非常高的CNN架构，名为ShuffleNet，它是专门为计算能力非常有限的移动设备而设计的。新的架构采用了两种新的操作，pointwise group convolution和channel shuffle，在保持精度的同时大大降低了计算成本。\nIntroduction  构建更深更大的卷积神经网络(CNNs)是解决主要视觉识别任务的主要趋势。最精确的CNN通常有数百层和数千个通道，因此需要的计算量非常大。但在非常有限的计算预算下，也需要追求最佳的准确性，如无人机，如无人机、机器人和智能手机等通用移动平台。但现有的许多工作都专注于剪枝、压缩或低位表示一个“基本的”网络架构。在本文，我们的目标是探索一个高效的基本结构。\n性能好的网络如Xception和ResNeXt，在规模小的网络中效率较低，因为密集的1×1卷积很昂贵。我们提出使用pointwise group convolution来降低1×1卷积的计算复杂度，为了克服group convolution带来的副作用，提出一种新的操作：channel shuffle，可以使信息在通道中流通。基于上述两种技术，构建一个高效的结构：ShuffleNet。相比于其他架构，对于给定的计算复杂度，可以实现更多的特征图通道，以编码更多信息，这对于很小的网络性能是很重要的。\nRelated Work Efficient Model Designs  深度神经网络在计算机视觉任务中取得的成功，模型设计发挥了重要的作用。例如，与简单的叠加卷积层相比，GoogLeNet以更低的复杂度增加了网络的深度。SqueezeNet在保持精度的同时显著减少了参数和计算。ResNet利用高效的bottleneck结构来实现令人印象深刻的性能。SENet引入了一个架构单元，可以以轻微的计算成本提高性能。与此同时，最近的一项工作采用了强化学习和模型搜索来探索有效的模型设计，所提出的移动NASNet模型达到了与我们对应的ShuffleNet模型相当的性能，但是NASNet并没有报告在极小的模型上的结果，也没有评估在移动设备上的实际测试时间。\nGroup Convolution  Group Convolution的概念首次在AlexNet中引入，用于将模型分布在两个GPU上，在ResNeXt中很好地证明了其有效性。在Xception中提出的深度可分离卷积depthwise separable convolution。最近，MobileNet利用深度可分离的卷积，并在轻量级模型中获得了最先进的结果。我们的工作以一种新的形式推广了group convolution和depthwise separable convolution。\nChannel Shuffle Operation  channel shuffle操作的想法在之前的高效模型设计中几乎没有被提到过，即使CNN库cuda-convnet支持随机稀疏卷积(random sparse convolution)层，相当于group convolution之后进行channel shuffle。这种random shuffle操作很少被使用。最近，另一个工作也采用了这个想法来进行两阶段卷积，但其并没有专门研究channel shuffle本身的有效性及其在小模型设计中的应用。\nModel Acceleration  在加速推理的同时，保证预训练模型的准确性。\nApproach Channel Shuffle for Group Convolutions  Xception和ResNeXt，在构建块中引入高效的深度可分离卷积或组卷积，以在表示能力和计算成本之间取得良好的权衡。然而，我们注意到，这两种设计都没有完全考虑到1×1卷积（也称为Pointwise Convolution），需要相当大的复杂性。在小型网络中，昂贵的Pointwise Convolution导致通道数量有限，可能会严重损害精度。\n为了解决这个问题，一个简单的解决方法是使用通道稀疏连接，例如组卷积也同样应用在1×1卷积上。通过确保每个卷积只在相应的输入通道组上操作，组卷积大大降低了计算成本。然而，如果多个组卷积堆叠在一起，就有一个副作用：某个通道的输出只与输入通道的一小部分有关。如上图中的（a）显示了两个堆叠的组卷积。很明显，来自某一组的输出只与组内的输入有关，这阻止了通道组之间的信息交流。\n如果我们允许组卷积获得来自不同组的输入数据，如上图中的（b）所示，那么输入通道和输出通道将完全相关。具体来说，对于上一组层生成的特征图，我们可以首先将每个组中的通道划分为几个子组，然后向下一层中的每个组提供不同的子组。这可以通过channel shuffle操作实现，如上图中的（c）：假设一个卷积层，有g个组，输出有g×n个通道，即每组的输出通道为n；我们首先将输出通道维度重塑为(g，n)，然后将其转平，作为下一层的输入，如下图所示： ShuffleNet Unit  利用channel shuffle操作，我们提出了ShuffleNet网络。从下图中的（a）模块出发，它是一个残差模块。其中3×3的卷积使用深度可分离卷积实现，将第一个1×1卷积替换成点组卷积紧跟着一个channel shuffle，形成一个ShuffleNet Unit，如下图的（b）所示，第二个点组卷积是为了恢复通道数目，以匹配shortcut连接。对于下采样模块，我们进行了两个修改，如下图（c）所示：（1）在shortcut通路上添加了一个平均池化层；（2）用通道连接替换元素相加，可以扩大通道，无需额外的计算成本。 由于点组卷积与channel shuffle，ShuffleNet Unit相同的设置下具有更小的复杂性，与ResNet和ResNeXt相比，例如：对于输入通道c，输出通道m，分组g的模块来说，ResNet需要$ 2cm\u002b9m^{2}$，ResNeXt需要$ 2cm\u002b\\frac{9m^{2}}{g}$，而ShuffleNet 需要$\\frac{2cm}{g}\u002b9m$。即在相同的计算量下，ShuffleNet可以拥有更多的通道数。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-04-06 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-04-06 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/shufflenet\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>ShuffleNet</title>
+  <meta property="og:title" content="ShuffleNet" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="ShuffleNet 原文链接：ShuffleNet
+Abstract  引入了一种计算效率非常高的CNN架构，名为ShuffleNet，它是专门为计算能力非常有限的移动设备而设计的。新的架构采用了两种新的操作，pointwise group convolution和channel shuffle，在保持精度的同时大大降低了计算成本。
+Introduction  构建更深更大的卷积神经网络(CNNs)是解决主要视觉识别任务的主要趋势。最精确的CNN通常有数百层和数千个通道，因此需要的计算量非常大。但在非常有限的计算预算下，也需要追求最佳的准确性，如无人机，如无人机、机器人和智能手机等通用移动平台。但现有的许多工作都专注于剪枝、压缩或低位表示一个“基本的”网络架构。在本文，我们的目标是探索一个高效的基本结构。
+性能好的网络如Xception和ResNeXt，在规模小的网络中效率较低，因为密集的1×1卷积很昂贵。我们提出使用pointwise group convolution来降低1×1卷积的计算复杂度，为了克服group convolution带来的副作用，提出一种新的操作：channel shuffle，可以使信息在通道中流通。基于上述两种技术，构建一个高效的结构：ShuffleNet。相比于其他架构，对于给定的计算复杂度，可以实现更多的特征图通道，以编码更多信息，这对于很小的网络性能是很重要的。
+Related Work Efficient Model Designs  深度神经网络在计算机视觉任务中取得的成功，模型设计发挥了重要的作用。例如，与简单的叠加卷积层相比，GoogLeNet以更低的复杂度增加了网络的深度。SqueezeNet在保持精度的同时显著减少了参数和计算。ResNet利用高效的bottleneck结构来实现令人印象深刻的性能。SENet引入了一个架构单元，可以以轻微的计算成本提高性能。与此同时，最近的一项工作采用了强化学习和模型搜索来探索有效的模型设计，所提出的移动NASNet模型达到了与我们对应的ShuffleNet模型相当的性能，但是NASNet并没有报告在极小的模型上的结果，也没有评估在移动设备上的实际测试时间。
+Group Convolution  Group Convolution的概念首次在AlexNet中引入，用于将模型分布在两个GPU上，在ResNeXt中很好地证明了其有效性。在Xception中提出的深度可分离卷积depthwise separable convolution。最近，MobileNet利用深度可分离的卷积，并在轻量级模型中获得了最先进的结果。我们的工作以一种新的形式推广了group convolution和depthwise separable convolution。
+Channel Shuffle Operation  channel shuffle操作的想法在之前的高效模型设计中几乎没有被提到过，即使CNN库cuda-convnet支持随机稀疏卷积(random sparse convolution)层，相当于group convolution之后进行channel shuffle。这种random shuffle操作很少被使用。最近，另一个工作也采用了这个想法来进行两阶段卷积，但其并没有专门研究channel shuffle本身的有效性及其在小模型设计中的应用。
+Model Acceleration  在加速推理的同时，保证预训练模型的准确性。
+Approach Channel Shuffle for Group Convolutions  Xception和ResNeXt，在构建块中引入高效的深度可分离卷积或组卷积，以在表示能力和计算成本之间取得良好的权衡。然而，我们注意到，这两种设计都没有完全考虑到1×1卷积（也称为Pointwise Convolution），需要相当大的复杂性。在小型网络中，昂贵的Pointwise Convolution导致通道数量有限，可能会严重损害精度。
+为了解决这个问题，一个简单的解决方法是使用通道稀疏连接，例如组卷积也同样应用在1×1卷积上。通过确保每个卷积只在相应的输入通道组上操作，组卷积大大降低了计算成本。然而，如果多个组卷积堆叠在一起，就有一个副作用：某个通道的输出只与输入通道的一小部分有关。如上图中的（a）显示了两个堆叠的组卷积。很明显，来自某一组的输出只与组内的输入有关，这阻止了通道组之间的信息交流。
+如果我们允许组卷积获得来自不同组的输入数据，如上图中的（b）所示，那么输入通道和输出通道将完全相关。具体来说，对于上一组层生成的特征图，我们可以首先将每个组中的通道划分为几个子组，然后向下一层中的每个组提供不同的子组。这可以通过channel shuffle操作实现，如上图中的（c）：假设一个卷积层，有g个组，输出有g×n个通道，即每组的输出通道为n；我们首先将输出通道维度重塑为(g，n)，然后将其转平，作为下一层的输入，如下图所示： ShuffleNet Unit  利用channel shuffle操作，我们提出了ShuffleNet网络。从下图中的（a）模块出发，它是一个残差模块。其中3×3的卷积使用深度可分离卷积实现，将第一个1×1卷积替换成点组卷积紧跟着一个channel shuffle，形成一个ShuffleNet Unit，如下图的（b）所示，第二个点组卷积是为了恢复通道数目，以匹配shortcut连接。对于下采样模块，我们进行了两个修改，如下图（c）所示：（1）在shortcut通路上添加了一个平均池化层；（2）用通道连接替换元素相加，可以扩大通道，无需额外的计算成本。 由于点组卷积与channel shuffle，ShuffleNet Unit相同的设置下具有更小的复杂性，与ResNet和ResNeXt相比，例如：对于输入通道c，输出通道m，分组g的模块来说，ResNet需要$ 2cm&#43;9m^{2}$，ResNeXt需要$ 2cm&#43;\frac{9m^{2}}{g}$，而ShuffleNet 需要$\frac{2cm}{g}&#43;9m$。即在相同的计算量下，ShuffleNet可以拥有更多的通道数。" />
+  <meta name="description" content="ShuffleNet 原文链接：ShuffleNet
+Abstract  引入了一种计算效率非常高的CNN架构，名为ShuffleNet，它是专门为计算能力非常有限的移动设备而设计的。新的架构采用了两种新的操作，pointwise group convolution和channel shuffle，在保持精度的同时大大降低了计算成本。
+Introduction  构建更深更大的卷积神经网络(CNNs)是解决主要视觉识别任务的主要趋势。最精确的CNN通常有数百层和数千个通道，因此需要的计算量非常大。但在非常有限的计算预算下，也需要追求最佳的准确性，如无人机，如无人机、机器人和智能手机等通用移动平台。但现有的许多工作都专注于剪枝、压缩或低位表示一个“基本的”网络架构。在本文，我们的目标是探索一个高效的基本结构。
+性能好的网络如Xception和ResNeXt，在规模小的网络中效率较低，因为密集的1×1卷积很昂贵。我们提出使用pointwise group convolution来降低1×1卷积的计算复杂度，为了克服group convolution带来的副作用，提出一种新的操作：channel shuffle，可以使信息在通道中流通。基于上述两种技术，构建一个高效的结构：ShuffleNet。相比于其他架构，对于给定的计算复杂度，可以实现更多的特征图通道，以编码更多信息，这对于很小的网络性能是很重要的。
+Related Work Efficient Model Designs  深度神经网络在计算机视觉任务中取得的成功，模型设计发挥了重要的作用。例如，与简单的叠加卷积层相比，GoogLeNet以更低的复杂度增加了网络的深度。SqueezeNet在保持精度的同时显著减少了参数和计算。ResNet利用高效的bottleneck结构来实现令人印象深刻的性能。SENet引入了一个架构单元，可以以轻微的计算成本提高性能。与此同时，最近的一项工作采用了强化学习和模型搜索来探索有效的模型设计，所提出的移动NASNet模型达到了与我们对应的ShuffleNet模型相当的性能，但是NASNet并没有报告在极小的模型上的结果，也没有评估在移动设备上的实际测试时间。
+Group Convolution  Group Convolution的概念首次在AlexNet中引入，用于将模型分布在两个GPU上，在ResNeXt中很好地证明了其有效性。在Xception中提出的深度可分离卷积depthwise separable convolution。最近，MobileNet利用深度可分离的卷积，并在轻量级模型中获得了最先进的结果。我们的工作以一种新的形式推广了group convolution和depthwise separable convolution。
+Channel Shuffle Operation  channel shuffle操作的想法在之前的高效模型设计中几乎没有被提到过，即使CNN库cuda-convnet支持随机稀疏卷积(random sparse convolution)层，相当于group convolution之后进行channel shuffle。这种random shuffle操作很少被使用。最近，另一个工作也采用了这个想法来进行两阶段卷积，但其并没有专门研究channel shuffle本身的有效性及其在小模型设计中的应用。
+Model Acceleration  在加速推理的同时，保证预训练模型的准确性。
+Approach Channel Shuffle for Group Convolutions  Xception和ResNeXt，在构建块中引入高效的深度可分离卷积或组卷积，以在表示能力和计算成本之间取得良好的权衡。然而，我们注意到，这两种设计都没有完全考虑到1×1卷积（也称为Pointwise Convolution），需要相当大的复杂性。在小型网络中，昂贵的Pointwise Convolution导致通道数量有限，可能会严重损害精度。
+为了解决这个问题，一个简单的解决方法是使用通道稀疏连接，例如组卷积也同样应用在1×1卷积上。通过确保每个卷积只在相应的输入通道组上操作，组卷积大大降低了计算成本。然而，如果多个组卷积堆叠在一起，就有一个副作用：某个通道的输出只与输入通道的一小部分有关。如上图中的（a）显示了两个堆叠的组卷积。很明显，来自某一组的输出只与组内的输入有关，这阻止了通道组之间的信息交流。
+如果我们允许组卷积获得来自不同组的输入数据，如上图中的（b）所示，那么输入通道和输出通道将完全相关。具体来说，对于上一组层生成的特征图，我们可以首先将每个组中的通道划分为几个子组，然后向下一层中的每个组提供不同的子组。这可以通过channel shuffle操作实现，如上图中的（c）：假设一个卷积层，有g个组，输出有g×n个通道，即每组的输出通道为n；我们首先将输出通道维度重塑为(g，n)，然后将其转平，作为下一层的输入，如下图所示： ShuffleNet Unit  利用channel shuffle操作，我们提出了ShuffleNet网络。从下图中的（a）模块出发，它是一个残差模块。其中3×3的卷积使用深度可分离卷积实现，将第一个1×1卷积替换成点组卷积紧跟着一个channel shuffle，形成一个ShuffleNet Unit，如下图的（b）所示，第二个点组卷积是为了恢复通道数目，以匹配shortcut连接。对于下采样模块，我们进行了两个修改，如下图（c）所示：（1）在shortcut通路上添加了一个平均池化层；（2）用通道连接替换元素相加，可以扩大通道，无需额外的计算成本。 由于点组卷积与channel shuffle，ShuffleNet Unit相同的设置下具有更小的复杂性，与ResNet和ResNeXt相比，例如：对于输入通道c，输出通道m，分组g的模块来说，ResNet需要$ 2cm&#43;9m^{2}$，ResNeXt需要$ 2cm&#43;\frac{9m^{2}}{g}$，而ShuffleNet 需要$\frac{2cm}{g}&#43;9m$。即在相同的计算量下，ShuffleNet可以拥有更多的通道数。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">ShuffleNet</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-04-06 00:00:00 UTC">
+                06 Apr 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <h1 id="shufflenet">ShuffleNet</h1>
+<p>原文链接：<a href="https://arxiv.org/abs/1707.01083">ShuffleNet</a></p>
+<h2 id="abstract">Abstract</h2>
+<p>    引入了一种计算效率非常高的CNN架构，名为<em>ShuffleNet</em>，它是专门为计算能力非常有限的移动设备而设计的。新的架构采用了两种新的操作，<em>pointwise group convolution</em>和<em>channel shuffle</em>，在保持精度的同时大大降低了计算成本。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    构建更深更大的卷积神经网络(CNNs)是解决主要视觉识别任务的主要趋势。最精确的CNN通常有数百层和数千个通道，因此需要的计算量非常大。但在非常有限的计算预算下，也需要追求最佳的准确性，如无人机，如无人机、机器人和智能手机等通用移动平台。但现有的许多工作都专注于剪枝、压缩或低位表示一个“基本的”网络架构。在本文，我们的目标是探索一个高效的基本结构。<br>
+    性能好的网络如<em>Xception</em>和<em>ResNeXt</em>，在规模小的网络中效率较低，因为密集的1×1卷积很昂贵。我们提出使用<em>pointwise group convolution</em>来降低1×1卷积的计算复杂度，为了克服<em>group convolution</em>带来的副作用，提出一种新的操作：<em>channel shuffle</em>，可以使信息在通道中流通。基于上述两种技术，构建一个高效的结构：<em>ShuffleNet</em>。相比于其他架构，对于给定的计算复杂度，可以实现更多的特征图通道，以编码更多信息，这对于很小的网络性能是很重要的。</p>
+<h2 id="related-work">Related Work</h2>
+<h3 id="efficient-model-designs">Efficient Model Designs</h3>
+<p>    深度神经网络在计算机视觉任务中取得的成功，模型设计发挥了重要的作用。例如，与简单的叠加卷积层相比，<em>GoogLeNet</em>以更低的复杂度增加了网络的深度。<em>SqueezeNet</em>在保持精度的同时显著减少了参数和计算。<em>ResNet</em>利用高效的<em>bottleneck</em>结构来实现令人印象深刻的性能。<em>SENet</em>引入了一个架构单元，可以以轻微的计算成本提高性能。与此同时，最近的一项工作采用了强化学习和模型搜索来探索有效的模型设计，所提出的移动<em>NASNet</em>模型达到了与我们对应的<em>ShuffleNet</em>模型相当的性能，但是<em>NASNet</em>并没有报告在极小的模型上的结果，也没有评估在移动设备上的实际测试时间。</p>
+<h3 id="group-convolution">Group Convolution</h3>
+<p>    <em>Group Convolution</em>的概念首次在<em>AlexNet</em>中引入，用于将模型分布在两个<em>GPU</em>上，在<em>ResNeXt</em>中很好地证明了其有效性。在<em>Xception</em>中提出的深度可分离卷积<em>depthwise separable convolution</em>。最近，<em>MobileNet</em>利用深度可分离的卷积，并在轻量级模型中获得了最先进的结果。我们的工作以一种新的形式推广了<em>group convolution</em>和<em>depthwise separable convolution</em>。</p>
+<h3 id="channel-shuffle-operation">Channel Shuffle Operation</h3>
+<p>    <em>channel shuffle</em>操作的想法在之前的高效模型设计中几乎没有被提到过，即使<em>CNN</em>库<em>cuda-convnet</em>支持随机稀疏卷积(<em>random sparse convolution</em>)层，相当于<em>group convolution</em>之后进行<em>channel shuffle</em>。这种<em>random shuffle</em>操作很少被使用。最近，另一个工作也采用了这个想法来进行两阶段卷积，但其并没有专门研究<em>channel shuffle</em>本身的有效性及其在小模型设计中的应用。</p>
+<h3 id="model-acceleration">Model Acceleration</h3>
+<p>    在加速推理的同时，保证预训练模型的准确性。</p>
+<h2 id="approach">Approach</h2>
+<h3 id="channel-shuffle-for-group-convolutions">Channel Shuffle for Group Convolutions</h3>
+<p>    Xception和ResNeXt，在构建块中引入高效的深度可分离卷积或组卷积，以在表示能力和计算成本之间取得良好的权衡。然而，我们注意到，这两种设计都没有完全考虑到1×1卷积（也称为Pointwise Convolution），需要相当大的复杂性。在小型网络中，昂贵的Pointwise Convolution导致通道数量有限，可能会严重损害精度。<br>
+<img src="/img/shufflenet1.PNG" alt="">
+    为了解决这个问题，一个简单的解决方法是使用通道稀疏连接，例如组卷积也同样应用在1×1卷积上。通过确保每个卷积只在相应的输入通道组上操作，组卷积大大降低了计算成本。然而，如果多个组卷积堆叠在一起，就有一个副作用：某个通道的输出只与输入通道的一小部分有关。如上图中的（a）显示了两个堆叠的组卷积。很明显，来自某一组的输出只与组内的输入有关，这阻止了通道组之间的信息交流。<br>
+    如果我们允许组卷积获得来自不同组的输入数据，如上图中的（b）所示，那么输入通道和输出通道将完全相关。具体来说，对于上一组层生成的特征图，我们可以首先将每个组中的通道划分为几个子组，然后向下一层中的每个组提供不同的子组。这可以通过channel shuffle操作实现，如上图中的（c）：假设一个卷积层，有g个组，输出有g×n个通道，即每组的输出通道为n；我们首先将输出通道维度重塑为(g，n)，然后将其转平，作为下一层的输入，如下图所示：
+<img src="/img/shufflenet2.PNG" alt=""></p>
+<h3 id="shufflenet-unit">ShuffleNet Unit</h3>
+<p>    利用channel shuffle操作，我们提出了ShuffleNet网络。从下图中的（a）模块出发，它是一个残差模块。其中3×3的卷积使用深度可分离卷积实现，将第一个1×1卷积替换成点组卷积紧跟着一个channel shuffle，形成一个ShuffleNet Unit，如下图的（b）所示，第二个点组卷积是为了恢复通道数目，以匹配shortcut连接。对于下采样模块，我们进行了两个修改，如下图（c）所示：（1）在shortcut通路上添加了一个平均池化层；（2）用通道连接替换元素相加，可以扩大通道，无需额外的计算成本。
+<img src="/img/shufflenet3.PNG" alt="">
+    由于点组卷积与channel shuffle，ShuffleNet Unit相同的设置下具有更小的复杂性，与ResNet和ResNeXt相比，例如：对于输入通道c，输出通道m，分组g的模块来说，ResNet需要$ 2cm+9m^{2}$，ResNeXt需要$ 2cm+\frac{9m^{2}}{g}$，而ShuffleNet 需要$\frac{2cm}{g}+9m$。即在相同的计算量下，ShuffleNet可以拥有更多的通道数。</p>
+<h3 id="network-architecture">Network Architecture</h3>
+<p>    下表是ShuffleNet的整体结构，由堆叠的ShuffleNet Unit组成。下表还探讨了不同的组数，我们调整了输出通道，以确保总体计算成本基本不变。显然，对于给定的复杂性约束，更大的组数会导致更多的输出通道（因此产生更多的卷积核），这有助于编码更多的信息。
+<img src="/img/shufflenet4.PNG" alt=""></p>
+<h1 id="shufflenetv2">ShuffleNetV2</h1>
+<p>原文链接：<a href="https://arxiv.org/pdf/1807.11164v1.pdf">ShuffleNetV2</a></p>
+<h2 id="practical-guidelines-for-efficient-network-design">Practical Guidelines for Efficient Network Design</h2>
+<p>    该论文通过一些实验提出了一些高效的网络架构设计的几个方面：<br>
+    （1）Equal channel width minimizes memory access cost (MAC)：输入通道和输出通道一致以最小化内存访问量；<br>
+    （2）Excessive group convolution increases MAC：过量使用组卷积会增加MAC；<br>
+    （3）Network fragmentation reduces degree of parallelism：网络的分支数量降低并行能力（网络碎片化降低了并行性的程度），如GoogleNet中的Inception，倾向于采用“多路”结构，即存在一个block中很多不同的小卷积或者pooling，这很容易造成网络碎片化，减低模型的并行度，有利于准确性，但它可能会降低效率；<br>
+    （4）Element-wise operations are non-negligible：不能忽略元素级操作，例如ReLu和add操作，需要较大的MAC，通过实验发现如果将ResNet中残差单元中的ReLU和shortcut移除的话，速度有20%的提升。<br>
+    基于实验验证，我们得出结论，一个高效的网络架构应该：<br>
+    （1）使用“平衡”卷积（等通道数）；<br>
+    （2）了解使用组卷积的成本；<br>
+    （3）减少碎片化程度；<br>
+    （4）减少元素级操作。</p>
+<h2 id="shufflenet-v2-an-efficient-architecture">ShuffleNet V2: an Efficient Architecture</h2>
+<p><img src="/img/shufflenetV2.PNG" alt=""></p>
+<h3 id="review-of-shufflenet-v1">Review of ShuffleNet v1</h3>
+<p>    如上图中的（a）（b）所示，利用到了两种技术：<em>pointwise group convolution</em>和<em>channel shuffle</em>。根据之前讨论的，分组卷积（1×1）违背了第二个原则，bottleneck结构中输入和输出通道数不同违背了第一个原则，同时使用过多的组，也违背了第三个原则，add操作违背了第四个原则。</p>
+<h3 id="channel-split-and-shufflenet-v2">Channel Split and ShuffleNet V2</h3>
+<p>    为了达到上述目的，我们引入了一个操作：channel split，如上图中的（c）所示，在每个unit开始，输入的$c$个特征通道，被分为两个分支，分别有$c-c'$和$c'$个通道。一个分支作为恒等映射，符合原则3，另一个分支由三个卷积组成，并且输入和输出通道相同，符合原则1，同时两个1x1卷积不再是组卷积，两个分支的输出不再是add元素，而是concat在一起，紧接着是对两个分支concat结果进行channle shuffle，以保证两个分支信息交流。<br>
+    对于下采样模块，对该单元进行了轻微的修改，如上图（d）所示，删除channel split操作，每个分支都是直接copy一份输入，每个分支都有stride=2的下采样，最后concat在一起后，特征图空间大小减半，但是通道数翻倍。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>
