@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-us" prefix="og: http://ogp.me/ns#">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="generator" content="Hugo 0.89.4" />
@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/" />
-  <link rel="canonical" href="https://gdy0924.github.io/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/attentionself-attention/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/attentionself-attention/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "",
-      "name" : "XY\u0027s Blog",
-      "headline" : "XY\u0027s Blog",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "Attention\u0026Self-Attention",
+      "headline" : "Attention\u0026Self-Attention",
+      "description" : "参考连接：\n注意力机制\n大白话浅谈【注意力机制】\n注意力机制（Attention）\n(强推)李宏毅2021\/2022春机器学习课程\nEncoder-Decoder 框架  下图是一个Encoder-Decoder 框架的例子，对应任务是机器翻译。 对于句子对\u0026lt;source，target\u0026gt;，将给定输入句子source，通过Encoder-Decoder框架生成目标句子target。其中，source和target都是一组单词序列： $$ source=\\left \\langle x_{1},x_{2},\u0026hellip;,x_{m} \\right \\rangle $$ $$ target=\\left \\langle y_{1},y_{2},\u0026hellip;,y_{n} \\right \\rangle $$ Encoder是对source进行编码，转换成中间语义$C$： $$ C=F(x_{1},x_{2},\u0026hellip;,x_{m}) $$ 对于解码器Decoder，其任务是根据中间语义C和当前已经生成的历史信息来生成下一时刻要生成的单词： $$ y_{i}=G(C,y_{1},y_{2},\u0026hellip;,y_{i-1}) $$ 具体来说，就是： $$ y_{1}=G(C) $$ $$ y_{2}=G(C,y_{1}) $$ $$ y_{3}=G(C,y_{1},y_{2}) $$ 从上述公式可以看出，对于每个输出$y$对应的都是相同的语义编码$C$，而$C$是对所有输入$x$“平等对待”所求得的，因此，对于target中的任何一个单词，source中任意单词对某个目标单词$y$来说影响力都是相同的。\n注意力机制  Attention是从大量信息中筛选出少量重要信息，并聚焦到这些重要信息上，忽略大多不重要的信息。权重越大越聚焦于其对应的Value值上，即权值代表了信息的重要性，而Value是其对应的信息。(可以说Key和Value是一样的东西)\n理解  引入注意力机制之后，上述框架图就变成了下边这样： 即对于每一个输出$y_{i}$都有其对应的自己的语义编码信息$C_{i}$，那么这个不同的$C_{i}$就代表了对输出$x$的不同“注意力”，如下公式所示： $$ C_{1}=F(\\alpha_{11}x_{1},\\alpha_{12}x_{2},\u0026hellip;,\\alpha_{1m}x_{m}) $$ 公式中的$\\alpha$就体现了对不同输入$x$的权重，生成target的过程就变成了： $$ y_1=G(C_1) $$ $$ y_{2}=G(C_{2},y_{1}) $$ $$ y_{3}=G(C_{3},y_{1},y_{2}) $$\n具体计算  Attention机制涉及到三个矩阵：$K$、$Q$、$V$，对这三个矩阵通俗的理解就是：图书馆（source）里有很多书（value），为了方便查找，我们给书做了编号（key）。当我们想要了解漫威（query）的时候，我们就可以看看那些动漫、电影、甚至二战相关的书籍。（$Q$是decoder的输出）\n其计算流程图如下所示： 共包含三个步骤：\n（1）根据Query和Key计算二者的相似度，得到注意力得分$s_{i}$，常见的方法包括：求两者的向量点积、求两者的向量cosine相似性或者引入额外的神经网络来求值等；",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -69,15 +69,35 @@ code.has-jax {
       "copyrightYear" : "2022",
       "datePublished": "2022-04-08 00:00:00 \u002b0000 UTC",
       "dateModified" : "2022-04-08 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/attentionself-attention\/",
       "keywords" : [  ]
   }
 </script>
-<title>XY&#39;s Blog</title>
-  <meta property="og:title" content="XY&#39;s Blog" />
-  <meta property="og:type" content="website" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+<title>Attention&amp;Self-Attention</title>
+  <meta property="og:title" content="Attention&amp;Self-Attention" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="参考连接：
+注意力机制
+大白话浅谈【注意力机制】
+注意力机制（Attention）
+(强推)李宏毅2021/2022春机器学习课程
+Encoder-Decoder 框架  下图是一个Encoder-Decoder 框架的例子，对应任务是机器翻译。 对于句子对&amp;lt;source，target&amp;gt;，将给定输入句子source，通过Encoder-Decoder框架生成目标句子target。其中，source和target都是一组单词序列： $$ source=\left \langle x_{1},x_{2},&amp;hellip;,x_{m} \right \rangle $$ $$ target=\left \langle y_{1},y_{2},&amp;hellip;,y_{n} \right \rangle $$ Encoder是对source进行编码，转换成中间语义$C$： $$ C=F(x_{1},x_{2},&amp;hellip;,x_{m}) $$ 对于解码器Decoder，其任务是根据中间语义C和当前已经生成的历史信息来生成下一时刻要生成的单词： $$ y_{i}=G(C,y_{1},y_{2},&amp;hellip;,y_{i-1}) $$ 具体来说，就是： $$ y_{1}=G(C) $$ $$ y_{2}=G(C,y_{1}) $$ $$ y_{3}=G(C,y_{1},y_{2}) $$ 从上述公式可以看出，对于每个输出$y$对应的都是相同的语义编码$C$，而$C$是对所有输入$x$“平等对待”所求得的，因此，对于target中的任何一个单词，source中任意单词对某个目标单词$y$来说影响力都是相同的。
+注意力机制  Attention是从大量信息中筛选出少量重要信息，并聚焦到这些重要信息上，忽略大多不重要的信息。权重越大越聚焦于其对应的Value值上，即权值代表了信息的重要性，而Value是其对应的信息。(可以说Key和Value是一样的东西)
+理解  引入注意力机制之后，上述框架图就变成了下边这样： 即对于每一个输出$y_{i}$都有其对应的自己的语义编码信息$C_{i}$，那么这个不同的$C_{i}$就代表了对输出$x$的不同“注意力”，如下公式所示： $$ C_{1}=F(\alpha_{11}x_{1},\alpha_{12}x_{2},&amp;hellip;,\alpha_{1m}x_{m}) $$ 公式中的$\alpha$就体现了对不同输入$x$的权重，生成target的过程就变成了： $$ y_1=G(C_1) $$ $$ y_{2}=G(C_{2},y_{1}) $$ $$ y_{3}=G(C_{3},y_{1},y_{2}) $$
+具体计算  Attention机制涉及到三个矩阵：$K$、$Q$、$V$，对这三个矩阵通俗的理解就是：图书馆（source）里有很多书（value），为了方便查找，我们给书做了编号（key）。当我们想要了解漫威（query）的时候，我们就可以看看那些动漫、电影、甚至二战相关的书籍。（$Q$是decoder的输出）
+其计算流程图如下所示： 共包含三个步骤：
+（1）根据Query和Key计算二者的相似度，得到注意力得分$s_{i}$，常见的方法包括：求两者的向量点积、求两者的向量cosine相似性或者引入额外的神经网络来求值等；" />
+  <meta name="description" content="参考连接：
+注意力机制
+大白话浅谈【注意力机制】
+注意力机制（Attention）
+(强推)李宏毅2021/2022春机器学习课程
+Encoder-Decoder 框架  下图是一个Encoder-Decoder 框架的例子，对应任务是机器翻译。 对于句子对&amp;lt;source，target&amp;gt;，将给定输入句子source，通过Encoder-Decoder框架生成目标句子target。其中，source和target都是一组单词序列： $$ source=\left \langle x_{1},x_{2},&amp;hellip;,x_{m} \right \rangle $$ $$ target=\left \langle y_{1},y_{2},&amp;hellip;,y_{n} \right \rangle $$ Encoder是对source进行编码，转换成中间语义$C$： $$ C=F(x_{1},x_{2},&amp;hellip;,x_{m}) $$ 对于解码器Decoder，其任务是根据中间语义C和当前已经生成的历史信息来生成下一时刻要生成的单词： $$ y_{i}=G(C,y_{1},y_{2},&amp;hellip;,y_{i-1}) $$ 具体来说，就是： $$ y_{1}=G(C) $$ $$ y_{2}=G(C,y_{1}) $$ $$ y_{3}=G(C,y_{1},y_{2}) $$ 从上述公式可以看出，对于每个输出$y$对应的都是相同的语义编码$C$，而$C$是对所有输入$x$“平等对待”所求得的，因此，对于target中的任何一个单词，source中任意单词对某个目标单词$y$来说影响力都是相同的。
+注意力机制  Attention是从大量信息中筛选出少量重要信息，并聚焦到这些重要信息上，忽略大多不重要的信息。权重越大越聚焦于其对应的Value值上，即权值代表了信息的重要性，而Value是其对应的信息。(可以说Key和Value是一样的东西)
+理解  引入注意力机制之后，上述框架图就变成了下边这样： 即对于每一个输出$y_{i}$都有其对应的自己的语义编码信息$C_{i}$，那么这个不同的$C_{i}$就代表了对输出$x$的不同“注意力”，如下公式所示： $$ C_{1}=F(\alpha_{11}x_{1},\alpha_{12}x_{2},&amp;hellip;,\alpha_{1m}x_{m}) $$ 公式中的$\alpha$就体现了对不同输入$x$的权重，生成target的过程就变成了： $$ y_1=G(C_1) $$ $$ y_{2}=G(C_{2},y_{1}) $$ $$ y_{3}=G(C_{3},y_{1},y_{2}) $$
+具体计算  Attention机制涉及到三个矩阵：$K$、$Q$、$V$，对这三个矩阵通俗的理解就是：图书馆（source）里有很多书（value），为了方便查找，我们给书做了编号（key）。当我们想要了解漫威（query）的时候，我们就可以看看那些动漫、电影、甚至二战相关的书籍。（$Q$是decoder的输出）
+其计算流程图如下所示： 共包含三个步骤：
+（1）根据Query和Key计算二者的相似度，得到注意力得分$s_{i}$，常见的方法包括：求两者的向量点积、求两者的向量cosine相似性或者引入额外的神经网络来求值等；" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +123,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,355 +156,165 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-        <div id="posts-list">
-          <section>
-            <h1 class="site-date-catalog">2022</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-3 col-sm-2">
-                <time datetime="2022-04-08 00:00:00 UTC">Apr 08</time>
-              </div>
-              <div class="posts-title col-xs-9 col-sm-10">
-                <div class="row">
-                  <div class="col-xs-11 col-sm-10">
-                    <a href="/posts/attentionself-attention/">Attention&amp;Self-Attention</a>
-                  </div>
-                  <div class="col-xs-1 col-sm-2 posts-categories">
-                    
-                    <div class="posts-category">
-                      <a href="/categories/tips/"><strong>Tips</strong></a>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-3 col-sm-2">
-                <time datetime="2022-04-06 00:00:00 UTC">Apr 06</time>
-              </div>
-              <div class="posts-title col-xs-9 col-sm-10">
-                <div class="row">
-                  <div class="col-xs-11 col-sm-10">
-                    <a href="/posts/%E5%88%86%E7%BB%84%E5%8D%B7%E7%A7%AF%E5%8F%AF%E5%88%86%E7%A6%BB%E5%8D%B7%E7%A7%AF/">分组卷积&amp;可分离卷积</a>
-                  </div>
-                  <div class="col-xs-1 col-sm-2 posts-categories">
-                    
-                    <div class="posts-category">
-                      <a href="/categories/tips/"><strong>Tips</strong></a>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-3 col-sm-2">
-                <time datetime="2022-04-06 00:00:00 UTC">Apr 06</time>
-              </div>
-              <div class="posts-title col-xs-9 col-sm-10">
-                <div class="row">
-                  <div class="col-xs-11 col-sm-10">
-                    <a href="/posts/shufflenet/">ShuffleNet</a>
-                  </div>
-                  <div class="col-xs-1 col-sm-2 posts-categories">
-                    
-                    <div class="posts-category">
-                      <a href="/categories/paper/"><strong>Paper</strong></a>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-3 col-sm-2">
-                <time datetime="2022-04-05 00:00:00 UTC">Apr 05</time>
-              </div>
-              <div class="posts-title col-xs-9 col-sm-10">
-                <div class="row">
-                  <div class="col-xs-11 col-sm-10">
-                    <a href="/posts/resnet/">ResNet</a>
-                  </div>
-                  <div class="col-xs-1 col-sm-2 posts-categories">
-                    
-                    <div class="posts-category">
-                      <a href="/categories/paper/"><strong>Paper</strong></a>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-3 col-sm-2">
-                <time datetime="2022-03-30 00:00:00 UTC">Mar 30</time>
-              </div>
-              <div class="posts-title col-xs-9 col-sm-10">
-                <div class="row">
-                  <div class="col-xs-11 col-sm-10">
-                    <a href="/posts/googlenetpaper/">GoogleNet</a>
-                  </div>
-                  <div class="col-xs-1 col-sm-2 posts-categories">
-                    
-                    <div class="posts-category">
-                      <a href="/categories/paper/"><strong>Paper</strong></a>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-3 col-sm-2">
-                <time datetime="2022-03-30 00:00:00 UTC">Mar 30</time>
-              </div>
-              <div class="posts-title col-xs-9 col-sm-10">
-                <div class="row">
-                  <div class="col-xs-11 col-sm-10">
-                    <a href="/posts/googlenetcode/">GoogleNet</a>
-                  </div>
-                  <div class="col-xs-1 col-sm-2 posts-categories">
-                    
-                    <div class="posts-category">
-                      <a href="/categories/code/"><strong>Code</strong></a>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-3 col-sm-2">
-                <time datetime="2022-03-29 00:00:00 UTC">Mar 29</time>
-              </div>
-              <div class="posts-title col-xs-9 col-sm-10">
-                <div class="row">
-                  <div class="col-xs-11 col-sm-10">
-                    <a href="/posts/vggpaper/">VGG</a>
-                  </div>
-                  <div class="col-xs-1 col-sm-2 posts-categories">
-                    
-                    <div class="posts-category">
-                      <a href="/categories/paper/"><strong>Paper</strong></a>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-3 col-sm-2">
-                <time datetime="2022-03-29 00:00:00 UTC">Mar 29</time>
-              </div>
-              <div class="posts-title col-xs-9 col-sm-10">
-                <div class="row">
-                  <div class="col-xs-11 col-sm-10">
-                    <a href="/posts/vggcode/">VGG</a>
-                  </div>
-                  <div class="col-xs-1 col-sm-2 posts-categories">
-                    
-                    <div class="posts-category">
-                      <a href="/categories/code/"><strong>Code</strong></a>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-3 col-sm-2">
-                <time datetime="2022-03-29 00:00:00 UTC">Mar 29</time>
-              </div>
-              <div class="posts-title col-xs-9 col-sm-10">
-                <div class="row">
-                  <div class="col-xs-11 col-sm-10">
-                    <a href="/posts/open-world-object-detector/">Open World Object Detector</a>
-                  </div>
-                  <div class="col-xs-1 col-sm-2 posts-categories">
-                    
-                    <div class="posts-category">
-                      <a href="/categories/paper/"><strong>Paper</strong></a>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-3 col-sm-2">
-                <time datetime="2022-03-27 00:00:00 UTC">Mar 27</time>
-              </div>
-              <div class="posts-title col-xs-9 col-sm-10">
-                <div class="row">
-                  <div class="col-xs-11 col-sm-10">
-                    <a href="/posts/relevance-campaper/">Relevance-CAM</a>
-                  </div>
-                  <div class="col-xs-1 col-sm-2 posts-categories">
-                    
-                    <div class="posts-category">
-                      <a href="/categories/paper/"><strong>Paper</strong></a>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-3 col-sm-2">
-                <time datetime="2022-01-24 00:00:00 UTC">Jan 24</time>
-              </div>
-              <div class="posts-title col-xs-9 col-sm-10">
-                <div class="row">
-                  <div class="col-xs-11 col-sm-10">
-                    <a href="/posts/batchnormalization/">BatchNormalization</a>
-                  </div>
-                  <div class="col-xs-1 col-sm-2 posts-categories">
-                    
-                    <div class="posts-category">
-                      <a href="/categories/tips/"><strong>Tips</strong></a>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-3 col-sm-2">
-                <time datetime="2022-01-12 00:00:00 UTC">Jan 12</time>
-              </div>
-              <div class="posts-title col-xs-9 col-sm-10">
-                <div class="row">
-                  <div class="col-xs-11 col-sm-10">
-                    <a href="/posts/alexnetpaper/">AlexNet</a>
-                  </div>
-                  <div class="col-xs-1 col-sm-2 posts-categories">
-                    
-                    <div class="posts-category">
-                      <a href="/categories/paper/"><strong>Paper</strong></a>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-3 col-sm-2">
-                <time datetime="2022-01-12 00:00:00 UTC">Jan 12</time>
-              </div>
-              <div class="posts-title col-xs-9 col-sm-10">
-                <div class="row">
-                  <div class="col-xs-11 col-sm-10">
-                    <a href="/posts/alexnetcode/">AlexNet</a>
-                  </div>
-                  <div class="col-xs-1 col-sm-2 posts-categories">
-                    
-                    <div class="posts-category">
-                      <a href="/categories/code/"><strong>Code</strong></a>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          <section>
-            <h1 class="site-date-catalog">2021</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-3 col-sm-2">
-                <time datetime="2021-12-26 20:58:21 CST">Dec 26</time>
-              </div>
-              <div class="posts-title col-xs-9 col-sm-10">
-                <div class="row">
-                  <div class="col-xs-11 col-sm-10">
-                    <a href="/posts/lenetcode/">LeNet</a>
-                  </div>
-                  <div class="col-xs-1 col-sm-2 posts-categories">
-                    
-                    <div class="posts-category">
-                      <a href="/categories/code/"><strong>Code</strong></a>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-3 col-sm-2">
-                <time datetime="2021-12-26 00:00:00 UTC">Dec 26</time>
-              </div>
-              <div class="posts-title col-xs-9 col-sm-10">
-                <div class="row">
-                  <div class="col-xs-11 col-sm-10">
-                    <a href="/posts/lenetpapar/">LeNet</a>
-                  </div>
-                  <div class="col-xs-1 col-sm-2 posts-categories">
-                    
-                    <div class="posts-category">
-                      <a href="/categories/paper/"><strong>Paper</strong></a>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-3 col-sm-2">
-                <time datetime="2021-12-11 15:52:51 CST">Dec 11</time>
-              </div>
-              <div class="posts-title col-xs-9 col-sm-10">
-                <div class="row">
-                  <div class="col-xs-11 col-sm-10">
-                    <a href="/posts/%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87/">模型评价指标</a>
-                  </div>
-                  <div class="col-xs-1 col-sm-2 posts-categories">
-                    
-                    <div class="posts-category">
-                      <a href="/categories/tips/"><strong>Tips</strong></a>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-3 col-sm-2">
-                <time datetime="2021-12-10 00:00:00 UTC">Dec 10</time>
-              </div>
-              <div class="posts-title col-xs-9 col-sm-10">
-                <div class="row">
-                  <div class="col-xs-11 col-sm-10">
-                    <a href="/posts/test/">test</a>
-                  </div>
-                  <div class="col-xs-1 col-sm-2 posts-categories">
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">Attention&amp;Self-Attention</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-04-08 00:00:00 UTC">
+                08 Apr 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>参考连接：<br>
+    <a href="https://www.jianshu.com/p/3968af85d3cb">注意力机制</a><br>
+    <a href="https://www.bilibili.com/video/BV1Ff4y187nr?p=2">大白话浅谈【注意力机制】</a><br>
+    <a href="https://blog.csdn.net/qq_37543361/article/details/117787368?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-1.pc_relevant_aa&amp;spm=1001.2101.3001.4242.2&amp;utm_relevant_index=4">注意力机制（Attention）</a><br>
+    <a href="https://www.bilibili.com/video/BV1Wv411h7kN?p=23">(强推)李宏毅2021/2022春机器学习课程</a></p>
+<h2 id="encoder-decoder-框架">Encoder-Decoder 框架</h2>
+<p>    下图是一个Encoder-Decoder 框架的例子，对应任务是机器翻译。
+<img src="/img/attention1.PNG" alt="">
+    对于句子对&lt;source，target&gt;，将给定输入句子source，通过Encoder-Decoder框架生成目标句子target。其中，source和target都是一组单词序列：
+$$
+source=\left \langle x_{1},x_{2},&hellip;,x_{m} \right \rangle
+$$
+$$
+target=\left \langle y_{1},y_{2},&hellip;,y_{n} \right \rangle
+$$
+    Encoder是对source进行编码，转换成中间语义$C$：
+$$
+C=F(x_{1},x_{2},&hellip;,x_{m})
+$$
+    对于解码器Decoder，其任务是根据中间语义C和当前已经生成的历史信息来生成下一时刻要生成的单词：
+$$
+y_{i}=G(C,y_{1},y_{2},&hellip;,y_{i-1})
+$$
+    具体来说，就是：
+$$
+y_{1}=G(C)
+$$
+$$
+y_{2}=G(C,y_{1})
+$$
+$$
+y_{3}=G(C,y_{1},y_{2})
+$$
+    从上述公式可以看出，对于每个输出$y$对应的都是相同的语义编码$C$，而$C$是对所有输入$x$“平等对待”所求得的，因此，对于target中的任何一个单词，source中任意单词对某个目标单词$y$来说影响力都是相同的。</p>
+<h2 id="注意力机制">注意力机制</h2>
+<p>    Attention是从大量信息中筛选出少量重要信息，并聚焦到这些重要信息上，忽略大多不重要的信息。权重越大越聚焦于其对应的Value值上，即权值代表了信息的重要性，而Value是其对应的信息。(可以说Key和Value是一样的东西)</p>
+<h3 id="理解">理解</h3>
+<p>    引入注意力机制之后，上述框架图就变成了下边这样：
+<img src="/img/attention2.PNG" alt="">
+    即对于每一个输出$y_{i}$都有其对应的自己的语义编码信息$C_{i}$，那么这个不同的$C_{i}$就代表了对输出$x$的不同“注意力”，如下公式所示：
+$$
+C_{1}=F(\alpha_{11}x_{1},\alpha_{12}x_{2},&hellip;,\alpha_{1m}x_{m})
+$$
+    公式中的$\alpha$就体现了对不同输入$x$的权重，生成target的过程就变成了：
+$$
+y_1=G(C_1)
+$$
+$$
+y_{2}=G(C_{2},y_{1})
+$$
+$$
+y_{3}=G(C_{3},y_{1},y_{2})
+$$</p>
+<h3 id="具体计算">具体计算</h3>
+<p>    Attention机制涉及到三个矩阵：$K$、$Q$、$V$，对这三个矩阵通俗的理解就是：图书馆（source）里有很多书（value），为了方便查找，我们给书做了编号（key）。当我们想要了解漫威（query）的时候，我们就可以看看那些动漫、电影、甚至二战相关的书籍。（$Q$是decoder的输出）<br>
+    其计算流程图如下所示：
+<img src="/img/attention3.PNG" alt="">
+    共包含三个步骤：<br>
+    （1）根据Query和Key计算二者的相似度，得到注意力得分$s_{i}$，常见的方法包括：求两者的向量点积、求两者的向量cosine相似性或者引入额外的神经网络来求值等；<br>
+    （2）用softmax函数对注意力得分进行数值转换，一方面可以进行归一化，得到所有权重系数之和为1的概率分布，另一方面可以用softmax函数的特性突出重要元素的权重$\alpha _{i}$；<br>
+    （3）根据权重系数对Value进行加权求和。<br>
+    过如上三个阶段的计算，就可以求出针对Query的Attention数值。</p>
+<h2 id="自注意力机制">自注意力机制</h2>
+<h3 id="理解-1">理解</h3>
+<p>    简单理解就是将输入$x_{i}$既当作$K$、$Q$，又当作$V$。这样做，往往是为了充分考虑句子之间不同词语之间的语义以及语法联系，可以捕获同一个句子中单词之间的一些语法特征。<br>
+    如下图，是Self-Attention的一个例子：
+<img src="/img/attention4.PNG" alt="">
+    从左边可以看出，我们找到了在该句子中与“make”单词最关联的几个单词，可以看作词组“make&hellip;more difficult”，在右边的例子中，我们可以找到与单词“its”最关联的单词，更可能是句子中“its”所指代的内容“law”或者“application”。通过Self-Attention可以避免在RNN或者LSTM中的长距离问题，当两个单词距离很远时，可能就捕捉不到它们之间的关系，不过Self-Attention在计算的时候，不考虑距离，因为会将当前的单词与句子中的所有单词计算相似度，与距离没有关系。</p>
+<h3 id="具体计算-1">具体计算</h3>
+<p>    引入三个矩阵$W^{q}$、$W^{k}$和$W^{v}$分别用来与输入$x_{i}$相乘得到注意力机制中的$K$、$Q$、$V$。<br>
+    具体计算流程如下：(下图都来自李宏毅老师的课程)<br>
+    （1）根据$Q$和$K$计算相似度，在Self-Attention中，通过$W^{q}$和$W^{k}$得到不同的$Q$和$K$，根据$Q$和$K$计算相似度，如下图所示，同时计算${a_1}$与$a_{1}$、$a_{2}$、$a_{3}$和$a_{4}$的相似度，得到$\alpha_{1}$、$\alpha_{2}$、$\alpha_{3}$和$\alpha_{4}$；
+<img src="/img/attention5.PNG" alt="">
+<img src="/img/attention6.PNG" alt="">
+    （2）用softmax函数对$\alpha_{1}$、$\alpha_{2}$、$\alpha_{3}$和$\alpha_{4}$进行数值转换，得到$\alpha_{1}$'、$\alpha_{2}$'、$\alpha_{3}$&lsquo;和$\alpha_{4}$'；
+<img src="/img/attention7.PNG" alt="">
+    （3）根据$\alpha_{1}$'、$\alpha_{2}$'、$\alpha_{3}$&lsquo;和$\alpha_{4}$&lsquo;对Value进行加权求和，Value是通过输入与矩阵$W^{v}$相乘计算得到来的。
+<img src="/img/attention8.PNG" alt="">
+    以矩阵的角度去看待整个计算过程就如下所示：
+<img src="/img/attention9.PNG" alt="">
+<img src="/img/attention10.PNG" alt="">
+<img src="/img/attention11.PNG" alt="">
+<img src="/img/attention12.PNG" alt=""></p>
+<h3 id="multi-head-self-attention">Multi-head Self-Attention</h3>
+<p>    之前我们都是用Q去找K，来计算相关性。但是两个事物之间相关性本身可能有多种不同的类型。因此设置多个Q(head),不同的Q来负责不同的相关性，即多组$W^{q}$、$W^{k}$和$W^{v}$矩阵分别计算相似度，也就是对于同一个输入回到的与头数相同的结果向量$b$，将多个$b$再进行一次转换得到最终的结果$B$，如下图所示：
+<img src="/img/attention13.PNG" alt="">
+<img src="/img/attention14.PNG" alt=""></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -503,6 +334,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

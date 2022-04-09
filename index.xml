@@ -6,7 +6,26 @@
     <description>Recent content on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 06 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 08 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Attention&amp;Self-Attention</title>
+      <link>https://gdy0924.github.io/posts/attentionself-attention/</link>
+      <pubDate>Fri, 08 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/attentionself-attention/</guid>
+      <description>参考连接：
+注意力机制
+大白话浅谈【注意力机制】
+注意力机制（Attention）
+(强推)李宏毅2021/2022春机器学习课程
+Encoder-Decoder 框架  下图是一个Encoder-Decoder 框架的例子，对应任务是机器翻译。 对于句子对&amp;lt;source，target&amp;gt;，将给定输入句子source，通过Encoder-Decoder框架生成目标句子target。其中，source和target都是一组单词序列： $$ source=\left \langle x_{1},x_{2},&amp;hellip;,x_{m} \right \rangle $$ $$ target=\left \langle y_{1},y_{2},&amp;hellip;,y_{n} \right \rangle $$ Encoder是对source进行编码，转换成中间语义$C$： $$ C=F(x_{1},x_{2},&amp;hellip;,x_{m}) $$ 对于解码器Decoder，其任务是根据中间语义C和当前已经生成的历史信息来生成下一时刻要生成的单词： $$ y_{i}=G(C,y_{1},y_{2},&amp;hellip;,y_{i-1}) $$ 具体来说，就是： $$ y_{1}=G(C) $$ $$ y_{2}=G(C,y_{1}) $$ $$ y_{3}=G(C,y_{1},y_{2}) $$ 从上述公式可以看出，对于每个输出$y$对应的都是相同的语义编码$C$，而$C$是对所有输入$x$“平等对待”所求得的，因此，对于target中的任何一个单词，source中任意单词对某个目标单词$y$来说影响力都是相同的。
+注意力机制  Attention是从大量信息中筛选出少量重要信息，并聚焦到这些重要信息上，忽略大多不重要的信息。权重越大越聚焦于其对应的Value值上，即权值代表了信息的重要性，而Value是其对应的信息。(可以说Key和Value是一样的东西)
+理解  引入注意力机制之后，上述框架图就变成了下边这样： 即对于每一个输出$y_{i}$都有其对应的自己的语义编码信息$C_{i}$，那么这个不同的$C_{i}$就代表了对输出$x$的不同“注意力”，如下公式所示： $$ C_{1}=F(\alpha_{11}x_{1},\alpha_{12}x_{2},&amp;hellip;,\alpha_{1m}x_{m}) $$ 公式中的$\alpha$就体现了对不同输入$x$的权重，生成target的过程就变成了： $$ y_1=G(C_1) $$ $$ y_{2}=G(C_{2},y_{1}) $$ $$ y_{3}=G(C_{3},y_{1},y_{2}) $$
+具体计算  Attention机制涉及到三个矩阵：$K$、$Q$、$V$，对这三个矩阵通俗的理解就是：图书馆（source）里有很多书（value），为了方便查找，我们给书做了编号（key）。当我们想要了解漫威（query）的时候，我们就可以看看那些动漫、电影、甚至二战相关的书籍。（$Q$是decoder的输出）
+其计算流程图如下所示： 共包含三个步骤：
+（1）根据Query和Key计算二者的相似度，得到注意力得分$s_{i}$，常见的方法包括：求两者的向量点积、求两者的向量cosine相似性或者引入额外的神经网络来求值等；</description>
+    </item>
+    
     <item>
       <title>ShuffleNet</title>
       <link>https://gdy0924.github.io/posts/shufflenet/</link>
