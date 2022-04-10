@@ -6,7 +6,31 @@
     <description>Recent content in Paper on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 06 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/paper/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 09 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/paper/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Transformer</title>
+      <link>https://gdy0924.github.io/posts/transformer/</link>
+      <pubDate>Sat, 09 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/transformer/</guid>
+      <description>原文链接：Transformer
+Abstract  目前主要的序列模型是主要是基于复杂的循环或者卷积神经网络的，包括一个编码器（encoder）和解码器（decoder）。性能最好的模型通过一种注意力机制将编码器和解码器连接起来。我们提出了一种新的简单的网络架构，Transformer，完全基于注意机制，完全取消递归和卷积，并通过实验验证了其有效性。
+Introduction  循环神经网络，特别是长短期记忆LSTM和门控循环GRU神经网络，已经成为序列建模和transduction问题的最先进的方法，如语言建模和机器翻译。此后，许多努力继续推动循环语言模型和编解码器架构。
+循环模型通常会沿着输入和输出序列的位置进行计算，它们生成一系列隐藏状态$h_{t}$，通过前一个隐藏状态$h_{t-1}$和输入$t$的计算得来。这种顺序性质阻碍了训练过程的并行化，这在较长的序列长度时变得至关重要，因为内存限制了样本之间的批处理。
+注意力机制已经成为各种任务中引人注目的序列建模和transduction模型的一个组成部分，其允许对依赖关系进行建模，而不考虑它们在输入或输出序列中的距离，通常与循环神经网络一起使用。
+在本文，我们提出了Transformer，一个不需要循环神经网络的模型架构，而是完全依赖于一个注意力机制来提取输入和输出之间的全局依赖关系，允许更多的并行化。
+Background  为了减少顺序计算，提出了扩展神经GPU、ByteNe和ConvS2S等，这些方法都使用卷积神经网络作为基本的block，并行计算所有输入和输出位置的隐藏表示。在这些模型中，关联两个任意输入或输出位置的信号所需的操作数量随着距离的增大而增长，这使得学习远距离位置之间的依赖关系更加困难。
+自注意力机制，是一种注意机制，将单个序列的不同位置联系起来，以计算序列的表示。自注意力机制已成功地应用于各种任务中，包括阅读理解、抽象摘要、文本隐含和学习任务独立的句子表征。
+据我们所知，Transformer是第一个完全依赖于自注意力机制来计算其输入和输出的表示的transduction模型，而不使用序列对齐的循环或卷积神经网络。
+Model Architecture  大多数神经序列transduction模型都是编码器（encoder）-解码器（decoder）结构。其中，编码器将一个符号表示的输入序列$(x_{1},&amp;hellip;,x_{n})$映射到一个连续表示的序列$z=(z_{1},&amp;hellip;,z_{n})$。给定$z$，解码器一次生成一个符号的输出序列$(y_{1},&amp;hellip;,y_{m})$，在生成下一个符号时，使用之前生成的符号作为附加的输入。
+Transformer遵循encoder-decoder架构，使用堆叠的自注意力机制，编码器和解码器的全连接层，分别如下图的左半部分和右半部分所示： Encoder and Decoder Stacks encoder和decoder的堆叠  Encoder： encoder由6个完全相同的层组成（n=6），每个层都有两个子层，第一个子层是一个multi-head自注意机制，第二个子层是一个简单的、全连接的前馈网络。我们在两个子层中使用残差连接，接着进行层归一化（layer normalization）。也就是说，每个子层的输出是$LayerNorm(x+Sublayer(x))$，其中$Sublayer(x)$是由子层本身实现的函数。为了方便残差连接，模型中的所有子层以及embedding层都会产生$d_{model}=512$的输出。
+Decoder： decoder也由6个完全相同的层组成（n=6）。除了每个编码器层中的两个子层外，decoder还增加了第三个子层，该子层对encoder的输出进行multi-head自注意操作。与encoder类似，我们在每个子层使用残差连接，然后进行层归一化。我们还修改了decoder中的自注意子层，以防止位置关注后续的位置。
+Attention 注意力机制  注意力机制可以描述为将查询（query）和一组键-值对（key-value）映射到输出，其中query、key、value和输出都是向量。输出是对value的加权求和，分配给每个value的权重由query与相应key通过函数计算得来的。
+Scaled Dot-Product Attention  我们将我们的注意力机制称为“Scaled Dot-Product Attention”（下图所示）。输入由query和key（维度为$d_{k}$），以及value（维度为$d_{v}$）组成。我们计算query和所有key的点乘，除以$\sqrt{d_{k}}$，并通过SoftMax获得value的权重。 实际上，我们将一组query、key和value整合成矩阵形式$Q$、$K$和$V$，同时计算一组query注意力分数，计算公式如下： $$ Attention(Q,K,V)=softmax(\frac{QK^{T}}{\sqrt{d_{k}}})V $$ 两个最常用的注意力函数是 additive attention和dot-product attention。dot-product attention与我们的算法相同，除了比例因子$\frac{1}{\sqrt{d_{k}}}$。点积注意力更快，更节省空间，因为它可以使用高度优化的矩阵乘法代码来实现。
+对于较小的$d_{k}$值，这两种注意力机制的表现相似，在$d_{k}$值较大的情况下， additive attention优于dot-product attention。我们猜测，对于大的$d_{k}$，其得到的点积结果也越来越大，使SoftMax进入一个具有极小梯度的区域，因此，为了避免上述问题，我们用比例因子$\frac{1}{\sqrt{d_{k}}}$来缩放点积。
+Multi-Head Attention  我们发现，不使用$d_{model}$维的key、value和query来得到单一的注意力函数，而是对key、value和query进行$h$次的线性投影，分别使用不同的、学习到的$d_{k}$、$d_{v}$和$d_{q}$维的线性投影。在每个query、key和value的投影结果上，我们并行地执行注意力函数，生成$d_{v}$维输出，这些输出被连接起来并再次线性变换，从而得到最终的值，如下图所示： multi-head注意力机制允许模型共同关注来自不同位置的不同表示子空间的信息，公式如下： $$ MultiHead(Q,K,V)=Concat(h_{1},&amp;hellip;,h_{h})W^{O} $$ $$ where; h_{i}=Attention(QW_{i}^{Q},KW_{i}^{K},VW_{i}^{V}) $$ 其中的投影是参数矩阵，$W_{i}^{Q}\in\mathbb{R}^{d_{model}\times d_{k}}$，$W_{i}^{K}\in\mathbb{R}^{d_{model}\times d_{k}}$，$W_{i}^{V}\in\mathbb{R}^{d_{model}\times d_{V}}$，$W^{O}\in\mathbb{R}^{hd_{v}\times d_{model}}$。</description>
+    </item>
+    
     <item>
       <title>ShuffleNet</title>
       <link>https://gdy0924.github.io/posts/shufflenet/</link>

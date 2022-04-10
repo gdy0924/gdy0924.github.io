@@ -268,6 +268,8 @@ $$</p>
 <p>    之前我们都是用Q去找K，来计算相关性。但是两个事物之间相关性本身可能有多种不同的类型。因此设置多个Q(head),不同的Q来负责不同的相关性，即多组$W^{q}$、$W^{k}$和$W^{v}$矩阵分别计算相似度，也就是对于同一个输入回到的与头数相同的结果向量$b$，将多个$b$再进行一次转换得到最终的结果$B$，如下图所示：
 <img src="/img/attention13.PNG" alt="">
 <img src="/img/attention14.PNG" alt=""></p>
+<h3 id="positional-encoding">Positional Encoding</h3>
+<p>    由于上述的自注意力机制中没有包含序列的位置信息，因此引入Positional Encoding。将position embedding和输入的embedding相加，在进行自注意力机制计算即可。在《Attention is all you need》论文中使用的是$sin$和$cos$函数计算得到的。</p>
 
         </div>
 

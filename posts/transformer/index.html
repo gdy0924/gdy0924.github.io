@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/transformer/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/transformer/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "Transformer",
+      "headline" : "Transformer",
+      "description" : "原文链接：Transformer\nAbstract  目前主要的序列模型是主要是基于复杂的循环或者卷积神经网络的，包括一个编码器（encoder）和解码器（decoder）。性能最好的模型通过一种注意力机制将编码器和解码器连接起来。我们提出了一种新的简单的网络架构，Transformer，完全基于注意机制，完全取消递归和卷积，并通过实验验证了其有效性。\nIntroduction  循环神经网络，特别是长短期记忆LSTM和门控循环GRU神经网络，已经成为序列建模和transduction问题的最先进的方法，如语言建模和机器翻译。此后，许多努力继续推动循环语言模型和编解码器架构。\n循环模型通常会沿着输入和输出序列的位置进行计算，它们生成一系列隐藏状态$h_{t}$，通过前一个隐藏状态$h_{t-1}$和输入$t$的计算得来。这种顺序性质阻碍了训练过程的并行化，这在较长的序列长度时变得至关重要，因为内存限制了样本之间的批处理。\n注意力机制已经成为各种任务中引人注目的序列建模和transduction模型的一个组成部分，其允许对依赖关系进行建模，而不考虑它们在输入或输出序列中的距离，通常与循环神经网络一起使用。\n在本文，我们提出了Transformer，一个不需要循环神经网络的模型架构，而是完全依赖于一个注意力机制来提取输入和输出之间的全局依赖关系，允许更多的并行化。\nBackground  为了减少顺序计算，提出了扩展神经GPU、ByteNe和ConvS2S等，这些方法都使用卷积神经网络作为基本的block，并行计算所有输入和输出位置的隐藏表示。在这些模型中，关联两个任意输入或输出位置的信号所需的操作数量随着距离的增大而增长，这使得学习远距离位置之间的依赖关系更加困难。\n自注意力机制，是一种注意机制，将单个序列的不同位置联系起来，以计算序列的表示。自注意力机制已成功地应用于各种任务中，包括阅读理解、抽象摘要、文本隐含和学习任务独立的句子表征。\n据我们所知，Transformer是第一个完全依赖于自注意力机制来计算其输入和输出的表示的transduction模型，而不使用序列对齐的循环或卷积神经网络。\nModel Architecture  大多数神经序列transduction模型都是编码器（encoder）-解码器（decoder）结构。其中，编码器将一个符号表示的输入序列$(x_{1},\u0026hellip;,x_{n})$映射到一个连续表示的序列$z=(z_{1},\u0026hellip;,z_{n})$。给定$z$，解码器一次生成一个符号的输出序列$(y_{1},\u0026hellip;,y_{m})$，在生成下一个符号时，使用之前生成的符号作为附加的输入。\nTransformer遵循encoder-decoder架构，使用堆叠的自注意力机制，编码器和解码器的全连接层，分别如下图的左半部分和右半部分所示： Encoder and Decoder Stacks encoder和decoder的堆叠  Encoder： encoder由6个完全相同的层组成（n=6），每个层都有两个子层，第一个子层是一个multi-head自注意机制，第二个子层是一个简单的、全连接的前馈网络。我们在两个子层中使用残差连接，接着进行层归一化（layer normalization）。也就是说，每个子层的输出是$LayerNorm(x\u002bSublayer(x))$，其中$Sublayer(x)$是由子层本身实现的函数。为了方便残差连接，模型中的所有子层以及embedding层都会产生$d_{model}=512$的输出。\nDecoder： decoder也由6个完全相同的层组成（n=6）。除了每个编码器层中的两个子层外，decoder还增加了第三个子层，该子层对encoder的输出进行multi-head自注意操作。与encoder类似，我们在每个子层使用残差连接，然后进行层归一化。我们还修改了decoder中的自注意子层，以防止位置关注后续的位置。\nAttention 注意力机制  注意力机制可以描述为将查询（query）和一组键-值对（key-value）映射到输出，其中query、key、value和输出都是向量。输出是对value的加权求和，分配给每个value的权重由query与相应key通过函数计算得来的。\nScaled Dot-Product Attention  我们将我们的注意力机制称为“Scaled Dot-Product Attention”（下图所示）。输入由query和key（维度为$d_{k}$），以及value（维度为$d_{v}$）组成。我们计算query和所有key的点乘，除以$\\sqrt{d_{k}}$，并通过SoftMax获得value的权重。 实际上，我们将一组query、key和value整合成矩阵形式$Q$、$K$和$V$，同时计算一组query注意力分数，计算公式如下： $$ Attention(Q,K,V)=softmax(\\frac{QK^{T}}{\\sqrt{d_{k}}})V $$ 两个最常用的注意力函数是 additive attention和dot-product attention。dot-product attention与我们的算法相同，除了比例因子$\\frac{1}{\\sqrt{d_{k}}}$。点积注意力更快，更节省空间，因为它可以使用高度优化的矩阵乘法代码来实现。\n对于较小的$d_{k}$值，这两种注意力机制的表现相似，在$d_{k}$值较大的情况下， additive attention优于dot-product attention。我们猜测，对于大的$d_{k}$，其得到的点积结果也越来越大，使SoftMax进入一个具有极小梯度的区域，因此，为了避免上述问题，我们用比例因子$\\frac{1}{\\sqrt{d_{k}}}$来缩放点积。\nMulti-Head Attention  我们发现，不使用$d_{model}$维的key、value和query来得到单一的注意力函数，而是对key、value和query进行$h$次的线性投影，分别使用不同的、学习到的$d_{k}$、$d_{v}$和$d_{q}$维的线性投影。在每个query、key和value的投影结果上，我们并行地执行注意力函数，生成$d_{v}$维输出，这些输出被连接起来并再次线性变换，从而得到最终的值，如下图所示： multi-head注意力机制允许模型共同关注来自不同位置的不同表示子空间的信息，公式如下： $$ MultiHead(Q,K,V)=Concat(h_{1},\u0026hellip;,h_{h})W^{O} $$ $$ where; h_{i}=Attention(QW_{i}^{Q},KW_{i}^{K},VW_{i}^{V}) $$ 其中的投影是参数矩阵，$W_{i}^{Q}\\in\\mathbb{R}^{d_{model}\\times d_{k}}$，$W_{i}^{K}\\in\\mathbb{R}^{d_{model}\\times d_{k}}$，$W_{i}^{V}\\in\\mathbb{R}^{d_{model}\\times d_{V}}$，$W^{O}\\in\\mathbb{R}^{hd_{v}\\times d_{model}}$。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-04-09 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-04-09 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/transformer\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>Transformer</title>
+  <meta property="og:title" content="Transformer" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="原文链接：Transformer
+Abstract  目前主要的序列模型是主要是基于复杂的循环或者卷积神经网络的，包括一个编码器（encoder）和解码器（decoder）。性能最好的模型通过一种注意力机制将编码器和解码器连接起来。我们提出了一种新的简单的网络架构，Transformer，完全基于注意机制，完全取消递归和卷积，并通过实验验证了其有效性。
+Introduction  循环神经网络，特别是长短期记忆LSTM和门控循环GRU神经网络，已经成为序列建模和transduction问题的最先进的方法，如语言建模和机器翻译。此后，许多努力继续推动循环语言模型和编解码器架构。
+循环模型通常会沿着输入和输出序列的位置进行计算，它们生成一系列隐藏状态$h_{t}$，通过前一个隐藏状态$h_{t-1}$和输入$t$的计算得来。这种顺序性质阻碍了训练过程的并行化，这在较长的序列长度时变得至关重要，因为内存限制了样本之间的批处理。
+注意力机制已经成为各种任务中引人注目的序列建模和transduction模型的一个组成部分，其允许对依赖关系进行建模，而不考虑它们在输入或输出序列中的距离，通常与循环神经网络一起使用。
+在本文，我们提出了Transformer，一个不需要循环神经网络的模型架构，而是完全依赖于一个注意力机制来提取输入和输出之间的全局依赖关系，允许更多的并行化。
+Background  为了减少顺序计算，提出了扩展神经GPU、ByteNe和ConvS2S等，这些方法都使用卷积神经网络作为基本的block，并行计算所有输入和输出位置的隐藏表示。在这些模型中，关联两个任意输入或输出位置的信号所需的操作数量随着距离的增大而增长，这使得学习远距离位置之间的依赖关系更加困难。
+自注意力机制，是一种注意机制，将单个序列的不同位置联系起来，以计算序列的表示。自注意力机制已成功地应用于各种任务中，包括阅读理解、抽象摘要、文本隐含和学习任务独立的句子表征。
+据我们所知，Transformer是第一个完全依赖于自注意力机制来计算其输入和输出的表示的transduction模型，而不使用序列对齐的循环或卷积神经网络。
+Model Architecture  大多数神经序列transduction模型都是编码器（encoder）-解码器（decoder）结构。其中，编码器将一个符号表示的输入序列$(x_{1},&amp;hellip;,x_{n})$映射到一个连续表示的序列$z=(z_{1},&amp;hellip;,z_{n})$。给定$z$，解码器一次生成一个符号的输出序列$(y_{1},&amp;hellip;,y_{m})$，在生成下一个符号时，使用之前生成的符号作为附加的输入。
+Transformer遵循encoder-decoder架构，使用堆叠的自注意力机制，编码器和解码器的全连接层，分别如下图的左半部分和右半部分所示： Encoder and Decoder Stacks encoder和decoder的堆叠  Encoder： encoder由6个完全相同的层组成（n=6），每个层都有两个子层，第一个子层是一个multi-head自注意机制，第二个子层是一个简单的、全连接的前馈网络。我们在两个子层中使用残差连接，接着进行层归一化（layer normalization）。也就是说，每个子层的输出是$LayerNorm(x&#43;Sublayer(x))$，其中$Sublayer(x)$是由子层本身实现的函数。为了方便残差连接，模型中的所有子层以及embedding层都会产生$d_{model}=512$的输出。
+Decoder： decoder也由6个完全相同的层组成（n=6）。除了每个编码器层中的两个子层外，decoder还增加了第三个子层，该子层对encoder的输出进行multi-head自注意操作。与encoder类似，我们在每个子层使用残差连接，然后进行层归一化。我们还修改了decoder中的自注意子层，以防止位置关注后续的位置。
+Attention 注意力机制  注意力机制可以描述为将查询（query）和一组键-值对（key-value）映射到输出，其中query、key、value和输出都是向量。输出是对value的加权求和，分配给每个value的权重由query与相应key通过函数计算得来的。
+Scaled Dot-Product Attention  我们将我们的注意力机制称为“Scaled Dot-Product Attention”（下图所示）。输入由query和key（维度为$d_{k}$），以及value（维度为$d_{v}$）组成。我们计算query和所有key的点乘，除以$\sqrt{d_{k}}$，并通过SoftMax获得value的权重。 实际上，我们将一组query、key和value整合成矩阵形式$Q$、$K$和$V$，同时计算一组query注意力分数，计算公式如下： $$ Attention(Q,K,V)=softmax(\frac{QK^{T}}{\sqrt{d_{k}}})V $$ 两个最常用的注意力函数是 additive attention和dot-product attention。dot-product attention与我们的算法相同，除了比例因子$\frac{1}{\sqrt{d_{k}}}$。点积注意力更快，更节省空间，因为它可以使用高度优化的矩阵乘法代码来实现。
+对于较小的$d_{k}$值，这两种注意力机制的表现相似，在$d_{k}$值较大的情况下， additive attention优于dot-product attention。我们猜测，对于大的$d_{k}$，其得到的点积结果也越来越大，使SoftMax进入一个具有极小梯度的区域，因此，为了避免上述问题，我们用比例因子$\frac{1}{\sqrt{d_{k}}}$来缩放点积。
+Multi-Head Attention  我们发现，不使用$d_{model}$维的key、value和query来得到单一的注意力函数，而是对key、value和query进行$h$次的线性投影，分别使用不同的、学习到的$d_{k}$、$d_{v}$和$d_{q}$维的线性投影。在每个query、key和value的投影结果上，我们并行地执行注意力函数，生成$d_{v}$维输出，这些输出被连接起来并再次线性变换，从而得到最终的值，如下图所示： multi-head注意力机制允许模型共同关注来自不同位置的不同表示子空间的信息，公式如下： $$ MultiHead(Q,K,V)=Concat(h_{1},&amp;hellip;,h_{h})W^{O} $$ $$ where; h_{i}=Attention(QW_{i}^{Q},KW_{i}^{K},VW_{i}^{V}) $$ 其中的投影是参数矩阵，$W_{i}^{Q}\in\mathbb{R}^{d_{model}\times d_{k}}$，$W_{i}^{K}\in\mathbb{R}^{d_{model}\times d_{k}}$，$W_{i}^{V}\in\mathbb{R}^{d_{model}\times d_{V}}$，$W^{O}\in\mathbb{R}^{hd_{v}\times d_{model}}$。" />
+  <meta name="description" content="原文链接：Transformer
+Abstract  目前主要的序列模型是主要是基于复杂的循环或者卷积神经网络的，包括一个编码器（encoder）和解码器（decoder）。性能最好的模型通过一种注意力机制将编码器和解码器连接起来。我们提出了一种新的简单的网络架构，Transformer，完全基于注意机制，完全取消递归和卷积，并通过实验验证了其有效性。
+Introduction  循环神经网络，特别是长短期记忆LSTM和门控循环GRU神经网络，已经成为序列建模和transduction问题的最先进的方法，如语言建模和机器翻译。此后，许多努力继续推动循环语言模型和编解码器架构。
+循环模型通常会沿着输入和输出序列的位置进行计算，它们生成一系列隐藏状态$h_{t}$，通过前一个隐藏状态$h_{t-1}$和输入$t$的计算得来。这种顺序性质阻碍了训练过程的并行化，这在较长的序列长度时变得至关重要，因为内存限制了样本之间的批处理。
+注意力机制已经成为各种任务中引人注目的序列建模和transduction模型的一个组成部分，其允许对依赖关系进行建模，而不考虑它们在输入或输出序列中的距离，通常与循环神经网络一起使用。
+在本文，我们提出了Transformer，一个不需要循环神经网络的模型架构，而是完全依赖于一个注意力机制来提取输入和输出之间的全局依赖关系，允许更多的并行化。
+Background  为了减少顺序计算，提出了扩展神经GPU、ByteNe和ConvS2S等，这些方法都使用卷积神经网络作为基本的block，并行计算所有输入和输出位置的隐藏表示。在这些模型中，关联两个任意输入或输出位置的信号所需的操作数量随着距离的增大而增长，这使得学习远距离位置之间的依赖关系更加困难。
+自注意力机制，是一种注意机制，将单个序列的不同位置联系起来，以计算序列的表示。自注意力机制已成功地应用于各种任务中，包括阅读理解、抽象摘要、文本隐含和学习任务独立的句子表征。
+据我们所知，Transformer是第一个完全依赖于自注意力机制来计算其输入和输出的表示的transduction模型，而不使用序列对齐的循环或卷积神经网络。
+Model Architecture  大多数神经序列transduction模型都是编码器（encoder）-解码器（decoder）结构。其中，编码器将一个符号表示的输入序列$(x_{1},&amp;hellip;,x_{n})$映射到一个连续表示的序列$z=(z_{1},&amp;hellip;,z_{n})$。给定$z$，解码器一次生成一个符号的输出序列$(y_{1},&amp;hellip;,y_{m})$，在生成下一个符号时，使用之前生成的符号作为附加的输入。
+Transformer遵循encoder-decoder架构，使用堆叠的自注意力机制，编码器和解码器的全连接层，分别如下图的左半部分和右半部分所示： Encoder and Decoder Stacks encoder和decoder的堆叠  Encoder： encoder由6个完全相同的层组成（n=6），每个层都有两个子层，第一个子层是一个multi-head自注意机制，第二个子层是一个简单的、全连接的前馈网络。我们在两个子层中使用残差连接，接着进行层归一化（layer normalization）。也就是说，每个子层的输出是$LayerNorm(x&#43;Sublayer(x))$，其中$Sublayer(x)$是由子层本身实现的函数。为了方便残差连接，模型中的所有子层以及embedding层都会产生$d_{model}=512$的输出。
+Decoder： decoder也由6个完全相同的层组成（n=6）。除了每个编码器层中的两个子层外，decoder还增加了第三个子层，该子层对encoder的输出进行multi-head自注意操作。与encoder类似，我们在每个子层使用残差连接，然后进行层归一化。我们还修改了decoder中的自注意子层，以防止位置关注后续的位置。
+Attention 注意力机制  注意力机制可以描述为将查询（query）和一组键-值对（key-value）映射到输出，其中query、key、value和输出都是向量。输出是对value的加权求和，分配给每个value的权重由query与相应key通过函数计算得来的。
+Scaled Dot-Product Attention  我们将我们的注意力机制称为“Scaled Dot-Product Attention”（下图所示）。输入由query和key（维度为$d_{k}$），以及value（维度为$d_{v}$）组成。我们计算query和所有key的点乘，除以$\sqrt{d_{k}}$，并通过SoftMax获得value的权重。 实际上，我们将一组query、key和value整合成矩阵形式$Q$、$K$和$V$，同时计算一组query注意力分数，计算公式如下： $$ Attention(Q,K,V)=softmax(\frac{QK^{T}}{\sqrt{d_{k}}})V $$ 两个最常用的注意力函数是 additive attention和dot-product attention。dot-product attention与我们的算法相同，除了比例因子$\frac{1}{\sqrt{d_{k}}}$。点积注意力更快，更节省空间，因为它可以使用高度优化的矩阵乘法代码来实现。
+对于较小的$d_{k}$值，这两种注意力机制的表现相似，在$d_{k}$值较大的情况下， additive attention优于dot-product attention。我们猜测，对于大的$d_{k}$，其得到的点积结果也越来越大，使SoftMax进入一个具有极小梯度的区域，因此，为了避免上述问题，我们用比例因子$\frac{1}{\sqrt{d_{k}}}$来缩放点积。
+Multi-Head Attention  我们发现，不使用$d_{model}$维的key、value和query来得到单一的注意力函数，而是对key、value和query进行$h$次的线性投影，分别使用不同的、学习到的$d_{k}$、$d_{v}$和$d_{q}$维的线性投影。在每个query、key和value的投影结果上，我们并行地执行注意力函数，生成$d_{v}$维输出，这些输出被连接起来并再次线性变换，从而得到最终的值，如下图所示： multi-head注意力机制允许模型共同关注来自不同位置的不同表示子空间的信息，公式如下： $$ MultiHead(Q,K,V)=Concat(h_{1},&amp;hellip;,h_{h})W^{O} $$ $$ where; h_{i}=Attention(QW_{i}^{Q},KW_{i}^{K},VW_{i}^{V}) $$ 其中的投影是参数矩阵，$W_{i}^{Q}\in\mathbb{R}^{d_{model}\times d_{k}}$，$W_{i}^{K}\in\mathbb{R}^{d_{model}\times d_{k}}$，$W_{i}^{V}\in\mathbb{R}^{d_{model}\times d_{V}}$，$W^{O}\in\mathbb{R}^{hd_{v}\times d_{model}}$。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">Transformer</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-04-09 00:00:00 UTC">
+                09 Apr 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>    原文链接：<a href="https://arxiv.org/pdf/1706.03762.pdf">Transformer</a></p>
+<h2 id="abstract">Abstract</h2>
+<p>    目前主要的序列模型是主要是基于复杂的循环或者卷积神经网络的，包括一个编码器（encoder）和解码器（decoder）。性能最好的模型通过一种注意力机制将编码器和解码器连接起来。我们提出了一种新的简单的网络架构，Transformer，完全基于注意机制，完全取消递归和卷积，并通过实验验证了其有效性。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    循环神经网络，特别是长短期记忆LSTM和门控循环GRU神经网络，已经成为序列建模和transduction问题的最先进的方法，如语言建模和机器翻译。此后，许多努力继续推动循环语言模型和编解码器架构。<br>
+    循环模型通常会沿着输入和输出序列的位置进行计算，它们生成一系列隐藏状态$h_{t}$，通过前一个隐藏状态$h_{t-1}$和输入$t$的计算得来。这种顺序性质阻碍了训练过程的并行化，这在较长的序列长度时变得至关重要，因为内存限制了样本之间的批处理。<br>
+    注意力机制已经成为各种任务中引人注目的序列建模和transduction模型的一个组成部分，其允许对依赖关系进行建模，而不考虑它们在输入或输出序列中的距离，通常与循环神经网络一起使用。<br>
+    在本文，我们提出了Transformer，一个不需要循环神经网络的模型架构，而是完全依赖于一个注意力机制来提取输入和输出之间的全局依赖关系，允许更多的并行化。</p>
+<h2 id="background">Background</h2>
+<p>    为了减少顺序计算，提出了扩展神经GPU、ByteNe和ConvS2S等，这些方法都使用卷积神经网络作为基本的block，并行计算所有输入和输出位置的隐藏表示。在这些模型中，关联两个任意输入或输出位置的信号所需的操作数量随着距离的增大而增长，这使得学习远距离位置之间的依赖关系更加困难。<br>
+    自注意力机制，是一种注意机制，将单个序列的不同位置联系起来，以计算序列的表示。自注意力机制已成功地应用于各种任务中，包括阅读理解、抽象摘要、文本隐含和学习任务独立的句子表征。<br>
+    据我们所知，Transformer是第一个完全依赖于自注意力机制来计算其输入和输出的表示的transduction模型，而不使用序列对齐的循环或卷积神经网络。</p>
+<h2 id="model-architecture">Model Architecture</h2>
+<p>    大多数神经序列transduction模型都是编码器（encoder）-解码器（decoder）结构。其中，编码器将一个符号表示的输入序列$(x_{1},&hellip;,x_{n})$映射到一个连续表示的序列$z=(z_{1},&hellip;,z_{n})$。给定$z$，解码器一次生成一个符号的输出序列$(y_{1},&hellip;,y_{m})$，在生成下一个符号时，使用之前生成的符号作为附加的输入。<br>
+    Transformer遵循encoder-decoder架构，使用堆叠的自注意力机制，编码器和解码器的全连接层，分别如下图的左半部分和右半部分所示：
+<img src="/img/transformer1.PNG" alt=""></p>
+<h3 id="encoder-and-decoder-stacks-encoder和decoder的堆叠">Encoder and Decoder Stacks encoder和decoder的堆叠</h3>
+<p>     <strong>Encoder：</strong> encoder由6个完全相同的层组成（n=6），每个层都有两个子层，第一个子层是一个multi-head自注意机制，第二个子层是一个简单的、全连接的前馈网络。我们在两个子层中使用残差连接，接着进行层归一化（layer normalization）。也就是说，每个子层的输出是$LayerNorm(x+Sublayer(x))$，其中$Sublayer(x)$是由子层本身实现的函数。为了方便残差连接，模型中的所有子层以及embedding层都会产生$d_{model}=512$的输出。<br>
+     <strong>Decoder：</strong> decoder也由6个完全相同的层组成（n=6）。除了每个编码器层中的两个子层外，decoder还增加了第三个子层，该子层对encoder的输出进行multi-head自注意操作。与encoder类似，我们在每个子层使用残差连接，然后进行层归一化。我们还修改了decoder中的自注意子层，以防止位置关注后续的位置。</p>
+<h3 id="attention-注意力机制">Attention 注意力机制</h3>
+<p>    注意力机制可以描述为将查询（query）和一组键-值对（key-value）映射到输出，其中query、key、value和输出都是向量。输出是对value的加权求和，分配给每个value的权重由query与相应key通过函数计算得来的。</p>
+<h4 id="scaled-dot-product-attention">Scaled Dot-Product Attention</h4>
+<p>    我们将我们的注意力机制称为“Scaled Dot-Product Attention”（下图所示）。输入由query和key（维度为$d_{k}$），以及value（维度为$d_{v}$）组成。我们计算query和所有key的点乘，除以$\sqrt{d_{k}}$，并通过SoftMax获得value的权重。
+<img src="/img/transformer2.PNG" alt="">
+    实际上，我们将一组query、key和value整合成矩阵形式$Q$、$K$和$V$，同时计算一组query注意力分数，计算公式如下：
+$$
+Attention(Q,K,V)=softmax(\frac{QK^{T}}{\sqrt{d_{k}}})V
+$$
+    两个最常用的注意力函数是 additive attention和dot-product  attention。dot-product  attention与我们的算法相同，除了比例因子$\frac{1}{\sqrt{d_{k}}}$。点积注意力更快，更节省空间，因为它可以使用高度优化的矩阵乘法代码来实现。<br>
+    对于较小的$d_{k}$值，这两种注意力机制的表现相似，在$d_{k}$值较大的情况下， additive attention优于dot-product  attention。我们猜测，对于大的$d_{k}$，其得到的点积结果也越来越大，使SoftMax进入一个具有极小梯度的区域，因此，为了避免上述问题，我们用比例因子$\frac{1}{\sqrt{d_{k}}}$来缩放点积。</p>
+<h4 id="multi-head-attention">Multi-Head Attention</h4>
+<p>    我们发现，不使用$d_{model}$维的key、value和query来得到单一的注意力函数，而是对key、value和query进行$h$次的线性投影，分别使用不同的、学习到的$d_{k}$、$d_{v}$和$d_{q}$维的线性投影。在每个query、key和value的投影结果上，我们并行地执行注意力函数，生成$d_{v}$维输出，这些输出被连接起来并再次线性变换，从而得到最终的值，如下图所示：
+<img src="/img/transformer3.PNG" alt="">
+    multi-head注意力机制允许模型共同关注来自不同位置的不同表示子空间的信息，公式如下：
+$$
+MultiHead(Q,K,V)=Concat(h_{1},&hellip;,h_{h})W^{O}
+$$
+$$
+where; h_{i}=Attention(QW_{i}^{Q},KW_{i}^{K},VW_{i}^{V})
+$$
+    其中的投影是参数矩阵，$W_{i}^{Q}\in\mathbb{R}^{d_{model}\times d_{k}}$，$W_{i}^{K}\in\mathbb{R}^{d_{model}\times d_{k}}$，$W_{i}^{V}\in\mathbb{R}^{d_{model}\times d_{V}}$，$W^{O}\in\mathbb{R}^{hd_{v}\times d_{model}}$。<br>
+    在本文中，我们使用8个平行的注意力层（头部h=8）。$d_{k}=d_{v}=\frac{d_{model}}{h}=64$。由于维数减少，其总计算代价与单头注意相似。</p>
+<h4 id="applications-of-attention-in-our-model">Applications of Attention in our Model</h4>
+<p>    该Transformer以三种不同的方式使用multi-head注意力：<br>
+    （1）在“encoder-decoder注意”层中，query来自上一个decoder层，key和value来自encoder的输出。<br>
+    （2）encoder包含自注意力层。在自注意力层中，所有的key、value和query都来自同一个位置，即encoder中上一层的输出。encoder中的每个位置都可以处理encoder上一层中的所有位置。<br>
+    （3）类似地，decoder中的自注意力层可以注意到encoder中的所有位置和目前decoder中输出的所有位置，包括当前位置。</p>
+<h3 id="position-wise-feed-forward-networks">Position-wise Feed-Forward Networks</h3>
+<p>    除了注意力子层外，我们的encoder和decoder中的每个层都包含一个全连接的前馈神经网络，由两个线性变换组成，中间有一个ReLU激活，公式如下：
+$$
+FFN(x)=max(0,xW_{1}+b_{1})W_{2}+b_{2}
+$$
+    另一种描述是使用1×1的卷积核进行两层卷积，输入和输出的维数为$d_{model}=512$，内层的维数为$d_{ff}=2048$。</p>
+<h3 id="embeddings-and-softmax">Embeddings and Softmax</h3>
+<p>    与其他seq2seq模型类似，使用学习到embedding的将输入token和输出token 转换为$d_{model}$维向量，使用学习到的线性变换和SoftMax将decoder的输出转换为预测下一token的概率。上述embedding层和pre-softmax层共享权重参数。</p>
+<h3 id="positional-encoding">Positional Encoding</h3>
+<p>    由于Transformer中不包含递归和卷积网络，为了使模型利用序列的顺序，我们必须注入一些关于序列中token的相对或绝对位置的信息。我们在encoder和decoder中，向输入embedding中添加“位置编码”信息。位置编码与embedding具有相同的维数，因此两者可以相加。<br>
+    在本文中，我们使用不同频率的正弦和余弦函数：
+$$
+PE_{(pos,2i)}=sin(\frac{pos}{10000^{\frac{2i}{d_{model}}}})
+$$
+$$
+PE_{(pos,2i+1)}=cos(\frac{pos}{10000^{\frac{2i}{d_{model}}}})
+$$
+    其中，$pos$是位置，$i$是维度，即位置编码的每个维度都对应于一个正弦曲线。</p>
+<h2 id="why-self-attention">Why Self-Attention</h2>
+<p>    在本节中，我们从不同方面比较自注意力层与循环和卷积层，都用于将一个可变长度序列$(x_{1},..,x_{n})$映射成另一等长序列$(y_{1},..,y_{n})$，我们从三个方面去考虑。<br>
+    第一个是每层的总计算复杂度，另一个是可以并行化的计算量，通过所需的最小顺序操作数量来衡量。<br>
+    第三个是网络中长期依赖关系之间的路径长度。学习长期依赖关系是许多序列转换任务中的一个关键挑战。影响学习这种依赖关系能力的一个关键因素是信息在网络中向前和向后穿过的路径的长度。在输入和输出序列中的任何位置组合之间的这些路径越短，就越容易学习长期依赖关系。因此，我们也比较了由不同层类型组成的网络中任意两个输入和输出位置之间的最大路径长度。<br>
+    如下表所示，展示了不同层类型的最大路径长度、每层复杂性和最小顺序操作数。$n$为序列长度，$d$为表示维数，$k$为卷积的核大小，$r$为受限自注意条件下邻域的大小：
+<img src="/img/transformer4.PNG" alt=""></p>
+<h2 id="conclusion">Conclusion</h2>
+<p>    在本文，我们提出了Transformer，第一个完全基于注意的序列transduction模型，用multi-head自注意机制取代了encoder-decoder结构中最常用的循环网络。我们计划将Transformer扩展到涉及文本以外的输入和输出模式的问题，并研究局部的、受限的注意机制，以有效地处理大型输入和输出，如图像、音频和视频。</p>
+<h2 id="transformer李宏毅">Transformer（李宏毅）</h2>
+<p><a href="https://www.bilibili.com/video/BV1Wv411h7kN?p=50">(强推)李宏毅2021/2022春机器学习课程</a>
+<img src="/img/transformer1.PNG" alt=""></p>
+<h3 id="masked-multi-head-attention">Masked Multi-Head Attention</h3>
+<p>    在之前的自注意力机制中，输入的source会全部考虑并进行计算得到最终的输出，但是在decoder中，我们希望只看到前边生成的内容，因此就需要就序列后边的信息mask掉。</p>
+<h3 id="encoder-decoder">Encoder-Decoder</h3>
+<p>    Encoder与Decoder之间通过cross attention，通过上图可以看出，encoder输入两个箭头（k和v），decoder输入一个箭头（q），与attention机制类似。
+<img src="/img/transformer5.PNG" alt=""></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>
