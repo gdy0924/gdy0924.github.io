@@ -3,7 +3,7 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://gdy0924.github.io/categories/</loc>
-    <lastmod>2022-04-09T00:00:00+00:00</lastmod>
+    <lastmod>2022-04-13T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -16,10 +16,10 @@
                 />
   </url><url>
     <loc>https://gdy0924.github.io/categories/paper/</loc>
-    <lastmod>2022-04-09T00:00:00+00:00</lastmod>
+    <lastmod>2022-04-13T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/</loc>
-    <lastmod>2022-04-09T00:00:00+00:00</lastmod>
+    <lastmod>2022-04-13T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -31,11 +31,8 @@
                 href="https://gdy0924.github.io/posts/"
                 />
   </url><url>
-    <loc>https://gdy0924.github.io/posts/transformer/</loc>
-    <lastmod>2022-04-09T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://gdy0924.github.io/</loc>
-    <lastmod>2022-04-09T00:00:00+00:00</lastmod>
+    <lastmod>2022-04-13T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -47,10 +44,25 @@
                 href="https://gdy0924.github.io/"
                 />
   </url><url>
-    <loc>https://gdy0924.github.io/posts/attentionself-attention/</loc>
-    <lastmod>2022-04-08T00:00:00+00:00</lastmod>
+    <loc>https://gdy0924.github.io/posts/yolo%E7%B3%BB%E5%88%97/</loc>
+    <lastmod>2022-04-13T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://gdy0924.github.io/categories/tips/</loc>
+    <loc>https://gdy0924.github.io/posts/r-cnn%E7%B3%BB%E5%88%97/</loc>
+    <lastmod>2022-04-12T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/r-cnn%E7%B3%BB%E5%88%97%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93/</loc>
+    <lastmod>2022-04-12T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/categories/summary/</loc>
+    <lastmod>2022-04-12T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/iounms/</loc>
+    <lastmod>2022-04-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/transformer/</loc>
+    <lastmod>2022-04-09T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/attentionself-attention/</loc>
     <lastmod>2022-04-08T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/shufflenet/</loc>

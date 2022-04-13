@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/iounms/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/iounms/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "IoU\u0026NMS",
+      "headline" : "IoU\u0026NMS",
+      "description" : "IoU  IoU的全称为交并比（Intersection over Union），即 “预测的边框” 和 “真实的边框” 的交集和并集的比值，如下图所示： NMS 参考链接：NMS\n非极大值抑制（Non-Maximum suppression，NMS）用于消除同一个物体上的冗余预测框。\n传统NMS  其主要思想是：先对网络预测出的所有边界框按照分数由高到低排序，然后选取分数最高的预测框作为target，分别计算target与其余剩下预测框的重叠程度（用IoU来衡量），若重叠程度大于某一预先设定的阈值，则认为该预测框与target是同时负责预测同一个物体的，所以将该边界框删除，否则予以保留。接着在未被删除的预测框中选择分数最高的预测框作为新target，重复以上过程，直至判断出所有的框是否应该删除。 Soft-NMS  在传统NMS中，对于$IoU\\geq NMS$阈值的相邻框，其做法是将其得分暴力置0。这对于有遮挡的情况十分不友好。因此Soft-NMS的做法是采取得分惩罚机制，使用一个与IoU正相关的惩罚函数对得分$s$进行惩罚： 其中，$M$代表当前的最大得分框。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,21 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-04-13 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-04-13 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "datePublished": "2022-04-11 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-04-11 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/iounms\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>IoU&amp;NMS</title>
+  <meta property="og:title" content="IoU&amp;NMS" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="IoU  IoU的全称为交并比（Intersection over Union），即 “预测的边框” 和 “真实的边框” 的交集和并集的比值，如下图所示： NMS 参考链接：NMS
+非极大值抑制（Non-Maximum suppression，NMS）用于消除同一个物体上的冗余预测框。
+传统NMS  其主要思想是：先对网络预测出的所有边界框按照分数由高到低排序，然后选取分数最高的预测框作为target，分别计算target与其余剩下预测框的重叠程度（用IoU来衡量），若重叠程度大于某一预先设定的阈值，则认为该预测框与target是同时负责预测同一个物体的，所以将该边界框删除，否则予以保留。接着在未被删除的预测框中选择分数最高的预测框作为新target，重复以上过程，直至判断出所有的框是否应该删除。 Soft-NMS  在传统NMS中，对于$IoU\geq NMS$阈值的相邻框，其做法是将其得分暴力置0。这对于有遮挡的情况十分不友好。因此Soft-NMS的做法是采取得分惩罚机制，使用一个与IoU正相关的惩罚函数对得分$s$进行惩罚： 其中，$M$代表当前的最大得分框。" />
+  <meta name="description" content="IoU  IoU的全称为交并比（Intersection over Union），即 “预测的边框” 和 “真实的边框” 的交集和并集的比值，如下图所示： NMS 参考链接：NMS
+非极大值抑制（Non-Maximum suppression，NMS）用于消除同一个物体上的冗余预测框。
+传统NMS  其主要思想是：先对网络预测出的所有边界框按照分数由高到低排序，然后选取分数最高的预测框作为target，分别计算target与其余剩下预测框的重叠程度（用IoU来衡量），若重叠程度大于某一预先设定的阈值，则认为该预测框与target是同时负责预测同一个物体的，所以将该边界框删除，否则予以保留。接着在未被删除的预测框中选择分数最高的预测框作为新target，重复以上过程，直至判断出所有的框是否应该删除。 Soft-NMS  在传统NMS中，对于$IoU\geq NMS$阈值的相邻框，其做法是将其得分暴力置0。这对于有遮挡的情况十分不友好。因此Soft-NMS的做法是采取得分惩罚机制，使用一个与IoU正相关的惩罚函数对得分$s$进行惩罚： 其中，$M$代表当前的最大得分框。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +107,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +140,91 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">IoU&amp;NMS</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-04-11 00:00:00 UTC">
+                11 Apr 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <h2 id="iou">IoU</h2>
+<p>    IoU的全称为交并比（Intersection over Union），即 “预测的边框” 和 “真实的边框” 的交集和并集的比值，如下图所示：
+<img src="/img/iou.jpg" alt=""></p>
+<h2 id="nms">NMS</h2>
+<p>参考链接：<a href="https://zhuanlan.zhihu.com/p/151914931">NMS</a><br>
+    非极大值抑制（Non-Maximum suppression，NMS）用于消除同一个物体上的冗余预测框。</p>
+<h3 id="传统nms">传统NMS</h3>
+<p>    其主要思想是：先对网络预测出的所有边界框按照分数由高到低排序，然后选取分数最高的预测框作为target，分别计算target与其余剩下预测框的重叠程度（用IoU来衡量），若重叠程度大于某一预先设定的阈值，则认为该预测框与target是同时负责预测同一个物体的，所以将该边界框删除，否则予以保留。接着在未被删除的预测框中选择分数最高的预测框作为新target，重复以上过程，直至判断出所有的框是否应该删除。
+<img src="/img/nms1.PNG" alt=""></p>
+<h3 id="soft-nms">Soft-NMS</h3>
+<p>    在传统NMS中，对于$IoU\geq NMS$阈值的相邻框，其做法是将其得分暴力置0。这对于有遮挡的情况十分不友好。因此Soft-NMS的做法是采取得分惩罚机制，使用一个与IoU正相关的惩罚函数对得分$s$进行惩罚：
+<img src="/img/nms2.PNG" alt="">
+    其中，$M$代表当前的最大得分框。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +244,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

@@ -6,7 +6,74 @@
     <description>Recent content in Paper on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 09 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/paper/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 13 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/paper/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>YOLO系列</title>
+      <link>https://gdy0924.github.io/posts/yolo%E7%B3%BB%E5%88%97/</link>
+      <pubDate>Wed, 13 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/yolo%E7%B3%BB%E5%88%97/</guid>
+      <description>YOLO V1  原文链接：YOLO V1
+参考链接：你真的读懂yolo了吗？
+Abstract  提出一种新的目标检测算法——YOLO，之前的目标检测工作都是使用另外的分类器实现检测，我们将目标检测构建成回归问题框架，在空间上分离bounding-box和相关类别概率。一个网络直接从完整图像中预测bounding-box和类别概率，因此速度很快。
+Introduction  最近的方法，如R-CNN使用候选区域生成方法，首先在图像中生成候选框，然后在这些候选框上进行分类，分类后，再对bounding-box进行细化，消除重复框。这些复杂的操作导致运行速度缓慢，难以优化，因为每个单独的网络必须单独训练。
+我们将目标检测重新定义为单一的回归问题，直接从图像像素到bounding-box坐标和分类概率，&amp;ldquo;you only look once&amp;rdquo;（YOLO）就可以预测有什么物体以及它们在哪里。其架构如下图所示（YOLO包括三部分：将输入图像调整为448×448，在图像上运行单一卷积网络，通过模型的置信度来确定检测结果的阈值。）：单个卷积网络同时预测多个bounding-box和及其分类概率，YOLO训练完整的图像，并直接优化检测性能。
+相比于之前的网络，其有如下优点：
+（1）YOLO的速度非常快：由于我们将目标检测作为一个回归问题，所以我们不需要一个复杂网络。基本网络以每秒45帧的速度运行，另外，YOLO实现的平均平均精度是其他实时系统的两倍以上；
+（2）YOLO在做预测时关注的是图像的整体（全局）：与基于滑动窗口和候选区域生成的方法不同，YOLO在训练和测试期间可以看到整个图像，因此它隐式地编码上下文信息，而对于Fast R-CNN，由于看不到上下文信息，会错误的将背景patch预测为目标类；
+（3）YOLO学习目标的可推广表示：当在图像上进行训练和测试时，YOLO的性能远远优于DPM和R-CNN等其他检测方法，当应用在新的领域或者有预期之外的输入时，YOLO也可以很好的运行。
+YOLO在精度上仍然落后于最先进的检测模型，虽然它可以快速识别图像中的物体，但它很难精确定位一些物体，特别是小的物体。
+Unified Detection  我们将目标检测中的独立网络统一为一个单一的神经网络，使用来自整个图像的特征来预测每个bounding-box，同时预测类别概率，即我们的网络会对整个图像和图像中的所有目标对象进行全局推理。
+我们的模型将输入图像分割成一个$S×S$网格，如果一个对象的中心落入某一网格单元格中，则该网格单元格负责检测该对象。
+每个网格单元格预测$B$个bounding-box和bounding-box的置信度分数，这些置信度分数反映了该bounding-box包含物体的真实程度，也反映了该bounding-box预测的准确程度。我们将信心定义为$Pr(Object)\ast IOU_{pred}^{truth}$：如果该单元格中不存在对象，则置信度分数应该为零，否则，我们希望置信度得分等于bounding-box和ground truth之间的IOU值。
+每个bounding-box由5个预测部分组成：$x,y,w,h,confident$，$(x,y)$坐标表示相对于网格单元格边界的bounding-box的中心，$w$和$h$是相对于整个图像进行预测的bounding-box的宽度和高度，$confident$表示bounding-box和ground truth之间的IOU。
+每个网格单元还预测类别$C$的条件概率，$Pr(Class_{i}|Object)$，我们只预测每个网格单元的一组类别概率，而不管bounding-box的数量。
+在测试时，我们将类别条件概率和单独的bounding-box置信度预测相乘： $$ Pr(Class_{i}|Object)\ast Pr(Object)\ast IOU_{pred}^{truth}=Pr(Class_{i})\ast IOU_{pred}^{truth} $$ 即每个bounding-box的特定类别的置信分数，这些分数既编码了该类出现在框中的概率，也编码了bounding-box与物体的匹配程度。
+我们设置$S=7$，$B=2$，如下图所示：该模型将图像划分为一个$S×S$的网格，并为每个网格单元预测$B$个bounding-box，及其置信度和$C$类的概率，因此，这些预测值被编码为一个$S×S×(B\ast 5+C)$张量。 Network Design  我们将该模型作为一个卷积神经网络实现，网络的初始卷积层从图像中提取特征，而全连接层则预测输出的概率和bounding-box坐标。
+我们的网络架构是基于GoogleNet的，共有24个卷积层，2个全连接层。没有使用GoogLeNet中的Inception模块，而是简单地使用1×1降维层和3×3卷积层，如下图所示： 我们的网络的最终输出是预测的$7×7×30$大小的张量。
+我们还训练了一个快速版本的YOLO，Fast YOLO使用的神经网络的卷积层更少（9个而不是24个），这些层的卷积核也更少。除了网络的大小之外，YOLO和Fast YOLO之间的所有训练和测试参数都是相同的。
+Training  我们在ImageNet数据集上预训练了我们的卷积层；然后，我们转换模型来进行目标检测，检测通常需要细粒度的视觉信息，因此我们将网络的输入分辨率从$224×224$提高到$448×448$；最后一层预测了分类概率和bounding-box坐标，我们根据图像的宽度和高度将边界框的宽度和高度进行归一化，使它们落在0到1之间，参数化边界框$x$和$y$坐标为特定网格单元位置的偏移，因此它们也被限定在0和1之间；最后一层使用线性激活函数，而所有其他层使用Leaky ReLU： $$ x&amp;gt; 0,f(x)=x $$ $$ otherwise,f(x)=0.1x $$ 我们使用均方误差进行模型优化，但对定位误差和分类误差的权重相同，因此可能并不理想。另外，在每个图像中，许多网格单元格不包含任何物体，其置信度分数就为0，远远超过了包含物体的单元格的梯度。
+为了解决上述问题，我们增加bounding-box坐标预测的损失，减少不包含物体的单元格的预测的损失，引入两个参数，$\lambda_{coord}$和$\lambda_{noobj} $，并设置$\lambda_{coord}=5$、$\lambda_{noobj}=0.5$。
+均方误差对大bounding-box和小bounding-box的误差具有同样的权重，但是误差度量应该反映：大bounding-box的小偏差比小bounding-box的小偏差小，为了解决这个问题，我们预测边界框宽度和高度的平方根，而不是直接预测宽度和高度。
+YOLO为每个网格单元格预测多个bounding-box。在训练时，对于每一个物体，我们希望有一个bounding-box预测器去负责该物体，因此，我们指定一个预测器来“负责”预测一个物体，与ground truth有最高IOU的预测。这使得bounding-box预测器之间的专门化，每个预测器都能更好地预测特定大小、纵横比或物体的类别。
+因此，我们的损失函数如下： $$ \lambda_{coord}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{obj}[(x_{i}-\hat{x_{i}})^{2}+(y_{i}-\hat{y_{i}})^{2}] $$ $$ +\lambda_{coord}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{obj}[(\sqrt{w_{i}}-\sqrt{\hat{w_{i}}})^{2}+(\sqrt{h_{i}}-\sqrt{\hat{h_{i}}})^{2}] $$ $$ +\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{obj}(C_{i}-\hat{C_{i}})^{2} $$ $$ +\lambda_{noobj} \sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{noobj}(C_{i}-\hat{C_{i}})^{2} $$ $$ +\sum_{i=0}^{S^{2}}\mathbb{I} _{i} ^{obj}\sum_{c\in classes}(p_{i}(c)-\hat{p_{i}}(c))^{2} $$ 其中，$\mathbb{I} _{i} ^{obj}$表示单元格$i$是否有物体出现（0或1），$\mathbb{I} _{ij} ^{obj}$表示单元格$i$中第$j$个bounding-box预测器负责预测（0或1）。第一行是边界框中心坐标的误差；第二行是边界框长宽的误差，由于边界框大小本身便会影响到误差的大小，为了降低边界框大小的影响，而采用了开方差来比较；第三行是包含物体的单元格以及准确预测的边界框的置信度误差；第四行是不包含物体的单元格中以及准确预测的边界框的置信度误差；第五行是包含物体的单元格中，预测对象概率的各分项的误差平方之和。</description>
+    </item>
+    
+    <item>
+      <title>R-CNN系列</title>
+      <link>https://gdy0924.github.io/posts/r-cnn%E7%B3%BB%E5%88%97/</link>
+      <pubDate>Tue, 12 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/r-cnn%E7%B3%BB%E5%88%97/</guid>
+      <description>R-CNN 原文链接：R-CNN
+Abstract  在pascalVOC数据集上针对图像检测任务，其性能在过去几年中已经趋于稳定。性能最好的方法是复杂的集成系统，它通常将多个低级图像特征与高级上下文结合起来。在本文中，我们提出了一种简单且可扩展的检测算法，相对于之前对VOC2012的最佳结果，它将平均精度(mAP)提高了30%以上——实现了53.3%的mAP。
+该方法具有两个关键点：（1）可以将卷积神经网络(CNNs)应用于自下而上的区域建议，以定位和分割对象；（2）当标记的训练数据稀缺时，通过对辅助任务的监督预训练，然后进行特定领域的微调，会产生显著的性能提高。
+我们将区域建议与CNN结合起来，我们称我们的方法为R-CNN，即具有CNN特征的区域。
+Introduction  LeCun等人表明，通过反向传播的随机梯度下降对于训练卷积神经网络(CNNs)是有效的，这是一类新的神经网络的模型。2012年，AlexNet上显示出更高的图像分类精度，重新点燃了人们对cnn的兴趣。因此人们开始讨论ImageNet上的CNN分类结果在多大程度上可以推广到pascalVOC挑战上的目标检测结果？
+我们通过缩小图像分类和目标检测之间的差距来回答上述问题。本文首次证明，CNN可以显著提高对pascalVOC的目标检测性能。为了实现这一结果，我们关注两个问题：使用深度网络来定位对象，训练一个只用少量标注数据的高性能模型。
+与图像分类不同，检测需要在图像中定位（可能有很多）对象。一种方法将定位框架定义为一个回归问题。另一种选择是建立一个滑动窗口检测器。为了保持高分辨率，这些CNN通常只有两个卷积层和池化层。我们考虑了滑动窗口的方法，但是在比较高层的单元，我们拥有5个卷积层，有很大的感受野和步长。
+我们通过“区域识别”操作来解决CNN定位问题，在测试时，我们的方法为输入图像生成大约2000个类别独立的区域建议，使用CNN从每个建议中提取一个固定长度的特征向量，然后用线性支持向量机对每个区域进行分类。下图展示了方法概述及结果，由于我们的模型结合了区域建议和CNN，因此称之为R-CNN。 目标检测中面临的第二个挑战是标记数据的稀缺，目前可用的数量不足以训练大型的CNN。解决这个问题的传统解决方法是使用无监督的预训练，然后进行有监督的微调。因此，我们通过实验证明在大型辅助数据集(ILSVRC)上进行监督预训练，然后在小数据集(pascal)上进行微调，是在数据稀缺时学习高性能CNN的有效方法。我们注意到，由于R-CNN在图片的区域上进行操作，所以很自然地可以将其扩展到语义分割的任务。
+Object detection with R-CNN  该目标检测模型由三个模块组成。（1）产生与类别不相关的候选区域，这些候选区域定义了检测模型的候选检测集；（2）一个大型的卷积神经网络，它从每个区域中提取一个固定长度的特征向量；（3）一组特定于类的线性支持向量机。
+Module design  Region proposals：最近的各种论文提供了产生类别不相关的候选区域的方法。例如：，我们使用的是selective search方法。
+Feature extraction：基于AlexNet网络，从每个候选区域中提取一个4096维的特征向量，网络输入是227×227RGB图像，接着通过5个卷积层和2个全连接层。为了提取候选区域的特征，由于网络的输入大小必须是227×227的，因此需要对候选区域进行缩放扭曲，如下图所示： Test-time detection  在测试时，我们对测试图像进行selective search，提取出大约2000个候选区域，将候选区域进行变换，经过CNN网络以提取特征，针对每个类，使用训练好的SVM进行评分。对于图像中所有的得分区域，使用NMS（对于每个类独立），即如果一个候选区域与另一个候选区域的IoU大于阈值，且另一个候选区域的得分大于该区域，则拒绝该区域。
+Run-time analysis：两个操作使检测更有效：所有的CNN参数都在所有类别中共享；与其他常用方法相比，CNN提取到的特征向量是低维的。
+Training  Supervised pre-training：我们在一个像素级标注的大型数据集(ILSVRC2012)上对CNN进行了预训练（该数据的边界框标签不可用）。
+Domain-specific fine-tuning：为了使我们的CNN适应新的任务和新的领域，我们使用转换后的候选区域对CNN进行随机梯度下降(SGD)训练。CNN的架构没有变，除了最后的分类数变为（N+1），其中N是对象类的数量，+1作为背景。将与真值的IoU大于0.5的区域作为正类，其余为负类。
+Object category classifiers：使用二分类来对目标进行检测，使用IoU重叠阈值来决定一个区域是否为正类，阈值选择0.3是在验证集上实验选择的（{0,0.1,&amp;hellip;,0.5}），我们发现，将阈值设置为0.5或者0时，mAP会降低。
+针对每个类，都会训练一个线性SVM。
+Selective Search 参考链接：Selective Search （以下部分是Selective Search论文中的内容。）
+物体识别，在之前的做法主要是基于穷举搜索（Exhaustive Search）：选择一个窗口扫描整张图像（image），改变窗口的大小，继续扫描整张图像。这种做法是比较原始直观，改变窗口大小，扫描整张图像，非常耗时。若能过滤掉一些无用的box将会节省大量时间。这就是本文中Selective Search(选择性搜索)的优点，将穷举搜索（Exhausticve Search)和分割（Segmentation)结合起来。
+层次归类算法(Hierarchical Grouping Algorithm)  input：图片
+output：集合L
+（1）获取图片初始分割区域$R=(r_{1},&amp;hellip;,r_{n})$；
+（2）初始化相似度集合$S=\varnothing $；
+（3）计算$R$中两两相邻区域$(r_{i},r_{j})$之间的相似度，添加到相似度集合$S$；
+（4）从相似度集合$S$中找出，相似度最大的两个区域$r_{i}$和$r_{j}$，将其合并成为一个区域$r_{t}$，从$S$中除去原先与$r_{i}$和$r_{j}$相邻区域之间计算的相似度，计算$r_{t}$与其相邻区域（原先与$r_{i}$或$r_{j}$相邻的区域）的相似度，添加到相似度集合$S$中，将新区域$r_{t}$添加到区域集合$R$中；
+（5）迭代步骤（4）直至$S$为空，即可合并区域都已合并完；
+（6）获取R中每个区域的Bounding Boxes，这个结果就是图像中物体可能位置的可能结果集合L。
+多样性策略  论文给出了两个方面的多样化策略：颜色空间多样化，相似度计算的多样化。</description>
+    </item>
+    
     <item>
       <title>Transformer</title>
       <link>https://gdy0924.github.io/posts/transformer/</link>

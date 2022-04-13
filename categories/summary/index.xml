@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Summary on XY&#39;s Blog</title>
+    <link>https://gdy0924.github.io/categories/summary/</link>
+    <description>Recent content in Summary on XY&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 12 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/summary/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>R-CNN系列简单总结</title>
+      <link>https://gdy0924.github.io/posts/r-cnn%E7%B3%BB%E5%88%97%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93/</link>
+      <pubDate>Tue, 12 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/r-cnn%E7%B3%BB%E5%88%97%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93/</guid>
+      <description>参考链接：RCNN, Fast R-CNN 与 Faster RCNN理解及改进方法
+R-CNN 包含三个步骤：
+（1）候选区域选择：使用基于启发式的区域提取方法，用的方法是Selective Search，即从小区域开始，逐步合并两个最相关的相邻区域，重复此步骤，直到图像合并为一个区域，最后输出候选区域；
+（2）CNN特征提取：将region proposal 缩放至统一大小，作为输入进行特征提取；
+（3）分类与边界回归：将得到的特征向量送进每一类的SVM进行分类, 如果有十个类别，那么每个region proposal要跑10个SVM，得到类别；同时将特征向量做回归（左上角右下角的四个坐标），修正region proposal的位置（在这一步中包括NMS操作，用于去除掉同一类别中重复的box）
+Fast R-CNN 包含四个步骤：
+（1）对原始图片使用selective search算法得到约2k个region proposals（与R-CNN第一步相同）；
+（2）将任意size的图片输入CNN，得到特征图，只做一次卷积，相比于R-CNN，每个region proposal都要经过一次卷积，大大减少了时间；
+（3）在特征图中找到每一个region proposals对应的特征框，使用RoI池化层将每个特征框池化到统一大小；
+（4）统一大小的特征框经过全连接层得到固定大小的特征向量，分别进行softmax分类（使用softmax代替了R-CNN里面的多个SVM分类器）和bbox回归。
+RoI pooling层  RoI池化层用来将region proposals对应的特征框池化成统一大小，具体来说就是：将$h×w$大小的RoI特征框，划分成近似$h/H×w/W$大小的子窗口，形成$H×W$网格，将每个子窗口中的最大值输出到相应的网格单元中，如下图所示：是将一个$5×7$大小的region proposals，经过RoI pooling得到固定大小$2×2$的特征向量。 Faster R-CNN 参考链接： 提出一个RPN网络来代替之前的selective search操作，即利用网络来生成候选框，大大提高了效率，其包含四个步骤：
+（1）提取特征：输入固定大小的图片，进过卷积层提取特征图feature map；
+（2）生成region proposals: 经过Region Proposal Networks(RPN)网络生成region proposals，接着通过softmax判断anchors属于foreground还是background，再利用bounding box 回归修正anchors获得精确的proposals（候选区域）；
+（3）ROI Pooling: 该层的输入是feature maps和proposals，综合这些信息后提取proposal feature maps；
+（4）Classification: 将Roi pooling生成的proposal feature maps分别传入softmax分类和bounding box regression获得检测物体类别和检测框最终的精确位置。 因此，在训练Faster R-CNN的时候有四个损失：RPN 分类损失：anchor是否为前景（二分类）；RPN位置回归损失：anchor位置微调；RoI 分类损失：RoI所属类别（K+1类）；RoI位置回归损失：继续对RoI位置微调。四个损失相加作为最后的损失，反向传播，更新参数。
+RPN  上述图片的下边部分的两个分支，就是RPN网络，上面分支通过softmax分类anchors获得positive和negative分类，下面分支用于计算对于anchors的bounding box regression偏移量，以获得精确的proposal。而最后的Proposal层则负责综合positive anchors和对应bounding box regression偏移量获取proposals，同时剔除太小和超出边界的proposals。（其实RPN网络就相当于一个小型的目标检测网络）</description>
+    </item>
+    
+    <item>
+      <title>IoU&amp;NMS</title>
+      <link>https://gdy0924.github.io/posts/iounms/</link>
+      <pubDate>Mon, 11 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/iounms/</guid>
+      <description>IoU  IoU的全称为交并比（Intersection over Union），即 “预测的边框” 和 “真实的边框” 的交集和并集的比值，如下图所示： NMS 参考链接：NMS
+非极大值抑制（Non-Maximum suppression，NMS）用于消除同一个物体上的冗余预测框。
+传统NMS  其主要思想是：先对网络预测出的所有边界框按照分数由高到低排序，然后选取分数最高的预测框作为target，分别计算target与其余剩下预测框的重叠程度（用IoU来衡量），若重叠程度大于某一预先设定的阈值，则认为该预测框与target是同时负责预测同一个物体的，所以将该边界框删除，否则予以保留。接着在未被删除的预测框中选择分数最高的预测框作为新target，重复以上过程，直至判断出所有的框是否应该删除。 Soft-NMS  在传统NMS中，对于$IoU\geq NMS$阈值的相邻框，其做法是将其得分暴力置0。这对于有遮挡的情况十分不友好。因此Soft-NMS的做法是采取得分惩罚机制，使用一个与IoU正相关的惩罚函数对得分$s$进行惩罚： 其中，$M$代表当前的最大得分框。</description>
+    </item>
+    
+    <item>
+      <title>Attention&amp;Self-Attention</title>
+      <link>https://gdy0924.github.io/posts/attentionself-attention/</link>
+      <pubDate>Fri, 08 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/attentionself-attention/</guid>
+      <description>参考连接：
+注意力机制
+大白话浅谈【注意力机制】
+注意力机制（Attention）
+(强推)李宏毅2021/2022春机器学习课程
+Encoder-Decoder 框架  下图是一个Encoder-Decoder 框架的例子，对应任务是机器翻译。 对于句子对&amp;lt;source，target&amp;gt;，将给定输入句子source，通过Encoder-Decoder框架生成目标句子target。其中，source和target都是一组单词序列： $$ source=\left \langle x_{1},x_{2},&amp;hellip;,x_{m} \right \rangle $$ $$ target=\left \langle y_{1},y_{2},&amp;hellip;,y_{n} \right \rangle $$ Encoder是对source进行编码，转换成中间语义$C$： $$ C=F(x_{1},x_{2},&amp;hellip;,x_{m}) $$ 对于解码器Decoder，其任务是根据中间语义C和当前已经生成的历史信息来生成下一时刻要生成的单词： $$ y_{i}=G(C,y_{1},y_{2},&amp;hellip;,y_{i-1}) $$ 具体来说，就是： $$ y_{1}=G(C) $$ $$ y_{2}=G(C,y_{1}) $$ $$ y_{3}=G(C,y_{1},y_{2}) $$ 从上述公式可以看出，对于每个输出$y$对应的都是相同的语义编码$C$，而$C$是对所有输入$x$“平等对待”所求得的，因此，对于target中的任何一个单词，source中任意单词对某个目标单词$y$来说影响力都是相同的。
+注意力机制  Attention是从大量信息中筛选出少量重要信息，并聚焦到这些重要信息上，忽略大多不重要的信息。权重越大越聚焦于其对应的Value值上，即权值代表了信息的重要性，而Value是其对应的信息。(可以说Key和Value是一样的东西)
+理解  引入注意力机制之后，上述框架图就变成了下边这样： 即对于每一个输出$y_{i}$都有其对应的自己的语义编码信息$C_{i}$，那么这个不同的$C_{i}$就代表了对输出$x$的不同“注意力”，如下公式所示： $$ C_{1}=F(\alpha_{11}x_{1},\alpha_{12}x_{2},&amp;hellip;,\alpha_{1m}x_{m}) $$ 公式中的$\alpha$就体现了对不同输入$x$的权重，生成target的过程就变成了： $$ y_1=G(C_1) $$ $$ y_{2}=G(C_{2},y_{1}) $$ $$ y_{3}=G(C_{3},y_{1},y_{2}) $$
+具体计算  Attention机制涉及到三个矩阵：$K$、$Q$、$V$，对这三个矩阵通俗的理解就是：图书馆（source）里有很多书（value），为了方便查找，我们给书做了编号（key）。当我们想要了解漫威（query）的时候，我们就可以看看那些动漫、电影、甚至二战相关的书籍。（$Q$是decoder的输出）
+其计算流程图如下所示： 共包含三个步骤：
+（1）根据Query和Key计算二者的相似度，得到注意力得分$s_{i}$，常见的方法包括：求两者的向量点积、求两者的向量cosine相似性或者引入额外的神经网络来求值等；</description>
+    </item>
+    
+    <item>
+      <title>分组卷积&amp;可分离卷积</title>
+      <link>https://gdy0924.github.io/posts/%E5%88%86%E7%BB%84%E5%8D%B7%E7%A7%AF%E5%8F%AF%E5%88%86%E7%A6%BB%E5%8D%B7%E7%A7%AF/</link>
+      <pubDate>Wed, 06 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/%E5%88%86%E7%BB%84%E5%8D%B7%E7%A7%AF%E5%8F%AF%E5%88%86%E7%A6%BB%E5%8D%B7%E7%A7%AF/</guid>
+      <description>分组卷积（Group Convolution）  标准的卷积如下图的上部分所示，则其参数量为：$(KernelSize\times KernelSize\times c_{1})\times c_{2}$；括号中表示一个卷积核所包含的数目，括号外表示需要的卷积核个数。
+分组卷积如下图的下半部分所示，将输入特征图按照通道数分成$g$组，则其参数量为：一组卷积操作所需的参数量×组数=（一组卷积操作所需的参数量）×$g$=（一组卷积中卷积核的个数×卷积核的参数）×$g$=$(\frac{c_{2}}{g}\times (KernelSize\times KernelSize\times \frac{c_{1}}{g}))×g$=$(KernelSize\times KernelSize\times c_{1})\times c_{2}\times \frac{1}{g}$。
+因此，分组卷积的参数量是标准卷积的$\frac{1}{g}$。 可分离卷积 空间可分离卷积（Spatially Separable Convolutions）  将nxn的卷积分成1xn和nx1两步计算，以3×3卷积为例：（GoogleNetV3中使用） 深度可分离卷积（Depthwise Separable Convolution）  它的核心思想是将一个完整的卷积运算分解为两步进行，分别为逐深度卷积Depthwise Convolution与逐点卷积Pointwise Convolution。
+原始的卷积操作与下图所示，其参数量为：$(KernelSize\times KernelSize\times c_{1})\times c_{2}$，假设输入层为一个大小为64×64的图片，输入通道为3，输出通道为4，卷积核大小为3×3，则其具体参数量为$3×3×3×4=108$。 深度可分离卷积的第一步是逐深度卷积，如下图所示，可以看出，就是将分组卷积中的组数设置为通道数，该卷积操作的输入和输出通道数相同，这一步只融合了空间信息，缺少对通道之间的信息交流；该步的参数量为：$(KernelSize\times KernelSize\times 1)\times c_{1}$，以上述例子为例，其具体参数量为$3×3×1×3=27$。 第二步就是逐点卷积，使通道之间的信息可以流通，如下图所示，用1×1的卷积组合不同深度卷积的输出，得到一组新的输出，通过1×1卷积的个数控制输出通道数；该步的参数量为$(1\times 1\times c_{1})\times c_{2}$，其具体参数量为$1×1×3×4=12$。 因此，深度可分离卷积的总参数量为$27+12=39$，差不多是原始卷积操作（108）的1/3。
+总结  分组卷积和可分离卷积都是可以用来减少参数量，通过这两种卷积可以对训练好的复杂模型进行压缩得到小模型，如ResNeXt，也可以直接设计小模型并进行训练，如MobileNet、ShuffleNet等。</description>
+    </item>
+    
+    <item>
+      <title>BatchNormalization</title>
+      <link>https://gdy0924.github.io/posts/batchnormalization/</link>
+      <pubDate>Mon, 24 Jan 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/batchnormalization/</guid>
+      <description>批归一化主要用在非线性激活函数层前，它不仅可以加快模型训练时的收敛速度，而且还能够使模型训练过程更加稳定，避免梯度爆炸或者梯度消失，也起到一定的正则化作用，所以在目前的网络中被广泛使用到。
+计算步骤及公式 1、计算均值与方差 首先，对于输入的数值集合$ B= $ $\lbrace$ $ x_{1&amp;hellip;m} $ $\rbrace$，计算其均值$ \mu _{B} $和方差$ \sigma _{B}^{2} $，如下所示： $$ \mu _{B}=\frac{1}{m} \sum_{i=1}^{n} {x_i} $$
+$$ \sigma _{B}^{2} = \frac{1}{m} \sum_{i=1}^{m} (x_i- \mu _{B})^{2} $$
+2、数据标准化 将集合$ B $转化为均值为0、方差为1的正态分布$ \tilde{x_{i}} $，其中$ \epsilon $是引入的一个极小常数，以防止在公式中出现除零的情况 $$ \tilde{x_{i}}=\frac{x_{i}-\mu _{B}}{\sqrt{\sigma _{B}^{2}+\epsilon }} $$
+3、BN 引入可训练参数$ \gamma $和$ \beta $，对数据实现平移和缩放操作，通过引入的两个还原参数，可以使网络学习到原始的特征分布，在一定程度上保留了原始数据的分布 $$ y_{i}=\gamma \tilde{x_{i}}+\beta
+$$
+在全连接层中，BN作用在特征维上，而在卷积层中，BN作用在通道维上，具体来说，就是对feature map的通道方向求均值和方差，即假设batch size=n, feature map的shape= (w, h, c), 则会对c个$nwh $的特征分别求出c个均值和方差。
+预测阶段的BN 在训练阶段，可能没有许多的数据来形成一整个batch，可能只用单个数据来进行测试，这时，单个数据就无法计算上边公式中的均值与方差。 在训练阶段，针对每一个batch使用BN公式计算出的均值 $ \mu= $ $\lbrace$ $\mu ^{1},\mu ^{2},&amp;hellip;,\mu ^{n} $ $\rbrace$ 和 $ \sigma =$ $\lbrace$ $\sigma ^{1},\sigma ^{2},&amp;hellip;,\sigma ^{n} $ $\rbrace$ ，分别计算，其中$ p $是新引入的可调节参数。 $$ \bar{\mu }=p\bar{\mu }+\left ( 1-p \right )\mu ^{t} $$</description>
+    </item>
+    
+    <item>
+      <title>模型评价指标</title>
+      <link>https://gdy0924.github.io/posts/%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87/</link>
+      <pubDate>Sat, 11 Dec 2021 15:52:51 +0800</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87/</guid>
+      <description>对于训练好的模型，我们通常更加关注该模型在未知数据上的性能“好坏”，也就是模型的泛化能力如何。要对模型的泛化性能进行评估，就需要有衡量模型泛化能力的评价标准，即评价指标，或者称为性能度量。针对两种不同的任务类型：分类任务和回归任务，有各自不同的评价指标。
+回归任务 回归任务简单来说就是对连续值进行预测，比如：面积大小、数量多少等，最常用的性能度量是平均绝对误差(MAE)和均方误差(MSE)。
+MAE 平均绝对误差就是计算预测值与真实值之间的距离，公式如下：
+$$ MAE=\frac{1}{n}\sum_{i=1}^{n}\left | y_{i}-\hat{y_{i}} \right | $$
+MSE 均方误差就是计算预测值与真实值之间距离的平方和，公式如下：
+$$ MSE=\frac{1}{n}\sum_{i=1}^{n}\left ( y_{i}-\hat{y_{i}} \right )^{2} $$
+分类任务 分类任务简单来说就是对离散值进行预测，比如是不是、属不属于、或者属于哪一类，最常用的性能度量是准确率、错误率、精确率、召回率和F1-score等。 在分类任务中，基础指标是混淆矩阵，在混淆矩阵的基础上可以产生精确率、召回率等不同的评价指标。
+混淆矩阵 当把数据集中的正负样本分开来看时，将会产生以下四个指标： TP(True Positive)：真正例，即该样本的真实标签为正类，预测也为正类 TN(True Negative)：真反例，即该样本的真实标签为负类，预测也为负类 FP(False Positive)：假正例，即该样本的真实标签为负类，但预测为正类 FN(False Negative)：假反例，即该样本的真实标签为正类，但预测为负类 将上述四个指标放在一个矩阵中，即可得到混淆矩阵。
+真实情况预测结果正例反例正例TPFN反例FPTN错误率(Error Rate) 即分类错误的样本数占样本总数的比例，公式如下：
+$$ ErrorRate=\frac{FN+FP}{TP+FN+FP+TN} $$
+准确率(Accuracy) 即分类正确的样本数占样本总数的比例，公式如下：
+$$ ACC=\frac{TP+TN}{TP+FN+FP+TN} $$
+精确率(Precision) 又称查准率，即被预测为正例的样本中真实标签为正例的比例，公式如下：
+$$ P=\frac{TP}{TP+FP} $$</description>
+    </item>
+    
+  </channel>
+</rss>

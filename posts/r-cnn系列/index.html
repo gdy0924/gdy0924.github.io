@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/r-cnn%E7%B3%BB%E5%88%97/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/r-cnn%E7%B3%BB%E5%88%97/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "R-CNN系列",
+      "headline" : "R-CNN系列",
+      "description" : "R-CNN 原文链接：R-CNN\nAbstract  在pascalVOC数据集上针对图像检测任务，其性能在过去几年中已经趋于稳定。性能最好的方法是复杂的集成系统，它通常将多个低级图像特征与高级上下文结合起来。在本文中，我们提出了一种简单且可扩展的检测算法，相对于之前对VOC2012的最佳结果，它将平均精度(mAP)提高了30%以上——实现了53.3%的mAP。\n该方法具有两个关键点：（1）可以将卷积神经网络(CNNs)应用于自下而上的区域建议，以定位和分割对象；（2）当标记的训练数据稀缺时，通过对辅助任务的监督预训练，然后进行特定领域的微调，会产生显著的性能提高。\n我们将区域建议与CNN结合起来，我们称我们的方法为R-CNN，即具有CNN特征的区域。\nIntroduction  LeCun等人表明，通过反向传播的随机梯度下降对于训练卷积神经网络(CNNs)是有效的，这是一类新的神经网络的模型。2012年，AlexNet上显示出更高的图像分类精度，重新点燃了人们对cnn的兴趣。因此人们开始讨论ImageNet上的CNN分类结果在多大程度上可以推广到pascalVOC挑战上的目标检测结果？\n我们通过缩小图像分类和目标检测之间的差距来回答上述问题。本文首次证明，CNN可以显著提高对pascalVOC的目标检测性能。为了实现这一结果，我们关注两个问题：使用深度网络来定位对象，训练一个只用少量标注数据的高性能模型。\n与图像分类不同，检测需要在图像中定位（可能有很多）对象。一种方法将定位框架定义为一个回归问题。另一种选择是建立一个滑动窗口检测器。为了保持高分辨率，这些CNN通常只有两个卷积层和池化层。我们考虑了滑动窗口的方法，但是在比较高层的单元，我们拥有5个卷积层，有很大的感受野和步长。\n我们通过“区域识别”操作来解决CNN定位问题，在测试时，我们的方法为输入图像生成大约2000个类别独立的区域建议，使用CNN从每个建议中提取一个固定长度的特征向量，然后用线性支持向量机对每个区域进行分类。下图展示了方法概述及结果，由于我们的模型结合了区域建议和CNN，因此称之为R-CNN。 目标检测中面临的第二个挑战是标记数据的稀缺，目前可用的数量不足以训练大型的CNN。解决这个问题的传统解决方法是使用无监督的预训练，然后进行有监督的微调。因此，我们通过实验证明在大型辅助数据集(ILSVRC)上进行监督预训练，然后在小数据集(pascal)上进行微调，是在数据稀缺时学习高性能CNN的有效方法。我们注意到，由于R-CNN在图片的区域上进行操作，所以很自然地可以将其扩展到语义分割的任务。\nObject detection with R-CNN  该目标检测模型由三个模块组成。（1）产生与类别不相关的候选区域，这些候选区域定义了检测模型的候选检测集；（2）一个大型的卷积神经网络，它从每个区域中提取一个固定长度的特征向量；（3）一组特定于类的线性支持向量机。\nModule design  Region proposals：最近的各种论文提供了产生类别不相关的候选区域的方法。例如：，我们使用的是selective search方法。\nFeature extraction：基于AlexNet网络，从每个候选区域中提取一个4096维的特征向量，网络输入是227×227RGB图像，接着通过5个卷积层和2个全连接层。为了提取候选区域的特征，由于网络的输入大小必须是227×227的，因此需要对候选区域进行缩放扭曲，如下图所示： Test-time detection  在测试时，我们对测试图像进行selective search，提取出大约2000个候选区域，将候选区域进行变换，经过CNN网络以提取特征，针对每个类，使用训练好的SVM进行评分。对于图像中所有的得分区域，使用NMS（对于每个类独立），即如果一个候选区域与另一个候选区域的IoU大于阈值，且另一个候选区域的得分大于该区域，则拒绝该区域。\nRun-time analysis：两个操作使检测更有效：所有的CNN参数都在所有类别中共享；与其他常用方法相比，CNN提取到的特征向量是低维的。\nTraining  Supervised pre-training：我们在一个像素级标注的大型数据集(ILSVRC2012)上对CNN进行了预训练（该数据的边界框标签不可用）。\nDomain-specific fine-tuning：为了使我们的CNN适应新的任务和新的领域，我们使用转换后的候选区域对CNN进行随机梯度下降(SGD)训练。CNN的架构没有变，除了最后的分类数变为（N\u002b1），其中N是对象类的数量，\u002b1作为背景。将与真值的IoU大于0.5的区域作为正类，其余为负类。\nObject category classifiers：使用二分类来对目标进行检测，使用IoU重叠阈值来决定一个区域是否为正类，阈值选择0.3是在验证集上实验选择的（{0,0.1,\u0026hellip;,0.5}），我们发现，将阈值设置为0.5或者0时，mAP会降低。\n针对每个类，都会训练一个线性SVM。\nSelective Search 参考链接：Selective Search （以下部分是Selective Search论文中的内容。）\n物体识别，在之前的做法主要是基于穷举搜索（Exhaustive Search）：选择一个窗口扫描整张图像（image），改变窗口的大小，继续扫描整张图像。这种做法是比较原始直观，改变窗口大小，扫描整张图像，非常耗时。若能过滤掉一些无用的box将会节省大量时间。这就是本文中Selective Search(选择性搜索)的优点，将穷举搜索（Exhausticve Search)和分割（Segmentation)结合起来。\n层次归类算法(Hierarchical Grouping Algorithm)  input：图片\noutput：集合L\n（1）获取图片初始分割区域$R=(r_{1},\u0026hellip;,r_{n})$；\n（2）初始化相似度集合$S=\\varnothing $；\n（3）计算$R$中两两相邻区域$(r_{i},r_{j})$之间的相似度，添加到相似度集合$S$；\n（4）从相似度集合$S$中找出，相似度最大的两个区域$r_{i}$和$r_{j}$，将其合并成为一个区域$r_{t}$，从$S$中除去原先与$r_{i}$和$r_{j}$相邻区域之间计算的相似度，计算$r_{t}$与其相邻区域（原先与$r_{i}$或$r_{j}$相邻的区域）的相似度，添加到相似度集合$S$中，将新区域$r_{t}$添加到区域集合$R$中；\n（5）迭代步骤（4）直至$S$为空，即可合并区域都已合并完；\n（6）获取R中每个区域的Bounding Boxes，这个结果就是图像中物体可能位置的可能结果集合L。\n多样性策略  论文给出了两个方面的多样化策略：颜色空间多样化，相似度计算的多样化。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-04-12 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-04-12 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/r-cnn%E7%B3%BB%E5%88%97\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>R-CNN系列</title>
+  <meta property="og:title" content="R-CNN系列" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="R-CNN 原文链接：R-CNN
+Abstract  在pascalVOC数据集上针对图像检测任务，其性能在过去几年中已经趋于稳定。性能最好的方法是复杂的集成系统，它通常将多个低级图像特征与高级上下文结合起来。在本文中，我们提出了一种简单且可扩展的检测算法，相对于之前对VOC2012的最佳结果，它将平均精度(mAP)提高了30%以上——实现了53.3%的mAP。
+该方法具有两个关键点：（1）可以将卷积神经网络(CNNs)应用于自下而上的区域建议，以定位和分割对象；（2）当标记的训练数据稀缺时，通过对辅助任务的监督预训练，然后进行特定领域的微调，会产生显著的性能提高。
+我们将区域建议与CNN结合起来，我们称我们的方法为R-CNN，即具有CNN特征的区域。
+Introduction  LeCun等人表明，通过反向传播的随机梯度下降对于训练卷积神经网络(CNNs)是有效的，这是一类新的神经网络的模型。2012年，AlexNet上显示出更高的图像分类精度，重新点燃了人们对cnn的兴趣。因此人们开始讨论ImageNet上的CNN分类结果在多大程度上可以推广到pascalVOC挑战上的目标检测结果？
+我们通过缩小图像分类和目标检测之间的差距来回答上述问题。本文首次证明，CNN可以显著提高对pascalVOC的目标检测性能。为了实现这一结果，我们关注两个问题：使用深度网络来定位对象，训练一个只用少量标注数据的高性能模型。
+与图像分类不同，检测需要在图像中定位（可能有很多）对象。一种方法将定位框架定义为一个回归问题。另一种选择是建立一个滑动窗口检测器。为了保持高分辨率，这些CNN通常只有两个卷积层和池化层。我们考虑了滑动窗口的方法，但是在比较高层的单元，我们拥有5个卷积层，有很大的感受野和步长。
+我们通过“区域识别”操作来解决CNN定位问题，在测试时，我们的方法为输入图像生成大约2000个类别独立的区域建议，使用CNN从每个建议中提取一个固定长度的特征向量，然后用线性支持向量机对每个区域进行分类。下图展示了方法概述及结果，由于我们的模型结合了区域建议和CNN，因此称之为R-CNN。 目标检测中面临的第二个挑战是标记数据的稀缺，目前可用的数量不足以训练大型的CNN。解决这个问题的传统解决方法是使用无监督的预训练，然后进行有监督的微调。因此，我们通过实验证明在大型辅助数据集(ILSVRC)上进行监督预训练，然后在小数据集(pascal)上进行微调，是在数据稀缺时学习高性能CNN的有效方法。我们注意到，由于R-CNN在图片的区域上进行操作，所以很自然地可以将其扩展到语义分割的任务。
+Object detection with R-CNN  该目标检测模型由三个模块组成。（1）产生与类别不相关的候选区域，这些候选区域定义了检测模型的候选检测集；（2）一个大型的卷积神经网络，它从每个区域中提取一个固定长度的特征向量；（3）一组特定于类的线性支持向量机。
+Module design  Region proposals：最近的各种论文提供了产生类别不相关的候选区域的方法。例如：，我们使用的是selective search方法。
+Feature extraction：基于AlexNet网络，从每个候选区域中提取一个4096维的特征向量，网络输入是227×227RGB图像，接着通过5个卷积层和2个全连接层。为了提取候选区域的特征，由于网络的输入大小必须是227×227的，因此需要对候选区域进行缩放扭曲，如下图所示： Test-time detection  在测试时，我们对测试图像进行selective search，提取出大约2000个候选区域，将候选区域进行变换，经过CNN网络以提取特征，针对每个类，使用训练好的SVM进行评分。对于图像中所有的得分区域，使用NMS（对于每个类独立），即如果一个候选区域与另一个候选区域的IoU大于阈值，且另一个候选区域的得分大于该区域，则拒绝该区域。
+Run-time analysis：两个操作使检测更有效：所有的CNN参数都在所有类别中共享；与其他常用方法相比，CNN提取到的特征向量是低维的。
+Training  Supervised pre-training：我们在一个像素级标注的大型数据集(ILSVRC2012)上对CNN进行了预训练（该数据的边界框标签不可用）。
+Domain-specific fine-tuning：为了使我们的CNN适应新的任务和新的领域，我们使用转换后的候选区域对CNN进行随机梯度下降(SGD)训练。CNN的架构没有变，除了最后的分类数变为（N&#43;1），其中N是对象类的数量，&#43;1作为背景。将与真值的IoU大于0.5的区域作为正类，其余为负类。
+Object category classifiers：使用二分类来对目标进行检测，使用IoU重叠阈值来决定一个区域是否为正类，阈值选择0.3是在验证集上实验选择的（{0,0.1,&amp;hellip;,0.5}），我们发现，将阈值设置为0.5或者0时，mAP会降低。
+针对每个类，都会训练一个线性SVM。
+Selective Search 参考链接：Selective Search （以下部分是Selective Search论文中的内容。）
+物体识别，在之前的做法主要是基于穷举搜索（Exhaustive Search）：选择一个窗口扫描整张图像（image），改变窗口的大小，继续扫描整张图像。这种做法是比较原始直观，改变窗口大小，扫描整张图像，非常耗时。若能过滤掉一些无用的box将会节省大量时间。这就是本文中Selective Search(选择性搜索)的优点，将穷举搜索（Exhausticve Search)和分割（Segmentation)结合起来。
+层次归类算法(Hierarchical Grouping Algorithm)  input：图片
+output：集合L
+（1）获取图片初始分割区域$R=(r_{1},&amp;hellip;,r_{n})$；
+（2）初始化相似度集合$S=\varnothing $；
+（3）计算$R$中两两相邻区域$(r_{i},r_{j})$之间的相似度，添加到相似度集合$S$；
+（4）从相似度集合$S$中找出，相似度最大的两个区域$r_{i}$和$r_{j}$，将其合并成为一个区域$r_{t}$，从$S$中除去原先与$r_{i}$和$r_{j}$相邻区域之间计算的相似度，计算$r_{t}$与其相邻区域（原先与$r_{i}$或$r_{j}$相邻的区域）的相似度，添加到相似度集合$S$中，将新区域$r_{t}$添加到区域集合$R$中；
+（5）迭代步骤（4）直至$S$为空，即可合并区域都已合并完；
+（6）获取R中每个区域的Bounding Boxes，这个结果就是图像中物体可能位置的可能结果集合L。
+多样性策略  论文给出了两个方面的多样化策略：颜色空间多样化，相似度计算的多样化。" />
+  <meta name="description" content="R-CNN 原文链接：R-CNN
+Abstract  在pascalVOC数据集上针对图像检测任务，其性能在过去几年中已经趋于稳定。性能最好的方法是复杂的集成系统，它通常将多个低级图像特征与高级上下文结合起来。在本文中，我们提出了一种简单且可扩展的检测算法，相对于之前对VOC2012的最佳结果，它将平均精度(mAP)提高了30%以上——实现了53.3%的mAP。
+该方法具有两个关键点：（1）可以将卷积神经网络(CNNs)应用于自下而上的区域建议，以定位和分割对象；（2）当标记的训练数据稀缺时，通过对辅助任务的监督预训练，然后进行特定领域的微调，会产生显著的性能提高。
+我们将区域建议与CNN结合起来，我们称我们的方法为R-CNN，即具有CNN特征的区域。
+Introduction  LeCun等人表明，通过反向传播的随机梯度下降对于训练卷积神经网络(CNNs)是有效的，这是一类新的神经网络的模型。2012年，AlexNet上显示出更高的图像分类精度，重新点燃了人们对cnn的兴趣。因此人们开始讨论ImageNet上的CNN分类结果在多大程度上可以推广到pascalVOC挑战上的目标检测结果？
+我们通过缩小图像分类和目标检测之间的差距来回答上述问题。本文首次证明，CNN可以显著提高对pascalVOC的目标检测性能。为了实现这一结果，我们关注两个问题：使用深度网络来定位对象，训练一个只用少量标注数据的高性能模型。
+与图像分类不同，检测需要在图像中定位（可能有很多）对象。一种方法将定位框架定义为一个回归问题。另一种选择是建立一个滑动窗口检测器。为了保持高分辨率，这些CNN通常只有两个卷积层和池化层。我们考虑了滑动窗口的方法，但是在比较高层的单元，我们拥有5个卷积层，有很大的感受野和步长。
+我们通过“区域识别”操作来解决CNN定位问题，在测试时，我们的方法为输入图像生成大约2000个类别独立的区域建议，使用CNN从每个建议中提取一个固定长度的特征向量，然后用线性支持向量机对每个区域进行分类。下图展示了方法概述及结果，由于我们的模型结合了区域建议和CNN，因此称之为R-CNN。 目标检测中面临的第二个挑战是标记数据的稀缺，目前可用的数量不足以训练大型的CNN。解决这个问题的传统解决方法是使用无监督的预训练，然后进行有监督的微调。因此，我们通过实验证明在大型辅助数据集(ILSVRC)上进行监督预训练，然后在小数据集(pascal)上进行微调，是在数据稀缺时学习高性能CNN的有效方法。我们注意到，由于R-CNN在图片的区域上进行操作，所以很自然地可以将其扩展到语义分割的任务。
+Object detection with R-CNN  该目标检测模型由三个模块组成。（1）产生与类别不相关的候选区域，这些候选区域定义了检测模型的候选检测集；（2）一个大型的卷积神经网络，它从每个区域中提取一个固定长度的特征向量；（3）一组特定于类的线性支持向量机。
+Module design  Region proposals：最近的各种论文提供了产生类别不相关的候选区域的方法。例如：，我们使用的是selective search方法。
+Feature extraction：基于AlexNet网络，从每个候选区域中提取一个4096维的特征向量，网络输入是227×227RGB图像，接着通过5个卷积层和2个全连接层。为了提取候选区域的特征，由于网络的输入大小必须是227×227的，因此需要对候选区域进行缩放扭曲，如下图所示： Test-time detection  在测试时，我们对测试图像进行selective search，提取出大约2000个候选区域，将候选区域进行变换，经过CNN网络以提取特征，针对每个类，使用训练好的SVM进行评分。对于图像中所有的得分区域，使用NMS（对于每个类独立），即如果一个候选区域与另一个候选区域的IoU大于阈值，且另一个候选区域的得分大于该区域，则拒绝该区域。
+Run-time analysis：两个操作使检测更有效：所有的CNN参数都在所有类别中共享；与其他常用方法相比，CNN提取到的特征向量是低维的。
+Training  Supervised pre-training：我们在一个像素级标注的大型数据集(ILSVRC2012)上对CNN进行了预训练（该数据的边界框标签不可用）。
+Domain-specific fine-tuning：为了使我们的CNN适应新的任务和新的领域，我们使用转换后的候选区域对CNN进行随机梯度下降(SGD)训练。CNN的架构没有变，除了最后的分类数变为（N&#43;1），其中N是对象类的数量，&#43;1作为背景。将与真值的IoU大于0.5的区域作为正类，其余为负类。
+Object category classifiers：使用二分类来对目标进行检测，使用IoU重叠阈值来决定一个区域是否为正类，阈值选择0.3是在验证集上实验选择的（{0,0.1,&amp;hellip;,0.5}），我们发现，将阈值设置为0.5或者0时，mAP会降低。
+针对每个类，都会训练一个线性SVM。
+Selective Search 参考链接：Selective Search （以下部分是Selective Search论文中的内容。）
+物体识别，在之前的做法主要是基于穷举搜索（Exhaustive Search）：选择一个窗口扫描整张图像（image），改变窗口的大小，继续扫描整张图像。这种做法是比较原始直观，改变窗口大小，扫描整张图像，非常耗时。若能过滤掉一些无用的box将会节省大量时间。这就是本文中Selective Search(选择性搜索)的优点，将穷举搜索（Exhausticve Search)和分割（Segmentation)结合起来。
+层次归类算法(Hierarchical Grouping Algorithm)  input：图片
+output：集合L
+（1）获取图片初始分割区域$R=(r_{1},&amp;hellip;,r_{n})$；
+（2）初始化相似度集合$S=\varnothing $；
+（3）计算$R$中两两相邻区域$(r_{i},r_{j})$之间的相似度，添加到相似度集合$S$；
+（4）从相似度集合$S$中找出，相似度最大的两个区域$r_{i}$和$r_{j}$，将其合并成为一个区域$r_{t}$，从$S$中除去原先与$r_{i}$和$r_{j}$相邻区域之间计算的相似度，计算$r_{t}$与其相邻区域（原先与$r_{i}$或$r_{j}$相邻的区域）的相似度，添加到相似度集合$S$中，将新区域$r_{t}$添加到区域集合$R$中；
+（5）迭代步骤（4）直至$S$为空，即可合并区域都已合并完；
+（6）获取R中每个区域的Bounding Boxes，这个结果就是图像中物体可能位置的可能结果集合L。
+多样性策略  论文给出了两个方面的多样化策略：颜色空间多样化，相似度计算的多样化。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">R-CNN系列</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-04-12 00:00:00 UTC">
+                12 Apr 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <h1 id="r-cnn">R-CNN</h1>
+<p>原文链接：<a href="https://arxiv.org/pdf/1311.2524.pdf">R-CNN</a></p>
+<h2 id="abstract">Abstract</h2>
+<p>    在pascalVOC数据集上针对图像检测任务，其性能在过去几年中已经趋于稳定。性能最好的方法是复杂的集成系统，它通常将多个低级图像特征与高级上下文结合起来。在本文中，我们提出了一种简单且可扩展的检测算法，相对于之前对VOC2012的最佳结果，它将平均精度(mAP)提高了30%以上——实现了53.3%的mAP。<br>
+    该方法具有两个关键点：（1）可以将卷积神经网络(CNNs)应用于自下而上的区域建议，以定位和分割对象；（2）当标记的训练数据稀缺时，通过对辅助任务的监督预训练，然后进行特定领域的微调，会产生显著的性能提高。<br>
+    我们将区域建议与CNN结合起来，我们称我们的方法为R-CNN，即具有CNN特征的区域。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    LeCun等人表明，通过反向传播的随机梯度下降对于训练卷积神经网络(CNNs)是有效的，这是一类新的神经网络的模型。2012年，AlexNet上显示出更高的图像分类精度，重新点燃了人们对cnn的兴趣。因此人们开始讨论ImageNet上的CNN分类结果在多大程度上可以推广到pascalVOC挑战上的目标检测结果？<br>
+    我们通过缩小图像分类和目标检测之间的差距来回答上述问题。本文首次证明，CNN可以显著提高对pascalVOC的目标检测性能。为了实现这一结果，我们关注两个问题：使用深度网络来定位对象，训练一个只用少量标注数据的高性能模型。<br>
+    与图像分类不同，检测需要在图像中定位（可能有很多）对象。一种方法将定位框架定义为一个回归问题。另一种选择是建立一个滑动窗口检测器。为了保持高分辨率，这些CNN通常只有两个卷积层和池化层。我们考虑了滑动窗口的方法，但是在比较高层的单元，我们拥有5个卷积层，有很大的感受野和步长。<br>
+    我们通过“区域识别”操作来解决CNN定位问题，在测试时，我们的方法为输入图像生成大约2000个类别独立的区域建议，使用CNN从每个建议中提取一个固定长度的特征向量，然后用线性支持向量机对每个区域进行分类。下图展示了方法概述及结果，由于我们的模型结合了区域建议和CNN，因此称之为R-CNN。
+<img src="/img/r-cnn1.PNG" alt="">
+    目标检测中面临的第二个挑战是标记数据的稀缺，目前可用的数量不足以训练大型的CNN。解决这个问题的传统解决方法是使用无监督的预训练，然后进行有监督的微调。因此，我们通过实验证明在大型辅助数据集(ILSVRC)上进行监督预训练，然后在小数据集(pascal)上进行微调，是在数据稀缺时学习高性能CNN的有效方法。我们注意到，由于R-CNN在图片的区域上进行操作，所以很自然地可以将其扩展到语义分割的任务。</p>
+<h2 id="object-detection-with-r-cnn">Object detection with R-CNN</h2>
+<p>    该目标检测模型由三个模块组成。（1）产生与类别不相关的候选区域，这些候选区域定义了检测模型的候选检测集；（2）一个大型的卷积神经网络，它从每个区域中提取一个固定长度的特征向量；（3）一组特定于类的线性支持向量机。</p>
+<h3 id="module-design">Module design</h3>
+<p>    <strong>Region proposals</strong>：最近的各种论文提供了产生类别不相关的候选区域的方法。例如：，我们使用的是<a href="https://www.researchgate.net/profile/Jasper-Uijlings/publication/262270555_Selective_Search_for_Object_Recognition/links/542017f70cf2218008d43bd7/Selective-Search-for-Object-Recognition.pdf">selective search</a>方法。<br>
+    <strong>Feature extraction</strong>：基于AlexNet网络，从每个候选区域中提取一个4096维的特征向量，网络输入是227×227RGB图像，接着通过5个卷积层和2个全连接层。为了提取候选区域的特征，由于网络的输入大小必须是227×227的，因此需要对候选区域进行缩放扭曲，如下图所示：
+<img src="/img/r-cnn2.PNG" alt=""></p>
+<h3 id="test-time-detection">Test-time detection</h3>
+<p>    在测试时，我们对测试图像进行selective search，提取出大约2000个候选区域，将候选区域进行变换，经过CNN网络以提取特征，针对每个类，使用训练好的SVM进行评分。对于图像中所有的得分区域，使用NMS（对于每个类独立），即如果一个候选区域与另一个候选区域的IoU大于阈值，且另一个候选区域的得分大于该区域，则拒绝该区域。<br>
+    <strong>Run-time analysis</strong>：两个操作使检测更有效：所有的CNN参数都在所有类别中共享；与其他常用方法相比，CNN提取到的特征向量是低维的。</p>
+<h3 id="training">Training</h3>
+<p>    <strong>Supervised pre-training</strong>：我们在一个像素级标注的大型数据集(ILSVRC2012)上对CNN进行了预训练（该数据的边界框标签不可用）。<br>
+    <strong>Domain-specific fine-tuning</strong>：为了使我们的CNN适应新的任务和新的领域，我们使用转换后的候选区域对CNN进行随机梯度下降(SGD)训练。CNN的架构没有变，除了最后的分类数变为（N+1），其中N是对象类的数量，+1作为背景。将与真值的IoU大于0.5的区域作为正类，其余为负类。<br>
+    <strong>Object category classifiers</strong>：使用二分类来对目标进行检测，使用IoU重叠阈值来决定一个区域是否为正类，阈值选择0.3是在验证集上实验选择的（{0,0.1,&hellip;,0.5}），我们发现，将阈值设置为0.5或者0时，mAP会降低。<br>
+    针对每个类，都会训练一个线性SVM。</p>
+<h2 id="selective-search">Selective Search</h2>
+<p>参考链接：<a href="https://www.jianshu.com/p/9e433ae38716">Selective Search</a>
+（以下部分是Selective Search论文中的内容。）<br>
+    物体识别，在之前的做法主要是基于穷举搜索（Exhaustive Search）：选择一个窗口扫描整张图像（image），改变窗口的大小，继续扫描整张图像。这种做法是比较原始直观，改变窗口大小，扫描整张图像，非常耗时。若能过滤掉一些无用的box将会节省大量时间。这就是本文中Selective Search(选择性搜索)的优点，将穷举搜索（Exhausticve Search)和分割（Segmentation)结合起来。</p>
+<h3 id="层次归类算法hierarchical-grouping-algorithm">层次归类算法(Hierarchical Grouping Algorithm)</h3>
+<p>    input：图片<br>
+    output：集合L<br>
+    （1）获取图片初始分割区域$R=(r_{1},&hellip;,r_{n})$；<br>
+    （2）初始化相似度集合$S=\varnothing $；<br>
+    （3）计算$R$中两两相邻区域$(r_{i},r_{j})$之间的相似度，添加到相似度集合$S$；<br>
+    （4）从相似度集合$S$中找出，相似度最大的两个区域$r_{i}$和$r_{j}$，将其合并成为一个区域$r_{t}$，从$S$中除去原先与$r_{i}$和$r_{j}$相邻区域之间计算的相似度，计算$r_{t}$与其相邻区域（原先与$r_{i}$或$r_{j}$相邻的区域）的相似度，添加到相似度集合$S$中，将新区域$r_{t}$添加到区域集合$R$中；<br>
+    （5）迭代步骤（4）直至$S$为空，即可合并区域都已合并完；<br>
+    （6）获取R中每个区域的Bounding Boxes，这个结果就是图像中物体可能位置的可能结果集合L。</p>
+<h3 id="多样性策略">多样性策略</h3>
+<p>    论文给出了两个方面的多样化策略：颜色空间多样化，相似度计算的多样化。<br>
+    颜色空间多样化主要应用于上述算法第1步，即原始区域的生成，包括8个要素：RGB、灰度I、Lab、rgI（归一化的rg通道加上灰度）、HSV、rgb（归一化的RGB）、C、H（HSV的H通道）。<br>
+    相似度计算多样化用于计算区域间的相似度，论文给出了四种相似度的计算策略，最后计算加权和，包括颜色、纹理、大小和吻合。</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>    本文提出了一种简单且可扩展的目标检测算法，该算法比之前对pascalVOC2012的最佳结果相对提高了30%。有两个关键点，第一个是将卷积神经网络应用于自底而上的候选区域生成，以定位和分割对象；第二个是当标记的训练数据稀缺时，通过对辅助任务的监督预训练，然后进行特定领域的微调，提高性能。</p>
+<h1 id="fast-r-cnn">Fast R-CNN</h1>
+<p>原文链接：<a href="https://arxiv.org/pdf/1504.08083.pdf">Fast R-CNN</a></p>
+<h2 id="abstract-1">Abstract</h2>
+<p>    本文提出了一种基于快速区域生成的卷积神经网络（Fast R-CNN）进行目标检测。Fast R-CNN建立在之前的工作基础上，使用深度卷积网络有效地对候选区域进行分类。与之前的工作相比，FastR-CNN采用了一些创新来提高训练和测试速度，同时也提高了检测精度。</p>
+<h2 id="introduction-1">Introduction</h2>
+<p>    目标检测任务的复杂性在于两个方面：（1）必须生成许多候选对象位置（候选框，通常称为“proposals”）；（2）这些候选框只提供粗略的定位，必须进行细化才能实现精确的定位。在本文中，我们简化了最先进的基于卷积神经网络的对象检测器的训练过程，提出了一个single-stage的训练算法，联合学习分类目标proposals和优化定位。</p>
+<h3 id="r-cnn-and-sppnet">R-CNN and SPPnet</h3>
+<p>    基于区域的卷积网络方法(R-CNN)使用卷积网络对候选框进行分类，获得了良好的目标检测精度，但是，R-CNN有以下缺点：<br>
+    （1）训练是多阶段。R-CNN首先生成候选框，接着利用卷积网络提取特征，利用SVM进行分类；<br>
+    （2）训练需要花费大量的空间和时间：对于SVM和bounding box回归训练，从每幅图像中的每个候选区域中提取特征并写入磁盘，需要很大的空间；<br>
+    （3）对象检测速度较慢：在测试时，从每个测试图像中的每个对象建议中提取特征，用VGG16检测需要47秒/图像(在GPU上)。<br>
+    R-CNN速度很慢，因为它为每个候选框进行一个卷积向前传递。因此提出了SPPnet方法，通过共享计算来加快R-CNN的计算速度，SPPnet为整个输入图像计算一个卷积特征图，然后使用从共享特征图中提取的特征向量对每个候选框进行分类。<br>
+    但是，SPPnet也有明显的缺点，与R-CNN一样，训练是多阶段的，包括提取特征，微调，训练SVM，最后拟合bounding box回归器。</p>
+<h3 id="contributions">Contributions</h3>
+<p>    我们提出了一种新的模型，解决了R-CNN和SPPnet的缺点，同时提高了它们的速度和精度。我们称这种方法为Fast R-CNN：<br>
+    （1）比R-CNN，SPPnet有更好的性能；<br>
+    （2）训练是single-stage的，使用multi-task损失；<br>
+    （3）训练可以更新所有的网络层；<br>
+    （4）提取的特征不需要磁盘存储；</p>
+<h2 id="fast-r-cnn-architecture-and-training">Fast R-CNN architecture and training</h2>
+<p>    下图展示了Fast R-CNN架构。Fast R-CNN的输入是整张图像和一组候选框，首先用多个卷积和最大池化层对整个图像进行处理，生成一个特征图；对于每个候选框，通过RoI池化层从特征图中提取一个固定长度的特征向量，接着将特征向量输入全连接层，最后分支到两个输出层：一个通过softmax产生分类概率，另一层为每个类别输出四个数字。每组4个数字代表一个类别的边界框位置。
+<img src="/img/fastr-cnn1.PNG" alt=""></p>
+<h3 id="the-roi-pooling-layer">The RoI pooling layer</h3>
+<p>    RoI池化层使用最大池化将候选区域的特征转换为固定大小$H×W$
+（例如，7×7），其中H和W是独立于RoI的超参数。每个RoI由一个四元组$(r,c,h,w)$组成,分别表示左上角的坐标$(r,c)$及其高度和宽度$(h,w)$。<br>
+    RoI最大池化的工作原理是：将$h×w$大小的RoI窗口，划分成近似$h/H×w/W$大小的子窗口，形成$H×W$网格，将每个子窗口中的最大值输出到相应的网格单元中。</p>
+<h3 id="initializing-from-pre-trained-networks">Initializing from pre-trained networks</h3>
+<p>    利用三个预训练的ImageNet网络进行实验，每个网络都有5个最大池化层，以及5到13个卷积层。<br>
+    当一个预训练的网络初始化Fast R-CNN时，它会经历三次转换：<br>
+    （1）最后一个最大池化层被RoI池化层所取代；<br>
+    （2）网络的最后一个完全连接层和softmax（1000个分类）被前面提到的两个分支（全连接与K+1个类别的softmax，类别的bounding-box回归预测）所取代。<br>
+    （3）对网络进行修改，以获取两个数据输入：图像列表和对应图像的RoI列表。</p>
+<h3 id="fine-tuning-for-detection">Fine-tuning for detection</h3>
+<p>    Multi-task loss：Fast R-CNN有两个输出分支，第一个是针对每一个RoI，其类别的概率$p=(p_{0},&hellip;,p_{K})$，包含$K+1$类，$p$是经过全连接层+softmax计算得到的。第二个是针对$K$个类别，输出bounding-box回归的偏移量，$t^{k}=(t_{x}^{k},t_{y}^{k},t_{w}^{k},t_{h}^{k})$。<br>
+    每个训练RoI都有一个真实类别$u$和一个真实bounding-box $v$，针对每个RoI使用多任务损失L来联合训练分类和bounding-box回归：
+$$
+L(p,u,t^{u},v)=L_{cls}(p,u)+\lambda[u \geq 1]L_{loc}(t^{u},v)
+$$
+    其中，$L_{cls}(p,u)$就是分类的对数损失。对于$L_{loc}(t^{u},v)$，当$u \geq 1$时$[u \geq 1]$为1，否则为0（背景类$u=0$），即对于背景，没有真实bounding-box，因此不计算损失。$L_{loc}$的计算公式如下：
+$$
+L_{loc}(t^{u},v)=\sum_{i\in \lbrace x,y,w,h \rbrace}smooth_{L_{1}}(t_{i}^{u}-v_{i})
+$$
+    其中：<br>
+$$
+\left | x \right |\leq 1:smooth_{L_{1}}(x)=0.5x^{2}
+$$
+$$
+otherwise:\left | x \right |-0.5
+$$
+    公式中的$\lambda$决定两个损失之间的比例，在所有实验中均设置为1。</p>
+<h1 id="faster-r-cnn">Faster R-CNN</h1>
+<p>原文链接：<a href="https://arxiv.org/pdf/1506.01497.pdf">Faster R-CNN</a></p>
+<h2 id="abstract-2">Abstract</h2>
+<p>    最先进的目标检测网络依赖于候选区域生成算法来候选目标的位置，SPPnet和Fast R-CNN这样的网络创新减少了检测网络的运行时间，但仍然不够。在本文中，我们引入一个Region Proposal Networks(RPN)，它与检测网络共享整个图像的卷积特征，RPN是一个完全卷积的网络，它可以同时预测每个位置的目标边界和类别得分，是端到端的模型，以生成高质量的候选区域，并应用在Fast R-CNN中。通过共享它们的卷积特征，我们进一步将RPN和Fast R-CNN合并为一个单一的网络。</p>
+<h2 id="introduction-2">Introduction</h2>
+<p>    候选区域生成方法和基于区域的卷积神经网络(R-CNNs)的成功推动了目标检测的最新进展，对于最新的FastR-CNN，当忽略花费在区域提案上的时间时，实现了接近实时的速率。因此，目前来说，候选区域生成是最目标检测模型中的计算瓶颈。在候选区域生成方法中，选择性搜索是最流行的方法之一，然而，与高效的检测网络相比，选择性搜索要慢一个数量级。<br>
+    在本文中，我们使用深度卷积神经网络生成候选区域，称为Region Proposal Networks(RPNs)，它与最先进的目标检测网络共享卷积层。我们观察到，基于区域的检测器所使用的卷积特征图，如Fast R-CNN，也可以用于生成候选区域。在这些卷积特征之上，我们通过添加一些额外的卷积层来构建一个RPN，因此，RPN是一种完全卷积网络(FCN)，可以专门为生成候选区域的任务进行端到端的训练。<br>
+    RPN被设计用来有效地预测具有广泛尺度和长宽比的候选区域生成。与使用金字塔的图像（a）和过滤器的金字塔（b）的方法相比，我们引入了新的“anchor”框，在多个尺度和高宽比上作为参考，一个回归参考的金字塔（c），它避免了枚举多个尺度或纵横比的图像或过滤器。
+<img src="/img/fasterr-cnn1.PNG" alt=""></p>
+<h2 id="related-work">Related Work</h2>
+<h3 id="object-proposals">Object Proposals</h3>
+<p>    目前已有大量关于候选区域生成的方法，例如：基于超像素分组（如选择性搜索、CPMC，MCG），基于滑动窗口（如窗口、edgeboxx中的对象），对象建议方法作为独立于检测器的外部模块（如，选择性搜索对象检测器、R-CNN和Fast R-CNN)。</p>
+<h3 id="deep-networks-for-object-detection">Deep Networks for Object Detection</h3>
+<p>    R-CNN使用端到端的方法训练CNN，将候选区域分类为对象类别或背景。R-CNN主要作为一个分类器，它不预测对象的边界，其准确性取决于候选区域生成模块的性能。</p>
+<h2 id="faster-r-cnn-1">Faster R-CNN</h2>
+<p>    我们的目标检测系统，称为Faster R-CNN，由两个模块组成的，第一个模块是候选区域生成的深度全卷积网络，第二个模块是使用候选区域的Faster R-CNN检测器。整个模型是一个单一的、统一的目标检测网络，如下图所示。RPN网络告诉Faster R-CNN网络要看哪里（类似attention机制）。
+<img src="/img/fasterr-cnn2.PNG" alt=""></p>
+<h3 id="region-proposal-networks">Region Proposal Networks</h3>
+<p>    Region Proposal网络(RPN)以一幅图像（任何大小）作为输入，输出一组矩形候选区域，每个候选框都有一个目标分类得分，使用一个全卷积网络FCN来建模。由于我们的最终目标是与一个Faster R-CNN目标检测网络共享计算，所以我们假设这两个网络共享一组卷积层。<br>
+    为了生成候选区域，我们在最后一个卷积层的输出特征图上滑动一个小网络，该网络的输入是特征图中$n×n$大小的空间窗口，每个滑动窗口都被映射到一个较低维的特征，这些特征被输入到两个分支中，bounding-box分类和回归。在本文中，我们设置$n=3$，下图展示了RPN网络：
+<img src="/img/fasterr-cnn3.PNG" alt=""></p>
+<h4 id="anchors">Anchors</h4>
+<p>    在每个滑动窗口的位置，我们同时预测多个候选区域，其中每个位置的最大可能候选区域的数量记为$k$，因此，回归分支有$4$k个输出，分别表示$k$个bounding-box的坐标，类别分类层有$2k$个输出，表示每个候选框是否是对象类或者背景类的概率。<br>
+    将$k$个候选框进行参数化，我们称之为“锚点”（anchors），锚点以滑动窗口为中心，并与比例和高宽比相关联，默认情况下，我们使用3个尺度和3个长宽比，即在每个滑动位置产生9个锚点，对于大小为$W×H$的特征图，总共有$W×H×k$个锚点。<br>
+    <strong>Translation-Invariant Anchors</strong>：我们的方法的一个重要特性是，它是平移不变的，即如果在图像中平移一个对象，生成的候选区域也应该平移，我们的方法（FCN）保证了这种平移不变的性质。作为比较，MultiBox方法使用k-means生成800个锚点，它们不是平移不变的，即不能保证当一个对象平移之后，会生成相同的候选框。<br>
+    <strong>Multi-Scale Anchors as Regression References</strong>：我们的锚点设计提出了一种新的方案来解决多尺度（长宽比）问题。如第一张图所示，有两种流行的方法：（1）基于图像/特征金字塔（a），即图像在多个尺度上调整大小，并为每个尺度计算特征图（HOG或深度卷积特征），该方法通常有用，但耗时；（2）在特征图上使用多个尺度（高宽比）的滑动窗口（b），即不同长宽比的模型是分别使用不同大小的卷积核（如5×7和7×5）进行训练的，称之为“pyramid of filters”。作为比较，我们提出的基于锚点的方法是建立在锚点金字塔上的，即根据多个尺度和长宽比的锚盒对边界框进行分类和回归，它只依赖于单一尺度的图像和特征图，并使用单一大小的卷积核（特征图上的滑动窗口）。</p>
+<h4 id="loss-function">Loss Function</h4>
+<p>    为了训练RPN网络，我们为每个锚点分配一个二分类标签（对象类/背景类），将两种锚点设置为正类：（1）与某个ground-truth的重叠IoU分数最高的锚点；（2）与任意ground-truth有超过0.7的IoU重叠的锚点。需要注意的是，一个ground-truth可能会为多个锚点分配正标签。<br>
+    我们使用Fast R-CNN中的多任务损失最小化目标函数，图像的损失函数被定义为：
+$$
+L(\lbrace p_{i}\rbrace,\lbrace t_{i}\rbrace)=\frac{1}{N_{cls}}\sum_{i}L_{cls}(p_{i},p_{i}^{\ast })+\lambda \frac{1}{N_{reg}}\sum_{i}p_{i}^{\ast }L_{reg}(t_{i},t_{i}^{\ast })
+$$
+    其中，$i$表示锚点的索引，$p_{i}$表示锚点$i$是对象类的概率，如果锚点为正类，则ground-truth标签$p_{i}^{\ast }$为1，否则为0，$t_{i}$表示预测bounding-box的4个坐标，$t_{i}^{\ast }$是与正锚点的ground-truth坐标。分类损失$L_{cls}$是二分类的对数损失，回归损失$L_{reg}(t_{i},t_{i}^{\ast })=R(t_{i}-t_{i}^{\ast })$，其中$R$是平滑的L1损失函数。$p_{i}^{\ast }L_{reg}$表示回归损失仅在正类锚点计算，即$p_{i}^{\ast }=1$，若为负类，则不计算回归损失。上述两个损失用$N_{cls}$和$N_{reg}$进行归一化，并用平衡参数$\lambda $进行加权。</p>
+<h4 id="training-rpns">Training RPNs</h4>
+<p>    RPN可以通过反向传播和随机梯度下降(SGD)进行端到端训练。我们遵循“以图像为中心”的采样策略来训练RPN，每个mini-batch都来自一张图像，其中包含许多正例锚点和负例锚点，但可能训练中会偏向于负样本，因为它们占主导地位。相反，我们在一张图像中随机采样256个锚点，以计算一个mini-batch的损失函数，其中采样的正例锚点和负例锚点的比例设置为$1:1$，如果图像中正例样本少于128个，我们用负例样本填充。</p>
+<h3 id="sharing-features-for-rpn-and-fast-r-cnn">Sharing Features for RPN and Fast R-CNN</h3>
+<p>    我们使用三种方法，允许RPN和Fast R-CNN两个网络之间共享卷积层：<br>
+    （1）<strong>Alternating training</strong>交替训练：首先训练RPN，并使用这些候选框来训练Fast R-CNN，然后使用由FastR-CNN调过参的网络来初始化RPN，并迭代这个过程，这也是本文中实验部分使用的方法；<br>
+    （2）<strong>Approximate joint training</strong>近似联合训练：RPN和Fast R-CNN网络在训练过程中被合并成一个网络，在每次SGD迭代中，当训练一个Fast R-CNN时，前向传递产生的候选区域被当作固定的、预先计算的候选框一样处理，对于共享层，RPN损失和Fast R-CNN损失的反向传播信号被合并；<br>
+    （3）<strong>Non-approximate joint training</strong>非近似联合训练：RPN预测的边界框也是输入的函数，Fast R-CNN中的RoI池化层接受卷积特征和预测的边界框作为输入，因此理论上有效的反向传播梯度也应该涉及候选框框的坐标。<br>
+    <strong>4-Step Alternating Training</strong>：在本文，我们采用4步训练算法，通过交替优化来学习共享的特征：第一步，训练RPN网络，采用ImageNet预训练模型进行初始化，并对候选区域生成任务进行端到端的微调；第二步，我们使用第一步得到的候选框，通过Fast R-CNN训练一个目标检测网络，该检测网络也由ImageNet预训练的模型初始化（此时，这两个网络并不共享卷积层）；第三步，使用目标检测网络来初始化RPN训练，并且只对RPN特有的层进行了微调，这时两个网络共享了卷积层；第四步，为了保持共享的卷积层不变，我们对Fast R-CNN特有的层进行了微调。因此，这两个网络共享相同的卷积层，并形成了一个统一的网络。具体的四步如下图所示：
+<img src="/img/fasterr-cnn5.jpg" alt=""></p>
+<h3 id="implementation-details">Implementation Details</h3>
+<p>    对于锚点，我们使用三种尺寸大小，分别为$128^{2}$、$256^{2}$、$512^{2}$，三种高宽比，分别是$1:1$、$1:2$、$1:3$，这些超参数并不是为特定的数据集精心选择的，而是通过实验得到的。<br>
+    一些RPN的候选区域彼此高度重叠，通过NMS来减少冗余，将NMS的IoU阈值固定在0.7，这使得我们每张图像大约有2000个候选区域。</p>
+<h2 id="conclusion-1">Conclusion</h2>
+<p>    我们提出了高效和准确的RPN网络，与下游检测网络共享卷积特征，使一个统一的、基于深度学习的目标检测系统能够以接近实时的帧速率运行；RPN还提高了候选区域生成质量，从而提高了整体目标检测精度。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>
