@@ -59,7 +59,7 @@ code.has-jax {
       "articleSection" : "posts",
       "name" : "YOLO系列",
       "headline" : "YOLO系列",
-      "description" : "YOLO V1  原文链接：YOLO V1\n参考链接：你真的读懂yolo了吗？\nAbstract  提出一种新的目标检测算法——YOLO，之前的目标检测工作都是使用另外的分类器实现检测，我们将目标检测构建成回归问题框架，在空间上分离bounding-box和相关类别概率。一个网络直接从完整图像中预测bounding-box和类别概率，因此速度很快。\nIntroduction  最近的方法，如R-CNN使用候选区域生成方法，首先在图像中生成候选框，然后在这些候选框上进行分类，分类后，再对bounding-box进行细化，消除重复框。这些复杂的操作导致运行速度缓慢，难以优化，因为每个单独的网络必须单独训练。\n我们将目标检测重新定义为单一的回归问题，直接从图像像素到bounding-box坐标和分类概率，\u0026ldquo;you only look once\u0026rdquo;（YOLO）就可以预测有什么物体以及它们在哪里。其架构如下图所示（YOLO包括三部分：将输入图像调整为448×448，在图像上运行单一卷积网络，通过模型的置信度来确定检测结果的阈值。）：单个卷积网络同时预测多个bounding-box和及其分类概率，YOLO训练完整的图像，并直接优化检测性能。\n相比于之前的网络，其有如下优点：\n（1）YOLO的速度非常快：由于我们将目标检测作为一个回归问题，所以我们不需要一个复杂网络。基本网络以每秒45帧的速度运行，另外，YOLO实现的平均平均精度是其他实时系统的两倍以上；\n（2）YOLO在做预测时关注的是图像的整体（全局）：与基于滑动窗口和候选区域生成的方法不同，YOLO在训练和测试期间可以看到整个图像，因此它隐式地编码上下文信息，而对于Fast R-CNN，由于看不到上下文信息，会错误的将背景patch预测为目标类；\n（3）YOLO学习目标的可推广表示：当在图像上进行训练和测试时，YOLO的性能远远优于DPM和R-CNN等其他检测方法，当应用在新的领域或者有预期之外的输入时，YOLO也可以很好的运行。\nYOLO在精度上仍然落后于最先进的检测模型，虽然它可以快速识别图像中的物体，但它很难精确定位一些物体，特别是小的物体。\nUnified Detection  我们将目标检测中的独立网络统一为一个单一的神经网络，使用来自整个图像的特征来预测每个bounding-box，同时预测类别概率，即我们的网络会对整个图像和图像中的所有目标对象进行全局推理。\n我们的模型将输入图像分割成一个$S×S$网格，如果一个对象的中心落入某一网格单元格中，则该网格单元格负责检测该对象。\n每个网格单元格预测$B$个bounding-box和bounding-box的置信度分数，这些置信度分数反映了该bounding-box包含物体的真实程度，也反映了该bounding-box预测的准确程度。我们将信心定义为$Pr(Object)\\ast IOU_{pred}^{truth}$：如果该单元格中不存在对象，则置信度分数应该为零，否则，我们希望置信度得分等于bounding-box和ground truth之间的IOU值。\n每个bounding-box由5个预测部分组成：$x,y,w,h,confident$，$(x,y)$坐标表示相对于网格单元格边界的bounding-box的中心，$w$和$h$是相对于整个图像进行预测的bounding-box的宽度和高度，$confident$表示bounding-box和ground truth之间的IOU。\n每个网格单元还预测类别$C$的条件概率，$Pr(Class_{i}|Object)$，我们只预测每个网格单元的一组类别概率，而不管bounding-box的数量。\n在测试时，我们将类别条件概率和单独的bounding-box置信度预测相乘： $$ Pr(Class_{i}|Object)\\ast Pr(Object)\\ast IOU_{pred}^{truth}=Pr(Class_{i})\\ast IOU_{pred}^{truth} $$ 即每个bounding-box的特定类别的置信分数，这些分数既编码了该类出现在框中的概率，也编码了bounding-box与物体的匹配程度。\n我们设置$S=7$，$B=2$，如下图所示：该模型将图像划分为一个$S×S$的网格，并为每个网格单元预测$B$个bounding-box，及其置信度和$C$类的概率，因此，这些预测值被编码为一个$S×S×(B\\ast 5\u002bC)$张量。 Network Design  我们将该模型作为一个卷积神经网络实现，网络的初始卷积层从图像中提取特征，而全连接层则预测输出的概率和bounding-box坐标。\n我们的网络架构是基于GoogleNet的，共有24个卷积层，2个全连接层。没有使用GoogLeNet中的Inception模块，而是简单地使用1×1降维层和3×3卷积层，如下图所示： 我们的网络的最终输出是预测的$7×7×30$大小的张量。\n我们还训练了一个快速版本的YOLO，Fast YOLO使用的神经网络的卷积层更少（9个而不是24个），这些层的卷积核也更少。除了网络的大小之外，YOLO和Fast YOLO之间的所有训练和测试参数都是相同的。\nTraining  我们在ImageNet数据集上预训练了我们的卷积层；然后，我们转换模型来进行目标检测，检测通常需要细粒度的视觉信息，因此我们将网络的输入分辨率从$224×224$提高到$448×448$；最后一层预测了分类概率和bounding-box坐标，我们根据图像的宽度和高度将边界框的宽度和高度进行归一化，使它们落在0到1之间，参数化边界框$x$和$y$坐标为特定网格单元位置的偏移，因此它们也被限定在0和1之间；最后一层使用线性激活函数，而所有其他层使用Leaky ReLU： $$ x\u0026gt; 0,f(x)=x $$ $$ otherwise,f(x)=0.1x $$ 我们使用均方误差进行模型优化，但对定位误差和分类误差的权重相同，因此可能并不理想。另外，在每个图像中，许多网格单元格不包含任何物体，其置信度分数就为0，远远超过了包含物体的单元格的梯度。\n为了解决上述问题，我们增加bounding-box坐标预测的损失，减少不包含物体的单元格的预测的损失，引入两个参数，$\\lambda_{coord}$和$\\lambda_{noobj} $，并设置$\\lambda_{coord}=5$、$\\lambda_{noobj}=0.5$。\n均方误差对大bounding-box和小bounding-box的误差具有同样的权重，但是误差度量应该反映：大bounding-box的小偏差比小bounding-box的小偏差小，为了解决这个问题，我们预测边界框宽度和高度的平方根，而不是直接预测宽度和高度。\nYOLO为每个网格单元格预测多个bounding-box。在训练时，对于每一个物体，我们希望有一个bounding-box预测器去负责该物体，因此，我们指定一个预测器来“负责”预测一个物体，与ground truth有最高IOU的预测。这使得bounding-box预测器之间的专门化，每个预测器都能更好地预测特定大小、纵横比或物体的类别。\n因此，我们的损失函数如下： $$ \\lambda_{coord}\\sum_{i=0}^{S^{2}}\\sum_{j=0}^{B}\\mathbb{I} _{ij} ^{obj}[(x_{i}-\\hat{x_{i}})^{2}\u002b(y_{i}-\\hat{y_{i}})^{2}] $$ $$ \u002b\\lambda_{coord}\\sum_{i=0}^{S^{2}}\\sum_{j=0}^{B}\\mathbb{I} _{ij} ^{obj}[(\\sqrt{w_{i}}-\\sqrt{\\hat{w_{i}}})^{2}\u002b(\\sqrt{h_{i}}-\\sqrt{\\hat{h_{i}}})^{2}] $$ $$ \u002b\\sum_{i=0}^{S^{2}}\\sum_{j=0}^{B}\\mathbb{I} _{ij} ^{obj}(C_{i}-\\hat{C_{i}})^{2} $$ $$ \u002b\\lambda_{noobj} \\sum_{i=0}^{S^{2}}\\sum_{j=0}^{B}\\mathbb{I} _{ij} ^{noobj}(C_{i}-\\hat{C_{i}})^{2} $$ $$ \u002b\\sum_{i=0}^{S^{2}}\\mathbb{I} _{i} ^{obj}\\sum_{c\\in classes}(p_{i}(c)-\\hat{p_{i}}(c))^{2} $$ 其中，$\\mathbb{I} _{i} ^{obj}$表示单元格$i$是否有物体出现（0或1），$\\mathbb{I} _{ij} ^{obj}$表示单元格$i$中第$j$个bounding-box预测器负责预测（0或1）。第一行是边界框中心坐标的误差；第二行是边界框长宽的误差，由于边界框大小本身便会影响到误差的大小，为了降低边界框大小的影响，而采用了开方差来比较；第三行是包含物体的单元格以及准确预测的边界框的置信度误差；第四行是不包含物体的单元格中以及准确预测的边界框的置信度误差；第五行是包含物体的单元格中，预测对象概率的各分项的误差平方之和。",
+      "description" : "YOLO V1  原文链接：YOLO V1\n参考链接：你真的读懂yolo了吗？\nAbstract  提出一种新的目标检测算法——YOLO，之前的目标检测工作都是使用另外的分类器实现检测，我们将目标检测构建成回归问题框架，在空间上分离bounding-box和相关类别概率。一个网络直接从完整图像中预测bounding-box和类别概率，因此速度很快。\nIntroduction  最近的方法，如R-CNN使用候选区域生成方法，首先在图像中生成候选框，然后在这些候选框上进行分类，分类后，再对bounding-box进行细化，消除重复框。这些复杂的操作导致运行速度缓慢，难以优化，因为每个单独的网络必须单独训练。\n我们将目标检测重新定义为单一的回归问题，直接从图像像素到bounding-box坐标和分类概率，\u0026ldquo;you only look once\u0026rdquo;（YOLO）就可以预测有什么物体以及它们在哪里。其架构如下图所示（YOLO包括三部分：将输入图像调整为448×448，在图像上运行单一卷积网络，通过模型的置信度来确定检测结果的阈值。）：单个卷积网络同时预测多个bounding-box和及其分类概率，YOLO训练完整的图像，并直接优化检测性能。\n相比于之前的网络，其有如下优点：\n（1）YOLO的速度非常快：由于我们将目标检测作为一个回归问题，所以我们不需要一个复杂网络。基本网络以每秒45帧的速度运行，另外，YOLO实现的平均平均精度是其他实时系统的两倍以上；\n（2）YOLO在做预测时关注的是图像的整体（全局）：与基于滑动窗口和候选区域生成的方法不同，YOLO在训练和测试期间可以看到整个图像，因此它隐式地编码上下文信息，而对于Fast R-CNN，由于看不到上下文信息，会错误的将背景patch预测为目标类；\n（3）YOLO学习目标的可推广表示：当在图像上进行训练和测试时，YOLO的性能远远优于DPM和R-CNN等其他检测方法，当应用在新的领域或者有预期之外的输入时，YOLO也可以很好的运行。\nYOLO在精度上仍然落后于最先进的检测模型，虽然它可以快速识别图像中的物体，但它很难精确定位一些物体，特别是小的物体。\nUnified Detection  我们将目标检测中的独立网络统一为一个单一的神经网络，使用来自整个图像的特征来预测每个bounding-box，同时预测类别概率，即我们的网络会对整个图像和图像中的所有目标对象进行全局推理。 我们的模型将输入图像分割成一个$S×S$网格，如果一个对象的中心落入某一网格单元格中，则该网格单元格负责检测该对象。\n每个网格单元格预测$B$个bounding-box和bounding-box的置信度分数，这些置信度分数反映了该bounding-box包含物体的真实程度，也反映了该bounding-box预测的准确程度。我们将信心定义为$Pr(Object)\\ast IOU_{pred}^{truth}$：如果该单元格中不存在对象，则置信度分数应该为零，否则，我们希望置信度得分等于bounding-box和ground truth之间的IOU值。\n每个bounding-box由5个预测部分组成：$x,y,w,h,confident$，$(x,y)$坐标表示相对于网格单元格边界的bounding-box的中心，$w$和$h$是相对于整个图像进行预测的bounding-box的宽度和高度，$confident$表示bounding-box和ground truth之间的IOU。\n每个网格单元还预测类别$C$的条件概率，$Pr(Class_{i}|Object)$，我们只预测每个网格单元的一组类别概率，而不管bounding-box的数量。\n在测试时，我们将类别条件概率和单独的bounding-box置信度预测相乘： $$ Pr(Class_{i}|Object)\\ast Pr(Object)\\ast IOU_{pred}^{truth}=Pr(Class_{i})\\ast IOU_{pred}^{truth} $$ 即每个bounding-box的特定类别的置信分数，这些分数既编码了该类出现在框中的概率，也编码了bounding-box与物体的匹配程度。\n我们设置$S=7$，$B=2$，如下图所示：该模型将图像划分为一个$S×S$的网格，并为每个网格单元预测$B$个bounding-box，及其置信度和$C$类的概率，因此，这些预测值被编码为一个$S×S×(B\\ast 5\u002bC)$张量。 Network Design  我们将该模型作为一个卷积神经网络实现，网络的初始卷积层从图像中提取特征，而全连接层则预测输出的概率和bounding-box坐标。\n我们的网络架构是基于GoogleNet的，共有24个卷积层，2个全连接层。没有使用GoogLeNet中的Inception模块，而是简单地使用1×1降维层和3×3卷积层，如下图所示： 我们的网络的最终输出是预测的$7×7×30$大小的张量。\n我们还训练了一个快速版本的YOLO，Fast YOLO使用的神经网络的卷积层更少（9个而不是24个），这些层的卷积核也更少。除了网络的大小之外，YOLO和Fast YOLO之间的所有训练和测试参数都是相同的。\nTraining  我们在ImageNet数据集上预训练了我们的卷积层；然后，我们转换模型来进行目标检测，检测通常需要细粒度的视觉信息，因此我们将网络的输入分辨率从$224×224$提高到$448×448$；最后一层预测了分类概率和bounding-box坐标，我们根据图像的宽度和高度将边界框的宽度和高度进行归一化，使它们落在0到1之间，参数化边界框$x$和$y$坐标为特定网格单元位置的偏移，因此它们也被限定在0和1之间；最后一层使用线性激活函数，而所有其他层使用Leaky ReLU： $$ x\u0026gt; 0,f(x)=x $$ $$ otherwise,f(x)=0.1x $$ 我们使用均方误差进行模型优化，但对定位误差和分类误差的权重相同，因此可能并不理想。另外，在每个图像中，许多网格单元格不包含任何物体，其置信度分数就为0，远远超过了包含物体的单元格的梯度。\n为了解决上述问题，我们增加bounding-box坐标预测的损失，减少不包含物体的单元格的预测的损失，引入两个参数，$\\lambda_{coord}$和$\\lambda_{noobj} $，并设置$\\lambda_{coord}=5$、$\\lambda_{noobj}=0.5$。\n均方误差对大bounding-box和小bounding-box的误差具有同样的权重，但是误差度量应该反映：大bounding-box的小偏差比小bounding-box的小偏差小，为了解决这个问题，我们预测边界框宽度和高度的平方根，而不是直接预测宽度和高度。\nYOLO为每个网格单元格预测多个bounding-box。在训练时，对于每一个物体，我们希望有一个bounding-box预测器去负责该物体，因此，我们指定一个预测器来“负责”预测一个物体，与ground truth有最高IOU的预测。这使得bounding-box预测器之间的专门化，每个预测器都能更好地预测特定大小、纵横比或物体的类别。\n因此，我们的损失函数如下： $$ \\lambda_{coord}\\sum_{i=0}^{S^{2}}\\sum_{j=0}^{B}\\mathbb{I}_ {ij}^{obj}[(x_{i}-\\hat{x_{i}})^{2}\u002b(y_{i}-\\hat{y_{i}})^{2}] $$ $$ \u002b\\lambda_{coord}\\sum_{i=0}^{S^{2}}\\sum_{j=0}^{B}\\mathbb{I}_ {ij}^{obj}[(\\sqrt{w_{i}}-\\sqrt{\\hat{w_{i}}})^{2}\u002b(\\sqrt{h_{i}}-\\sqrt{\\hat{h_{i}}})^{2}] $$ $$ \u002b\\sum_{i=0}^{S^{2}}\\sum_{j=0}^{B}\\mathbb{I}_ {ij}^{obj}(C_{i}-\\hat{C_{i}})^{2} $$ $$ \u002b\\lambda_{noobj} \\sum_{i=0}^{S^{2}}\\sum_{j=0}^{B}\\mathbb{I}_ {ij}^{noobj}(C_{i}-\\hat{C_{i}})^{2} $$ $$ \u002b\\sum_{i=0}^{S^{2}}\\mathbb{I}_ {i}^{obj}\\sum_{c\\in classes}(p_{i}(c)-\\hat{p_{i}}(c))^{2} $$ 其中，$\\mathbb{I}_ {i}^{obj}$表示单元格$i$是否有物体出现（0或1），$\\mathbb{I}_ {ij}^{obj}$表示单元格$i$中第$j$个bounding-box预测器负责预测（0或1）。第一行是边界框中心坐标的误差；第二行是边界框长宽的误差，由于边界框大小本身便会影响到误差的大小，为了降低边界框大小的影响，而采用了开方差来比较；第三行是包含物体的单元格以及准确预测的边界框的置信度误差；第四行是不包含物体的单元格中以及准确预测的边界框的置信度误差；第五行是包含物体的单元格中，预测对象概率的各分项的误差平方之和。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -86,8 +86,7 @@ Introduction  最近的方法，如R-CNN使用候选区域生成方法，首�
 （2）YOLO在做预测时关注的是图像的整体（全局）：与基于滑动窗口和候选区域生成的方法不同，YOLO在训练和测试期间可以看到整个图像，因此它隐式地编码上下文信息，而对于Fast R-CNN，由于看不到上下文信息，会错误的将背景patch预测为目标类；
 （3）YOLO学习目标的可推广表示：当在图像上进行训练和测试时，YOLO的性能远远优于DPM和R-CNN等其他检测方法，当应用在新的领域或者有预期之外的输入时，YOLO也可以很好的运行。
 YOLO在精度上仍然落后于最先进的检测模型，虽然它可以快速识别图像中的物体，但它很难精确定位一些物体，特别是小的物体。
-Unified Detection  我们将目标检测中的独立网络统一为一个单一的神经网络，使用来自整个图像的特征来预测每个bounding-box，同时预测类别概率，即我们的网络会对整个图像和图像中的所有目标对象进行全局推理。
-我们的模型将输入图像分割成一个$S×S$网格，如果一个对象的中心落入某一网格单元格中，则该网格单元格负责检测该对象。
+Unified Detection  我们将目标检测中的独立网络统一为一个单一的神经网络，使用来自整个图像的特征来预测每个bounding-box，同时预测类别概率，即我们的网络会对整个图像和图像中的所有目标对象进行全局推理。 我们的模型将输入图像分割成一个$S×S$网格，如果一个对象的中心落入某一网格单元格中，则该网格单元格负责检测该对象。
 每个网格单元格预测$B$个bounding-box和bounding-box的置信度分数，这些置信度分数反映了该bounding-box包含物体的真实程度，也反映了该bounding-box预测的准确程度。我们将信心定义为$Pr(Object)\ast IOU_{pred}^{truth}$：如果该单元格中不存在对象，则置信度分数应该为零，否则，我们希望置信度得分等于bounding-box和ground truth之间的IOU值。
 每个bounding-box由5个预测部分组成：$x,y,w,h,confident$，$(x,y)$坐标表示相对于网格单元格边界的bounding-box的中心，$w$和$h$是相对于整个图像进行预测的bounding-box的宽度和高度，$confident$表示bounding-box和ground truth之间的IOU。
 每个网格单元还预测类别$C$的条件概率，$Pr(Class_{i}|Object)$，我们只预测每个网格单元的一组类别概率，而不管bounding-box的数量。
@@ -99,7 +98,7 @@ Training  我们在ImageNet数据集上预训练了我们的卷积层；然后
 为了解决上述问题，我们增加bounding-box坐标预测的损失，减少不包含物体的单元格的预测的损失，引入两个参数，$\lambda_{coord}$和$\lambda_{noobj} $，并设置$\lambda_{coord}=5$、$\lambda_{noobj}=0.5$。
 均方误差对大bounding-box和小bounding-box的误差具有同样的权重，但是误差度量应该反映：大bounding-box的小偏差比小bounding-box的小偏差小，为了解决这个问题，我们预测边界框宽度和高度的平方根，而不是直接预测宽度和高度。
 YOLO为每个网格单元格预测多个bounding-box。在训练时，对于每一个物体，我们希望有一个bounding-box预测器去负责该物体，因此，我们指定一个预测器来“负责”预测一个物体，与ground truth有最高IOU的预测。这使得bounding-box预测器之间的专门化，每个预测器都能更好地预测特定大小、纵横比或物体的类别。
-因此，我们的损失函数如下： $$ \lambda_{coord}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{obj}[(x_{i}-\hat{x_{i}})^{2}&#43;(y_{i}-\hat{y_{i}})^{2}] $$ $$ &#43;\lambda_{coord}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{obj}[(\sqrt{w_{i}}-\sqrt{\hat{w_{i}}})^{2}&#43;(\sqrt{h_{i}}-\sqrt{\hat{h_{i}}})^{2}] $$ $$ &#43;\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{obj}(C_{i}-\hat{C_{i}})^{2} $$ $$ &#43;\lambda_{noobj} \sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{noobj}(C_{i}-\hat{C_{i}})^{2} $$ $$ &#43;\sum_{i=0}^{S^{2}}\mathbb{I} _{i} ^{obj}\sum_{c\in classes}(p_{i}(c)-\hat{p_{i}}(c))^{2} $$ 其中，$\mathbb{I} _{i} ^{obj}$表示单元格$i$是否有物体出现（0或1），$\mathbb{I} _{ij} ^{obj}$表示单元格$i$中第$j$个bounding-box预测器负责预测（0或1）。第一行是边界框中心坐标的误差；第二行是边界框长宽的误差，由于边界框大小本身便会影响到误差的大小，为了降低边界框大小的影响，而采用了开方差来比较；第三行是包含物体的单元格以及准确预测的边界框的置信度误差；第四行是不包含物体的单元格中以及准确预测的边界框的置信度误差；第五行是包含物体的单元格中，预测对象概率的各分项的误差平方之和。" />
+因此，我们的损失函数如下： $$ \lambda_{coord}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I}_ {ij}^{obj}[(x_{i}-\hat{x_{i}})^{2}&#43;(y_{i}-\hat{y_{i}})^{2}] $$ $$ &#43;\lambda_{coord}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I}_ {ij}^{obj}[(\sqrt{w_{i}}-\sqrt{\hat{w_{i}}})^{2}&#43;(\sqrt{h_{i}}-\sqrt{\hat{h_{i}}})^{2}] $$ $$ &#43;\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I}_ {ij}^{obj}(C_{i}-\hat{C_{i}})^{2} $$ $$ &#43;\lambda_{noobj} \sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I}_ {ij}^{noobj}(C_{i}-\hat{C_{i}})^{2} $$ $$ &#43;\sum_{i=0}^{S^{2}}\mathbb{I}_ {i}^{obj}\sum_{c\in classes}(p_{i}(c)-\hat{p_{i}}(c))^{2} $$ 其中，$\mathbb{I}_ {i}^{obj}$表示单元格$i$是否有物体出现（0或1），$\mathbb{I}_ {ij}^{obj}$表示单元格$i$中第$j$个bounding-box预测器负责预测（0或1）。第一行是边界框中心坐标的误差；第二行是边界框长宽的误差，由于边界框大小本身便会影响到误差的大小，为了降低边界框大小的影响，而采用了开方差来比较；第三行是包含物体的单元格以及准确预测的边界框的置信度误差；第四行是不包含物体的单元格中以及准确预测的边界框的置信度误差；第五行是包含物体的单元格中，预测对象概率的各分项的误差平方之和。" />
   <meta name="description" content="YOLO V1  原文链接：YOLO V1
 参考链接：你真的读懂yolo了吗？
 Abstract  提出一种新的目标检测算法——YOLO，之前的目标检测工作都是使用另外的分类器实现检测，我们将目标检测构建成回归问题框架，在空间上分离bounding-box和相关类别概率。一个网络直接从完整图像中预测bounding-box和类别概率，因此速度很快。
@@ -110,8 +109,7 @@ Introduction  最近的方法，如R-CNN使用候选区域生成方法，首�
 （2）YOLO在做预测时关注的是图像的整体（全局）：与基于滑动窗口和候选区域生成的方法不同，YOLO在训练和测试期间可以看到整个图像，因此它隐式地编码上下文信息，而对于Fast R-CNN，由于看不到上下文信息，会错误的将背景patch预测为目标类；
 （3）YOLO学习目标的可推广表示：当在图像上进行训练和测试时，YOLO的性能远远优于DPM和R-CNN等其他检测方法，当应用在新的领域或者有预期之外的输入时，YOLO也可以很好的运行。
 YOLO在精度上仍然落后于最先进的检测模型，虽然它可以快速识别图像中的物体，但它很难精确定位一些物体，特别是小的物体。
-Unified Detection  我们将目标检测中的独立网络统一为一个单一的神经网络，使用来自整个图像的特征来预测每个bounding-box，同时预测类别概率，即我们的网络会对整个图像和图像中的所有目标对象进行全局推理。
-我们的模型将输入图像分割成一个$S×S$网格，如果一个对象的中心落入某一网格单元格中，则该网格单元格负责检测该对象。
+Unified Detection  我们将目标检测中的独立网络统一为一个单一的神经网络，使用来自整个图像的特征来预测每个bounding-box，同时预测类别概率，即我们的网络会对整个图像和图像中的所有目标对象进行全局推理。 我们的模型将输入图像分割成一个$S×S$网格，如果一个对象的中心落入某一网格单元格中，则该网格单元格负责检测该对象。
 每个网格单元格预测$B$个bounding-box和bounding-box的置信度分数，这些置信度分数反映了该bounding-box包含物体的真实程度，也反映了该bounding-box预测的准确程度。我们将信心定义为$Pr(Object)\ast IOU_{pred}^{truth}$：如果该单元格中不存在对象，则置信度分数应该为零，否则，我们希望置信度得分等于bounding-box和ground truth之间的IOU值。
 每个bounding-box由5个预测部分组成：$x,y,w,h,confident$，$(x,y)$坐标表示相对于网格单元格边界的bounding-box的中心，$w$和$h$是相对于整个图像进行预测的bounding-box的宽度和高度，$confident$表示bounding-box和ground truth之间的IOU。
 每个网格单元还预测类别$C$的条件概率，$Pr(Class_{i}|Object)$，我们只预测每个网格单元的一组类别概率，而不管bounding-box的数量。
@@ -123,7 +121,7 @@ Training  我们在ImageNet数据集上预训练了我们的卷积层；然后
 为了解决上述问题，我们增加bounding-box坐标预测的损失，减少不包含物体的单元格的预测的损失，引入两个参数，$\lambda_{coord}$和$\lambda_{noobj} $，并设置$\lambda_{coord}=5$、$\lambda_{noobj}=0.5$。
 均方误差对大bounding-box和小bounding-box的误差具有同样的权重，但是误差度量应该反映：大bounding-box的小偏差比小bounding-box的小偏差小，为了解决这个问题，我们预测边界框宽度和高度的平方根，而不是直接预测宽度和高度。
 YOLO为每个网格单元格预测多个bounding-box。在训练时，对于每一个物体，我们希望有一个bounding-box预测器去负责该物体，因此，我们指定一个预测器来“负责”预测一个物体，与ground truth有最高IOU的预测。这使得bounding-box预测器之间的专门化，每个预测器都能更好地预测特定大小、纵横比或物体的类别。
-因此，我们的损失函数如下： $$ \lambda_{coord}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{obj}[(x_{i}-\hat{x_{i}})^{2}&#43;(y_{i}-\hat{y_{i}})^{2}] $$ $$ &#43;\lambda_{coord}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{obj}[(\sqrt{w_{i}}-\sqrt{\hat{w_{i}}})^{2}&#43;(\sqrt{h_{i}}-\sqrt{\hat{h_{i}}})^{2}] $$ $$ &#43;\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{obj}(C_{i}-\hat{C_{i}})^{2} $$ $$ &#43;\lambda_{noobj} \sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{noobj}(C_{i}-\hat{C_{i}})^{2} $$ $$ &#43;\sum_{i=0}^{S^{2}}\mathbb{I} _{i} ^{obj}\sum_{c\in classes}(p_{i}(c)-\hat{p_{i}}(c))^{2} $$ 其中，$\mathbb{I} _{i} ^{obj}$表示单元格$i$是否有物体出现（0或1），$\mathbb{I} _{ij} ^{obj}$表示单元格$i$中第$j$个bounding-box预测器负责预测（0或1）。第一行是边界框中心坐标的误差；第二行是边界框长宽的误差，由于边界框大小本身便会影响到误差的大小，为了降低边界框大小的影响，而采用了开方差来比较；第三行是包含物体的单元格以及准确预测的边界框的置信度误差；第四行是不包含物体的单元格中以及准确预测的边界框的置信度误差；第五行是包含物体的单元格中，预测对象概率的各分项的误差平方之和。" />
+因此，我们的损失函数如下： $$ \lambda_{coord}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I}_ {ij}^{obj}[(x_{i}-\hat{x_{i}})^{2}&#43;(y_{i}-\hat{y_{i}})^{2}] $$ $$ &#43;\lambda_{coord}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I}_ {ij}^{obj}[(\sqrt{w_{i}}-\sqrt{\hat{w_{i}}})^{2}&#43;(\sqrt{h_{i}}-\sqrt{\hat{h_{i}}})^{2}] $$ $$ &#43;\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I}_ {ij}^{obj}(C_{i}-\hat{C_{i}})^{2} $$ $$ &#43;\lambda_{noobj} \sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I}_ {ij}^{noobj}(C_{i}-\hat{C_{i}})^{2} $$ $$ &#43;\sum_{i=0}^{S^{2}}\mathbb{I}_ {i}^{obj}\sum_{c\in classes}(p_{i}(c)-\hat{p_{i}}(c))^{2} $$ 其中，$\mathbb{I}_ {i}^{obj}$表示单元格$i$是否有物体出现（0或1），$\mathbb{I}_ {ij}^{obj}$表示单元格$i$中第$j$个bounding-box预测器负责预测（0或1）。第一行是边界框中心坐标的误差；第二行是边界框长宽的误差，由于边界框大小本身便会影响到误差的大小，为了降低边界框大小的影响，而采用了开方差来比较；第三行是包含物体的单元格以及准确预测的边界框的置信度误差；第四行是不包含物体的单元格中以及准确预测的边界框的置信度误差；第五行是包含物体的单元格中，预测对象概率的各分项的误差平方之和。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -223,7 +221,7 @@ look once&rdquo;（YOLO）就可以预测有什么物体以及它们在哪里。
     （3）YOLO学习目标的可推广表示：当在图像上进行训练和测试时，YOLO的性能远远优于DPM和R-CNN等其他检测方法，当应用在新的领域或者有预期之外的输入时，YOLO也可以很好的运行。<br>
     YOLO在精度上仍然落后于最先进的检测模型，虽然它可以快速识别图像中的物体，但它很难精确定位一些物体，特别是小的物体。</p>
 <h2 id="unified-detection">Unified Detection</h2>
-<p>    我们将目标检测中的独立网络统一为一个单一的神经网络，使用来自整个图像的特征来预测每个bounding-box，同时预测类别概率，即我们的网络会对整个图像和图像中的所有目标对象进行全局推理。<br>
+<p>    我们将目标检测中的独立网络统一为一个单一的神经网络，使用来自整个图像的特征来预测每个bounding-box，同时预测类别概率，即我们的网络会对整个图像和图像中的所有目标对象进行全局推理。
     我们的模型将输入图像分割成一个$S×S$网格，如果一个对象的中心落入某一网格单元格中，则该网格单元格负责检测该对象。<br>
     每个网格单元格预测$B$个bounding-box和bounding-box的置信度分数，这些置信度分数反映了该bounding-box包含物体的真实程度，也反映了该bounding-box预测的准确程度。我们将信心定义为$Pr(Object)\ast IOU_{pred}^{truth}$：如果该单元格中不存在对象，则置信度分数应该为零，否则，我们希望置信度得分等于bounding-box和ground truth之间的IOU值。<br>
     每个bounding-box由5个预测部分组成：$x,y,w,h,confident$，$(x,y)$坐标表示相对于网格单元格边界的bounding-box的中心，$w$和$h$是相对于整个图像进行预测的bounding-box的宽度和高度，$confident$表示bounding-box和ground truth之间的IOU。<br>
@@ -256,27 +254,102 @@ $，并设置$\lambda_{coord}=5$、$\lambda_{noobj}=0.5$。<br>
     YOLO为每个网格单元格预测多个bounding-box。在训练时，对于每一个物体，我们希望有一个bounding-box预测器去负责该物体，因此，我们指定一个预测器来“负责”预测一个物体，与ground truth有最高IOU的预测。这使得bounding-box预测器之间的专门化，每个预测器都能更好地预测特定大小、纵横比或物体的类别。<br>
     因此，我们的损失函数如下：
 $$
-\lambda_{coord}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{obj}[(x_{i}-\hat{x_{i}})^{2}+(y_{i}-\hat{y_{i}})^{2}]
+\lambda_{coord}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I}_ {ij}^{obj}[(x_{i}-\hat{x_{i}})^{2}+(y_{i}-\hat{y_{i}})^{2}]
 $$
 $$
-+\lambda_{coord}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{obj}[(\sqrt{w_{i}}-\sqrt{\hat{w_{i}}})^{2}+(\sqrt{h_{i}}-\sqrt{\hat{h_{i}}})^{2}]
++\lambda_{coord}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I}_ {ij}^{obj}[(\sqrt{w_{i}}-\sqrt{\hat{w_{i}}})^{2}+(\sqrt{h_{i}}-\sqrt{\hat{h_{i}}})^{2}]
 $$
 $$
-+\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{obj}(C_{i}-\hat{C_{i}})^{2}
++\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I}_ {ij}^{obj}(C_{i}-\hat{C_{i}})^{2}
 $$
 $$
-+\lambda_{noobj} \sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{noobj}(C_{i}-\hat{C_{i}})^{2}
++\lambda_{noobj} \sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I}_ {ij}^{noobj}(C_{i}-\hat{C_{i}})^{2}
 $$
 $$
-+\sum_{i=0}^{S^{2}}\mathbb{I} _{i} ^{obj}\sum_{c\in classes}(p_{i}(c)-\hat{p_{i}}(c))^{2}
++\sum_{i=0}^{S^{2}}\mathbb{I}_ {i}^{obj}\sum_{c\in classes}(p_{i}(c)-\hat{p_{i}}(c))^{2}
 $$
-    其中，$\mathbb{I} _{i} ^{obj}$表示单元格$i$是否有物体出现（0或1），$\mathbb{I} _{ij} ^{obj}$表示单元格$i$中第$j$个bounding-box预测器负责预测（0或1）。第一行是边界框中心坐标的误差；第二行是边界框长宽的误差，由于边界框大小本身便会影响到误差的大小，为了降低边界框大小的影响，而采用了开方差来比较；第三行是包含物体的单元格以及准确预测的边界框的置信度误差；第四行是不包含物体的单元格中以及准确预测的边界框的置信度误差；第五行是包含物体的单元格中，预测对象概率的各分项的误差平方之和。</p>
+    其中，$\mathbb{I}_ {i}^{obj}$表示单元格$i$是否有物体出现（0或1），$\mathbb{I}_ {ij}^{obj}$表示单元格$i$中第$j$个bounding-box预测器负责预测（0或1）。第一行是边界框中心坐标的误差；第二行是边界框长宽的误差，由于边界框大小本身便会影响到误差的大小，为了降低边界框大小的影响，而采用了开方差来比较；第三行是包含物体的单元格以及准确预测的边界框的置信度误差；第四行是不包含物体的单元格中以及准确预测的边界框的置信度误差；第五行是包含物体的单元格中，预测对象概率的各分项的误差平方之和。</p>
 <h3 id="limitations-of-yolo">Limitations of YOLO</h3>
 <p>    YOLO对bounding-box预测施加了强大的空间约束，因为每个网格单元只能预测两个框，并且只能有一个类。这限制了我们的模型可以预测的临近的物体的数量。</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>    介绍了目标检测的统一模型YOLO，构造简单，可以直接在完整的图像上进行训练。与基于分类器的方法不同，YOLO是在一个直接对应于检测性能的损失函数上进行训练的，并且整个模型是联合训练的。</p>
-<h1 id="yolo9000">YOLO9000</h1>
-<p>原文链接：<a href="https://arxiv.org/pdf/1612.08242.pdf">YOLO9000</a></p>
+<h1 id="yolo-v2">YOLO V2</h1>
+<p>    原文链接：<a href="https://arxiv.org/pdf/1612.08242.pdf">YOLO9000</a><br>
+    提出了一种新的方法来利用现有的大量的分类数据，并使用该数据扩大当前检测模型的范围，我提出了一种联合训练算法，可以在检测和分类数据集上训练目标检测模型，该方法利用带标记的检测图像来学习精确定位对象，同时使用分类图像来增加其词汇量和鲁棒性。<br>
+    首先，改进了基础YOLO模型，生成YOLOv2；然后，使用联合训练算法通过两个数据集，目标检测和分类，来训练一个模型YOLO9000。</p>
+<h2 id="better">Better</h2>
+<p><strong>Batch Normalization</strong><br>
+<strong>High Resolution Classifier</strong><br>
+    所有最先进的检测方法都使用在ImageNe上预先训练过的分类器。从AlexNet开始，大多数分类器操作小于256×256的输入图像。原始的YOLO在224×224处训练分类器网络，并将检测的分辨率提高到448。这意味着网络必须同时切换到学习目标检测并且调整到新的输入分辨率。对于YOLOv2，我们首先在ImageNet上以448×448分辨率微调分类网络，使得网络有时间来调整进行调整，使其在更高分辨率的输入时能够更好地工作。<br>
+<strong>Convolutional With Anchor Boxes</strong><br>
+    YOLO直接使用卷积特征提取器上的全连接层来预测边界框的坐标；Faster R-CNN使用手工挑选的先验来预测边界框，而不是直接预测坐标；Faster R-CNN仅使用卷积层，通过区域建议网络(RPN)预测锚框的偏移量和置信度。由于预测层是卷积操作，所以RPN可以预测一个特征图中的每个位置的偏移量，预测偏移量而不是坐标，简化了问题，并使网络更容易学习。<br>
+    我们将YOLO中的全连接层删除，并使用锚框来预测边界框。首先，我们删除一个池化层，以使网络的卷积层的输出具有更高的分辨率；我们还缩小了网络，416的输入图像，而不是448个×448，这样做是因为我们想要在特征图中有奇数个位置，这样就有一个中心单元格；物体，特别是大型物体，往往会占据图像的中心，所以在中心有一个位置来预测这些物体，而不是附近的四个位置。YOLO的卷积层对图像降采样32倍，所以对于416的输入图像，我们会得到一个13×13的输出特征图。<br>
+    不预测每个锚盒的类和物体，与YOLO相似，分别预测box与ground truth的IoU（置信度）和在有对象的情况下某一类别的条件概率。<br>
+    在YOLO中，每张图片只预测98个box，但使用锚盒后，预测的box超过1000个，虽然精度mAP下降了，但是召回率提高了。<br>
+<strong>Dimension Clusters</strong><br>
+    相比于手工挑选anchor的尺寸与比例，我们选择自动选择。我们在训练集的边界框上运行k-means聚类以自动的找到更好的先验框，但如果使用标准的欧几里得距离的k-means，较大的box比较小的box会产生更多的误差。然而，我们真正想要的是好的IoU的先验，这与box的大小无关。因此，对于我们的距离度量，我们使用：
+$$
+d(box, centroid) = 1 − IOU(box, centroid)
+$$
+    我们选择不同的K值，并绘制具有最近质心的平均IOU，我们选择k=5作为模型复杂度和高召回率之间的一个很好的权衡。聚类的质心与手工挑选的锚定盒有显著的不同：短而宽的盒子少了，高而薄的盒子多了。<br>
+<strong>Direct location prediction</strong><br>
+    当YOLO使用锚框anchor时，会遇到第二个问题，模型的不稳定性，特别是在训练初期。在YOLO中，是直接预测偏移量，现在不直接预测偏移量，预测相对于网格的位置坐标，这样做将回归的真值限制在0到1范围内。该网络在输出特征图中预测每个网格上的5个边界框。该网络预测了每个边界框的5个值（4个坐标，1个置信度）。由于约束了位置预测，参数化更容易学习，使网络更加稳定。
+<strong>Fine-Grained Features</strong><br>
+    修改后的YOLO对分辨率为13×13的特征图进行目标检测，虽然这对于大型的物体是足够的，但可能存在一些小物体需要更细粒度的特征。Faster R-CNN和SSD都在网络中的不同大小的特征图上生成候选框，以获得一定范围的分辨率。我们通过简单地添加一个直连接层，来提供之前层中的分辨率为26×26的特征图。直连接层通过将相邻特征叠加到不同的通道中，而不是在空间位置上，将高分辨率特征与低分辨率特征连接起来，类似于ResNet中的恒等映射。需要将$26 × 26 × 512$大小的特征图转换为$13 × 13 × 2048$大小的特征图，以与最初的特征图进行连接。<br>
+<strong>Multi-Scale Training</strong><br>
+    原始YOLO使用的输入分辨率为448×448，由于锚框的加入，我们将分辨率更改为416×416。然而，由于我们的模型只使用卷积层和池化层，因此可以动态地调整大小，所以我们希望YOLOv2能够在不同大小的图像上进行运行。<br>
+    我们不固定输入图像的大小，而是每隔几次迭代就改变一次网络。我们的网络每经过十个批次，就随机选择一个新的图像尺寸。由于我们的模型会对样本下降32倍，因此我们从32的倍数中提取：$\lbrace 320,352，&hellip;，608 \rbrace$。最小的是320×320，最大的是608×608。</p>
+<h2 id="faster">Faster</h2>
+<p>    我们希望YOLOv2在一开始就是快的，大多数目标检测框架依赖于VGG-16作为基本特征提取网络，虽然VGG-16是一个强大的、准确的分类网络，但其很复杂，计算量很大。因此我们选择了GoogleNet作为基本架构，比VGG更快，但准确性比VGG-16略差。<br>
+<strong>Darknet-19</strong><br>
+    我们的搭建了一个新的分类网络作为YOLOv2的基本架构。与VGG模型类似，我们主要使用3×3大小的卷积核，并在每个池化层后将通道数加倍，最后使用全局平均池来进行预测，以及1×1卷积核实现降维，批归一化来稳定训练，加速收敛速度。<br>
+    我们最终的模型，称为Darknet-19，有19个卷积层和5个最大池化层，如下图所示：
+<img src="/img/yolo2-1.PNG" alt="">
+<strong>Training for classification</strong><br>
+    我们使用ImageNet数据集对上述网络进行训练，在训练过程中，我们使用了数据增强，包括随机剪裁、旋转、色调、饱和度和曝光变换等。先用224×224大小的图像对网络进行预训练，接着用448×448大小的图片进行微调，只训练10个epoch就可以达到比较好的精度。<br>
+<strong>Training for detection</strong><br>
+    将网络的最后一层删除，添加三个3×3的卷积层，每个层有1024个卷积核，最后一个是1×1卷积层，包含我们需要检测的输出数量。对于VOC数据集，每个网格预测5个框，每个框有预测5个数值，共包括20类，所以有125个卷积核。我们还将3×3×512层的特征添加到最后一个卷积层中，以使模型使用细粒度特征。</p>
+<h2 id="stronger">Stronger</h2>
+<p>    我们提出了一种联合训练分类数据和目标检测数据的方法制。使用图像检测标签学习目标检测中的特定信息，如bounding-box坐标和置信度等，以及如何分类常见的对象。它使用只带有类别标签的图像来扩展它可以检测到的类别的数量。<br>
+    在训练过程中，我们混合了来自目标检测和分类数据中的图像。当网络看到一个标记为目标检测的图像时，可以基于完整的YOLOv2损失函数进行反向传播。当它看到一个分类图像时，可以只反向传播结构中分类部分的特定损失。<br>
+    目标检测数据集只有常见的对象和一般的标签，如“狗”或“船”。分类数据集有更广泛和更深层次的标签范围，例如：“诺福克梗”、“约克郡犬”和“贝灵顿梗”。大多数分类方法在所有可能的类别中使用softmax层来计算最终的概率分布。使用softmax假定这些类是互斥的，这给合并数据集带来了问题，例如，ImageNet和COCO数据集就不能合并，因为“诺福克梗”和“狗”这两类并不是相互排斥的。
+Hierarchical classification</p>
+<h2 id="conclusion-1">Conclusion</h2>
+<p>    介绍了YOLOv2和YOLO9000，其中，YOLOv2是最先进的目标检测模型，并且比检测系统更快，它可以在各种图像大小下运行，以提供速度和精度之间的平衡。YOLO9000是一个实时框架，通过联合优化检测和分类来对9000多个对象进行分类检测。我们使用WordTree结合不同来源的数据集，以及联合优化方法，同时在ImageNet和COCO上进行训练。YOLO9000是缩小检测和分类之间的数据集大小差距的有力一步。
+    我们的许多技术都可以推广到目标检测之外：ImageNet的文字树表示为图像分类提供了一个更丰富、更详细的输出空间。使用分层分类的数据集组合将在分类和分割领域中是有用的。像多尺度训练这样的训练技术可以在各种视觉任务中提供好处。</p>
+<h1 id="yolo-v3">YOLO V3</h1>
+<p>    原文链接：<a href="https://pjreddie.com/media/files/papers/YOLOv3.pdf">YOLOv3</a></p>
+<h2 id="the-deal">The Deal</h2>
+<p>    YOLOv3的改进是：引入一些其他研究人员的好方法，并且训练了一个比其他分类器网络更好的分类网络。</p>
+<h3 id="bounding-box-prediction">Bounding Box Prediction</h3>
+<p>    在YOLO9000之后，我们的系统使用维度集群作为锚框来预测bounding-box。该网络预测了每个边界框的4个坐标，$t_{x},t_{y},t_{w},t_{h}$，在训练过程中，我们使用误差损失的平方和。在匹配原则上，选择与ground truth的IoU值最大的bounding-box进行匹配，即每个ground truth只分配一个bounding box（在SSD中，一个ground truth与多个bounding-box进行匹配）。</p>
+<h3 id="class-prediction">Class Prediction</h3>
+<p>    每个bounding-box使用多标签分类来预测bounding-box可能包含的类别。我们没有使用softmax，而是使用独立的逻辑分类器。在训练过程中，我们使用二进制交叉熵损失来进行类预测。当我们移动到更复杂的领域，如开放图像数据集时，在这个数据集中有许多重叠的标签（即女人和人），如果使用softmax就是假设每个bounding-box都有一个类，但通常不是这样。</p>
+<h3 id="predictions-across-scales">Predictions Across Scales</h3>
+<p>    YOLOv3预测了3个不同尺度的bounding-box，使用类似特征金字塔的概念，在基本特征提取网络末端，添加几个卷积层。最后一个预测一个三维张量bounding-box、对象类和类别预测。在我们的COCO数据集中，在每个尺度上预测三个bounding-box，因此预测大小为$N×N×[3×(4+1+80)]$。<br>
+    接下来，我们从之前的两层中提取特征图，并对其进行上采样。我们还从网络的浅层获取一个特征图，并将其与我们的上采样特征图进行连接。该方法允许我们从上采样的特征中获得更有意义的语义信息，并从浅层的特征图中获得更细粒度的信息。然后我们添加了一些卷积层来处理这个组合的特征图，并最终预测一个类似的张量。</p>
+<h3 id="feature-extractor">Feature Extractor</h3>
+<p>    我们使用了一个新的网络来进行特征提取，是在YOLOv2中使用的Darknet-19网络的改进。我们的网络使用连续的3×3和1×1卷积层，并结合残差链接，共有53个卷积层，所以称为Darknet-53，如下图所示，其性能要比ResNet-101好，并且速度也比它快，性能与ResNet-152类似，但比其快一倍，主要是因为ResNet-152层数太多了。
+<img src="/img/yolo3-1.PNG" alt=""></p>
+<h2 id="how-we-do">How We Do</h2>
+<p>    YOLOv3的效果很好，如下表所示，在COCO数据集上，mAP与SSD类似，但速度快了3倍。但是其性能还是不如RetinaNet。在过去，YOLO一直致力于在小物体上实现更好的检测结果，然而，通过下表可以看出，通过新的多尺度预测，YOLOv3具有相对较高的$AP_{S}$性能。但是，它在中等和较大尺寸的物体上的性能相对较差。目前还需要更多的研究才能知道为什么。
+<img src="/img/yolo3-2.PNG" alt=""></p>
+<h2 id="things-we-tried-that-didnt-work">Things We Tried That Didn’t Work</h2>
+<p>    在开发YOLOv3的时候尝试了很多东西。很多方法都不起作用。<br>
+<strong>Anchor box $x$, $y$ offset predictions</strong><br>
+    我们尝试使用普通锚框预测方法，即使用线性激活的方式来将$x$与$y$的偏移量预测为bounding-box的宽度或高度的倍数。但是这种方法会降低模型的稳定性，而且效果不是很好。<br>
+<strong>Linear $x$, $y$ predictions instead of logistic</strong><br>
+    我们尝试使用线性激活来直接预测$x$和$y$的偏移量，而不是逻辑回归（逻辑回归的模型是一个非线性模型，sigmoid函数，又称逻辑回归函数），这会导致mAP值下降几个百分点。<br>
+<strong>Dual IOU thresholds and truth assignment</strong><br>
+    Faster R-CNN中使用了两个IOU阈值。如果一个预测与ground truth重叠大于0.7，作为正例，如果在0.3到0.7之间，则被忽略，对于小于0.3，作为负例。我们尝试了类似的策略，但没有取得好的结果。</p>
+<h2 id="overview">Overview</h2>
+<p>参考链接：<a href="https://blog.csdn.net/leviopku/article/details/82660381">yolo系列之yolo v3【深度解析】</a>
+<img src="/img/yolo3-3.jfif" alt="">
+    <strong>DBL</strong>：如上图左下角所示，是YOLOv3的基本组件，即卷积+BN+Leaky relu；<br>
+    <strong>resn</strong>：n代表数字，有res1，res2, … ,res8等等，表示这个res_block里含有多少个res_unit，YOLOv3开始借鉴ResNet的残差结构，使用这种结构可以让网络结构更深(从v2的darknet-19上升到v3的darknet-53)；<br>
+    <strong>concat</strong>：张量拼接，即将网络中间层与后面某一层的特征图的上采样进行拼接（拼接会扩充张量维度，而add是元素相加）。<br>
+    整个v3结构里面，是没有池化层和全连接层的，特征图的尺寸变换是通过改变卷积核的步长来实现的。<br>
+    YOLOv3输出了3个不同尺度的feature map，如上图所示的y1，y2，y3；YOLOv3设定的是每个网格单元预测3个box，所以每个box需要有$(x, y, w, h, confidence)$五个输出预测值，然后加上80个类别的概率，所以$3×(5 + 80) = 255$。</p>
 
         </div>
 

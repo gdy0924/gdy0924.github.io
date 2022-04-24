@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/ssd/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/ssd/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "SSD",
+      "headline" : "SSD",
+      "description" : "SSD: Single Shot MultiBox Detector\n原文链接：SSD\nAbstract  提出了一种利用一个深度神经网络来实现目标检测的方法：SSD，根据不同的高宽比和每个特征图定位的尺寸大小，将bounding-box的输出空间离散为一组默认框。在预测时，该网络为每个默认框中每个对象类别的存在生成分数，并对该框进行调整，以更好地匹配对象形状。此外，该网络结合了不同分辨率的多个特征图进行预测，以能够处理不同大小的对象。相比于需要候选框生成的方法，SSD很简单：完全取消了候选区域生成和后续的像素\/特征重采样阶段，将所有的计算过程封装在一个网络中。\nIntroduction  目前最先进的对象检测方法流程是：生成候选框，为每个框重新采样像素或特征，将其输入到一个分类器中。以上方法速度很慢。\n本文提出了第一个基于深度网络的对象检测器，不需要为候选框重新采样像素或特征，并且可以达到一样的精度（精度要比YOLO高）。速度的提升来自于消除候选框生成和后续的像素或特征重采样阶段。\n我们的改进包括使用一个小的卷积核来预测bounding-box的对象类别和偏移量，为不同的高宽比检测使用单独的预测器（卷积核），并将这些卷积核应用在网络后期的多个特征图上，以便在多个尺度上检测。通过这些修改，特别是在不同尺度上使用多层进行预测，可以使用相对较低分辨率的输入来实现高精度，进一步提高检测速度。\nContributions：\n（1）引入SSD，多个类别的单阶段检测器，比之前的单阶段检测器YOLO更快更精确，与更慢的Faster R-CNN精度相同；\n（2）SSD的核心是为一组固定的默认边界框预测类别和偏移量，通过使用较小的应用在特征图上的卷积核；\n（3）为了获得较高的检测精度，我们从不同尺度的特征图中生成不同尺度的预测，并通过长宽比明确地分离预测；\n（4）以上的改进形成了简单的端到端训练和高精度，甚至在低分辨率的输入图像上，进一步提高了速度和准确性。\nThe Single Shot Detector (SSD) Model  SSD方法是基于前馈卷积网络的，该网络生成固定大小的bounding-box集合，并获得这些框中对象类实例的分数，然后通过NMS产生最终的结果。早期的网络是基于高质量图像分类的标准结构（去掉最终的分类层），我们将称之为base network，我们向网络中添加辅助结构，以生成具有以下特征的检测器：\nMulti-scale feature maps for detection\n在base network的末端添加卷积特征层，通过这些层，特征图的大小逐步减小，并在多个尺度的特征图上进行检测，对于每一个特征层，用于预测检测的卷积模型是不同的。（Overfeat和YOLO都在单尺度特征图上检测的）。\nConvolutional predictors for detection\n每个添加的特征层（或是来自base network的现有特征层）都可以使用一组卷积核生成一组固定的检测预测，如下图所示。对于大小为$m×n$、通道数为$p$的特征层，使用$3×3×p$的卷积核，生成一个类别的分数或相对于默认框的偏移量，在$m×n$的每个位置应用卷积核，产生一个输出值。边界框偏移输出值是相对于相对于每个特征图位置的默认框位置来测量的（参见YOLO的架构，它在此步骤中使用的是全连接层而不是卷积）。 Default boxes and aspect ratios\n我们将一组默认的边界框与每个特征图的网格关联起来（类似于Faster R-CNN中的anchor）。默认框以卷积的方式滑过特征图，这样每个框相对于其对应网格的位置就是固定的。在每个特征图的网格中，我们预测相对于网格中默认框的偏移量，以及每个框中存在类实例的类别分数。\n在每个网格生成$k$个默认框，计算$c$个类分数和相对于原始默认框的4个偏移量，特征图中的每个网格生成$(c\u002b4)×k$个输出，即一个$m×n$大小的特征图产生$(c\u002b4)×k×m×n$个输出，我们的默认框与anchor相同，不过我们将其应用在不同分辨率的特征图上。\ndefault box\n如下图所示： （a）表示SSD在训练期间只需要一个输入图像和每个object的ground truth。以卷积的方式，在特征图的每个位置生成一组不同高宽比的默认框（如图中一组为4个），并且应用在不同尺度的特征图上（（b）为$8×8$，（c）为$4×4$）。对于每个默认框，预测所有对象类别和偏移量。\nTraining  训练SSD与训练两阶段的检测模型的区别在于，ground truth的信息需要被分配给固定的检测器的输出集合中的特定输出。\nMatching strategy\n在训练过程中，我们需要确定哪些默认框与ground truth相对应，对于每个ground truth框，我们从不同位置、高宽比和尺寸的默认框中进行选择。首先将每个ground truth框与具有 the best jaccard overlap的默认框进行匹配。与MultiBox不同的是，我们将与ground truth的jaccard重叠高于阈值（0.",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-04-19 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-04-19 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/ssd\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>SSD</title>
+  <meta property="og:title" content="SSD" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="SSD: Single Shot MultiBox Detector
+原文链接：SSD
+Abstract  提出了一种利用一个深度神经网络来实现目标检测的方法：SSD，根据不同的高宽比和每个特征图定位的尺寸大小，将bounding-box的输出空间离散为一组默认框。在预测时，该网络为每个默认框中每个对象类别的存在生成分数，并对该框进行调整，以更好地匹配对象形状。此外，该网络结合了不同分辨率的多个特征图进行预测，以能够处理不同大小的对象。相比于需要候选框生成的方法，SSD很简单：完全取消了候选区域生成和后续的像素/特征重采样阶段，将所有的计算过程封装在一个网络中。
+Introduction  目前最先进的对象检测方法流程是：生成候选框，为每个框重新采样像素或特征，将其输入到一个分类器中。以上方法速度很慢。
+本文提出了第一个基于深度网络的对象检测器，不需要为候选框重新采样像素或特征，并且可以达到一样的精度（精度要比YOLO高）。速度的提升来自于消除候选框生成和后续的像素或特征重采样阶段。
+我们的改进包括使用一个小的卷积核来预测bounding-box的对象类别和偏移量，为不同的高宽比检测使用单独的预测器（卷积核），并将这些卷积核应用在网络后期的多个特征图上，以便在多个尺度上检测。通过这些修改，特别是在不同尺度上使用多层进行预测，可以使用相对较低分辨率的输入来实现高精度，进一步提高检测速度。
+Contributions：
+（1）引入SSD，多个类别的单阶段检测器，比之前的单阶段检测器YOLO更快更精确，与更慢的Faster R-CNN精度相同；
+（2）SSD的核心是为一组固定的默认边界框预测类别和偏移量，通过使用较小的应用在特征图上的卷积核；
+（3）为了获得较高的检测精度，我们从不同尺度的特征图中生成不同尺度的预测，并通过长宽比明确地分离预测；
+（4）以上的改进形成了简单的端到端训练和高精度，甚至在低分辨率的输入图像上，进一步提高了速度和准确性。
+The Single Shot Detector (SSD) Model  SSD方法是基于前馈卷积网络的，该网络生成固定大小的bounding-box集合，并获得这些框中对象类实例的分数，然后通过NMS产生最终的结果。早期的网络是基于高质量图像分类的标准结构（去掉最终的分类层），我们将称之为base network，我们向网络中添加辅助结构，以生成具有以下特征的检测器：
+Multi-scale feature maps for detection
+在base network的末端添加卷积特征层，通过这些层，特征图的大小逐步减小，并在多个尺度的特征图上进行检测，对于每一个特征层，用于预测检测的卷积模型是不同的。（Overfeat和YOLO都在单尺度特征图上检测的）。
+Convolutional predictors for detection
+每个添加的特征层（或是来自base network的现有特征层）都可以使用一组卷积核生成一组固定的检测预测，如下图所示。对于大小为$m×n$、通道数为$p$的特征层，使用$3×3×p$的卷积核，生成一个类别的分数或相对于默认框的偏移量，在$m×n$的每个位置应用卷积核，产生一个输出值。边界框偏移输出值是相对于相对于每个特征图位置的默认框位置来测量的（参见YOLO的架构，它在此步骤中使用的是全连接层而不是卷积）。 Default boxes and aspect ratios
+我们将一组默认的边界框与每个特征图的网格关联起来（类似于Faster R-CNN中的anchor）。默认框以卷积的方式滑过特征图，这样每个框相对于其对应网格的位置就是固定的。在每个特征图的网格中，我们预测相对于网格中默认框的偏移量，以及每个框中存在类实例的类别分数。
+在每个网格生成$k$个默认框，计算$c$个类分数和相对于原始默认框的4个偏移量，特征图中的每个网格生成$(c&#43;4)×k$个输出，即一个$m×n$大小的特征图产生$(c&#43;4)×k×m×n$个输出，我们的默认框与anchor相同，不过我们将其应用在不同分辨率的特征图上。
+default box
+如下图所示： （a）表示SSD在训练期间只需要一个输入图像和每个object的ground truth。以卷积的方式，在特征图的每个位置生成一组不同高宽比的默认框（如图中一组为4个），并且应用在不同尺度的特征图上（（b）为$8×8$，（c）为$4×4$）。对于每个默认框，预测所有对象类别和偏移量。
+Training  训练SSD与训练两阶段的检测模型的区别在于，ground truth的信息需要被分配给固定的检测器的输出集合中的特定输出。
+Matching strategy
+在训练过程中，我们需要确定哪些默认框与ground truth相对应，对于每个ground truth框，我们从不同位置、高宽比和尺寸的默认框中进行选择。首先将每个ground truth框与具有 the best jaccard overlap的默认框进行匹配。与MultiBox不同的是，我们将与ground truth的jaccard重叠高于阈值（0." />
+  <meta name="description" content="SSD: Single Shot MultiBox Detector
+原文链接：SSD
+Abstract  提出了一种利用一个深度神经网络来实现目标检测的方法：SSD，根据不同的高宽比和每个特征图定位的尺寸大小，将bounding-box的输出空间离散为一组默认框。在预测时，该网络为每个默认框中每个对象类别的存在生成分数，并对该框进行调整，以更好地匹配对象形状。此外，该网络结合了不同分辨率的多个特征图进行预测，以能够处理不同大小的对象。相比于需要候选框生成的方法，SSD很简单：完全取消了候选区域生成和后续的像素/特征重采样阶段，将所有的计算过程封装在一个网络中。
+Introduction  目前最先进的对象检测方法流程是：生成候选框，为每个框重新采样像素或特征，将其输入到一个分类器中。以上方法速度很慢。
+本文提出了第一个基于深度网络的对象检测器，不需要为候选框重新采样像素或特征，并且可以达到一样的精度（精度要比YOLO高）。速度的提升来自于消除候选框生成和后续的像素或特征重采样阶段。
+我们的改进包括使用一个小的卷积核来预测bounding-box的对象类别和偏移量，为不同的高宽比检测使用单独的预测器（卷积核），并将这些卷积核应用在网络后期的多个特征图上，以便在多个尺度上检测。通过这些修改，特别是在不同尺度上使用多层进行预测，可以使用相对较低分辨率的输入来实现高精度，进一步提高检测速度。
+Contributions：
+（1）引入SSD，多个类别的单阶段检测器，比之前的单阶段检测器YOLO更快更精确，与更慢的Faster R-CNN精度相同；
+（2）SSD的核心是为一组固定的默认边界框预测类别和偏移量，通过使用较小的应用在特征图上的卷积核；
+（3）为了获得较高的检测精度，我们从不同尺度的特征图中生成不同尺度的预测，并通过长宽比明确地分离预测；
+（4）以上的改进形成了简单的端到端训练和高精度，甚至在低分辨率的输入图像上，进一步提高了速度和准确性。
+The Single Shot Detector (SSD) Model  SSD方法是基于前馈卷积网络的，该网络生成固定大小的bounding-box集合，并获得这些框中对象类实例的分数，然后通过NMS产生最终的结果。早期的网络是基于高质量图像分类的标准结构（去掉最终的分类层），我们将称之为base network，我们向网络中添加辅助结构，以生成具有以下特征的检测器：
+Multi-scale feature maps for detection
+在base network的末端添加卷积特征层，通过这些层，特征图的大小逐步减小，并在多个尺度的特征图上进行检测，对于每一个特征层，用于预测检测的卷积模型是不同的。（Overfeat和YOLO都在单尺度特征图上检测的）。
+Convolutional predictors for detection
+每个添加的特征层（或是来自base network的现有特征层）都可以使用一组卷积核生成一组固定的检测预测，如下图所示。对于大小为$m×n$、通道数为$p$的特征层，使用$3×3×p$的卷积核，生成一个类别的分数或相对于默认框的偏移量，在$m×n$的每个位置应用卷积核，产生一个输出值。边界框偏移输出值是相对于相对于每个特征图位置的默认框位置来测量的（参见YOLO的架构，它在此步骤中使用的是全连接层而不是卷积）。 Default boxes and aspect ratios
+我们将一组默认的边界框与每个特征图的网格关联起来（类似于Faster R-CNN中的anchor）。默认框以卷积的方式滑过特征图，这样每个框相对于其对应网格的位置就是固定的。在每个特征图的网格中，我们预测相对于网格中默认框的偏移量，以及每个框中存在类实例的类别分数。
+在每个网格生成$k$个默认框，计算$c$个类分数和相对于原始默认框的4个偏移量，特征图中的每个网格生成$(c&#43;4)×k$个输出，即一个$m×n$大小的特征图产生$(c&#43;4)×k×m×n$个输出，我们的默认框与anchor相同，不过我们将其应用在不同分辨率的特征图上。
+default box
+如下图所示： （a）表示SSD在训练期间只需要一个输入图像和每个object的ground truth。以卷积的方式，在特征图的每个位置生成一组不同高宽比的默认框（如图中一组为4个），并且应用在不同尺度的特征图上（（b）为$8×8$，（c）为$4×4$）。对于每个默认框，预测所有对象类别和偏移量。
+Training  训练SSD与训练两阶段的检测模型的区别在于，ground truth的信息需要被分配给固定的检测器的输出集合中的特定输出。
+Matching strategy
+在训练过程中，我们需要确定哪些默认框与ground truth相对应，对于每个ground truth框，我们从不同位置、高宽比和尺寸的默认框中进行选择。首先将每个ground truth框与具有 the best jaccard overlap的默认框进行匹配。与MultiBox不同的是，我们将与ground truth的jaccard重叠高于阈值（0." />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">SSD</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-04-19 00:00:00 UTC">
+                19 Apr 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>    <strong>SSD: Single Shot MultiBox Detector</strong><br>
+    原文链接：<a href="https://arxiv.org/pdf/1512.02325.pdf">SSD</a></p>
+<h2 id="abstract">Abstract</h2>
+<p>    提出了一种利用一个深度神经网络来实现目标检测的方法：SSD，根据不同的高宽比和每个特征图定位的尺寸大小，将bounding-box的输出空间离散为一组默认框。在预测时，该网络为每个默认框中每个对象类别的存在生成分数，并对该框进行调整，以更好地匹配对象形状。此外，该网络结合了不同分辨率的多个特征图进行预测，以能够处理不同大小的对象。相比于需要候选框生成的方法，SSD很简单：完全取消了候选区域生成和后续的像素/特征重采样阶段，将所有的计算过程封装在一个网络中。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    目前最先进的对象检测方法流程是：生成候选框，为每个框重新采样像素或特征，将其输入到一个分类器中。以上方法速度很慢。<br>
+    本文提出了第一个基于深度网络的对象检测器，不需要为候选框重新采样像素或特征，并且可以达到一样的精度（精度要比YOLO高）。速度的提升来自于消除候选框生成和后续的像素或特征重采样阶段。<br>
+    我们的改进包括使用一个小的卷积核来预测bounding-box的对象类别和偏移量，为不同的高宽比检测使用单独的预测器（卷积核），并将这些卷积核应用在网络后期的多个特征图上，以便在多个尺度上检测。通过这些修改，特别是在不同尺度上使用多层进行预测，可以使用相对较低分辨率的输入来实现高精度，进一步提高检测速度。<br>
+<em><strong>Contributions</strong></em>：<br>
+    （1）引入SSD，多个类别的单阶段检测器，比之前的单阶段检测器YOLO更快更精确，与更慢的Faster R-CNN精度相同；<br>
+    （2）SSD的核心是为一组固定的默认边界框预测类别和偏移量，通过使用较小的应用在特征图上的卷积核；<br>
+    （3）为了获得较高的检测精度，我们从不同尺度的特征图中生成不同尺度的预测，并通过长宽比明确地分离预测；<br>
+    （4）以上的改进形成了简单的端到端训练和高精度，甚至在低分辨率的输入图像上，进一步提高了速度和准确性。</p>
+<h2 id="the-single-shot-detector-ssd">The Single Shot Detector (SSD)</h2>
+<h3 id="model">Model</h3>
+<p>    SSD方法是基于前馈卷积网络的，该网络生成固定大小的bounding-box集合，并获得这些框中对象类实例的分数，然后通过NMS产生最终的结果。早期的网络是基于高质量图像分类的标准结构（去掉最终的分类层），我们将称之为base network，我们向网络中添加辅助结构，以生成具有以下特征的检测器：<br>
+<strong>Multi-scale feature maps for detection</strong><br>
+    在base network的末端添加卷积特征层，通过这些层，特征图的大小逐步减小，并在多个尺度的特征图上进行检测，对于每一个特征层，用于预测检测的卷积模型是不同的。（Overfeat和YOLO都在单尺度特征图上检测的）。<br>
+<strong>Convolutional predictors for detection</strong><br>
+    每个添加的特征层（或是来自base network的现有特征层）都可以使用一组卷积核生成一组固定的检测预测，如下图所示。对于大小为$m×n$、通道数为$p$的特征层，使用$3×3×p$的卷积核，生成一个类别的分数或相对于默认框的偏移量，在$m×n$的每个位置应用卷积核，产生一个输出值。边界框偏移输出值是相对于相对于每个特征图位置的默认框位置来测量的（参见YOLO的架构，它在此步骤中使用的是全连接层而不是卷积）。
+<img src="/img/ssd2.PNG" alt="">
+<strong>Default boxes and aspect ratios</strong><br>
+    我们将一组默认的边界框与每个特征图的网格关联起来（类似于Faster R-CNN中的anchor）。默认框以卷积的方式滑过特征图，这样每个框相对于其对应网格的位置就是固定的。在每个特征图的网格中，我们预测相对于网格中默认框的偏移量，以及每个框中存在类实例的类别分数。<br>
+    在每个网格生成$k$个默认框，计算$c$个类分数和相对于原始默认框的4个偏移量，特征图中的每个网格生成$(c+4)×k$个输出，即一个$m×n$大小的特征图产生$(c+4)×k×m×n$个输出，我们的默认框与anchor相同，不过我们将其应用在不同分辨率的特征图上。<br>
+<strong>default box</strong><br>
+    如下图所示：
+<img src="/img/ssd1.PNG" alt="">
+    （a）表示SSD在训练期间只需要一个输入图像和每个object的ground truth。以卷积的方式，在特征图的每个位置生成一组不同高宽比的默认框（如图中一组为4个），并且应用在不同尺度的特征图上（（b）为$8×8$，（c）为$4×4$）。对于每个默认框，预测所有对象类别和偏移量。</p>
+<h3 id="training">Training</h3>
+<p>    训练SSD与训练两阶段的检测模型的区别在于，ground truth的信息需要被分配给固定的检测器的输出集合中的特定输出。<br>
+<strong>Matching strategy</strong><br>
+    在训练过程中，我们需要确定哪些默认框与ground truth相对应，对于每个ground truth框，我们从不同位置、高宽比和尺寸的默认框中进行选择。首先将每个ground truth框与具有 the best jaccard overlap的默认框进行匹配。与MultiBox不同的是，我们将与ground truth的jaccard重叠高于阈值（0.5）的默认框与之匹配，这使得网络可以预测多个重叠的默认框，而不是只选择具有最大重叠的默认框。<br>
+<strong>Training objective</strong><br>
+    设$x_{ij}^{p}={1,0}$，表示第$i$个默认框是否与类别$p$的第$j$个ground truth相匹配，总体损失函数是位置损失（loc）和置信损失（conf）的加权和：
+$$
+L(x,c,l,g)=\frac{1}{N}(L_{conf}(x,c)+\alpha L_{loc}(x,l,g))
+$$
+    其中，$N$是比配的默认框的数量，即如果$N=0$那么loss就为0，位置损失是预测框与框之间的平滑L1损失，与Faster R-CNN类似，我们使用中心点$(cx,cy)$、宽度$(w)$和高度$(h)$的回归偏移量：
+$$
+L_{loc}(x,l,g)=\sum_{i\in Pos}^{N}\sum_{m\in \lbrace cx,cy,w,h \rbrace}x_{ij}^{k}smooth_{L1}(l_{i}^{m}-\hat{g}_ {i}^{m})
+$$
+    置信损失是softmax损失：
+$$
+L_{conf}(x,c)=-\sum_{i\in Pos}^{N}x_{ij}^{p}log(\hat{c}_ {i}^{p})-\sum_{i\in Neg}log(\hat{c}_ {i}^{0})
+$$
+<strong>Choosing scales and aspect ratios for default boxes</strong><br>
+    为了处理不同的对象尺度，一些方法通过处理不同大小的图像，并将结果结合起来，但是利用单个网络中来自多个不同层的特征图进行预测，可以模拟相同的效果。之前的工作也表明，使用较底层的特征图可以提高语义分割质量，类似地，添加从特征图中汇集的全局上下文可以帮助平滑分割结果。基于以上，我们同时使用上层和下层的特征图用于检测。<br>
+    已知来自不同层的特征图具有不同的感受野，在SSD框架中，默认框不需要对应于每一层的实际感受野。我们设计默认框的平铺，让特定的特征图学习对对象的特定尺度做出响应。假设我们想使用$m$个特征图来进行预测，每个特征映射的默认框的尺寸计算为：
+$$
+s_{k}=s_{min}+\frac{s_{max}-s_{min}}{m-1}(k-1),k\in [1,m]
+$$
+    其中，$s_{min}=0.2$，$s_{max}=0.9$，意味着最低层的尺寸是0.2最高层的尺寸是0.9，介于两者之间的所有层都有规律地间隔。我们对默认框施加不同的高宽比，定义为$a_{r}\in (1,2,3,\frac{1}{2},\frac{1}{3})$，根据高宽比和尺寸计算默认框的宽度和高度。设置默认框的中心点是$(\frac{i+0.5}{|f_{k}|},\frac{j+0.5}{|f_{k}|})$，其中，$|f_{k}|$是第$k$个特征图的大小，$i,j\in [0,|f_{k}|) $。综上所示，每个中心点产生6个默认框（针对高宽比为1的多一个默认框）。<br>
+    通过结合来自许多特征图的所有位置的具有不同尺度和高宽比的默认框的预测，我们有了一组不同的预测，涵盖了不同的输入对象大小和形状。例如，在第一张图中，狗与$4×4$特征图中的一个默认框匹配，但不与$8×8$特征图中的任何默认框匹配。这是因为这些box有不同的尺度，与狗的box不匹配。<br>
+Hard negative mining<br>
+    在匹配步骤之后，大多数默认框都是负类，会使得训练样本之间的显著不平衡，因此我们没有使用所有负类，而是使用每个默认框的最高置信损失对它们进行排序，并选择排在前边的，使负类和正类之间的比率最多为$3:1$。</p>
+<h2 id="conclusions">Conclusions</h2>
+<p>    本文介绍了一种针对多类别的快速单阶段物体检测模型，关键是使用了多尺度的bounding-box输出，并附加到网络顶部的多个特征图上。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

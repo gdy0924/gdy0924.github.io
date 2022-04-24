@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/vit/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/vit/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "Vision Transformer",
+      "headline" : "Vision Transformer",
+      "description" : "AN IMAGE IS WORTH 16X16 WORDS：TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE\n原文链接：ViT\nAbstract  虽然Transformer架构已经成为自然语言处理任务的实际标准，但它在计算机视觉中的应用仍然有限。在视觉领域中，注意力机制要么与卷积网络结合，要么用于替换卷积网络的某些部分，同时保持其整体结构。在本文中，证明了依赖CNN是不必要的，一个直接应用于图像patch序列的transformer可以很好完成图像分类任务。使用大量数据进行预训练，并转移到多个中型或小型图像识别进行基准测试，与最先进的卷积网络相比，Vision Transformer(ViT)获得了良好的结果，同时需要更少的计算资源来训练。\nIntroduction  自注意力机制，特别是transformer，已经成为自然语言处理的首选模型。主要的方法是在大型文本语料库上进行预训练，然后在较小的特定任务数据集上进行微调。然而，在计算机视觉中，CNN架构仍然占主导地位。受NLP成功的启发，许多工作尝试将自注意力机制与卷积架构相结合，但是在大规模图像识别中，经典的ResNet类架构仍然是最先进的技术。\n受NLP中transformer成功的启发，我们将transformer架构直接应用于图像，并实现最少的修改。为此，我们将一个图像分割成一些patch，并将patch的线性embedding序列作为transformer的输入。patch的处理方式与NLP中token的处理方式相同。我们以有监督的方式训练该模型进行图像分类。\n当在中等大小的数据集，如ImageNet上进行训练时，模型产生的精度比相当大小的ResNets低几个百分点。但是，通过在更大的数据集上进行训练，我们发现，ViT在足够规模的预训练和转移到数据点较少的任务时获得了优秀的结果。\nRelative Work  Transformer已成为许多NLP任务中的最新方法，通常利用transformer在大型语料库上进行预训练，然后对特定的任务进行微调。\n与该工作最相关的是：论文《 On the relationship between self-attention and convolutional layers》中提出的模型，该模型从输入图像中提取大小为2×2的patch，并在顶部应用自注意力机制。这个模型与ViT非常相似，但我们的工作进一步证明，大规模的预训练使transformer能够与最先进的卷积网络竞争（甚至更好）。此外，该模型使用了2×2像素的小patch尺寸，这使得该模型仅适用于小分辨率图像，而我们也处理中等分辨率图像。\nMethod Vision Transformer (ViT) 上图为该模型的整体架构：transformer接收一个一维的token embedding序列，为了处理二维图像，我们将图像$x\\in \\mathbb{R}^{H\\times W\\times C}$重塑为展平的2维patch序列$x_{p}\\in \\mathbb{R}^{N\\times (P^{2}\\cdot C)}$，其中$(H,W)$是原始图像的分辨率，$C$为通道数量，$(P,P)$是图像patch的分辨率，$N=\\frac{HW}{P^{2}}$是patch的数量，也是transformer的有效输入序列长度。transformer在所有的层中使用恒定的潜在向量大小$D$，因此，我们将补丁展平，并通过可训练的线性投影映射到D维，如下面公式所示，我们将这个投影的输出称为patch embedding。 $$ z_{0}=[x_{class};x_{p}^{1}E;x_{p}^{2}E;\u0026hellip;;x_{p}^{N}E]\u002bE_{pos},E\\in \\mathbb{R}^{(P^{2}\\cdot C)\\times D},E_{pos}\\in \\mathbb{R}^{(N\u002b1)\\times D} $$ 与BERT的$[class]$token类似，我们在embedding的patch序列中加入了一个可学习的embedding：$z_{0}^{0}=x_{class}$，其为transformer的encoder的输出层的状态$z_{L}^{0}$，作为图像的表示$y$，如下面公式所示。在预训练和微调过程中，一个分类头都被附加在$z_{L}^{0}$上：在预训练时，分类头由一个隐藏层的MLP实现，在微调时由一个单一的线性层实现。（即用最终的输出状态$z_{L}^{0}$来分类） $$ y=LN(z_{L}^{0}) $$ 位置embedding被添加到patch embedding中，以保留位置信息。我们使用标准的可学习的一维位置embedding，因为我们没有观察到使用更先进的二维位置embedding能显著的提高性能，所得到的embedding向量序列作为编码器的输入。\ntransformer的encoder由Multi-Head自注意（MSA）和MLP块（MLP）组成。在每个块之前应用层归一化（Layernorm，LN），在每个块之后应用残差连接。 $$ {z_{t}}\u0027=MSA(LN(z_{t-1}))\u002bz_{t-1} $$ $$ z_{t}=MLP(LN({z_{t}}\u0027))\u002b{z_{t}}\u0027 $$ Hybrid Architecture",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-04-20 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-04-20 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/vit\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>Vision Transformer</title>
+  <meta property="og:title" content="Vision Transformer" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="AN IMAGE IS WORTH 16X16 WORDS：TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE
+原文链接：ViT
+Abstract  虽然Transformer架构已经成为自然语言处理任务的实际标准，但它在计算机视觉中的应用仍然有限。在视觉领域中，注意力机制要么与卷积网络结合，要么用于替换卷积网络的某些部分，同时保持其整体结构。在本文中，证明了依赖CNN是不必要的，一个直接应用于图像patch序列的transformer可以很好完成图像分类任务。使用大量数据进行预训练，并转移到多个中型或小型图像识别进行基准测试，与最先进的卷积网络相比，Vision Transformer(ViT)获得了良好的结果，同时需要更少的计算资源来训练。
+Introduction  自注意力机制，特别是transformer，已经成为自然语言处理的首选模型。主要的方法是在大型文本语料库上进行预训练，然后在较小的特定任务数据集上进行微调。然而，在计算机视觉中，CNN架构仍然占主导地位。受NLP成功的启发，许多工作尝试将自注意力机制与卷积架构相结合，但是在大规模图像识别中，经典的ResNet类架构仍然是最先进的技术。
+受NLP中transformer成功的启发，我们将transformer架构直接应用于图像，并实现最少的修改。为此，我们将一个图像分割成一些patch，并将patch的线性embedding序列作为transformer的输入。patch的处理方式与NLP中token的处理方式相同。我们以有监督的方式训练该模型进行图像分类。
+当在中等大小的数据集，如ImageNet上进行训练时，模型产生的精度比相当大小的ResNets低几个百分点。但是，通过在更大的数据集上进行训练，我们发现，ViT在足够规模的预训练和转移到数据点较少的任务时获得了优秀的结果。
+Relative Work  Transformer已成为许多NLP任务中的最新方法，通常利用transformer在大型语料库上进行预训练，然后对特定的任务进行微调。
+与该工作最相关的是：论文《 On the relationship between self-attention and convolutional layers》中提出的模型，该模型从输入图像中提取大小为2×2的patch，并在顶部应用自注意力机制。这个模型与ViT非常相似，但我们的工作进一步证明，大规模的预训练使transformer能够与最先进的卷积网络竞争（甚至更好）。此外，该模型使用了2×2像素的小patch尺寸，这使得该模型仅适用于小分辨率图像，而我们也处理中等分辨率图像。
+Method Vision Transformer (ViT) 上图为该模型的整体架构：transformer接收一个一维的token embedding序列，为了处理二维图像，我们将图像$x\in \mathbb{R}^{H\times W\times C}$重塑为展平的2维patch序列$x_{p}\in \mathbb{R}^{N\times (P^{2}\cdot C)}$，其中$(H,W)$是原始图像的分辨率，$C$为通道数量，$(P,P)$是图像patch的分辨率，$N=\frac{HW}{P^{2}}$是patch的数量，也是transformer的有效输入序列长度。transformer在所有的层中使用恒定的潜在向量大小$D$，因此，我们将补丁展平，并通过可训练的线性投影映射到D维，如下面公式所示，我们将这个投影的输出称为patch embedding。 $$ z_{0}=[x_{class};x_{p}^{1}E;x_{p}^{2}E;&amp;hellip;;x_{p}^{N}E]&#43;E_{pos},E\in \mathbb{R}^{(P^{2}\cdot C)\times D},E_{pos}\in \mathbb{R}^{(N&#43;1)\times D} $$ 与BERT的$[class]$token类似，我们在embedding的patch序列中加入了一个可学习的embedding：$z_{0}^{0}=x_{class}$，其为transformer的encoder的输出层的状态$z_{L}^{0}$，作为图像的表示$y$，如下面公式所示。在预训练和微调过程中，一个分类头都被附加在$z_{L}^{0}$上：在预训练时，分类头由一个隐藏层的MLP实现，在微调时由一个单一的线性层实现。（即用最终的输出状态$z_{L}^{0}$来分类） $$ y=LN(z_{L}^{0}) $$ 位置embedding被添加到patch embedding中，以保留位置信息。我们使用标准的可学习的一维位置embedding，因为我们没有观察到使用更先进的二维位置embedding能显著的提高性能，所得到的embedding向量序列作为编码器的输入。
+transformer的encoder由Multi-Head自注意（MSA）和MLP块（MLP）组成。在每个块之前应用层归一化（Layernorm，LN），在每个块之后应用残差连接。 $$ {z_{t}}&#39;=MSA(LN(z_{t-1}))&#43;z_{t-1} $$ $$ z_{t}=MLP(LN({z_{t}}&#39;))&#43;{z_{t}}&#39; $$ Hybrid Architecture" />
+  <meta name="description" content="AN IMAGE IS WORTH 16X16 WORDS：TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE
+原文链接：ViT
+Abstract  虽然Transformer架构已经成为自然语言处理任务的实际标准，但它在计算机视觉中的应用仍然有限。在视觉领域中，注意力机制要么与卷积网络结合，要么用于替换卷积网络的某些部分，同时保持其整体结构。在本文中，证明了依赖CNN是不必要的，一个直接应用于图像patch序列的transformer可以很好完成图像分类任务。使用大量数据进行预训练，并转移到多个中型或小型图像识别进行基准测试，与最先进的卷积网络相比，Vision Transformer(ViT)获得了良好的结果，同时需要更少的计算资源来训练。
+Introduction  自注意力机制，特别是transformer，已经成为自然语言处理的首选模型。主要的方法是在大型文本语料库上进行预训练，然后在较小的特定任务数据集上进行微调。然而，在计算机视觉中，CNN架构仍然占主导地位。受NLP成功的启发，许多工作尝试将自注意力机制与卷积架构相结合，但是在大规模图像识别中，经典的ResNet类架构仍然是最先进的技术。
+受NLP中transformer成功的启发，我们将transformer架构直接应用于图像，并实现最少的修改。为此，我们将一个图像分割成一些patch，并将patch的线性embedding序列作为transformer的输入。patch的处理方式与NLP中token的处理方式相同。我们以有监督的方式训练该模型进行图像分类。
+当在中等大小的数据集，如ImageNet上进行训练时，模型产生的精度比相当大小的ResNets低几个百分点。但是，通过在更大的数据集上进行训练，我们发现，ViT在足够规模的预训练和转移到数据点较少的任务时获得了优秀的结果。
+Relative Work  Transformer已成为许多NLP任务中的最新方法，通常利用transformer在大型语料库上进行预训练，然后对特定的任务进行微调。
+与该工作最相关的是：论文《 On the relationship between self-attention and convolutional layers》中提出的模型，该模型从输入图像中提取大小为2×2的patch，并在顶部应用自注意力机制。这个模型与ViT非常相似，但我们的工作进一步证明，大规模的预训练使transformer能够与最先进的卷积网络竞争（甚至更好）。此外，该模型使用了2×2像素的小patch尺寸，这使得该模型仅适用于小分辨率图像，而我们也处理中等分辨率图像。
+Method Vision Transformer (ViT) 上图为该模型的整体架构：transformer接收一个一维的token embedding序列，为了处理二维图像，我们将图像$x\in \mathbb{R}^{H\times W\times C}$重塑为展平的2维patch序列$x_{p}\in \mathbb{R}^{N\times (P^{2}\cdot C)}$，其中$(H,W)$是原始图像的分辨率，$C$为通道数量，$(P,P)$是图像patch的分辨率，$N=\frac{HW}{P^{2}}$是patch的数量，也是transformer的有效输入序列长度。transformer在所有的层中使用恒定的潜在向量大小$D$，因此，我们将补丁展平，并通过可训练的线性投影映射到D维，如下面公式所示，我们将这个投影的输出称为patch embedding。 $$ z_{0}=[x_{class};x_{p}^{1}E;x_{p}^{2}E;&amp;hellip;;x_{p}^{N}E]&#43;E_{pos},E\in \mathbb{R}^{(P^{2}\cdot C)\times D},E_{pos}\in \mathbb{R}^{(N&#43;1)\times D} $$ 与BERT的$[class]$token类似，我们在embedding的patch序列中加入了一个可学习的embedding：$z_{0}^{0}=x_{class}$，其为transformer的encoder的输出层的状态$z_{L}^{0}$，作为图像的表示$y$，如下面公式所示。在预训练和微调过程中，一个分类头都被附加在$z_{L}^{0}$上：在预训练时，分类头由一个隐藏层的MLP实现，在微调时由一个单一的线性层实现。（即用最终的输出状态$z_{L}^{0}$来分类） $$ y=LN(z_{L}^{0}) $$ 位置embedding被添加到patch embedding中，以保留位置信息。我们使用标准的可学习的一维位置embedding，因为我们没有观察到使用更先进的二维位置embedding能显著的提高性能，所得到的embedding向量序列作为编码器的输入。
+transformer的encoder由Multi-Head自注意（MSA）和MLP块（MLP）组成。在每个块之前应用层归一化（Layernorm，LN），在每个块之后应用残差连接。 $$ {z_{t}}&#39;=MSA(LN(z_{t-1}))&#43;z_{t-1} $$ $$ z_{t}=MLP(LN({z_{t}}&#39;))&#43;{z_{t}}&#39; $$ Hybrid Architecture" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">Vision Transformer</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-04-20 00:00:00 UTC">
+                20 Apr 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>AN IMAGE IS WORTH 16X16 WORDS：TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE<br>
+    原文链接：<a href="https://arxiv.org/pdf/2010.11929.pdf">ViT</a></p>
+<h2 id="abstract">Abstract</h2>
+<p>    虽然Transformer架构已经成为自然语言处理任务的实际标准，但它在计算机视觉中的应用仍然有限。在视觉领域中，注意力机制要么与卷积网络结合，要么用于替换卷积网络的某些部分，同时保持其整体结构。在本文中，证明了依赖CNN是不必要的，一个直接应用于图像patch序列的transformer可以很好完成图像分类任务。使用大量数据进行预训练，并转移到多个中型或小型图像识别进行基准测试，与最先进的卷积网络相比，Vision Transformer(ViT)获得了良好的结果，同时需要更少的计算资源来训练。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    自注意力机制，特别是transformer，已经成为自然语言处理的首选模型。主要的方法是在大型文本语料库上进行预训练，然后在较小的特定任务数据集上进行微调。然而，在计算机视觉中，CNN架构仍然占主导地位。受NLP成功的启发，许多工作尝试将自注意力机制与卷积架构相结合，但是在大规模图像识别中，经典的ResNet类架构仍然是最先进的技术。<br>
+    受NLP中transformer成功的启发，我们将transformer架构直接应用于图像，并实现最少的修改。为此，我们将一个图像分割成一些patch，并将patch的线性embedding序列作为transformer的输入。patch的处理方式与NLP中token的处理方式相同。我们以有监督的方式训练该模型进行图像分类。<br>
+    当在中等大小的数据集，如ImageNet上进行训练时，模型产生的精度比相当大小的ResNets低几个百分点。但是，通过在更大的数据集上进行训练，我们发现，ViT在足够规模的预训练和转移到数据点较少的任务时获得了优秀的结果。</p>
+<h2 id="relative-work">Relative Work</h2>
+<p>    Transformer已成为许多NLP任务中的最新方法，通常利用transformer在大型语料库上进行预训练，然后对特定的任务进行微调。<br>
+    与该工作最相关的是：论文《 On the relationship between self-attention and convolutional layers》中提出的模型，该模型从输入图像中提取大小为2×2的patch，并在顶部应用自注意力机制。这个模型与ViT非常相似，但我们的工作进一步证明，大规模的预训练使transformer能够与最先进的卷积网络竞争（甚至更好）。此外，该模型使用了2×2像素的小patch尺寸，这使得该模型仅适用于小分辨率图像，而我们也处理中等分辨率图像。</p>
+<h2 id="method">Method</h2>
+<h3 id="vision-transformer-vit">Vision Transformer (ViT)</h3>
+<p><img src="/img/vit1.PNG" alt="">
+    上图为该模型的整体架构：transformer接收一个一维的token embedding序列，为了处理二维图像，我们将图像$x\in \mathbb{R}^{H\times W\times C}$重塑为展平的2维patch序列$x_{p}\in \mathbb{R}^{N\times (P^{2}\cdot C)}$，其中$(H,W)$是原始图像的分辨率，$C$为通道数量，$(P,P)$是图像patch的分辨率，$N=\frac{HW}{P^{2}}$是patch的数量，也是transformer的有效输入序列长度。transformer在所有的层中使用恒定的潜在向量大小$D$，因此，我们将补丁展平，并通过可训练的线性投影映射到D维，如下面公式所示，我们将这个投影的输出称为patch embedding。
+$$
+z_{0}=[x_{class};x_{p}^{1}E;x_{p}^{2}E;&hellip;;x_{p}^{N}E]+E_{pos},E\in \mathbb{R}^{(P^{2}\cdot C)\times D},E_{pos}\in \mathbb{R}^{(N+1)\times D}
+$$
+    与BERT的$[class]$token类似，我们在embedding的patch序列中加入了一个可学习的embedding：$z_{0}^{0}=x_{class}$，其为transformer的encoder的输出层的状态$z_{L}^{0}$，作为图像的表示$y$，如下面公式所示。在预训练和微调过程中，一个分类头都被附加在$z_{L}^{0}$上：在预训练时，分类头由一个隐藏层的MLP实现，在微调时由一个单一的线性层实现。（即用最终的输出状态$z_{L}^{0}$来分类）
+$$
+y=LN(z_{L}^{0})
+$$
+    位置embedding被添加到patch embedding中，以保留位置信息。我们使用标准的可学习的一维位置embedding，因为我们没有观察到使用更先进的二维位置embedding能显著的提高性能，所得到的embedding向量序列作为编码器的输入。<br>
+    transformer的encoder由Multi-Head自注意（MSA）和MLP块（MLP）组成。在每个块之前应用层归一化（Layernorm，LN），在每个块之后应用残差连接。
+$$
+{z_{t}}'=MSA(LN(z_{t-1}))+z_{t-1}
+$$
+$$
+z_{t}=MLP(LN({z_{t}}'))+{z_{t}}'
+$$
+<strong>Hybrid Architecture</strong><br>
+    作为原始图像patch的替代方案，输入序列可以由CNN的特征图形成。在这种情况下，patch embedding映射应用在从CNN特征图中提取的patch上。作为一种特殊情况，patch的大小可以为$1x1$，这意味着输入序列是通过简单地将特征图的空间维度压平并投影到transformer维度获得的。</p>
+<h3 id="fine-tuning-and-higher-resolution">Fine-Tuning and Higher Resolution</h3>
+<p>    通常，我们会在大型数据集上对ViT进行预训练，并对下游任务进行微调。因此，我们去掉了预先训练好的预测头，并附加了一个用零初始化的前馈层（$D×K$），其中$K$是下游任务的类别数量。<br>
+    与预训练相比，以更高的分辨率进行微调往往有益的。当输入更高分辨率的图像时，我们保持patch大小不变，从而得到更大的有效序列长度。Vision Transformer可以处理任意的序列长度（直到内存限制），然而，预训练的位置embedding可能不再有意义。因此，我们根据预先训练好的位置embedding在原始图像中的位置，进行二维插值。</p>
+<h3 id="position-embedding">Position Embedding</h3>
+<p>参考链接：<a href="https://zhuanlan.zhihu.com/p/356155277">&ldquo;未来&quot;的经典之作ViT：transformer is all you need!</a><br>
+    除了patch embeddings，模型还需要另外一个特殊的position embedding。transformer和CNN不同，需要position embedding来编码tokens的位置信息，这主要是因为self-attention是permutation-invariant（Permutation Invariant指的是特征之间没有空间位置关系，例如多层感知机，改变像素的位置对最后的结果没有影响，如$f(1,2)=f(2,1)$，但是对卷积网络而言情况就不同了，特征是有位置关系的。）。如果不给模型提供patch的位置信息，那么模型就需要通过patch的语义来学习拼图，这就额外增加了学习成本。通过实验证明，如果不提供positional embedding效果会差，但其它各种类型的positional embedding效果都接近，这主要是因为ViT的输入是相对较大的patchs而不是pixels，所以学习位置信息相对容易很多。<br>
+    1-D 位置编码：例如3x3共9个patch，patch编码为1到9<br>
+    2-D 位置编码：patch编码11,12,13,21,22,23,31,32,33，即同时考虑X和Y轴的信息<br>
+    ViT中默认采用学习（训练的）的1-D positional embedding。要注意的一点，如果改变图像的输入大小，ViT不会改变patch的大小，那么patchs的数量会发生变化，那么之前学习的pos_embed就维度对不上了，ViT采用的方案是通过插值来解决这个问题。</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>    我们探索了transformer在图像识别中的直接应用，我们将图像分割为一系列patch，并通过NLP中使用的transformer的编码器对其进行处理。这种简单但可扩展的策略在结合大型数据集上的预训练时，效果很好。</p>
+<h2 id="vit-vs-cnn">ViT vs. CNN</h2>
+<p>原文链接：<a href="https://arxiv.org/pdf/2108.08810.pdf">Do Vision Transformers See Like Convolutional Neural Networks?</a><br>
+<strong>ViT在初始层的有比CNN更大的感受野</strong>：<br>
+    CNNs 通过对内核周围的信息逐层反复“卷积”，逐渐扩大视野；ViT 使用了一种自注意力机制，让模型在最底层也能拥有整个视野。
+<img src="/img/vit2.jpg" alt="">
+<strong>与 CNN 相比，ViT 在浅层和深层获得的表征之间具有更多相似性</strong><br>
+    越亮的地方越相似，左边两张为ViT，右边两张为ResNet。
+<img src="/img/vit3.jpg" alt="">
+<strong>ViT从浅层获得全局表示，但从浅层获得的局部表示也很重要</strong><br>
+    第一张为数据量足够多时，渐层可以学到局部表示（距离近的像素），第二张为数据量不够时，浅层无法学习到局部的表示，这也是在数据量不足的时候，ViT的性能不如ResNet的原因。
+<img src="/img/vit4.jpg" alt="">
+<img src="/img/vit5.jpg" alt="">
+<strong>ViT 比 ResNet 保留了更多的空间信息</strong><br>
+    计算图像的一个patch与最后一层feature map在某一位置的相似性来测试ViT和ResNet是否保留了位置信息。如果保留了位置信息，那么只有在feature map中与该位置对应的位置上与输入图像的patch在某个位置上的相似度才应该较高，第一行是原始图像，第二行是ViT，第三行对应ResNet。
+<img src="/img/vit6.png" alt=""></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

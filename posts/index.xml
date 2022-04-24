@@ -6,7 +6,56 @@
     <description>Recent content in Posts on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 16 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 20 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Vision Transformer</title>
+      <link>https://gdy0924.github.io/posts/vit/</link>
+      <pubDate>Wed, 20 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/vit/</guid>
+      <description>AN IMAGE IS WORTH 16X16 WORDS：TRANSFORMERS FOR IMAGE RECOGNITION AT SCALE
+原文链接：ViT
+Abstract  虽然Transformer架构已经成为自然语言处理任务的实际标准，但它在计算机视觉中的应用仍然有限。在视觉领域中，注意力机制要么与卷积网络结合，要么用于替换卷积网络的某些部分，同时保持其整体结构。在本文中，证明了依赖CNN是不必要的，一个直接应用于图像patch序列的transformer可以很好完成图像分类任务。使用大量数据进行预训练，并转移到多个中型或小型图像识别进行基准测试，与最先进的卷积网络相比，Vision Transformer(ViT)获得了良好的结果，同时需要更少的计算资源来训练。
+Introduction  自注意力机制，特别是transformer，已经成为自然语言处理的首选模型。主要的方法是在大型文本语料库上进行预训练，然后在较小的特定任务数据集上进行微调。然而，在计算机视觉中，CNN架构仍然占主导地位。受NLP成功的启发，许多工作尝试将自注意力机制与卷积架构相结合，但是在大规模图像识别中，经典的ResNet类架构仍然是最先进的技术。
+受NLP中transformer成功的启发，我们将transformer架构直接应用于图像，并实现最少的修改。为此，我们将一个图像分割成一些patch，并将patch的线性embedding序列作为transformer的输入。patch的处理方式与NLP中token的处理方式相同。我们以有监督的方式训练该模型进行图像分类。
+当在中等大小的数据集，如ImageNet上进行训练时，模型产生的精度比相当大小的ResNets低几个百分点。但是，通过在更大的数据集上进行训练，我们发现，ViT在足够规模的预训练和转移到数据点较少的任务时获得了优秀的结果。
+Relative Work  Transformer已成为许多NLP任务中的最新方法，通常利用transformer在大型语料库上进行预训练，然后对特定的任务进行微调。
+与该工作最相关的是：论文《 On the relationship between self-attention and convolutional layers》中提出的模型，该模型从输入图像中提取大小为2×2的patch，并在顶部应用自注意力机制。这个模型与ViT非常相似，但我们的工作进一步证明，大规模的预训练使transformer能够与最先进的卷积网络竞争（甚至更好）。此外，该模型使用了2×2像素的小patch尺寸，这使得该模型仅适用于小分辨率图像，而我们也处理中等分辨率图像。
+Method Vision Transformer (ViT) 上图为该模型的整体架构：transformer接收一个一维的token embedding序列，为了处理二维图像，我们将图像$x\in \mathbb{R}^{H\times W\times C}$重塑为展平的2维patch序列$x_{p}\in \mathbb{R}^{N\times (P^{2}\cdot C)}$，其中$(H,W)$是原始图像的分辨率，$C$为通道数量，$(P,P)$是图像patch的分辨率，$N=\frac{HW}{P^{2}}$是patch的数量，也是transformer的有效输入序列长度。transformer在所有的层中使用恒定的潜在向量大小$D$，因此，我们将补丁展平，并通过可训练的线性投影映射到D维，如下面公式所示，我们将这个投影的输出称为patch embedding。 $$ z_{0}=[x_{class};x_{p}^{1}E;x_{p}^{2}E;&amp;hellip;;x_{p}^{N}E]+E_{pos},E\in \mathbb{R}^{(P^{2}\cdot C)\times D},E_{pos}\in \mathbb{R}^{(N+1)\times D} $$ 与BERT的$[class]$token类似，我们在embedding的patch序列中加入了一个可学习的embedding：$z_{0}^{0}=x_{class}$，其为transformer的encoder的输出层的状态$z_{L}^{0}$，作为图像的表示$y$，如下面公式所示。在预训练和微调过程中，一个分类头都被附加在$z_{L}^{0}$上：在预训练时，分类头由一个隐藏层的MLP实现，在微调时由一个单一的线性层实现。（即用最终的输出状态$z_{L}^{0}$来分类） $$ y=LN(z_{L}^{0}) $$ 位置embedding被添加到patch embedding中，以保留位置信息。我们使用标准的可学习的一维位置embedding，因为我们没有观察到使用更先进的二维位置embedding能显著的提高性能，所得到的embedding向量序列作为编码器的输入。
+transformer的encoder由Multi-Head自注意（MSA）和MLP块（MLP）组成。在每个块之前应用层归一化（Layernorm，LN），在每个块之后应用残差连接。 $$ {z_{t}}&#39;=MSA(LN(z_{t-1}))+z_{t-1} $$ $$ z_{t}=MLP(LN({z_{t}}&#39;))+{z_{t}}&#39; $$ Hybrid Architecture</description>
+    </item>
+    
+    <item>
+      <title>SSD</title>
+      <link>https://gdy0924.github.io/posts/ssd/</link>
+      <pubDate>Tue, 19 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/ssd/</guid>
+      <description>SSD: Single Shot MultiBox Detector
+原文链接：SSD
+Abstract  提出了一种利用一个深度神经网络来实现目标检测的方法：SSD，根据不同的高宽比和每个特征图定位的尺寸大小，将bounding-box的输出空间离散为一组默认框。在预测时，该网络为每个默认框中每个对象类别的存在生成分数，并对该框进行调整，以更好地匹配对象形状。此外，该网络结合了不同分辨率的多个特征图进行预测，以能够处理不同大小的对象。相比于需要候选框生成的方法，SSD很简单：完全取消了候选区域生成和后续的像素/特征重采样阶段，将所有的计算过程封装在一个网络中。
+Introduction  目前最先进的对象检测方法流程是：生成候选框，为每个框重新采样像素或特征，将其输入到一个分类器中。以上方法速度很慢。
+本文提出了第一个基于深度网络的对象检测器，不需要为候选框重新采样像素或特征，并且可以达到一样的精度（精度要比YOLO高）。速度的提升来自于消除候选框生成和后续的像素或特征重采样阶段。
+我们的改进包括使用一个小的卷积核来预测bounding-box的对象类别和偏移量，为不同的高宽比检测使用单独的预测器（卷积核），并将这些卷积核应用在网络后期的多个特征图上，以便在多个尺度上检测。通过这些修改，特别是在不同尺度上使用多层进行预测，可以使用相对较低分辨率的输入来实现高精度，进一步提高检测速度。
+Contributions：
+（1）引入SSD，多个类别的单阶段检测器，比之前的单阶段检测器YOLO更快更精确，与更慢的Faster R-CNN精度相同；
+（2）SSD的核心是为一组固定的默认边界框预测类别和偏移量，通过使用较小的应用在特征图上的卷积核；
+（3）为了获得较高的检测精度，我们从不同尺度的特征图中生成不同尺度的预测，并通过长宽比明确地分离预测；
+（4）以上的改进形成了简单的端到端训练和高精度，甚至在低分辨率的输入图像上，进一步提高了速度和准确性。
+The Single Shot Detector (SSD) Model  SSD方法是基于前馈卷积网络的，该网络生成固定大小的bounding-box集合，并获得这些框中对象类实例的分数，然后通过NMS产生最终的结果。早期的网络是基于高质量图像分类的标准结构（去掉最终的分类层），我们将称之为base network，我们向网络中添加辅助结构，以生成具有以下特征的检测器：
+Multi-scale feature maps for detection
+在base network的末端添加卷积特征层，通过这些层，特征图的大小逐步减小，并在多个尺度的特征图上进行检测，对于每一个特征层，用于预测检测的卷积模型是不同的。（Overfeat和YOLO都在单尺度特征图上检测的）。
+Convolutional predictors for detection
+每个添加的特征层（或是来自base network的现有特征层）都可以使用一组卷积核生成一组固定的检测预测，如下图所示。对于大小为$m×n$、通道数为$p$的特征层，使用$3×3×p$的卷积核，生成一个类别的分数或相对于默认框的偏移量，在$m×n$的每个位置应用卷积核，产生一个输出值。边界框偏移输出值是相对于相对于每个特征图位置的默认框位置来测量的（参见YOLO的架构，它在此步骤中使用的是全连接层而不是卷积）。 Default boxes and aspect ratios
+我们将一组默认的边界框与每个特征图的网格关联起来（类似于Faster R-CNN中的anchor）。默认框以卷积的方式滑过特征图，这样每个框相对于其对应网格的位置就是固定的。在每个特征图的网格中，我们预测相对于网格中默认框的偏移量，以及每个框中存在类实例的类别分数。
+在每个网格生成$k$个默认框，计算$c$个类分数和相对于原始默认框的4个偏移量，特征图中的每个网格生成$(c+4)×k$个输出，即一个$m×n$大小的特征图产生$(c+4)×k×m×n$个输出，我们的默认框与anchor相同，不过我们将其应用在不同分辨率的特征图上。
+default box
+如下图所示： （a）表示SSD在训练期间只需要一个输入图像和每个object的ground truth。以卷积的方式，在特征图的每个位置生成一组不同高宽比的默认框（如图中一组为4个），并且应用在不同尺度的特征图上（（b）为$8×8$，（c）为$4×4$）。对于每个默认框，预测所有对象类别和偏移量。
+Training  训练SSD与训练两阶段的检测模型的区别在于，ground truth的信息需要被分配给固定的检测器的输出集合中的特定输出。
+Matching strategy
+在训练过程中，我们需要确定哪些默认框与ground truth相对应，对于每个ground truth框，我们从不同位置、高宽比和尺寸的默认框中进行选择。首先将每个ground truth框与具有 the best jaccard overlap的默认框进行匹配。与MultiBox不同的是，我们将与ground truth的jaccard重叠高于阈值（0.</description>
+    </item>
+    
     <item>
       <title>BERT</title>
       <link>https://gdy0924.github.io/posts/bert/</link>
@@ -46,8 +95,7 @@ Introduction  最近的方法，如R-CNN使用候选区域生成方法，首�
 （2）YOLO在做预测时关注的是图像的整体（全局）：与基于滑动窗口和候选区域生成的方法不同，YOLO在训练和测试期间可以看到整个图像，因此它隐式地编码上下文信息，而对于Fast R-CNN，由于看不到上下文信息，会错误的将背景patch预测为目标类；
 （3）YOLO学习目标的可推广表示：当在图像上进行训练和测试时，YOLO的性能远远优于DPM和R-CNN等其他检测方法，当应用在新的领域或者有预期之外的输入时，YOLO也可以很好的运行。
 YOLO在精度上仍然落后于最先进的检测模型，虽然它可以快速识别图像中的物体，但它很难精确定位一些物体，特别是小的物体。
-Unified Detection  我们将目标检测中的独立网络统一为一个单一的神经网络，使用来自整个图像的特征来预测每个bounding-box，同时预测类别概率，即我们的网络会对整个图像和图像中的所有目标对象进行全局推理。
-我们的模型将输入图像分割成一个$S×S$网格，如果一个对象的中心落入某一网格单元格中，则该网格单元格负责检测该对象。
+Unified Detection  我们将目标检测中的独立网络统一为一个单一的神经网络，使用来自整个图像的特征来预测每个bounding-box，同时预测类别概率，即我们的网络会对整个图像和图像中的所有目标对象进行全局推理。 我们的模型将输入图像分割成一个$S×S$网格，如果一个对象的中心落入某一网格单元格中，则该网格单元格负责检测该对象。
 每个网格单元格预测$B$个bounding-box和bounding-box的置信度分数，这些置信度分数反映了该bounding-box包含物体的真实程度，也反映了该bounding-box预测的准确程度。我们将信心定义为$Pr(Object)\ast IOU_{pred}^{truth}$：如果该单元格中不存在对象，则置信度分数应该为零，否则，我们希望置信度得分等于bounding-box和ground truth之间的IOU值。
 每个bounding-box由5个预测部分组成：$x,y,w,h,confident$，$(x,y)$坐标表示相对于网格单元格边界的bounding-box的中心，$w$和$h$是相对于整个图像进行预测的bounding-box的宽度和高度，$confident$表示bounding-box和ground truth之间的IOU。
 每个网格单元还预测类别$C$的条件概率，$Pr(Class_{i}|Object)$，我们只预测每个网格单元的一组类别概率，而不管bounding-box的数量。
@@ -59,7 +107,7 @@ Training  我们在ImageNet数据集上预训练了我们的卷积层；然后
 为了解决上述问题，我们增加bounding-box坐标预测的损失，减少不包含物体的单元格的预测的损失，引入两个参数，$\lambda_{coord}$和$\lambda_{noobj} $，并设置$\lambda_{coord}=5$、$\lambda_{noobj}=0.5$。
 均方误差对大bounding-box和小bounding-box的误差具有同样的权重，但是误差度量应该反映：大bounding-box的小偏差比小bounding-box的小偏差小，为了解决这个问题，我们预测边界框宽度和高度的平方根，而不是直接预测宽度和高度。
 YOLO为每个网格单元格预测多个bounding-box。在训练时，对于每一个物体，我们希望有一个bounding-box预测器去负责该物体，因此，我们指定一个预测器来“负责”预测一个物体，与ground truth有最高IOU的预测。这使得bounding-box预测器之间的专门化，每个预测器都能更好地预测特定大小、纵横比或物体的类别。
-因此，我们的损失函数如下： $$ \lambda_{coord}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{obj}[(x_{i}-\hat{x_{i}})^{2}+(y_{i}-\hat{y_{i}})^{2}] $$ $$ +\lambda_{coord}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{obj}[(\sqrt{w_{i}}-\sqrt{\hat{w_{i}}})^{2}+(\sqrt{h_{i}}-\sqrt{\hat{h_{i}}})^{2}] $$ $$ +\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{obj}(C_{i}-\hat{C_{i}})^{2} $$ $$ +\lambda_{noobj} \sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I} _{ij} ^{noobj}(C_{i}-\hat{C_{i}})^{2} $$ $$ +\sum_{i=0}^{S^{2}}\mathbb{I} _{i} ^{obj}\sum_{c\in classes}(p_{i}(c)-\hat{p_{i}}(c))^{2} $$ 其中，$\mathbb{I} _{i} ^{obj}$表示单元格$i$是否有物体出现（0或1），$\mathbb{I} _{ij} ^{obj}$表示单元格$i$中第$j$个bounding-box预测器负责预测（0或1）。第一行是边界框中心坐标的误差；第二行是边界框长宽的误差，由于边界框大小本身便会影响到误差的大小，为了降低边界框大小的影响，而采用了开方差来比较；第三行是包含物体的单元格以及准确预测的边界框的置信度误差；第四行是不包含物体的单元格中以及准确预测的边界框的置信度误差；第五行是包含物体的单元格中，预测对象概率的各分项的误差平方之和。</description>
+因此，我们的损失函数如下： $$ \lambda_{coord}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I}_ {ij}^{obj}[(x_{i}-\hat{x_{i}})^{2}+(y_{i}-\hat{y_{i}})^{2}] $$ $$ +\lambda_{coord}\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I}_ {ij}^{obj}[(\sqrt{w_{i}}-\sqrt{\hat{w_{i}}})^{2}+(\sqrt{h_{i}}-\sqrt{\hat{h_{i}}})^{2}] $$ $$ +\sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I}_ {ij}^{obj}(C_{i}-\hat{C_{i}})^{2} $$ $$ +\lambda_{noobj} \sum_{i=0}^{S^{2}}\sum_{j=0}^{B}\mathbb{I}_ {ij}^{noobj}(C_{i}-\hat{C_{i}})^{2} $$ $$ +\sum_{i=0}^{S^{2}}\mathbb{I}_ {i}^{obj}\sum_{c\in classes}(p_{i}(c)-\hat{p_{i}}(c))^{2} $$ 其中，$\mathbb{I}_ {i}^{obj}$表示单元格$i$是否有物体出现（0或1），$\mathbb{I}_ {ij}^{obj}$表示单元格$i$中第$j$个bounding-box预测器负责预测（0或1）。第一行是边界框中心坐标的误差；第二行是边界框长宽的误差，由于边界框大小本身便会影响到误差的大小，为了降低边界框大小的影响，而采用了开方差来比较；第三行是包含物体的单元格以及准确预测的边界框的置信度误差；第四行是不包含物体的单元格中以及准确预测的边界框的置信度误差；第五行是包含物体的单元格中，预测对象概率的各分项的误差平方之和。</description>
     </item>
     
     <item>
