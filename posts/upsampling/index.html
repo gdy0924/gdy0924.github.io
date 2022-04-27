@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/upsampling/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/upsampling/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "Upsampling",
+      "headline" : "Upsampling",
+      "description" : "参考链接：上采样的几种方法\n图像语义分割中，编码器通过卷积层得到图像的一些特征，但是解码器需要将该特征还原到原图像的尺寸大小，才可以对原图像的每个像素点进行分类。从一个较小尺寸的矩阵进行变换，得到较大尺寸的矩阵，在这个过程就是上采样。\n插值法  插值法不需要学习任何的参数，只是根据已知的像素点对未知的点进行预测估计，从而可以扩大图像的尺寸，达到上采样的效果。\n转置卷积（反卷积） 参考链接：47 转置卷积【动手学深度学习v2】 抽丝剥茧，带你理解转置卷积（反卷积） 原始卷积  直观的理解就是固定大小的卷积核在原始的输入图像进行滑动，通过矩阵加权计算得到输出特征，如下图所示： 但是实际在计算机中计算的时候，并不是像这样一个位置一个位置的进行滑动计算，因为这样的效率太低了。计算机会将卷积核转换成等效的矩阵，将输入转换为向量。通过输入向量和卷积核矩阵的相乘获得输出向量。输出的向量经过整形便可得到我们的二维输出特征。具体的操作如下图所示，由于我们的3x3卷积核要在输入上不同的位置卷积4次，所以通过补零的方法将卷积核分别置于一个4x4矩阵的四个角落。这样我们的输入可以直接和这四个4x4的矩阵进行卷积，而舍去了滑动这一操作步骤。 进一步，将输入拉成长向量，四个4x4卷积核也拉成长向量并进行拼接，如下图所示： 记向量化的图像为$I$，向量化的卷积矩阵为$C$，输出特征向量为$O$，则有： $$ I^{T}×C=O^{T} $$ 上述过程将一个$1×16$的行向量乘以$16×4$的矩阵，得到了$1×4$的行向量。那么反过来将一个$1×4$的向量乘以一个$4×16$的矩阵应该就能得到一个$1×16$的行向量，这就是转置卷积的思想。\n转置卷积  对应上面公式，我们有转置卷积的公式： $$ O^{T}×C^{T}=I^{T} $$ 需要注意的是这两个操作并不是可逆的，对于同一个卷积核，经过转置卷积操作之后并不能恢复到原始的数值，保留的只有原始的形状。\n代码 1import tensorflow as tf 2 3x = tf.reshape(tf.constant([[1,2], 4 [4,5]],dtype=tf.float32), [1, 2, 2, 1]) 5kernel = tf.reshape(tf.constant([[1,2,3], 6 [4,5,6], 7 [7,8,9]],dtype=tf.float32), [3, 3, 1, 1]) 8transpose_conv = tf.nn.conv2d_transpose(x, kernel, output_shape=[1, 4, 4, 1], strides=[1,1,1,1], padding=\u0026#39;VALID\u0026#39;) 9sess = tf.Session() 10print(sess.run(x)) 11print(sess.run(kernel)) 12print(sess.run(transpose_conv)) 示例  当padding=0，stride=1时，具体例子计算如下：  在原始的卷积操作中，加入padding，会使输出比无填充时尺寸更大，相反，在转置卷积中，加入padding会使输出更小，如下图所示（具体来说，就是在计算完成得到输出后，padding为多少，就把输出结果的几圈去掉）：  在原始的卷积操作中，加入stride，会使输出比无填充时尺寸更小，相反，在转置卷积中，加入stride会使输出更大，如下图所示（stride对应的为补0操作，并且是在内部行列之间进行补0）： 反池化（UnPooling）  max pooling的逆操作，即在max pool的时候记录一个池化的索引，就是记录取得的这个值是在哪个位置。在反池化的时候，输入的值根据索引放回原来的位置，其余位置填0，如下图所示： ",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-04-26 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-04-26 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/upsampling\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>Upsampling</title>
+  <meta property="og:title" content="Upsampling" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="参考链接：上采样的几种方法
+图像语义分割中，编码器通过卷积层得到图像的一些特征，但是解码器需要将该特征还原到原图像的尺寸大小，才可以对原图像的每个像素点进行分类。从一个较小尺寸的矩阵进行变换，得到较大尺寸的矩阵，在这个过程就是上采样。
+插值法  插值法不需要学习任何的参数，只是根据已知的像素点对未知的点进行预测估计，从而可以扩大图像的尺寸，达到上采样的效果。
+转置卷积（反卷积） 参考链接：47 转置卷积【动手学深度学习v2】 抽丝剥茧，带你理解转置卷积（反卷积） 原始卷积  直观的理解就是固定大小的卷积核在原始的输入图像进行滑动，通过矩阵加权计算得到输出特征，如下图所示： 但是实际在计算机中计算的时候，并不是像这样一个位置一个位置的进行滑动计算，因为这样的效率太低了。计算机会将卷积核转换成等效的矩阵，将输入转换为向量。通过输入向量和卷积核矩阵的相乘获得输出向量。输出的向量经过整形便可得到我们的二维输出特征。具体的操作如下图所示，由于我们的3x3卷积核要在输入上不同的位置卷积4次，所以通过补零的方法将卷积核分别置于一个4x4矩阵的四个角落。这样我们的输入可以直接和这四个4x4的矩阵进行卷积，而舍去了滑动这一操作步骤。 进一步，将输入拉成长向量，四个4x4卷积核也拉成长向量并进行拼接，如下图所示： 记向量化的图像为$I$，向量化的卷积矩阵为$C$，输出特征向量为$O$，则有： $$ I^{T}×C=O^{T} $$ 上述过程将一个$1×16$的行向量乘以$16×4$的矩阵，得到了$1×4$的行向量。那么反过来将一个$1×4$的向量乘以一个$4×16$的矩阵应该就能得到一个$1×16$的行向量，这就是转置卷积的思想。
+转置卷积  对应上面公式，我们有转置卷积的公式： $$ O^{T}×C^{T}=I^{T} $$ 需要注意的是这两个操作并不是可逆的，对于同一个卷积核，经过转置卷积操作之后并不能恢复到原始的数值，保留的只有原始的形状。
+代码 1import tensorflow as tf 2 3x = tf.reshape(tf.constant([[1,2], 4 [4,5]],dtype=tf.float32), [1, 2, 2, 1]) 5kernel = tf.reshape(tf.constant([[1,2,3], 6 [4,5,6], 7 [7,8,9]],dtype=tf.float32), [3, 3, 1, 1]) 8transpose_conv = tf.nn.conv2d_transpose(x, kernel, output_shape=[1, 4, 4, 1], strides=[1,1,1,1], padding=&amp;#39;VALID&amp;#39;) 9sess = tf.Session() 10print(sess.run(x)) 11print(sess.run(kernel)) 12print(sess.run(transpose_conv)) 示例  当padding=0，stride=1时，具体例子计算如下：  在原始的卷积操作中，加入padding，会使输出比无填充时尺寸更大，相反，在转置卷积中，加入padding会使输出更小，如下图所示（具体来说，就是在计算完成得到输出后，padding为多少，就把输出结果的几圈去掉）：  在原始的卷积操作中，加入stride，会使输出比无填充时尺寸更小，相反，在转置卷积中，加入stride会使输出更大，如下图所示（stride对应的为补0操作，并且是在内部行列之间进行补0）： 反池化（UnPooling）  max pooling的逆操作，即在max pool的时候记录一个池化的索引，就是记录取得的这个值是在哪个位置。在反池化的时候，输入的值根据索引放回原来的位置，其余位置填0，如下图所示： " />
+  <meta name="description" content="参考链接：上采样的几种方法
+图像语义分割中，编码器通过卷积层得到图像的一些特征，但是解码器需要将该特征还原到原图像的尺寸大小，才可以对原图像的每个像素点进行分类。从一个较小尺寸的矩阵进行变换，得到较大尺寸的矩阵，在这个过程就是上采样。
+插值法  插值法不需要学习任何的参数，只是根据已知的像素点对未知的点进行预测估计，从而可以扩大图像的尺寸，达到上采样的效果。
+转置卷积（反卷积） 参考链接：47 转置卷积【动手学深度学习v2】 抽丝剥茧，带你理解转置卷积（反卷积） 原始卷积  直观的理解就是固定大小的卷积核在原始的输入图像进行滑动，通过矩阵加权计算得到输出特征，如下图所示： 但是实际在计算机中计算的时候，并不是像这样一个位置一个位置的进行滑动计算，因为这样的效率太低了。计算机会将卷积核转换成等效的矩阵，将输入转换为向量。通过输入向量和卷积核矩阵的相乘获得输出向量。输出的向量经过整形便可得到我们的二维输出特征。具体的操作如下图所示，由于我们的3x3卷积核要在输入上不同的位置卷积4次，所以通过补零的方法将卷积核分别置于一个4x4矩阵的四个角落。这样我们的输入可以直接和这四个4x4的矩阵进行卷积，而舍去了滑动这一操作步骤。 进一步，将输入拉成长向量，四个4x4卷积核也拉成长向量并进行拼接，如下图所示： 记向量化的图像为$I$，向量化的卷积矩阵为$C$，输出特征向量为$O$，则有： $$ I^{T}×C=O^{T} $$ 上述过程将一个$1×16$的行向量乘以$16×4$的矩阵，得到了$1×4$的行向量。那么反过来将一个$1×4$的向量乘以一个$4×16$的矩阵应该就能得到一个$1×16$的行向量，这就是转置卷积的思想。
+转置卷积  对应上面公式，我们有转置卷积的公式： $$ O^{T}×C^{T}=I^{T} $$ 需要注意的是这两个操作并不是可逆的，对于同一个卷积核，经过转置卷积操作之后并不能恢复到原始的数值，保留的只有原始的形状。
+代码 1import tensorflow as tf 2 3x = tf.reshape(tf.constant([[1,2], 4 [4,5]],dtype=tf.float32), [1, 2, 2, 1]) 5kernel = tf.reshape(tf.constant([[1,2,3], 6 [4,5,6], 7 [7,8,9]],dtype=tf.float32), [3, 3, 1, 1]) 8transpose_conv = tf.nn.conv2d_transpose(x, kernel, output_shape=[1, 4, 4, 1], strides=[1,1,1,1], padding=&amp;#39;VALID&amp;#39;) 9sess = tf.Session() 10print(sess.run(x)) 11print(sess.run(kernel)) 12print(sess.run(transpose_conv)) 示例  当padding=0，stride=1时，具体例子计算如下：  在原始的卷积操作中，加入padding，会使输出比无填充时尺寸更大，相反，在转置卷积中，加入padding会使输出更小，如下图所示（具体来说，就是在计算完成得到输出后，padding为多少，就把输出结果的几圈去掉）：  在原始的卷积操作中，加入stride，会使输出比无填充时尺寸更小，相反，在转置卷积中，加入stride会使输出更大，如下图所示（stride对应的为补0操作，并且是在内部行列之间进行补0）： 反池化（UnPooling）  max pooling的逆操作，即在max pool的时候记录一个池化的索引，就是记录取得的这个值是在哪个位置。在反池化的时候，输入的值根据索引放回原来的位置，其余位置填0，如下图所示： " />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">Upsampling</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-04-26 00:00:00 UTC">
+                26 Apr 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>参考链接：<a href="https://blog.csdn.net/jackzhang11/article/details/105046217?spm=1001.2101.3001.6650.5&amp;utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5.topblog&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5.topblog&amp;utm_relevant_index=7">上采样的几种方法</a><br>
+    图像语义分割中，编码器通过卷积层得到图像的一些特征，但是解码器需要将该特征还原到原图像的尺寸大小，才可以对原图像的每个像素点进行分类。从一个较小尺寸的矩阵进行变换，得到较大尺寸的矩阵，在这个过程就是上采样。</p>
+<h2 id="插值法">插值法</h2>
+<p>    插值法不需要学习任何的参数，只是根据已知的像素点对未知的点进行预测估计，从而可以扩大图像的尺寸，达到上采样的效果。</p>
+<h2 id="转置卷积反卷积">转置卷积（反卷积）</h2>
+<p>参考链接：<a href="https://www.bilibili.com/video/BV17o4y1X7Jn?spm_id_from=333.999.0.0">47 转置卷积【动手学深度学习v2】</a>
+<a href="https://blog.csdn.net/tsyccnh/article/details/87357447?spm=1001.2101.3001.6650.1&amp;utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1.pc_relevant_default&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1.pc_relevant_default&amp;utm_relevant_index=2">抽丝剥茧，带你理解转置卷积（反卷积）</a>
+<img src="/img/transpose5.PNG" alt=""></p>
+<h3 id="原始卷积">原始卷积</h3>
+<p>    直观的理解就是固定大小的卷积核在原始的输入图像进行滑动，通过矩阵加权计算得到输出特征，如下图所示：
+<img src="/img/conv1.PNG" alt="">
+    但是实际在计算机中计算的时候，并不是像这样一个位置一个位置的进行滑动计算，因为这样的效率太低了。计算机会<strong>将卷积核转换成等效的矩阵</strong>，<strong>将输入转换为向量</strong>。通过输入向量和卷积核矩阵的相乘获得输出向量。输出的向量经过整形便可得到我们的二维输出特征。具体的操作如下图所示，由于我们的3x3卷积核要在输入上不同的位置卷积4次，所以通过补零的方法将卷积核分别置于一个4x4矩阵的四个角落。这样我们的输入可以直接和这四个4x4的矩阵进行卷积，而舍去了滑动这一操作步骤。
+<img src="/img/conv2.PNG" alt="">
+    进一步，将输入拉成长向量，四个4x4卷积核也拉成长向量并进行拼接，如下图所示：
+<img src="/img/conv3.PNG" alt="">
+    记向量化的图像为$I$，向量化的卷积矩阵为$C$，输出特征向量为$O$，则有：
+$$
+I^{T}×C=O^{T}
+$$
+<img src="/img/conv4.PNG" alt="">
+    上述过程将一个$1×16$的行向量乘以$16×4$的矩阵，得到了$1×4$的行向量。那么反过来将一个$1×4$的向量乘以一个$4×16$的矩阵应该就能得到一个$1×16$的行向量，这就是转置卷积的思想。</p>
+<h3 id="转置卷积">转置卷积</h3>
+<p>    对应上面公式，我们有转置卷积的公式：
+$$
+O^{T}×C^{T}=I^{T}
+$$
+<img src="/img/transpose4.PNG" alt="">
+    需要注意的是这两个操作并不是可逆的，对于同一个卷积核，经过转置卷积操作之后并不能恢复到原始的数值，保留的只有原始的形状。</p>
+<h3 id="代码">代码</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Python" data-lang="Python"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#000;font-weight:bold">import</span> <span style="color:#555">tensorflow</span> <span style="color:#000;font-weight:bold">as</span> <span style="color:#555">tf</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>x <span style="color:#000;font-weight:bold">=</span> tf<span style="color:#000;font-weight:bold">.</span>reshape(tf<span style="color:#000;font-weight:bold">.</span>constant([[<span style="color:#099">1</span>,<span style="color:#099">2</span>],
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>                            [<span style="color:#099">4</span>,<span style="color:#099">5</span>]],dtype<span style="color:#000;font-weight:bold">=</span>tf<span style="color:#000;font-weight:bold">.</span>float32), [<span style="color:#099">1</span>, <span style="color:#099">2</span>, <span style="color:#099">2</span>, <span style="color:#099">1</span>])
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>kernel <span style="color:#000;font-weight:bold">=</span> tf<span style="color:#000;font-weight:bold">.</span>reshape(tf<span style="color:#000;font-weight:bold">.</span>constant([[<span style="color:#099">1</span>,<span style="color:#099">2</span>,<span style="color:#099">3</span>],
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>                                 [<span style="color:#099">4</span>,<span style="color:#099">5</span>,<span style="color:#099">6</span>],
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>                                 [<span style="color:#099">7</span>,<span style="color:#099">8</span>,<span style="color:#099">9</span>]],dtype<span style="color:#000;font-weight:bold">=</span>tf<span style="color:#000;font-weight:bold">.</span>float32), [<span style="color:#099">3</span>, <span style="color:#099">3</span>, <span style="color:#099">1</span>, <span style="color:#099">1</span>])
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>transpose_conv <span style="color:#000;font-weight:bold">=</span> tf<span style="color:#000;font-weight:bold">.</span>nn<span style="color:#000;font-weight:bold">.</span>conv2d_transpose(x, kernel, output_shape<span style="color:#000;font-weight:bold">=</span>[<span style="color:#099">1</span>, <span style="color:#099">4</span>, <span style="color:#099">4</span>, <span style="color:#099">1</span>], strides<span style="color:#000;font-weight:bold">=</span>[<span style="color:#099">1</span>,<span style="color:#099">1</span>,<span style="color:#099">1</span>,<span style="color:#099">1</span>], padding<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;VALID&#39;</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>sess <span style="color:#000;font-weight:bold">=</span> tf<span style="color:#000;font-weight:bold">.</span>Session()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span style="color:#0086b3">print</span>(sess<span style="color:#000;font-weight:bold">.</span>run(x))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span style="color:#0086b3">print</span>(sess<span style="color:#000;font-weight:bold">.</span>run(kernel))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span style="color:#0086b3">print</span>(sess<span style="color:#000;font-weight:bold">.</span>run(transpose_conv))
+</code></pre></div><h3 id="示例">示例</h3>
+<p>    当padding=0，stride=1时，具体例子计算如下：
+<img src="/img/transpose1.PNG" alt=""></p>
+<p>    在原始的卷积操作中，加入padding，会使输出比无填充时尺寸更大，相反，在转置卷积中，加入padding会使输出更小，如下图所示（具体来说，就是在计算完成得到输出后，padding为多少，就把输出结果的几圈去掉）：
+<img src="/img/transpose2.PNG" alt=""></p>
+<p>    在原始的卷积操作中，加入stride，会使输出比无填充时尺寸更小，相反，在转置卷积中，加入stride会使输出更大，如下图所示（stride对应的为补0操作，并且是在内部行列之间进行补0）：
+<img src="/img/transpose3.PNG" alt=""></p>
+<h2 id="反池化unpooling">反池化（UnPooling）</h2>
+<p>    max pooling的逆操作，即在max pool的时候记录一个池化的索引，就是记录取得的这个值是在哪个位置。在反池化的时候，输入的值根据索引放回原来的位置，其余位置填0，如下图所示：
+<img src="/img/upsampling1.PNG" alt=""></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

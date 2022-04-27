@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/u-netu-net&#43;&#43;/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/u-netu-net&#43;&#43;/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "U-Net\u0026U-Net\u002b\u002b",
+      "headline" : "U-Net\u0026U-Net\u002b\u002b",
+      "description" : "U-Net: Convolutional Networks for Biomedical Image Segmentation\n原文链接：U-Net\nAbstract  深度网络的成功训练通常需要数千个带标签的训练样本。在本文中，我们提出了一种网络和训练策略，通过数据增强来更有效地使用可用的带标签样本。该网络结构由两条路径组成，一个是捕捉上下文的contracting path，另一个是能够实现精确定位的对称的expanding path组成。通过实验证明，这种网络可以从很少的图像中实现端到端的训练。\nIntroduction  在过去的两年里，深度卷积网络在许多视觉识别任务中都表现出色。但由于可用的训练集的大小和网络的大小，卷积网络的成功受到了限制。卷积网络的典型应用是在分类任务中，对图像的输出是一个单一的类别标签。然而，在许多视觉任务中，特别是在生物医学图像处理中，所需的输出应该包括定位，即为每个像素分配一个类标签。同时，大规模的训练图像在生物医学任务中通常是无法获得的。因此，有工作在滑动窗口设置中训练一个网络，通过在像素周围的局部区域（patch）作为输入来预测每个像素的类标签。首先，这个网络可以定位。其次，在patch方面的训练数据远远大于训练图像的数量。\n显然，上述方法有两个缺点。首先，非常慢，因为网络必须为每个patch单独运行，而且由于重叠的patch，会有很多冗余。其次，在定位精度和上下文的使用之间存在一种权衡。较大的补丁需要更多的最大池化层，从而降低了定位精度，而较小的补丁只允许网络看到很少的上下文。\n在本文中，我们提出了一个新的网络结构，即所谓的“全卷积网络”。我们对FCN结构进行修改与扩展，使其可以在很少的训练图像下运行，并产生更精确的分割，如下图所示，其主要思想是通过连续的层来添加一个contracting network，其中池化操作被上采样操作所取代。因此，这些层可以提高输出的分辨率。为了实现定位，将从contracting path获得的高分辨率特征图与上采样的输出相结合。 在该结构中，一个重要的修改是，在上采样部分，有大量的特征通道，这样可以将上下文信息传播到更高分辨率的层。因此，expanding path与contracting path是对称的，并形成一个u形结构。该网络没有全连接层，并且卷积层。为了预测图像边界区域中的像素，通过镜像输入图像来引入缺失的上下文。\n由于可用的训练数据很少，我们通过对可用的训练图像进行数据增强。许多细胞分割任务中的另一个挑战是分离同一类别的接触对象（即细胞间的连接处），因此使用加权损失，即接触细胞单元之间的分离背景标签在损失函数中的权重很大。\nNetwork Architecture  网络架构如上图所示所示。它由contracting path（左侧）和expanding path（右侧）组成。contracting path遵循卷积网络的典型架构：包括连续两个3x3的卷积，接着是通过ReLU和2x2的最大池化层（下采样），每经过一次下采样，特征通道数将增加一倍。expanding path中的每个block都先对对特征图的进行2倍的上采样，同时将特征通道数量减半，再与contracting path中相应裁剪的特征图进行concat拼接操作，接着是两个3x3卷积（跟着ReLU），这次卷积不改变图像大小。在最后一层，使用1x1的卷积将每个64个分量的特征向量映射到所需的类的数量，该网络总共有23个卷积层。（在上采样的过程中会丢失部分语义特征，通过拼接的方式，可以恢复部分的语义信息，从而保证分割的精度）\n网络的输入是一张$572×572$的边缘经过镜像操作的图片，contracting path的输出是$32×32$大小的特征图，expanding path通过反卷积将特征图的尺寸扩大两倍，同时将其通道数数减半，和左侧对称的contracting path的特征图进行拼接，由于左侧contracting path和右侧expanding path的特征图的尺寸不一样，U-Net通过将contracting path的特征图裁剪到和expanding path相同尺寸的特征图。\nOverlap-Tile  该策略的思想是：对图像的某一块像素点（黄框内部分）进行预测时，将原始的大图像分割成patch，patch的边缘在原图中可能不是边缘，需要该图像块周围的像素点（蓝色框内）提供上下文信息（context），以获得更准确的预测，如下图所示，预测部分为黄框，输入区域为蓝框。\n这样的策略会带来一个问题，图像边界的图像块没有周围像素，因此周围像素采用了镜像扩充，如下图所示，白色框边缘外边部分为镜像填充的部分。\n这样的操作会带来图像重叠问题，即第一块图像周围的部分会和第二块图像重叠。因此作者在卷积时只使用有效部分（valid part of each convolution），不使用padding，虽然卷积的时候会用到周围的像素点（蓝色框内），但最终传到下一层的只有中间原先图像块（黄色框内）的部分，并且使最终的输出图像对应要真是预测的部分（也可理解为连续的零填充会带来一些误差）。\nTraining  利用输入的图像及其对应的分割图，通过随机梯度下降训练网络。为了最小化开销并最大限度地利用GPU内存，我们支持大型输入块而不是大批处理大小，因此将批处理减少为单个图像。因此，我们使用了一个高动量（0.99）。\n损失函数通过Softmax和交叉熵损失函数相结合， $$ E=\\sum_{x\\in \\Omega }w(x)log(p_{l(x)}(x)) $$ 其中，$l:\\Omega \\rightarrow \\lbrace 1,\u0026hellip;,K \\rbrace$为每个像素的真实标签，$w:\\Omega \\rightarrow \\mathbb{R}$是引入的权重系数，在训练过程中赋予边界像素更大的重要性。\n我们预先计算出针对每个ground truth分割的权重图，以使训练数据集中某一类像素的权重更大，并迫使网络学习我们在接触细胞单元之间引入的小分离边界，如下图是的c和d： （上图：用显微镜记录玻璃上的HeLa细胞。（a）原始图像；（b）ground truth：不同的颜色表示HeLa细胞的不同实例；（c）生成的分割掩码：白色为前景，黑色为背景；（d）像素级的损失权重图，以迫使网络学习边界像素，越靠近红色，权重越大。）",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-04-27 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-04-27 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/u-netu-net\u002b\u002b\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>U-Net&amp;U-Net&#43;&#43;</title>
+  <meta property="og:title" content="U-Net&amp;U-Net&#43;&#43;" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="U-Net: Convolutional Networks for Biomedical Image Segmentation
+原文链接：U-Net
+Abstract  深度网络的成功训练通常需要数千个带标签的训练样本。在本文中，我们提出了一种网络和训练策略，通过数据增强来更有效地使用可用的带标签样本。该网络结构由两条路径组成，一个是捕捉上下文的contracting path，另一个是能够实现精确定位的对称的expanding path组成。通过实验证明，这种网络可以从很少的图像中实现端到端的训练。
+Introduction  在过去的两年里，深度卷积网络在许多视觉识别任务中都表现出色。但由于可用的训练集的大小和网络的大小，卷积网络的成功受到了限制。卷积网络的典型应用是在分类任务中，对图像的输出是一个单一的类别标签。然而，在许多视觉任务中，特别是在生物医学图像处理中，所需的输出应该包括定位，即为每个像素分配一个类标签。同时，大规模的训练图像在生物医学任务中通常是无法获得的。因此，有工作在滑动窗口设置中训练一个网络，通过在像素周围的局部区域（patch）作为输入来预测每个像素的类标签。首先，这个网络可以定位。其次，在patch方面的训练数据远远大于训练图像的数量。
+显然，上述方法有两个缺点。首先，非常慢，因为网络必须为每个patch单独运行，而且由于重叠的patch，会有很多冗余。其次，在定位精度和上下文的使用之间存在一种权衡。较大的补丁需要更多的最大池化层，从而降低了定位精度，而较小的补丁只允许网络看到很少的上下文。
+在本文中，我们提出了一个新的网络结构，即所谓的“全卷积网络”。我们对FCN结构进行修改与扩展，使其可以在很少的训练图像下运行，并产生更精确的分割，如下图所示，其主要思想是通过连续的层来添加一个contracting network，其中池化操作被上采样操作所取代。因此，这些层可以提高输出的分辨率。为了实现定位，将从contracting path获得的高分辨率特征图与上采样的输出相结合。 在该结构中，一个重要的修改是，在上采样部分，有大量的特征通道，这样可以将上下文信息传播到更高分辨率的层。因此，expanding path与contracting path是对称的，并形成一个u形结构。该网络没有全连接层，并且卷积层。为了预测图像边界区域中的像素，通过镜像输入图像来引入缺失的上下文。
+由于可用的训练数据很少，我们通过对可用的训练图像进行数据增强。许多细胞分割任务中的另一个挑战是分离同一类别的接触对象（即细胞间的连接处），因此使用加权损失，即接触细胞单元之间的分离背景标签在损失函数中的权重很大。
+Network Architecture  网络架构如上图所示所示。它由contracting path（左侧）和expanding path（右侧）组成。contracting path遵循卷积网络的典型架构：包括连续两个3x3的卷积，接着是通过ReLU和2x2的最大池化层（下采样），每经过一次下采样，特征通道数将增加一倍。expanding path中的每个block都先对对特征图的进行2倍的上采样，同时将特征通道数量减半，再与contracting path中相应裁剪的特征图进行concat拼接操作，接着是两个3x3卷积（跟着ReLU），这次卷积不改变图像大小。在最后一层，使用1x1的卷积将每个64个分量的特征向量映射到所需的类的数量，该网络总共有23个卷积层。（在上采样的过程中会丢失部分语义特征，通过拼接的方式，可以恢复部分的语义信息，从而保证分割的精度）
+网络的输入是一张$572×572$的边缘经过镜像操作的图片，contracting path的输出是$32×32$大小的特征图，expanding path通过反卷积将特征图的尺寸扩大两倍，同时将其通道数数减半，和左侧对称的contracting path的特征图进行拼接，由于左侧contracting path和右侧expanding path的特征图的尺寸不一样，U-Net通过将contracting path的特征图裁剪到和expanding path相同尺寸的特征图。
+Overlap-Tile  该策略的思想是：对图像的某一块像素点（黄框内部分）进行预测时，将原始的大图像分割成patch，patch的边缘在原图中可能不是边缘，需要该图像块周围的像素点（蓝色框内）提供上下文信息（context），以获得更准确的预测，如下图所示，预测部分为黄框，输入区域为蓝框。
+这样的策略会带来一个问题，图像边界的图像块没有周围像素，因此周围像素采用了镜像扩充，如下图所示，白色框边缘外边部分为镜像填充的部分。
+这样的操作会带来图像重叠问题，即第一块图像周围的部分会和第二块图像重叠。因此作者在卷积时只使用有效部分（valid part of each convolution），不使用padding，虽然卷积的时候会用到周围的像素点（蓝色框内），但最终传到下一层的只有中间原先图像块（黄色框内）的部分，并且使最终的输出图像对应要真是预测的部分（也可理解为连续的零填充会带来一些误差）。
+Training  利用输入的图像及其对应的分割图，通过随机梯度下降训练网络。为了最小化开销并最大限度地利用GPU内存，我们支持大型输入块而不是大批处理大小，因此将批处理减少为单个图像。因此，我们使用了一个高动量（0.99）。
+损失函数通过Softmax和交叉熵损失函数相结合， $$ E=\sum_{x\in \Omega }w(x)log(p_{l(x)}(x)) $$ 其中，$l:\Omega \rightarrow \lbrace 1,&amp;hellip;,K \rbrace$为每个像素的真实标签，$w:\Omega \rightarrow \mathbb{R}$是引入的权重系数，在训练过程中赋予边界像素更大的重要性。
+我们预先计算出针对每个ground truth分割的权重图，以使训练数据集中某一类像素的权重更大，并迫使网络学习我们在接触细胞单元之间引入的小分离边界，如下图是的c和d： （上图：用显微镜记录玻璃上的HeLa细胞。（a）原始图像；（b）ground truth：不同的颜色表示HeLa细胞的不同实例；（c）生成的分割掩码：白色为前景，黑色为背景；（d）像素级的损失权重图，以迫使网络学习边界像素，越靠近红色，权重越大。）" />
+  <meta name="description" content="U-Net: Convolutional Networks for Biomedical Image Segmentation
+原文链接：U-Net
+Abstract  深度网络的成功训练通常需要数千个带标签的训练样本。在本文中，我们提出了一种网络和训练策略，通过数据增强来更有效地使用可用的带标签样本。该网络结构由两条路径组成，一个是捕捉上下文的contracting path，另一个是能够实现精确定位的对称的expanding path组成。通过实验证明，这种网络可以从很少的图像中实现端到端的训练。
+Introduction  在过去的两年里，深度卷积网络在许多视觉识别任务中都表现出色。但由于可用的训练集的大小和网络的大小，卷积网络的成功受到了限制。卷积网络的典型应用是在分类任务中，对图像的输出是一个单一的类别标签。然而，在许多视觉任务中，特别是在生物医学图像处理中，所需的输出应该包括定位，即为每个像素分配一个类标签。同时，大规模的训练图像在生物医学任务中通常是无法获得的。因此，有工作在滑动窗口设置中训练一个网络，通过在像素周围的局部区域（patch）作为输入来预测每个像素的类标签。首先，这个网络可以定位。其次，在patch方面的训练数据远远大于训练图像的数量。
+显然，上述方法有两个缺点。首先，非常慢，因为网络必须为每个patch单独运行，而且由于重叠的patch，会有很多冗余。其次，在定位精度和上下文的使用之间存在一种权衡。较大的补丁需要更多的最大池化层，从而降低了定位精度，而较小的补丁只允许网络看到很少的上下文。
+在本文中，我们提出了一个新的网络结构，即所谓的“全卷积网络”。我们对FCN结构进行修改与扩展，使其可以在很少的训练图像下运行，并产生更精确的分割，如下图所示，其主要思想是通过连续的层来添加一个contracting network，其中池化操作被上采样操作所取代。因此，这些层可以提高输出的分辨率。为了实现定位，将从contracting path获得的高分辨率特征图与上采样的输出相结合。 在该结构中，一个重要的修改是，在上采样部分，有大量的特征通道，这样可以将上下文信息传播到更高分辨率的层。因此，expanding path与contracting path是对称的，并形成一个u形结构。该网络没有全连接层，并且卷积层。为了预测图像边界区域中的像素，通过镜像输入图像来引入缺失的上下文。
+由于可用的训练数据很少，我们通过对可用的训练图像进行数据增强。许多细胞分割任务中的另一个挑战是分离同一类别的接触对象（即细胞间的连接处），因此使用加权损失，即接触细胞单元之间的分离背景标签在损失函数中的权重很大。
+Network Architecture  网络架构如上图所示所示。它由contracting path（左侧）和expanding path（右侧）组成。contracting path遵循卷积网络的典型架构：包括连续两个3x3的卷积，接着是通过ReLU和2x2的最大池化层（下采样），每经过一次下采样，特征通道数将增加一倍。expanding path中的每个block都先对对特征图的进行2倍的上采样，同时将特征通道数量减半，再与contracting path中相应裁剪的特征图进行concat拼接操作，接着是两个3x3卷积（跟着ReLU），这次卷积不改变图像大小。在最后一层，使用1x1的卷积将每个64个分量的特征向量映射到所需的类的数量，该网络总共有23个卷积层。（在上采样的过程中会丢失部分语义特征，通过拼接的方式，可以恢复部分的语义信息，从而保证分割的精度）
+网络的输入是一张$572×572$的边缘经过镜像操作的图片，contracting path的输出是$32×32$大小的特征图，expanding path通过反卷积将特征图的尺寸扩大两倍，同时将其通道数数减半，和左侧对称的contracting path的特征图进行拼接，由于左侧contracting path和右侧expanding path的特征图的尺寸不一样，U-Net通过将contracting path的特征图裁剪到和expanding path相同尺寸的特征图。
+Overlap-Tile  该策略的思想是：对图像的某一块像素点（黄框内部分）进行预测时，将原始的大图像分割成patch，patch的边缘在原图中可能不是边缘，需要该图像块周围的像素点（蓝色框内）提供上下文信息（context），以获得更准确的预测，如下图所示，预测部分为黄框，输入区域为蓝框。
+这样的策略会带来一个问题，图像边界的图像块没有周围像素，因此周围像素采用了镜像扩充，如下图所示，白色框边缘外边部分为镜像填充的部分。
+这样的操作会带来图像重叠问题，即第一块图像周围的部分会和第二块图像重叠。因此作者在卷积时只使用有效部分（valid part of each convolution），不使用padding，虽然卷积的时候会用到周围的像素点（蓝色框内），但最终传到下一层的只有中间原先图像块（黄色框内）的部分，并且使最终的输出图像对应要真是预测的部分（也可理解为连续的零填充会带来一些误差）。
+Training  利用输入的图像及其对应的分割图，通过随机梯度下降训练网络。为了最小化开销并最大限度地利用GPU内存，我们支持大型输入块而不是大批处理大小，因此将批处理减少为单个图像。因此，我们使用了一个高动量（0.99）。
+损失函数通过Softmax和交叉熵损失函数相结合， $$ E=\sum_{x\in \Omega }w(x)log(p_{l(x)}(x)) $$ 其中，$l:\Omega \rightarrow \lbrace 1,&amp;hellip;,K \rbrace$为每个像素的真实标签，$w:\Omega \rightarrow \mathbb{R}$是引入的权重系数，在训练过程中赋予边界像素更大的重要性。
+我们预先计算出针对每个ground truth分割的权重图，以使训练数据集中某一类像素的权重更大，并迫使网络学习我们在接触细胞单元之间引入的小分离边界，如下图是的c和d： （上图：用显微镜记录玻璃上的HeLa细胞。（a）原始图像；（b）ground truth：不同的颜色表示HeLa细胞的不同实例；（c）生成的分割掩码：白色为前景，黑色为背景；（d）像素级的损失权重图，以迫使网络学习边界像素，越靠近红色，权重越大。）" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">U-Net&amp;U-Net&#43;&#43;</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-04-27 00:00:00 UTC">
+                27 Apr 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>U-Net: Convolutional Networks for Biomedical Image Segmentation<br>
+原文链接：<a href="https://arxiv.org/pdf/1505.04597.pdf">U-Net</a></p>
+<h2 id="abstract">Abstract</h2>
+<p>    深度网络的成功训练通常需要数千个带标签的训练样本。在本文中，我们提出了一种网络和训练策略，通过数据增强来更有效地使用可用的带标签样本。该网络结构由两条路径组成，一个是捕捉上下文的contracting path，另一个是能够实现精确定位的对称的expanding path组成。通过实验证明，这种网络可以从很少的图像中实现端到端的训练。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    在过去的两年里，深度卷积网络在许多视觉识别任务中都表现出色。但由于可用的训练集的大小和网络的大小，卷积网络的成功受到了限制。卷积网络的典型应用是在分类任务中，对图像的输出是一个单一的类别标签。然而，在许多视觉任务中，特别是在生物医学图像处理中，所需的输出应该包括定位，即为每个像素分配一个类标签。同时，大规模的训练图像在生物医学任务中通常是无法获得的。因此，有工作在滑动窗口设置中训练一个网络，通过在像素周围的局部区域（patch）作为输入来预测每个像素的类标签。首先，这个网络可以定位。其次，在patch方面的训练数据远远大于训练图像的数量。<br>
+    显然，上述方法有两个缺点。首先，非常慢，因为网络必须为每个patch单独运行，而且由于重叠的patch，会有很多冗余。其次，在定位精度和上下文的使用之间存在一种权衡。较大的补丁需要更多的最大池化层，从而降低了定位精度，而较小的补丁只允许网络看到很少的上下文。<br>
+    在本文中，我们提出了一个新的网络结构，即所谓的“全卷积网络”。我们对FCN结构进行修改与扩展，使其可以在很少的训练图像下运行，并产生更精确的分割，如下图所示，其主要思想是通过连续的层来添加一个contracting network，其中池化操作被上采样操作所取代。因此，这些层可以提高输出的分辨率。为了实现定位，将从contracting path获得的高分辨率特征图与上采样的输出相结合。
+<img src="/img/unet1.PNG" alt="">
+    在该结构中，一个重要的修改是，在上采样部分，有大量的特征通道，这样可以将上下文信息传播到更高分辨率的层。因此，expanding path与contracting path是对称的，并形成一个u形结构。该网络没有全连接层，并且卷积层。为了预测图像边界区域中的像素，通过镜像输入图像来引入缺失的上下文。<br>
+    由于可用的训练数据很少，我们通过对可用的训练图像进行数据增强。许多细胞分割任务中的另一个挑战是分离同一类别的接触对象（即细胞间的连接处），因此使用加权损失，即接触细胞单元之间的分离背景标签在损失函数中的权重很大。</p>
+<h2 id="network-architecture">Network Architecture</h2>
+<p>    网络架构如上图所示所示。它由contracting path（左侧）和expanding path（右侧）组成。contracting path遵循卷积网络的典型架构：包括连续两个3x3的卷积，接着是通过ReLU和2x2的最大池化层（下采样），每经过一次下采样，特征通道数将增加一倍。expanding path中的每个block都先对对特征图的进行2倍的上采样，同时将特征通道数量减半，再与contracting path中相应裁剪的特征图进行concat拼接操作，接着是两个3x3卷积（跟着ReLU），这次卷积不改变图像大小。在最后一层，使用1x1的卷积将每个64个分量的特征向量映射到所需的类的数量，该网络总共有23个卷积层。（在上采样的过程中会丢失部分语义特征，通过拼接的方式，可以恢复部分的语义信息，从而保证分割的精度）<br>
+    网络的输入是一张$572×572$的边缘经过<strong>镜像操作</strong>的图片，contracting path的输出是$32×32$大小的特征图，expanding path通过反卷积将特征图的尺寸扩大两倍，同时将其通道数数减半，和左侧对称的contracting path的特征图进行拼接，由于左侧contracting path和右侧expanding path的特征图的尺寸不一样，U-Net通过将contracting path的特征图裁剪到和expanding path相同尺寸的特征图。</p>
+<h3 id="overlap-tile">Overlap-Tile</h3>
+<p>    该策略的思想是：对图像的某一块像素点（黄框内部分）进行预测时，将原始的大图像分割成patch，patch的边缘在原图中可能不是边缘，需要该图像块周围的像素点（蓝色框内）提供上下文信息（context），以获得更准确的预测，如下图所示，预测部分为黄框，输入区域为蓝框。<br>
+    这样的策略会带来一个问题，图像边界的图像块没有周围像素，因此周围像素采用了镜像扩充，如下图所示，白色框边缘外边部分为镜像填充的部分。<br>
+    这样的操作会带来图像重叠问题，即第一块图像周围的部分会和第二块图像重叠。因此作者在卷积时只使用有效部分（valid part of each convolution），不使用padding，虽然卷积的时候会用到周围的像素点（蓝色框内），但最终传到下一层的只有中间原先图像块（黄色框内）的部分，并且使最终的输出图像对应要真是预测的部分（也可理解为连续的零填充会带来一些误差）。</p>
+<p><img src="/img/unet5.PNG" alt=""></p>
+<h2 id="training">Training</h2>
+<p>    利用输入的图像及其对应的分割图，通过随机梯度下降训练网络。为了最小化开销并最大限度地利用GPU内存，我们支持大型输入块而不是大批处理大小，因此将批处理减少为单个图像。因此，我们使用了一个高动量（0.99）。<br>
+    损失函数通过Softmax和交叉熵损失函数相结合，
+$$
+E=\sum_{x\in \Omega }w(x)log(p_{l(x)}(x))
+$$
+    其中，$l:\Omega \rightarrow \lbrace 1,&hellip;,K \rbrace$为每个像素的真实标签，$w:\Omega \rightarrow \mathbb{R}$是引入的权重系数，在训练过程中赋予边界像素更大的重要性。<br>
+    我们预先计算出针对每个ground truth分割的权重图，以使训练数据集中某一类像素的权重更大，并迫使网络学习我们在接触细胞单元之间引入的小分离边界，如下图是的c和d：
+<img src="/img/unet2.PNG" alt="">
+（上图：用显微镜记录玻璃上的HeLa细胞。（a）原始图像；（b）ground truth：不同的颜色表示HeLa细胞的不同实例；（c）生成的分割掩码：白色为前景，黑色为背景；（d）像素级的损失权重图，以迫使网络学习边界像素，越靠近红色，权重越大。）<br>
+    权重图计算公式如下：
+$$
+w(x)=w_{c}(x)+w_{0}\cdot exp(-\frac{(d_{1}(x)+d_{2}(x))^{2}}{2\sigma^{2}})
+$$
+    其中，$w_{c}(x):\Omega \rightarrow \mathbb{R}$是平衡类别频率的权重图，$d_{1}(x):\Omega \rightarrow \mathbb{R}$表示到最近的单元格的边界的距离，$d_{2}(x):\Omega \rightarrow \mathbb{R}$表示到第二个最近的单元格的边界的距离，在具体实验中，设置$w_{0}=10$，$\sigma=5$个像素。</p>
+<h3 id="data-augmentation">Data Augmentation</h3>
+<p>    当只有少量的训练样本可用时，数据增强是非常重要的。对于显微镜图像，需要的是移位和旋转不变性，以及对变形和灰度值变化的鲁棒性。</p>
+<h2 id="result">Result</h2>
+<p><img src="/img/unet3.PNG" alt="">
+<img src="/img/unet4.PNG" alt="">
+（上图：（a）是“PhC-U373”数据集中输入图像的一部分；（b）分割结果（青色mask）与ground truth（黄色边框）；（c）输入的“DIC-HeLa”数据集；（d）分割结果（随机彩色掩码）和ground truth（黄色边框）。）<br>
+    如上表所示，第一个数据集“PhC-U373”包含胶质母细胞瘤-星形细胞瘤U373细胞，包含35张部分注释的训练图像，我们实现了平均IOU为92%，这明显优于第二优算法的83%。第二个数据集“DIC-HeLa”是HeLa细胞，它包含20个部分注释的训练图像，我们获得了平均IOU为77.5%，明显优于第二优算法的46%。</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>     U-NET架构在不同的生物医学分割应用上取得了非常好的性能。由于数据增强，它只需要很少的标注图像。</p>
+<h1 id="u-net">U-NET++</h1>
+<p>原文链接：<a href="https://arxiv.org/pdf/1807.10165.pdf">UNet+ +: A Nested U-Net Architecture for Medical Image Segmentation</a><br>
+参考链接：<a href="https://zhuanlan.zhihu.com/p/44958351">研习U-Net</a></p>
+<h2 id="abstract-1">Abstract</h2>
+<p>     在本文中，我们提出了UNet 2+，一种新的、更强大的医学图像分割架构，其本质上是一个深度监督的编码器-解码器网络，其中编码器和解码器的子网络通过一系列嵌套的dense skip pathway连接，重新设计的skip pathway旨在减少编码器和解码器中子网络的特征映射之间的语义差距。我们将UNet 2+与U-Net和wide U-Net架构在多个医学图像分割任务中进行了比较，实验表明，UNet 2+对U-Net和wide U-Net的平均IoU增益分别为3.9点和3.4点。</p>
+<h2 id="introduction-1">Introduction</h2>
+<p>    最先进的图像分割模型是编码器-解码器结构的变体，如U-Net和全卷积网络(FCN)。这些用于分割的编码器-解码器网络具有一个关键的相似性：skip连接，它将来自解码器子网络的深度、语义、粗粒度的特征映射与来自编码器子网络的浅层、低层、细粒度的特征映射结合起来。skip连接在恢复目标对象的细粒度细节方面是有效的；即使在复杂的背景下，也能生成具有精细细节的分割掩码。<br>
+    在医学图像中分割病变或异常需要比自然图像更高的准确性。此外，不准确的分割也可能导致后续计算机生成的诊断的重大变化。因此，我们需要设计出更有效的图像分割体系结构，能够有效地恢复医学图像中目标对象的细节。<br>
+    为了解决在医学图像中更准确的分割的需求，我们提出了UNet 2+，一种基于嵌套和密集skip连接的分割架构，即当编码器网络的高分辨率特征图与解码器网络的语义丰富的特征图融合之前逐渐丰富时，该模型可以更有效地捕获前景对象的细粒度细节。</p>
+<h2 id="related-work">Related Work</h2>
+<p>    FCN和U-Net都有一个关键点：skip连接，在FCN中，上采样的特征图是通过从编码器中skip过来的特征映射求和得到的，而U-Net将它们拼接起来，并在每个上采样步骤之间添加卷积和非线性激活。skip连接有助于恢复网络输出的全空间分辨率，使完全卷积方法适合于语义分割。尽管上述架构之间存在细微的差异，但它们都倾向于融合编码器和解码器子网络语义上不同的特征图，根据我们的实验，这会降低分割性能。</p>
+<h2 id="proposed-network-architecture-unet">Proposed Network Architecture: UNet++</h2>
+<p><img src="/img/unet++1.PNG" alt=""></p>
+<p>    上图为UNet 2+的整体架构，如上图所示，UNet 2+由编码器和解码器组成。UNet 2+与U-Net（上图中的黑色部分）的区别之处在于重新设计的skip路径（绿色和蓝色线条）。<br>
+    上图中，（a）UNet 2+由一个编码器和解码器组成，它们通过一系列嵌套的密集卷积块进行连接，其背后的主要思想是在融合前消除编码器和解码器的特征映射之间的语义差距，例如，$(X_{0,0},X_{1,3})$之间的语义间隙通过具有三个卷积层的密集卷积块来桥接的。其中，黑色表示原始的U-Net，绿色和蓝色表示skip路径上密集的卷积块。（b）详细分析了UNet 2+的第一个skip连接。（c）UNet 2+可以在推理时进行修剪。</p>
+<h3 id="re-designed-skip-pathways">Re-designed skip pathways</h3>
+<p>    重新设计的skip路径改变了编码器和解码器中子网络的连通性。在U-Net中，编码器的特征映射直接与解码器相连接；然而，在UNet 2+中，它们通过一个密集的卷积块，其卷积层的数量取决于金字塔的level。例如，节点$X_{0}$和$X_{1}$之间的skip路径由具有三个卷积层的密集卷积块组成，其中每个卷积层之前有一个连接层，将该层的卷积层的输出与下一层的上采样输出融合起来。<br>
+    我们将skip路径表示为：设$x^{i,j}$表示节点$X^{i,j}$的输出，其中$i$表示编码器下采样中的层数索引，$j$表示沿着skip路径中密集block中的卷积层数的索引，那么$x^{i,j}$的计算公式如下：
+$$
+j=0:x^{i,j}=H(x^{i-1,j})
+$$
+$$
+j&gt;0:x^{i,j}=H([[x^{i,k}]_ {k=0}^{k=j-1},U(x^{i+1,j-1})])
+$$
+    $H(x)$是一个卷积操作跟着一个非线性激活，$U(x)$表示上采样层，$[]$表示连接层。也就是说，$j=0$的节点只接收来自encoder前一层的输入；$j=1$的节点接收两个输入，均来自编码器；$j&gt;1$的节点接收$j+1$个输入，其中$j$个输入是同一skip路径中前$j$个节点的输出（虚线），最后一个输入是下一层skip路径的上采样输出（实线）。</p>
+<h3 id="deep-supervision">Deep supervision</h3>
+<p>    我们提出在UNet 2+中使用深度监督，使模型能够在两种模式下运行：<br>
+    （1）精确模式，其中所有分割分支的输出被平均；<br>
+    （2）快速模式，其中仅从一个分割分支中选择最终的分割地图，其选择决定了模型修剪的程度和速度增益。<br>
+    上图中的（c）显示了在快速模式下选择分割分支的结果是如何导致不同复杂度的体系结构。<br>
+    由于嵌套的skip路径，UNet 2+在多个语义级别上生成全分辨率的特征映射，$\lbrace x^{0,j},j\in \lbrace1,2,3,4 \rbrace \rbrace$。我们在上述四个语义级别中分别增加了二分类交叉熵和系数作为损失函数：
+$$
+L(Y,\hat{Y})=-\frac{1}{N}\sum_{i=1}^{N}(\frac{1}{2}Y_{b}log\hat{Y_{b}}+\frac{2Y_{b}\hat{Y_{b}}}{Y_{b}+\hat{Y_{b}}})
+$$
+    其中，$Y_{b}$和$\hat{Y_{b}}$分别表示第b幅图像的预测值和真值，$N$是batch size。<br>
+    综上所述，如上图所示，UNet 2+与原U-Net有三个不同之处：<br>
+    （1）在skip路径上有卷积层（绿色），弥补了编码器和解码器特征映射之间的语义差距；<br>
+    （2）在skip路径上有密集的skip连接（蓝色），改善了梯度流；<br>
+    （3）具有深度监督（红色），并可以进行模型修剪，在最差的情况下达到与只使用一个损失层相当的性能。</p>
+<h2 id="experiments">Experiments</h2>
+<p>    Baseline models：为了进行比较，我们使用了原始的U-Net和一个wide U-Net体系结构。我们选择U-Net是因为它是图像分割的一个常见的性能基线。我们还设计了一个wide U-Net，其参数数量与我们提出的架构相似。这是为了确保我们的体系结构所产生的性能增益并不仅仅是由于参数数量的增加。下表详细介绍了U-Net和宽U-Net体系结构：
+<img src="/img/unet++2.PNG" alt=""></p>
+<h2 id="results">Results</h2>
+<p>    下表比较了U-Net、wide U-Net和UNet 2+在肺结节分割、结肠息肉分割、肝脏分割和细胞核分割等方面的数量参数和分割精度。如下表所示，wide U-Net的性能始终优于U-Net，除了在肝脏分割中两种架构的性能差不多，这种提升归因于wide U-Net中更多的参数。在没有深度监督的情况下，UNet 2+比UNet和wide U-Net都取得了显著的性能提高，使IoU平均提高了2.8点和3.3点。有深度监督的UNet 2+与没有深度监督的UNet 2+平均提高了0.6分。
+<img src="/img/unet++3.PNG" alt=""></p>
+<p>    下图展示了UNet 2+在应用不同层次的剪枝后的分割性能。我们使用UNet 2+ Li来表示在第i级修剪过的UNet 2+。UNet 2+ L3的推理时间平均减少了32.2%，而IoU仅降低了0.6点。更激进的剪枝进一步减少了推理时间，但以显著的精度降低为代价。其中，（a）为细胞核，（b）为结肠息肉，（c）为肝，（d）为肺结节。
+<img src="/img/unet++4.PNG" alt=""></p>
+<h2 id="conclusion-1">Conclusion</h2>
+<p>    为了满足对更准确的医学图像分割的需求，我们提出了UNet 2+。提出的架构利用了重新设计的skip路径和深度监督。重新设计的skip路径旨在减少编码器和解码器的特征映射之间的语义差距，深度监督还可以更准确地分割，特别是对于出现在多个尺度上的病变，我们使用四个医学成像数据集评估了UNet 2+，分别包括肺结节分割、结肠息肉分割、细胞核分割和肝脏分割。实验表明，在深度监督下，UNet 2+比U-Net和wide U-Net的平均增益分别为3.9和3.4点。</p>
+<h2 id="研习u-net">研习U-Net</h2>
+<p>    可以说，U-Net里面最精彩的部分就是三部分：下采样，上采样和skip connection，如下图所示：
+<img src="/img/unet++1-1.PNG" alt="">
+    如果在这个经典的结构基础上进行改进，第一个想到的问题可能是：<strong>要多深才合适？</strong>，关于到底要多深这个问题，还有一个引申的问题就是，<strong>降采样对于分割网络到底是不是必须的？</strong> 问这个问题的原因就是，既然输入和输出都是相同大小的图，为什么要折腾去降采样一下再升采样呢？<br>
+    降采样它可以增加对输入图像的一些小扰动的鲁棒性，比如图像平移，旋转等，减少过拟合的风险，降低运算量，和增加感受野的大小。升采样的最大的作用其实就是把抽象的特征再还原解码到原图的尺寸，最终得到分割结果。因此肯定是必须的。<br>
+    对于特征提取阶段，浅层结构可以抓取图像的一些简单的特征，比如边界，颜色，而深层结构因为感受野大了，而且经过的卷积操作多了，能抓取到图像的一些说不清道不明的抽象特征，总之，浅有浅的侧重，深有深的优势。那么既然浅层特征和深层特征都很重要，U-Net为什么只在4层以后才返回去，也就是只去抓深层特征呢？即在下图中，既然$X^{1,0}$、$X^{2,0}$、$X^{3,0}$、$X^{4,0}$所抓取的特征都很重要，为什么我非要降到 $X^{4,0}$层了才开始上采样回去呢？
+<img src="/img/unet++1-3.PNG" alt="">
+    针对要多深才适合这个问题，经过实验结果（下图），可以看出，<strong>并不是越深越好</strong>，它背后的传达的信息就是，<strong>不同层次特征的重要性对于不同的数据集是不一样的</strong>，并不是说我设计一个4层的U-Net，就像原论文给出的那个结构，就一定对所有数据集的分割问题都最优。
+<img src="/img/unet++1-2.PNG" alt="">
+    那么改进的核心思想，就是同时使用浅层和深层的特征，进行分割，但是总不能不同网络深度的网络都训练一遍，以比较哪个网络更适合具体的数据集。
+<img src="/img/unet++1-4.PNG" alt="">
+    那么针对上面四个不同深度的网络，将其<strong>融合</strong>，一个改进的网络就出来了，如下图所示：
+<img src="/img/unet++1-5.PNG" alt="">
+    这样就把<strong>1～4层的U-Net全给连一起</strong>了。这个结构的好处就是我不管你哪个深度的特征有效，我干脆都给你用上，让网络自己去学习不同深度的特征的重要性。第二个好处是它共享了一个特征提取器，也就是你不需要训练一堆U-Net，而是只训练一个encoder，它的不同层次的特征由不同的decoder路径来还原。<br>
+    但是这个网络结构是不能被训练的，原因在于，不会由任何<strong>梯度</strong>会经过这个红色区域，因为它和算loss function的地方是在反向传播时是断开的。<br>
+    那么该如何解决这个问题，有两个思路，第一个是用deep supervision，强行增加梯度，第二个是再修改网络结构，改成下边这样：
+<img src="/img/unet++1-6.PNG" alt="">
+    但是上边这个网络已经发了论文。但是，将它与原始的U-Net相对比，可以看出，这个结构强行去掉了U-Net本身自带的长连接，取而代之的是一系列的短连接。而U-Net中的<strong>长连接</strong>是有必要的，它联系了输入图像的很多信息，有助于还原降采样所带来的信息损失，在一定程度上，我觉得它和残差的操作非常类似，也就是residual操作。<br>
+    那么现在的改进方法，就是将长连接与短连接结合起来，因此，就提出了U-Net 2+的网络结构，如下所示（目前还只有一个loss连接）：
+<img src="/img/unet++1-9.PNG" alt=""></p>
+<p>    对于这个主体结构，我们在论文中给出了一些点评，说白了就是把原来空心的U-Net填满了，优势是可以抓取不同层次的特征，将它们通过特征叠加的方式整合，不同层次的特征，或者说不同大小的感受野，对于大小不一的目标对象的敏感度是不同的，比如，感受野大的特征，可以很容易的识别出大物体的，但是在实际分割中，大物体边缘信息和小物体本身是很容易被深层网络一次次的降采样和一次次升采样给弄丢的，这个时候就可能需要感受野小的特征来帮助。另一个解读就是如果你横着看其中一层的特征叠加过程，就像一个去年很火的DenseNet的结构，非常的巧合，原先的U-Net，横着看就很像是Residual的结构，这个就很有意思了，U-Net 2+对于U-Net分割效果提升可能和DenseNet对于ResNet分类效果的提升，原因如出一辙，因此，在解读中我们也参考了Dense Connection的一些优势。</p>
+<h3 id="deep-supervision-1">Deep Supervision</h3>
+<p>    所谓深监督(Deep Supervision)，就是在深度神经网络的某些中间隐藏层加了一个辅助的分类器作为一种网络分支来对主干网络进行监督的技巧，用来解决深度神经网络训练梯度消失和收敛速度过慢等问题。<br>
+    在该结构中，如上图所示，具体的实现操作就是在图中$X^{0,1}$、$X^{0,2}$、$X^{0,3}$、$X^{0,4}$ 后面加一个1x1的卷积核，相当于去监督每个level，或者每个分支的U-Net的输出。<br>
+    当Deep Supervision配合上这样一个填满的U-Net结构时，会带来一个很大的优势，<strong>剪枝</strong>。也就是说，因为在深监督的过程中，每个子网络的输出都其实已经是图像的分割结果了，所以<strong>如果小的子网络的输出结果已经足够好了，我们可以随意的剪掉那些多余的部分</strong>。<br>
+    在训练阶段，因为既有前向，又有反向传播，整个网络都会被训练进行权重更新；而在测试的阶段，由于输入的图像只会前向传播，我们可以将作用不大的部分剪掉（即如果更深层的网络并没有很好的结果的时候，就可以将其剪掉）。<br>
+    那么该如何去决定剪多少，因为在训练模型的时候会把数据分为训练集，验证集和测试集，所以我们会根据子网络在验证集的结果来决定剪多少。如下图所示，可以看出四个数据集中L1的结果并不好，但是其中有三个数据集显示L2的结果和L4已经非常接近了，也就是说对于这三个数据集，在测试阶段，我们不需要用9M的网络，用半M的网络足够了。
+<img src="/img/unet++1-7.PNG" alt=""></p>
+<p>    最后，回想一下一开始的问题，网络需要多深合适，其实就很好解释了。网络的深度和数据集的难度是有关系的，这上边四个数据集当中，第二个，也就是息肉分割是最难的，大家可以看到纵坐标，它代表分割的评价指标，越大越好，其他都能达到挺高的，但是唯独息肉分割只有在30左右，对于比较难的数据集，可以看到网络越深，它的分割结果是在不断上升的。对于大多数比较简单的分割问题，其实并不需要非常深，非常大的网络就可以达到很不错的精度了。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

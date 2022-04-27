@@ -6,7 +6,54 @@
     <description>Recent content in Summary on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 12 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/summary/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 26 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/summary/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Upsampling</title>
+      <link>https://gdy0924.github.io/posts/upsampling/</link>
+      <pubDate>Tue, 26 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/upsampling/</guid>
+      <description>参考链接：上采样的几种方法
+图像语义分割中，编码器通过卷积层得到图像的一些特征，但是解码器需要将该特征还原到原图像的尺寸大小，才可以对原图像的每个像素点进行分类。从一个较小尺寸的矩阵进行变换，得到较大尺寸的矩阵，在这个过程就是上采样。
+插值法  插值法不需要学习任何的参数，只是根据已知的像素点对未知的点进行预测估计，从而可以扩大图像的尺寸，达到上采样的效果。
+转置卷积（反卷积） 参考链接：47 转置卷积【动手学深度学习v2】 抽丝剥茧，带你理解转置卷积（反卷积） 原始卷积  直观的理解就是固定大小的卷积核在原始的输入图像进行滑动，通过矩阵加权计算得到输出特征，如下图所示： 但是实际在计算机中计算的时候，并不是像这样一个位置一个位置的进行滑动计算，因为这样的效率太低了。计算机会将卷积核转换成等效的矩阵，将输入转换为向量。通过输入向量和卷积核矩阵的相乘获得输出向量。输出的向量经过整形便可得到我们的二维输出特征。具体的操作如下图所示，由于我们的3x3卷积核要在输入上不同的位置卷积4次，所以通过补零的方法将卷积核分别置于一个4x4矩阵的四个角落。这样我们的输入可以直接和这四个4x4的矩阵进行卷积，而舍去了滑动这一操作步骤。 进一步，将输入拉成长向量，四个4x4卷积核也拉成长向量并进行拼接，如下图所示： 记向量化的图像为$I$，向量化的卷积矩阵为$C$，输出特征向量为$O$，则有： $$ I^{T}×C=O^{T} $$ 上述过程将一个$1×16$的行向量乘以$16×4$的矩阵，得到了$1×4$的行向量。那么反过来将一个$1×4$的向量乘以一个$4×16$的矩阵应该就能得到一个$1×16$的行向量，这就是转置卷积的思想。
+转置卷积  对应上面公式，我们有转置卷积的公式： $$ O^{T}×C^{T}=I^{T} $$ 需要注意的是这两个操作并不是可逆的，对于同一个卷积核，经过转置卷积操作之后并不能恢复到原始的数值，保留的只有原始的形状。
+代码 1import tensorflow as tf 2 3x = tf.reshape(tf.constant([[1,2], 4 [4,5]],dtype=tf.float32), [1, 2, 2, 1]) 5kernel = tf.reshape(tf.constant([[1,2,3], 6 [4,5,6], 7 [7,8,9]],dtype=tf.float32), [3, 3, 1, 1]) 8transpose_conv = tf.nn.conv2d_transpose(x, kernel, output_shape=[1, 4, 4, 1], strides=[1,1,1,1], padding=&amp;#39;VALID&amp;#39;) 9sess = tf.Session() 10print(sess.run(x)) 11print(sess.run(kernel)) 12print(sess.run(transpose_conv)) 示例  当padding=0，stride=1时，具体例子计算如下：  在原始的卷积操作中，加入padding，会使输出比无填充时尺寸更大，相反，在转置卷积中，加入padding会使输出更小，如下图所示（具体来说，就是在计算完成得到输出后，padding为多少，就把输出结果的几圈去掉）：  在原始的卷积操作中，加入stride，会使输出比无填充时尺寸更小，相反，在转置卷积中，加入stride会使输出更大，如下图所示（stride对应的为补0操作，并且是在内部行列之间进行补0）： 反池化（UnPooling）  max pooling的逆操作，即在max pool的时候记录一个池化的索引，就是记录取得的这个值是在哪个位置。在反池化的时候，输入的值根据索引放回原来的位置，其余位置填0，如下图所示： </description>
+    </item>
+    
+    <item>
+      <title>Transformer中的位置编码</title>
+      <link>https://gdy0924.github.io/posts/transformer%E4%B8%AD%E7%9A%84%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81/</link>
+      <pubDate>Mon, 25 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/transformer%E4%B8%AD%E7%9A%84%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81/</guid>
+      <description>位置编码 参考链接：如何理解Transformer论文中的positional encoding，和三角函数有什么关系？
+首先，给定一个长为$T$的文本，最简单的位置编码就是计数，即使用$PE=pos=0,1,2,&amp;hellip;,T-1$作为文本中每个字的位置编码，但是这个方法缺点很明显，这个序列是没有上界的。当有一个很长的文本，那么最后一个字的位置编码会比第一个字大太多，肯定会对模型有干扰。
+其次，我们希望编码有一个范围，那么就可以想到使用文本长度对每个位置作归一化，得到$PE=\frac{pos}{T-1}$。这样固然使得所有位置编码都落入$[0,1]$区间，但是问题也是显著的：不同长度文本的位置编码步长是不同的，在较短的文本中紧紧相邻的两个字的位置编码差异，会和长文本中相邻数个字的两个字的位置编码差异一致。
+最后，对于位置编码应该满足：体现同一个单词在不同位置的区别；体现一定的先后次序关系（相对位置），并且在一定范围内的编码差异不应该依赖于文本长度，具有一定不变性。一种思路是使用有界的周期性函数。在前面的两种做法里面，我们为了体现某个字在句子中的绝对位置，使用了一个单调的函数，使得任意后续的字符的位置编码都大于前面的字，如果我们放弃对绝对位置的追求，转而要求位置编码仅仅关注一定范围内的相对次序关系，那么有界的周期性函数就是很好的选择。
+为什么选择三角函数 参考链接：浅谈 Transformer-based 模型中的位置表示
+什么？是Transformer位置编码
+位置编码可以分为绝对位置编码和相对位置编码，绝对位置对句子语义的影响不大，而相对位置比较重要。
+Transformer 中使用 Positional Encoding 生成固定的位置表示： $$ PE(pos,2i)=sin(\frac{pos}{10000^{\frac{2i}{d_{model}}}}) $$ $$ PE(pos,2i+1)=cos(\frac{pos}{10000^{\frac{2i}{d_{model}}}}) $$ 其中，$pos$为token的位置，$pos=0,1,2,&amp;hellip;,L$，$i$为向量的某一维度，当$d_{model}=512$时，$i=0,1,2,&amp;hellip;,255$。
+选择sin函数与cos函数，是因为其有以下特点： $$ sin(\alpha +\beta )=sin\alpha cos\beta +cos\alpha sin\beta $$ $$ cos(\alpha +\beta )=cos\alpha cos\beta -sin\alpha sin\beta $$ 由于上述公式，可以将$PE_{pos+k}$表示为$PE_{pos}$的线性组合，即： $$ PE(pos+k,2i)=sin(\frac{pos+k}{10000^{\frac{2i}{d_{model}}}}) $$ $$ =sin(\frac{pos}{10000^{\frac{2i}{d_{model}}}})cos(\frac{k}{10000^{\frac{2i}{d_{model}}}})+cos(\frac{pos}{10000^{\frac{2i}{d_{model}}}})sin(\frac{k}{10000^{\frac{2i}{d_{model}}}}) $$ $$ =PE(pos,2i)\times PE(k,2i+1)+PE(pos,2i+1)\times PE(k,2i) $$ $$ PE(pos+k,2i+1)=cos(\frac{pos+k}{10000^{\frac{2i}{d_{model}}}}) $$ $$ =cos(\frac{pos}{10000^{\frac{2i}{d_{model}}}})cos(\frac{k}{10000^{\frac{2i}{d_{model}}}})-sin(\frac{pos}{10000^{\frac{2i}{d_{model}}}})sin(\frac{k}{10000^{\frac{2i}{d_{model}}}}) $$ $$ =PE(pos,2i+1)\times PE(k,2i+1)-PE(pos,2i)\times PE(k,2i) $$ 借助上述绝对位置的编码公式，可以模型能够学习到相对位置信息。也就是说，如果将$PE_{pos}$和$PE_{pos+k}$相乘，可以得到： $$ PE_{pos}\cdot PE_{pos+k}=\sum_{i=0}^{\frac{d_{model}}{2}-1}sin(w_{i}pos)sin(w_{i}(pos+k))+cos(w_{i}pos)cos(w_{i}(pos+k)) $$ $$ =\sum_{i=0}^{\frac{d_{model}}{2}-1}cos(w_{i}(pos-(pos+k))) $$ $$ =\sum_{i=0}^{\frac{d_{model}}{2}-1}cos(w_{i}k) $$ 其中，$w_{i}=\frac{1}{10000^{\frac{2i}{d_{model}}}}$，从最后结果可以看出，唯一影响结果的就是$k$，并且，如果两个token的距离越大，也就是$k$越大，根据余弦函数的性质可以知道，两个位置的相乘结果越小。这样可以得到，如果两个token距离越远则乘积的结果越小。</description>
+    </item>
+    
+    <item>
+      <title>图像分割经典论文总结</title>
+      <link>https://gdy0924.github.io/posts/%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%BB%8F%E5%85%B8%E8%AE%BA%E6%96%87%E6%80%BB%E7%BB%93/</link>
+      <pubDate>Mon, 25 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%BB%8F%E5%85%B8%E8%AE%BA%E6%96%87%E6%80%BB%E7%BB%93/</guid>
+      <description>参考链接：超像素、语义分割、实例分割、全景分割 傻傻分不清？
+分类 superpixels（超像素）  超像素是一系列像素的集合，这些像素具有类似的颜色、纹理等特征，距离也比较近。用超像素对一张图片进行分割的结果见下图，其中每个白色线条区域内的像素集合就是一个超像素。需要注意的是，超像素很可能把同一个物体的不同部分分成多个超像素。 Semantic Segmentation（语义分割）  语义分割还就是把图像中每个像素赋予一个类别标签（比如汽车、建筑、地面、天空等），如下图所示，把图像分为了草地（浅绿）、人（红色）、树木（深绿）、天空（蓝色）等标签，用不同的颜色来表示。但是该方式存在一些问题，比如如果一个像素被标记为红色，那就代表这个像素所在的位置是一个人，但是如果有两个都是红色的像素，这种方式无法判断它们是属于同一个人还是不同的人，即语义分割只能判断类别，无法区分个体。 Instance Segmentation（实例分割）  实例分割有点类似于物体检测，不过物体检测一般输出的是 bounding box，而实例分割输出的是一个mask。实例分割和语义分割也不同，它不需要对每个像素进行标记，它只需要找到感兴趣物体的边缘轮廓就行，比如下图中的人就是感兴趣的物体。该图的分割方法采用了一种称为Mask R-CNN的方法。我们可以看到每个人都是不同的颜色的轮廓，因此我们可以区分出单个个体。 Panoptic Segmentation（全景分割）  全景分割是语义分割和实例分割的结合。如下图所示，每个像素都被分为一类，如果一种类别里有多个实例，会用不同的颜色进行区分，我们可以知道哪个像素属于哪个类中的哪个实例。比如下图中黄色和红色都属于人这一个类别里，但是分别属于不同的实例（人），因此我们可以通过mask的颜色很容易分辨出不同的实例。 经典网络 语义分割： FCN：Fully Convolution Networks
+U-NET：U-Net: Convolutional Networks for Biomedical Image Segmentation
+SegNet：A Deep Convolutional Encoder-Decoder Architecture for Image Segmentation
+PSPNet：PSPNet: Pyramid Scene Parsing Network
+DeepLab：
+v1：Semantic Image Segmentation with deep convolutional nets and fully connected CRFs
+v2：DeepLab: Semantic Image Segmentation with Deep Convolutional Nets, Atrous Convolution, and Fully Connected CRFs</description>
+    </item>
+    
     <item>
       <title>R-CNN系列简单总结</title>
       <link>https://gdy0924.github.io/posts/r-cnn%E7%B3%BB%E5%88%97%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93/</link>

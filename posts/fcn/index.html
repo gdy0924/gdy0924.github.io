@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/fcn/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/fcn/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "FCN",
+      "headline" : "FCN",
+      "description" : "FCN：Fully Convolutional Networks for Semantic Segmentation\n原文链接：FCN\nAbstract  卷积网络是一种能够产生特征层次结构的视觉模型，我们证明了通过卷积网络，经过端到端的训练，其性能超过了语义分割领域最先进的方法。建立一个“全卷积”网络，该网络可以接受任意大小的输入，并通过有效的推理和学习产生相应大小的输出。我们定义并详细描述了全卷积网络的结构，并与之前的模型建立了联系。我们将目前的分类网络（AlexNet，VGGnet和GoogLeNe）修改为全卷积网络，并通过微调将其学习到的表示转移到分割任务中。然后，形成了一种新的架构，它将深层、粗层的语义信息与浅层的信息结合起来，以产生准确和详细的分割。\nIntroduction  卷积网络正在推动图像识别技术的进步，起不仅在图像分类方面得到了改进，而且在具有结构化输出的任务上也取得了进展，包括bounding-box目标检测、部分和关键点的预测等。在从粗略推理到精细推理的过程中，很自然的下一步是对每个像素进行预测。先前的方法使用卷积网络进行语义分割，其中每个像素都标记其封闭对象或区域的类别，但这项工作有缺点。\n我们提出了一个全卷积网络(FCN)，端到端进行训练，实现像素到像素的语义分割。据我们所知，这是第一个端到端的训练FCNs：（1）进行像素级预测，（2）来自监督预训练。现有网络的全卷积版本可以预测来自任意大小的输入的密集输出。通过前馈计算和反向传播对全图像进行学习和推理，网络内的上采样层能够在具有下采样池的网络中进行像素级预测和学习。\n语义分割面临着语义和位置之间的内在紧张关系：全局信息解决了什么这一问题，而局部信息解决了在哪里这一问题。深度特征层次结构在一个局部-全局的金字塔结构中联合编码位置和语义信息，我们定义了一种新的“skip”结构，将深、粗的语义信息和浅、细的位置信息结合起来（）。\nRelated work  我们的方法利用了深度图像分类网络和迁移学习。首先是在各种视觉识别任务上进行转移，然后在目标检测领域，以及在混合分类器模型的实例和语义分割上。我们现在重新设计并微调分类网络，以实现语义分割。\nFully convolutional networks Dense prediction with convnets  最近的一些工作已经将卷积网络应用于密集的预测问题，这些方法的共同之处在于：限制和感受野的小模型，逐patch训练，通过超像素投影、随机场正则化、过滤或局部分类，由OverFeat引入用于密集输出的输入移位和输出交错，多尺度金字塔处理，tanh非线性激活。与这些现有的方法不同，我们采用和扩展了深度分类网络架构，使用图像分类作为有监督的预训练，并进行全卷积的微调，以简单有效地从整个图像输入和整个图像ground truth中学习。\nFully convolutional networks  卷积网络中的每一层都是一个大小为$h×w×d$的三维数组，其中$w$和$h$是空间维度，$d$是特征维度（通道数）。卷积神经是建立在平移不变性之上的，它们的基本组件（卷积、池化和激活函数）作用于局部输入区域，并且只依赖于相对的空间坐标。如果将某一层中位置$(x,y)$的数据向量表示为$x_{ij}$，$y_{ij}$为下一层的数据，其计算公式为： $$ y_{ij}=f_{ks}(\\lbrace x_{si\u002b\\delta i,sj\u002b\\delta j} \\rbrace _ {0\\leq \\delta i,0\\leq \\delta j}) $$ 其中，$k$为卷积核大小，$s$为步长，$f_{ks}$定义了层的类型，卷积或平均池化的矩阵乘法，最大池化，或激活函数等等。\n接下来，我们将解释如何将分类网转换为生成粗略特征图的全卷积网络。对于像素级预测，我们需要将这些粗略输出连接回像素。\nAdapting classifiers for dense prediction  典型的识别网络，包括LeNet、AlexNet及其后续的网络，接受固定大小的输入并产生输出。这些网络的全连接层具有固定的尺寸，放弃空间坐标。然而，这些全连接层也可以被视为：与覆盖其整个输入区域的内核进行的卷积操作（即卷积大小为整个输入大小）。这样做可以将它们转换成完全卷积的网络，以接受任何大小的输入和输出，如下图所示，得到的最终特征图就相当于对特定输入patch的预测 卷积模型的空间输出图使其可以实现语义分割等密集预测的任务，在每个输出单元上都有ground truth，前向和后向传播都是简单的，并且两者都利用了卷积固有的计算效率。\n虽然我们将分类网络重新修改为全卷积网络，从而可以将任何大小的输入生成输出特征图，但输出维度通常通过下采样实现减少。分类网络的下采样是为了保持卷积核小和计算量的合理性，这使得分类网络的全卷积版本的输出非常粗糙。\nUpsampling is backwards strided convolution  另一种连接粗略输出到密集像素的方法是插值。例如，简单的双线性插值通过计算距离最近的四个输入的线性映射得到每一个输出$y_{ij}$，该映射只依赖于输入和输出单元的相对位置。在某种意义上，采样因子为$f$的上采样与步长为$\\frac{1}{f}$的卷积相同，只要$f$是整数，那么上采样方法就是输出步长为$f$的backwards convolution（有时称为deconvolution）。因此，可以在网络内进行反向传播，以实现端到端学习。deconvolution层的卷积核是不需要固定的（例如，双线性上采样），是可以学习的。在我们的实验中，发现网络中的上采样对于学习密集预测是快速和有效的。\nSegmentation Architecture  我们将ILSVRC分类器转换成FCNs，并通过上采样和像素级损失进行密集预测。我们通过微调来训练分割。接下来，我们引入了一个新的”skip“架构，它结合了粗略的、语义的信息和局部的信息来重新细化预测。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-04-25 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-04-25 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/fcn\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>FCN</title>
+  <meta property="og:title" content="FCN" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="FCN：Fully Convolutional Networks for Semantic Segmentation
+原文链接：FCN
+Abstract  卷积网络是一种能够产生特征层次结构的视觉模型，我们证明了通过卷积网络，经过端到端的训练，其性能超过了语义分割领域最先进的方法。建立一个“全卷积”网络，该网络可以接受任意大小的输入，并通过有效的推理和学习产生相应大小的输出。我们定义并详细描述了全卷积网络的结构，并与之前的模型建立了联系。我们将目前的分类网络（AlexNet，VGGnet和GoogLeNe）修改为全卷积网络，并通过微调将其学习到的表示转移到分割任务中。然后，形成了一种新的架构，它将深层、粗层的语义信息与浅层的信息结合起来，以产生准确和详细的分割。
+Introduction  卷积网络正在推动图像识别技术的进步，起不仅在图像分类方面得到了改进，而且在具有结构化输出的任务上也取得了进展，包括bounding-box目标检测、部分和关键点的预测等。在从粗略推理到精细推理的过程中，很自然的下一步是对每个像素进行预测。先前的方法使用卷积网络进行语义分割，其中每个像素都标记其封闭对象或区域的类别，但这项工作有缺点。
+我们提出了一个全卷积网络(FCN)，端到端进行训练，实现像素到像素的语义分割。据我们所知，这是第一个端到端的训练FCNs：（1）进行像素级预测，（2）来自监督预训练。现有网络的全卷积版本可以预测来自任意大小的输入的密集输出。通过前馈计算和反向传播对全图像进行学习和推理，网络内的上采样层能够在具有下采样池的网络中进行像素级预测和学习。
+语义分割面临着语义和位置之间的内在紧张关系：全局信息解决了什么这一问题，而局部信息解决了在哪里这一问题。深度特征层次结构在一个局部-全局的金字塔结构中联合编码位置和语义信息，我们定义了一种新的“skip”结构，将深、粗的语义信息和浅、细的位置信息结合起来（）。
+Related work  我们的方法利用了深度图像分类网络和迁移学习。首先是在各种视觉识别任务上进行转移，然后在目标检测领域，以及在混合分类器模型的实例和语义分割上。我们现在重新设计并微调分类网络，以实现语义分割。
+Fully convolutional networks Dense prediction with convnets  最近的一些工作已经将卷积网络应用于密集的预测问题，这些方法的共同之处在于：限制和感受野的小模型，逐patch训练，通过超像素投影、随机场正则化、过滤或局部分类，由OverFeat引入用于密集输出的输入移位和输出交错，多尺度金字塔处理，tanh非线性激活。与这些现有的方法不同，我们采用和扩展了深度分类网络架构，使用图像分类作为有监督的预训练，并进行全卷积的微调，以简单有效地从整个图像输入和整个图像ground truth中学习。
+Fully convolutional networks  卷积网络中的每一层都是一个大小为$h×w×d$的三维数组，其中$w$和$h$是空间维度，$d$是特征维度（通道数）。卷积神经是建立在平移不变性之上的，它们的基本组件（卷积、池化和激活函数）作用于局部输入区域，并且只依赖于相对的空间坐标。如果将某一层中位置$(x,y)$的数据向量表示为$x_{ij}$，$y_{ij}$为下一层的数据，其计算公式为： $$ y_{ij}=f_{ks}(\lbrace x_{si&#43;\delta i,sj&#43;\delta j} \rbrace _ {0\leq \delta i,0\leq \delta j}) $$ 其中，$k$为卷积核大小，$s$为步长，$f_{ks}$定义了层的类型，卷积或平均池化的矩阵乘法，最大池化，或激活函数等等。
+接下来，我们将解释如何将分类网转换为生成粗略特征图的全卷积网络。对于像素级预测，我们需要将这些粗略输出连接回像素。
+Adapting classifiers for dense prediction  典型的识别网络，包括LeNet、AlexNet及其后续的网络，接受固定大小的输入并产生输出。这些网络的全连接层具有固定的尺寸，放弃空间坐标。然而，这些全连接层也可以被视为：与覆盖其整个输入区域的内核进行的卷积操作（即卷积大小为整个输入大小）。这样做可以将它们转换成完全卷积的网络，以接受任何大小的输入和输出，如下图所示，得到的最终特征图就相当于对特定输入patch的预测 卷积模型的空间输出图使其可以实现语义分割等密集预测的任务，在每个输出单元上都有ground truth，前向和后向传播都是简单的，并且两者都利用了卷积固有的计算效率。
+虽然我们将分类网络重新修改为全卷积网络，从而可以将任何大小的输入生成输出特征图，但输出维度通常通过下采样实现减少。分类网络的下采样是为了保持卷积核小和计算量的合理性，这使得分类网络的全卷积版本的输出非常粗糙。
+Upsampling is backwards strided convolution  另一种连接粗略输出到密集像素的方法是插值。例如，简单的双线性插值通过计算距离最近的四个输入的线性映射得到每一个输出$y_{ij}$，该映射只依赖于输入和输出单元的相对位置。在某种意义上，采样因子为$f$的上采样与步长为$\frac{1}{f}$的卷积相同，只要$f$是整数，那么上采样方法就是输出步长为$f$的backwards convolution（有时称为deconvolution）。因此，可以在网络内进行反向传播，以实现端到端学习。deconvolution层的卷积核是不需要固定的（例如，双线性上采样），是可以学习的。在我们的实验中，发现网络中的上采样对于学习密集预测是快速和有效的。
+Segmentation Architecture  我们将ILSVRC分类器转换成FCNs，并通过上采样和像素级损失进行密集预测。我们通过微调来训练分割。接下来，我们引入了一个新的”skip“架构，它结合了粗略的、语义的信息和局部的信息来重新细化预测。" />
+  <meta name="description" content="FCN：Fully Convolutional Networks for Semantic Segmentation
+原文链接：FCN
+Abstract  卷积网络是一种能够产生特征层次结构的视觉模型，我们证明了通过卷积网络，经过端到端的训练，其性能超过了语义分割领域最先进的方法。建立一个“全卷积”网络，该网络可以接受任意大小的输入，并通过有效的推理和学习产生相应大小的输出。我们定义并详细描述了全卷积网络的结构，并与之前的模型建立了联系。我们将目前的分类网络（AlexNet，VGGnet和GoogLeNe）修改为全卷积网络，并通过微调将其学习到的表示转移到分割任务中。然后，形成了一种新的架构，它将深层、粗层的语义信息与浅层的信息结合起来，以产生准确和详细的分割。
+Introduction  卷积网络正在推动图像识别技术的进步，起不仅在图像分类方面得到了改进，而且在具有结构化输出的任务上也取得了进展，包括bounding-box目标检测、部分和关键点的预测等。在从粗略推理到精细推理的过程中，很自然的下一步是对每个像素进行预测。先前的方法使用卷积网络进行语义分割，其中每个像素都标记其封闭对象或区域的类别，但这项工作有缺点。
+我们提出了一个全卷积网络(FCN)，端到端进行训练，实现像素到像素的语义分割。据我们所知，这是第一个端到端的训练FCNs：（1）进行像素级预测，（2）来自监督预训练。现有网络的全卷积版本可以预测来自任意大小的输入的密集输出。通过前馈计算和反向传播对全图像进行学习和推理，网络内的上采样层能够在具有下采样池的网络中进行像素级预测和学习。
+语义分割面临着语义和位置之间的内在紧张关系：全局信息解决了什么这一问题，而局部信息解决了在哪里这一问题。深度特征层次结构在一个局部-全局的金字塔结构中联合编码位置和语义信息，我们定义了一种新的“skip”结构，将深、粗的语义信息和浅、细的位置信息结合起来（）。
+Related work  我们的方法利用了深度图像分类网络和迁移学习。首先是在各种视觉识别任务上进行转移，然后在目标检测领域，以及在混合分类器模型的实例和语义分割上。我们现在重新设计并微调分类网络，以实现语义分割。
+Fully convolutional networks Dense prediction with convnets  最近的一些工作已经将卷积网络应用于密集的预测问题，这些方法的共同之处在于：限制和感受野的小模型，逐patch训练，通过超像素投影、随机场正则化、过滤或局部分类，由OverFeat引入用于密集输出的输入移位和输出交错，多尺度金字塔处理，tanh非线性激活。与这些现有的方法不同，我们采用和扩展了深度分类网络架构，使用图像分类作为有监督的预训练，并进行全卷积的微调，以简单有效地从整个图像输入和整个图像ground truth中学习。
+Fully convolutional networks  卷积网络中的每一层都是一个大小为$h×w×d$的三维数组，其中$w$和$h$是空间维度，$d$是特征维度（通道数）。卷积神经是建立在平移不变性之上的，它们的基本组件（卷积、池化和激活函数）作用于局部输入区域，并且只依赖于相对的空间坐标。如果将某一层中位置$(x,y)$的数据向量表示为$x_{ij}$，$y_{ij}$为下一层的数据，其计算公式为： $$ y_{ij}=f_{ks}(\lbrace x_{si&#43;\delta i,sj&#43;\delta j} \rbrace _ {0\leq \delta i,0\leq \delta j}) $$ 其中，$k$为卷积核大小，$s$为步长，$f_{ks}$定义了层的类型，卷积或平均池化的矩阵乘法，最大池化，或激活函数等等。
+接下来，我们将解释如何将分类网转换为生成粗略特征图的全卷积网络。对于像素级预测，我们需要将这些粗略输出连接回像素。
+Adapting classifiers for dense prediction  典型的识别网络，包括LeNet、AlexNet及其后续的网络，接受固定大小的输入并产生输出。这些网络的全连接层具有固定的尺寸，放弃空间坐标。然而，这些全连接层也可以被视为：与覆盖其整个输入区域的内核进行的卷积操作（即卷积大小为整个输入大小）。这样做可以将它们转换成完全卷积的网络，以接受任何大小的输入和输出，如下图所示，得到的最终特征图就相当于对特定输入patch的预测 卷积模型的空间输出图使其可以实现语义分割等密集预测的任务，在每个输出单元上都有ground truth，前向和后向传播都是简单的，并且两者都利用了卷积固有的计算效率。
+虽然我们将分类网络重新修改为全卷积网络，从而可以将任何大小的输入生成输出特征图，但输出维度通常通过下采样实现减少。分类网络的下采样是为了保持卷积核小和计算量的合理性，这使得分类网络的全卷积版本的输出非常粗糙。
+Upsampling is backwards strided convolution  另一种连接粗略输出到密集像素的方法是插值。例如，简单的双线性插值通过计算距离最近的四个输入的线性映射得到每一个输出$y_{ij}$，该映射只依赖于输入和输出单元的相对位置。在某种意义上，采样因子为$f$的上采样与步长为$\frac{1}{f}$的卷积相同，只要$f$是整数，那么上采样方法就是输出步长为$f$的backwards convolution（有时称为deconvolution）。因此，可以在网络内进行反向传播，以实现端到端学习。deconvolution层的卷积核是不需要固定的（例如，双线性上采样），是可以学习的。在我们的实验中，发现网络中的上采样对于学习密集预测是快速和有效的。
+Segmentation Architecture  我们将ILSVRC分类器转换成FCNs，并通过上采样和像素级损失进行密集预测。我们通过微调来训练分割。接下来，我们引入了一个新的”skip“架构，它结合了粗略的、语义的信息和局部的信息来重新细化预测。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">FCN</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-04-25 00:00:00 UTC">
+                25 Apr 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>    FCN：Fully Convolutional Networks for Semantic Segmentation<br>
+    原文链接：<a href="https://arxiv.org/pdf/1411.4038.pdf">FCN</a></p>
+<h2 id="abstract">Abstract</h2>
+<p>    卷积网络是一种能够产生特征层次结构的视觉模型，我们证明了通过卷积网络，经过端到端的训练，其性能超过了语义分割领域最先进的方法。建立一个“全卷积”网络，该网络可以接受任意大小的输入，并通过有效的推理和学习产生相应大小的输出。我们定义并详细描述了全卷积网络的结构，并与之前的模型建立了联系。我们将目前的分类网络（AlexNet，VGGnet和GoogLeNe）修改为全卷积网络，并通过微调将其学习到的表示转移到分割任务中。然后，形成了一种新的架构，它将深层、粗层的语义信息与浅层的信息结合起来，以产生准确和详细的分割。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    卷积网络正在推动图像识别技术的进步，起不仅在图像分类方面得到了改进，而且在具有结构化输出的任务上也取得了进展，包括bounding-box目标检测、部分和关键点的预测等。在从粗略推理到精细推理的过程中，很自然的下一步是对每个像素进行预测。先前的方法使用卷积网络进行语义分割，其中每个像素都标记其封闭对象或区域的类别，但这项工作有缺点。<br>
+    我们提出了一个全卷积网络(FCN)，端到端进行训练，实现像素到像素的语义分割。据我们所知，这是第一个端到端的训练FCNs：（1）进行像素级预测，（2）来自监督预训练。现有网络的全卷积版本可以预测来自任意大小的输入的密集输出。通过前馈计算和反向传播对全图像进行学习和推理，网络内的上采样层能够在具有下采样池的网络中进行像素级预测和学习。<br>
+    语义分割面临着语义和位置之间的内在紧张关系：全局信息解决了什么这一问题，而局部信息解决了在哪里这一问题。深度特征层次结构在一个局部-全局的金字塔结构中联合编码位置和语义信息，我们定义了一种新的“skip”结构，将深、粗的语义信息和浅、细的位置信息结合起来（）。</p>
+<h2 id="related-work">Related work</h2>
+<p>    我们的方法利用了深度图像分类网络和迁移学习。首先是在各种视觉识别任务上进行转移，然后在目标检测领域，以及在混合分类器模型的实例和语义分割上。我们现在重新设计并微调分类网络，以实现语义分割。</p>
+<h3 id="fully-convolutional-networks">Fully convolutional networks</h3>
+<h3 id="dense-prediction-with-convnets">Dense prediction with convnets</h3>
+<p>    最近的一些工作已经将卷积网络应用于密集的预测问题，这些方法的共同之处在于：限制和感受野的小模型，逐patch训练，通过超像素投影、随机场正则化、过滤或局部分类，由OverFeat引入用于密集输出的输入移位和输出交错，多尺度金字塔处理，tanh非线性激活。与这些现有的方法不同，我们采用和扩展了深度分类网络架构，使用图像分类作为有监督的预训练，并进行全卷积的微调，以简单有效地从整个图像输入和整个图像ground truth中学习。</p>
+<h2 id="fully-convolutional-networks-1">Fully convolutional networks</h2>
+<p>    卷积网络中的每一层都是一个大小为$h×w×d$的三维数组，其中$w$和$h$是空间维度，$d$是特征维度（通道数）。卷积神经是建立在平移不变性之上的，它们的基本组件（卷积、池化和激活函数）作用于局部输入区域，并且只依赖于相对的空间坐标。如果将某一层中位置$(x,y)$的数据向量表示为$x_{ij}$，$y_{ij}$为下一层的数据，其计算公式为：
+$$
+y_{ij}=f_{ks}(\lbrace x_{si+\delta i,sj+\delta j} \rbrace _ {0\leq \delta i,0\leq \delta j})
+$$
+    其中，$k$为卷积核大小，$s$为步长，$f_{ks}$定义了层的类型，卷积或平均池化的矩阵乘法，最大池化，或激活函数等等。<br>
+    接下来，我们将解释如何将分类网转换为生成粗略特征图的全卷积网络。对于像素级预测，我们需要将这些粗略输出连接回像素。</p>
+<h3 id="adapting-classifiers-for-dense-prediction">Adapting classifiers for dense prediction</h3>
+<p>    典型的识别网络，包括LeNet、AlexNet及其后续的网络，接受固定大小的输入并产生输出。这些网络的全连接层具有固定的尺寸，放弃空间坐标。然而，这些全连接层也可以被视为：与覆盖其整个输入区域的内核进行的卷积操作（即卷积大小为整个输入大小）。这样做可以将它们转换成完全卷积的网络，以接受任何大小的输入和输出，如下图所示，得到的最终特征图就相当于对特定输入patch的预测
+<img src="/img/FCN1.PNG" alt="">
+    卷积模型的空间输出图使其可以实现语义分割等密集预测的任务，在每个输出单元上都有ground truth，前向和后向传播都是简单的，并且两者都利用了卷积固有的计算效率。<br>
+    虽然我们将分类网络重新修改为全卷积网络，从而可以将任何大小的输入生成输出特征图，但输出维度通常通过下采样实现减少。分类网络的下采样是为了保持卷积核小和计算量的合理性，这使得分类网络的全卷积版本的输出非常粗糙。</p>
+<h3 id="upsampling-is-backwards-strided-convolution">Upsampling is backwards strided convolution</h3>
+<p>    另一种连接粗略输出到密集像素的方法是插值。例如，简单的双线性插值通过计算距离最近的四个输入的线性映射得到每一个输出$y_{ij}$，该映射只依赖于输入和输出单元的相对位置。在某种意义上，采样因子为$f$的上采样与步长为$\frac{1}{f}$的卷积相同，只要$f$是整数，那么上采样方法就是输出步长为$f$的backwards convolution（有时称为deconvolution）。因此，可以在网络内进行反向传播，以实现端到端学习。deconvolution层的卷积核是不需要固定的（例如，双线性上采样），是可以学习的。在我们的实验中，发现网络中的上采样对于学习密集预测是快速和有效的。</p>
+<h2 id="segmentation-architecture">Segmentation Architecture</h2>
+<p>    我们将ILSVRC分类器转换成FCNs，并通过上采样和像素级损失进行密集预测。我们通过微调来训练分割。接下来，我们引入了一个新的”skip“架构，它结合了粗略的、语义的信息和局部的信息来重新细化预测。</p>
+<h3 id="from-classifier-to-dense-fcn">From classifier to dense FCN</h3>
+<p>    我们考虑了AlexNet架构，以及VGG网络和GoogLeNet，将其修改为全卷积的网络，在网络末端附加了一个1×1卷积来预测每个位置的每个类别的分数，然后是一个反卷积层对粗略输出到像素密集输出进行上采样。</p>
+<h3 id="combining-what-and-where">Combining what and where</h3>
+<p>    我们定义了一个新的全卷积网络(FCN)，它结合了特征层次，并改进了输出的空间精度，如下图所示。虽然完全卷积化的分类器可以按照之前所说的进行精细的分割，甚至在标准度量上得分很高，但它们的输出结果依旧粗糙，令人不满意。我们通过添加连接来解决这个问题，将最终的预测层与较低的层结合起来。结合浅层和深层，可以让模型实现拥有全局结构的局部预测。
+<img src="/img/FCN2.PNG" alt="">
+（上图：只显示池化层和预测层，中间卷积层被省略；实线(FCN-32s)：最原始的修改模型；虚线(FCN-16s)：结合来自最后一层和pooling4层的预测，在第16步，让我们的网络预测更精细的细节，同时保留高级语义信息；虚线(FCN-8s)：来自polling3的额外预测，在第8步，提供了进一步的精度。）<br>
+    具体的说：FCN-32s就是对最后一层的特征图进行32倍的上采样；FCN-16s是先将最后一层进行一次两倍的上采样，接着与pooling4的特征图进行元素相加，然后相加之后的特征图进行16倍的上采样；FCN-8s是先先将最后一层进行一次两倍的上采样，并与pooling4的特征图进行元素相加，相加的结果再进行一次2倍的上采样，和pooling3的特征图进行元素相加，相加结果进行一次8倍的上采样，得到最终的特征图。</p>
+<h2 id="metrics">Metrics</h2>
+<p><strong>pixel accuracy</strong>：像素精度，$\frac{\sum_{i}n_{ii}}{\sum_{i}t_{i}}$，标记正确的像素占总像素的比例；<br>
+<strong>mean accuraccy</strong>：平均像素精度，$(\frac{1}{n_{cl}})\sum_{i}(\frac{n_{ii}}{t_{i}})$，计算每个类内被正确分类像素数的比例，再进行平均；<br>
+<strong>mean IU</strong>：平均交并比，$(\frac{1}{n_{cl}})\sum_{i}(\frac{n_{ii}}{t_{i}+\sum_{j}n_{ji}-n_{ii}})$，计算ground truth与预测值之间的交并比；<br>
+<strong>frequency weighted IU</strong>：频权交并比，$(\frac{1}{\sum_{k}t_{k}})\sum_{i}(\frac{t_{i}n_{ii}}{t_{i}+\sum_{j}n_{ji}-n_{ii}})$，将每个类出现的频率作为权重。<br>
+其中，$n_{ij}$表示将第$i$类像素预测为第$j$类像素的数量，$n_{cl}$是类别数，$t_{i}=\sum_{j}n_{ij}$是第i类像素的总数。</p>
+<h2 id="train">Train</h2>
+<h3 id="pre-train">pre-train</h3>
+<p>    以经典的分类网络为初始化，最后两级是全连接（红色），参数弃去不用。
+<img src="/img/FCN3.PNG" alt=""></p>
+<h3 id="fine-tuning">Fine-tuning</h3>
+<h4 id="fcn-32s">FCN-32s</h4>
+<p>    从特征小图$(16×16×4096)$预测分割小图$(16×16×21)$，之后直接上采样为大图，反卷积（橙色）的步长为32，这个网络称为FCN-32s，即直接上采样扩大32倍。 
+<img src="/img/FCN4.PNG" alt=""></p>
+<h4 id="fcn-16s">FCN-16s</h4>
+<p>    上采样分为两次完成（橙色×2）。 在第二次上采样前，把第4个pooling层（绿色）的预测结果（蓝色）融合进来。使用跳级结构提升精确性。 第二次反卷积步长为16，这个网络称为FCN-16s。
+<img src="/img/FCN5.PNG" alt=""></p>
+<h4 id="fcn-8s">FCN-8s</h4>
+<p>    上采样分为三次完成（橙色×3）。 进一步融合了第3个pooling层的预测结果。 第三次反卷积步长为8，记为FCN-8s。 
+<img src="/img/FCN6.PNG" alt=""></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>
