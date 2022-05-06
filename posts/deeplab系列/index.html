@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/deeplab%E7%B3%BB%E5%88%97/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/deeplab%E7%B3%BB%E5%88%97/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "DeepLab系列",
+      "headline" : "DeepLab系列",
+      "description" : "V1 SEMANTIC IMAGE SEGMENTATION WITH DEEP CONVOLUTIONAL NETS AND FULLY CONNECTED CRFS 原文链接：DeepLab V1\nAbstract  深度卷积神经网络(DCNNs)最近在视觉任务中显示出了最先进的性能，如图像分类和目标检测。该工作结合了DCNNs和概率图形模型的方法，用于解决像素级分类的任务，即语义分割。我们通过将DCNN的最后一层与一个全连接的条件随机场(CRF)相结合，克服了深度网络的定位能力弱的特性。\nIntroduction  将DCNN应用在语义分割任务中有两个挑战：降采样，空间“不敏感”（不变性）。降采样是指在网络每层重复进行最大池和降采样（步长）导致图像分辨率降低；而通过“空洞”卷积算法，能够有效地密集计算DCNN响应。\n第二个问题是指从分类器获得以对象为中心的预测需要对空间转换的不变性，这限制了DCNN模型的空间准确性。我们通过使用全连接条件随机场(CRF)，提高了模型捕捉细节的能力。在我们的工作中，我们证明了当与基于DCNN的像素级分类器相结合时，它会有最先进的结果。\nDeepLab三个主要优势是：\n（1）速度：利用“空洞卷积”算法；\n（2）精度：我们获得了最先进的结果；\n（3）简单：我们的系统是由两个相当完善的模块组成，DCNNs和CRFs。\nConvolutional Neural Networks For Dense Image Labeling Efficient Dense Sliding Window Feature Extraction With Hole Algorithm 利用空洞卷积算法有效地提取密集滑动窗口特征\n密集的空间结果有助于特征提取器的成功，作为实现这一目标的第一步，我们将VGG-16的全连接层转换为卷积层，并在原始分辨率的图像上以卷积方式运行网络。然而，这是不够的，因为它产生非常稀疏计算的检测结果（步幅为32像素，即下采样32倍）。为了使下采样变为8倍，修改为：删除最后两个max pooling层（或者stride修改为1），由于max pooling的修改，影响了其后的卷积层，使其视野分别下降了 2x 和 4x，为了保持其原来的视野，便将其改成空洞卷积，dilation 分别为 2 和 4，这种方法普遍适用，并允许我们在任何下采样中有效地计算密集的CNN特征映射，而不引入任何其他的参数。\n训练时将预训练的VGG16的权重做fine-tune，损失函数取是输出的特征图与ground truth下采样8倍做交叉熵和；测试时取输出图双线性上采样8倍得到结果。我们使用简单的双线性插值来将最终的特征图的分辨率提高8倍，而计算成本可以忽略不计。FCN网络中没有使用空洞卷积算法，并且在CNN输出处产生非常粗糙的特征图（下采样率为32倍），这迫使他们使用学习的上采样层（转置卷积），显著增加了他们系统的复杂性和训练时间。\nCONTROLLING THE RECEPTIVE FIELD SIZE AND ACCELERATING DENSE COMPUTATION WITH CONVOLUTIONAL NETS 利用空洞卷积控制感受野的大小，加速密集计算\n最近的基于DCNN的图像识别方法依赖于在图像集大规模分类任务上预先训练的网络。这些网络通常具有较大的感受野大小：对于我们考虑的VGG-16网络，它的感受野是224×224（零填充），如果网络被卷积应用，则为404×404像素。在将网络转换为完全卷积层后，第一个全连接层大小为7×7×4096，成为我们密集预测结果的计算瓶颈。\n我们通过对第一个FC层（通过简单的抽取）进行空间下采样到4×4（或3×3）的空间大小来解决这个实际问题。这将网络的感受野减少到128×128（零填充）或308×308（卷积模式），并将第一FC层的计算时间减少了2−3倍。具体来说：给定一个306×306输入图像，它在测试期间以大约8帧\/秒的速度在网络顶部产生39×39密集的原始特征分数。训练期间的速度是3帧\/秒。我们还成功地尝试了将全连接层的通道数从4096个减少到1024个，在不牺牲性能的情况下，大大减少了计算时间和内存占用。\nDetailed Boundary Recovery：Fully-Connected Conditional Random Fields and Multi-Scale Prediction 详细的边界恢复：全连接条件随机场和多尺度预测",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-05-04 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-05-04 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/deeplab%E7%B3%BB%E5%88%97\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>DeepLab系列</title>
+  <meta property="og:title" content="DeepLab系列" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="V1 SEMANTIC IMAGE SEGMENTATION WITH DEEP CONVOLUTIONAL NETS AND FULLY CONNECTED CRFS 原文链接：DeepLab V1
+Abstract  深度卷积神经网络(DCNNs)最近在视觉任务中显示出了最先进的性能，如图像分类和目标检测。该工作结合了DCNNs和概率图形模型的方法，用于解决像素级分类的任务，即语义分割。我们通过将DCNN的最后一层与一个全连接的条件随机场(CRF)相结合，克服了深度网络的定位能力弱的特性。
+Introduction  将DCNN应用在语义分割任务中有两个挑战：降采样，空间“不敏感”（不变性）。降采样是指在网络每层重复进行最大池和降采样（步长）导致图像分辨率降低；而通过“空洞”卷积算法，能够有效地密集计算DCNN响应。
+第二个问题是指从分类器获得以对象为中心的预测需要对空间转换的不变性，这限制了DCNN模型的空间准确性。我们通过使用全连接条件随机场(CRF)，提高了模型捕捉细节的能力。在我们的工作中，我们证明了当与基于DCNN的像素级分类器相结合时，它会有最先进的结果。
+DeepLab三个主要优势是：
+（1）速度：利用“空洞卷积”算法；
+（2）精度：我们获得了最先进的结果；
+（3）简单：我们的系统是由两个相当完善的模块组成，DCNNs和CRFs。
+Convolutional Neural Networks For Dense Image Labeling Efficient Dense Sliding Window Feature Extraction With Hole Algorithm 利用空洞卷积算法有效地提取密集滑动窗口特征
+密集的空间结果有助于特征提取器的成功，作为实现这一目标的第一步，我们将VGG-16的全连接层转换为卷积层，并在原始分辨率的图像上以卷积方式运行网络。然而，这是不够的，因为它产生非常稀疏计算的检测结果（步幅为32像素，即下采样32倍）。为了使下采样变为8倍，修改为：删除最后两个max pooling层（或者stride修改为1），由于max pooling的修改，影响了其后的卷积层，使其视野分别下降了 2x 和 4x，为了保持其原来的视野，便将其改成空洞卷积，dilation 分别为 2 和 4，这种方法普遍适用，并允许我们在任何下采样中有效地计算密集的CNN特征映射，而不引入任何其他的参数。
+训练时将预训练的VGG16的权重做fine-tune，损失函数取是输出的特征图与ground truth下采样8倍做交叉熵和；测试时取输出图双线性上采样8倍得到结果。我们使用简单的双线性插值来将最终的特征图的分辨率提高8倍，而计算成本可以忽略不计。FCN网络中没有使用空洞卷积算法，并且在CNN输出处产生非常粗糙的特征图（下采样率为32倍），这迫使他们使用学习的上采样层（转置卷积），显著增加了他们系统的复杂性和训练时间。
+CONTROLLING THE RECEPTIVE FIELD SIZE AND ACCELERATING DENSE COMPUTATION WITH CONVOLUTIONAL NETS 利用空洞卷积控制感受野的大小，加速密集计算
+最近的基于DCNN的图像识别方法依赖于在图像集大规模分类任务上预先训练的网络。这些网络通常具有较大的感受野大小：对于我们考虑的VGG-16网络，它的感受野是224×224（零填充），如果网络被卷积应用，则为404×404像素。在将网络转换为完全卷积层后，第一个全连接层大小为7×7×4096，成为我们密集预测结果的计算瓶颈。
+我们通过对第一个FC层（通过简单的抽取）进行空间下采样到4×4（或3×3）的空间大小来解决这个实际问题。这将网络的感受野减少到128×128（零填充）或308×308（卷积模式），并将第一FC层的计算时间减少了2−3倍。具体来说：给定一个306×306输入图像，它在测试期间以大约8帧/秒的速度在网络顶部产生39×39密集的原始特征分数。训练期间的速度是3帧/秒。我们还成功地尝试了将全连接层的通道数从4096个减少到1024个，在不牺牲性能的情况下，大大减少了计算时间和内存占用。
+Detailed Boundary Recovery：Fully-Connected Conditional Random Fields and Multi-Scale Prediction 详细的边界恢复：全连接条件随机场和多尺度预测" />
+  <meta name="description" content="V1 SEMANTIC IMAGE SEGMENTATION WITH DEEP CONVOLUTIONAL NETS AND FULLY CONNECTED CRFS 原文链接：DeepLab V1
+Abstract  深度卷积神经网络(DCNNs)最近在视觉任务中显示出了最先进的性能，如图像分类和目标检测。该工作结合了DCNNs和概率图形模型的方法，用于解决像素级分类的任务，即语义分割。我们通过将DCNN的最后一层与一个全连接的条件随机场(CRF)相结合，克服了深度网络的定位能力弱的特性。
+Introduction  将DCNN应用在语义分割任务中有两个挑战：降采样，空间“不敏感”（不变性）。降采样是指在网络每层重复进行最大池和降采样（步长）导致图像分辨率降低；而通过“空洞”卷积算法，能够有效地密集计算DCNN响应。
+第二个问题是指从分类器获得以对象为中心的预测需要对空间转换的不变性，这限制了DCNN模型的空间准确性。我们通过使用全连接条件随机场(CRF)，提高了模型捕捉细节的能力。在我们的工作中，我们证明了当与基于DCNN的像素级分类器相结合时，它会有最先进的结果。
+DeepLab三个主要优势是：
+（1）速度：利用“空洞卷积”算法；
+（2）精度：我们获得了最先进的结果；
+（3）简单：我们的系统是由两个相当完善的模块组成，DCNNs和CRFs。
+Convolutional Neural Networks For Dense Image Labeling Efficient Dense Sliding Window Feature Extraction With Hole Algorithm 利用空洞卷积算法有效地提取密集滑动窗口特征
+密集的空间结果有助于特征提取器的成功，作为实现这一目标的第一步，我们将VGG-16的全连接层转换为卷积层，并在原始分辨率的图像上以卷积方式运行网络。然而，这是不够的，因为它产生非常稀疏计算的检测结果（步幅为32像素，即下采样32倍）。为了使下采样变为8倍，修改为：删除最后两个max pooling层（或者stride修改为1），由于max pooling的修改，影响了其后的卷积层，使其视野分别下降了 2x 和 4x，为了保持其原来的视野，便将其改成空洞卷积，dilation 分别为 2 和 4，这种方法普遍适用，并允许我们在任何下采样中有效地计算密集的CNN特征映射，而不引入任何其他的参数。
+训练时将预训练的VGG16的权重做fine-tune，损失函数取是输出的特征图与ground truth下采样8倍做交叉熵和；测试时取输出图双线性上采样8倍得到结果。我们使用简单的双线性插值来将最终的特征图的分辨率提高8倍，而计算成本可以忽略不计。FCN网络中没有使用空洞卷积算法，并且在CNN输出处产生非常粗糙的特征图（下采样率为32倍），这迫使他们使用学习的上采样层（转置卷积），显著增加了他们系统的复杂性和训练时间。
+CONTROLLING THE RECEPTIVE FIELD SIZE AND ACCELERATING DENSE COMPUTATION WITH CONVOLUTIONAL NETS 利用空洞卷积控制感受野的大小，加速密集计算
+最近的基于DCNN的图像识别方法依赖于在图像集大规模分类任务上预先训练的网络。这些网络通常具有较大的感受野大小：对于我们考虑的VGG-16网络，它的感受野是224×224（零填充），如果网络被卷积应用，则为404×404像素。在将网络转换为完全卷积层后，第一个全连接层大小为7×7×4096，成为我们密集预测结果的计算瓶颈。
+我们通过对第一个FC层（通过简单的抽取）进行空间下采样到4×4（或3×3）的空间大小来解决这个实际问题。这将网络的感受野减少到128×128（零填充）或308×308（卷积模式），并将第一FC层的计算时间减少了2−3倍。具体来说：给定一个306×306输入图像，它在测试期间以大约8帧/秒的速度在网络顶部产生39×39密集的原始特征分数。训练期间的速度是3帧/秒。我们还成功地尝试了将全连接层的通道数从4096个减少到1024个，在不牺牲性能的情况下，大大减少了计算时间和内存占用。
+Detailed Boundary Recovery：Fully-Connected Conditional Random Fields and Multi-Scale Prediction 详细的边界恢复：全连接条件随机场和多尺度预测" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">DeepLab系列</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-05-04 00:00:00 UTC">
+                04 May 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <h1 id="v1">V1</h1>
+<p>SEMANTIC IMAGE SEGMENTATION WITH DEEP CONVOLUTIONAL NETS AND FULLY CONNECTED CRFS
+原文链接：<a href="https://arxiv.org/pdf/1412.7062v3.pdf">DeepLab V1</a></p>
+<h2 id="abstract">Abstract</h2>
+<p>    深度卷积神经网络(DCNNs)最近在视觉任务中显示出了最先进的性能，如图像分类和目标检测。该工作结合了DCNNs和概率图形模型的方法，用于解决像素级分类的任务，即语义分割。我们通过将DCNN的最后一层与一个全连接的条件随机场(CRF)相结合，克服了深度网络的定位能力弱的特性。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    将DCNN应用在语义分割任务中有两个挑战：降采样，空间“不敏感”（不变性）。降采样是指在网络每层重复进行最大池和降采样（步长）导致图像分辨率降低；而通过“空洞”卷积算法，能够有效地密集计算DCNN响应。<br>
+    第二个问题是指从分类器获得以对象为中心的预测需要对空间转换的不变性，这限制了DCNN模型的空间准确性。我们通过使用全连接条件随机场(CRF)，提高了模型捕捉细节的能力。在我们的工作中，我们证明了当与基于DCNN的像素级分类器相结合时，它会有最先进的结果。<br>
+    DeepLab三个主要优势是：<br>
+    （1）速度：利用“空洞卷积”算法；<br>
+    （2）精度：我们获得了最先进的结果；<br>
+    （3）简单：我们的系统是由两个相当完善的模块组成，DCNNs和CRFs。</p>
+<h2 id="convolutional-neural-networks-for-dense-image-labeling">Convolutional Neural Networks For Dense Image Labeling</h2>
+<p><img src="/img/deeplabv1-1.PNG" alt=""></p>
+<h3 id="efficient-dense-sliding-window-feature-extraction-with-hole-algorithm">Efficient Dense Sliding Window Feature Extraction With Hole Algorithm</h3>
+<p>利用空洞卷积算法有效地提取密集滑动窗口特征<br>
+    密集的空间结果有助于特征提取器的成功，作为实现这一目标的第一步，我们将VGG-16的全连接层转换为卷积层，并在原始分辨率的图像上以卷积方式运行网络。然而，这是不够的，因为它产生非常稀疏计算的检测结果（步幅为32像素，即下采样32倍）。为了使下采样变为8倍，修改为：删除最后两个max pooling层（或者stride修改为1），由于max pooling的修改，影响了其后的卷积层，使其视野分别下降了 2x 和 4x，为了保持其原来的视野，便将其改成空洞卷积，dilation 分别为 2 和 4，这种方法普遍适用，并允许我们在任何下采样中有效地计算密集的CNN特征映射，而不引入任何其他的参数。<br>
+    训练时将预训练的VGG16的权重做fine-tune，损失函数取是输出的特征图与ground truth下采样8倍做交叉熵和；测试时取输出图双线性上采样8倍得到结果。我们使用简单的双线性插值来将最终的特征图的分辨率提高8倍，而计算成本可以忽略不计。FCN网络中没有使用空洞卷积算法，并且在CNN输出处产生非常粗糙的特征图（下采样率为32倍），这迫使他们使用学习的上采样层（转置卷积），显著增加了他们系统的复杂性和训练时间。</p>
+<h3 id="controlling-the-receptive-field-size-and-accelerating-dense-computation-with-convolutional-nets">CONTROLLING THE RECEPTIVE FIELD SIZE AND ACCELERATING DENSE COMPUTATION WITH CONVOLUTIONAL NETS</h3>
+<p>利用空洞卷积控制感受野的大小，加速密集计算<br>
+    最近的基于DCNN的图像识别方法依赖于在图像集大规模分类任务上预先训练的网络。这些网络通常具有较大的感受野大小：对于我们考虑的VGG-16网络，它的感受野是224×224（零填充），如果网络被卷积应用，则为404×404像素。在将网络转换为完全卷积层后，第一个全连接层大小为7×7×4096，成为我们密集预测结果的计算瓶颈。<br>
+    我们通过对第一个FC层（通过简单的抽取）进行空间下采样到4×4（或3×3）的空间大小来解决这个实际问题。这将网络的感受野减少到128×128（零填充）或308×308（卷积模式），并将第一FC层的计算时间减少了2−3倍。具体来说：给定一个306×306输入图像，它在测试期间以大约8帧/秒的速度在网络顶部产生39×39密集的原始特征分数。训练期间的速度是3帧/秒。我们还成功地尝试了将全连接层的通道数从4096个减少到1024个，在不牺牲性能的情况下，大大减少了计算时间和内存占用。</p>
+<h2 id="detailed-boundary-recoveryfully-connected-conditional-random-fields-and-multi-scale-prediction">Detailed Boundary Recovery：Fully-Connected Conditional Random Fields and Multi-Scale Prediction</h2>
+<p>详细的边界恢复：全连接条件随机场和多尺度预测</p>
+<h3 id="深度卷积网络和定位方面的挑战">深度卷积网络和定位方面的挑战</h3>
+<p>    DCNN预测图可以可靠地预测图像中物体的存在和粗糙位置，但不太适合精确定位它们的精确轮廓。最近的工作是从两个方向来解决这一定位问题。第一种方法是利用来自卷积网络中的多层信息，以便更好地估计目标边界。第二种方法是采用超像素表示，本质上是将定位任务委托给一个低级别的分割方法。</p>
+<h3 id="全连接条件随机场的精确定位">全连接条件随机场的精确定位</h3>
+<p>    传统上，条件随机场(CRFs)被用于平滑有噪声的分割图。通常，这些模型包含耦合相邻节点的能量项，有利于对空间近端像素的相同标签分配。</p>
+<h3 id="多尺度预测">多尺度预测</h3>
+<p>    根据FCN网络，我们提出了一种多尺度预测方法来提高边界定位精度。具体来说，在输入图像和前四个最大池化层的输出上附加一个两层MLP：第一层：128个3x3卷积核；第二层：128个1x1卷积核，其特征图连接到主网络的最后一层特征图上。因此，输入到softmax层的聚合特征图的通道数为5×128=640个。</p>
+<h2 id="discussion">Discussion</h2>
+<p>    我们的工作结合了深度卷积神经网络和全连接条件随机场，产生了一种新的方法，能够产生语义上准确的预测和详细的分割图，同时计算效率高。</p>
+<h1 id="v2">V2</h1>
+<p>DeepLab: Semantic Image Segmentation with Deep Convolutional Nets, Atrous Convolution,
+and Fully Connected CRFs<br>
+原文链接：<a href="https://arxiv.org/pdf/1606.00915.pdf">DeepLab v2</a></p>
+<h2 id="abstract-1">Abstract</h2>
+<p>    在该工作中，我们解决了用深度学习进行语义图像分割的任务，并做出了三个主要的贡献，实验证明有实质性的实际价值。首先，我们强调上采样卷积，或“空洞卷积”，作为密集预测任务中的强大工具。空洞卷积允许我们明确地控制在深度卷积神经网络中计算特征图的分辨率，还允许我们有效地扩大感受野，以合并更大的上下文，而不增加参数的数量或计算量。其次，我们提出了空间金字塔池(ASPP， atrous spatial pyramid pooling)在多个尺度上对物体进行分割。ASPP以多个采样率和感受野上进行卷积，从而在多个尺度上捕获对象和图像上下文。第三，我们通过结合卷积网络和概率图形模型的方法，改进了对象边界的定位。在卷积网络中，常用的最大池化和下采样组合实现了不变性，但影响了定位精度。我们通过将最终DCNN层与全连接条件随机场(CRF)相结合来克服这一点，以提高定位性能。</p>
+<h2 id="introduction-1">Introduction</h2>
+<p>    我们考虑了卷积网络在语义图像分割中应用的三个挑战：（1）特征分辨率降低；（2）存在不同尺度的多个无图；（3）由于卷积网络的不变性，降低了定位精度。<br>
+    第一个挑战是由于在最初为图像分类任务而设计的连续卷积层上进行的最大池采样和下采样的重复组合造成的。当卷积网络以全卷积方式时，这导致特征图的空间分辨率显著降低。为了克服这一挑战并有效地生成更密集的特征图，我们删除网络的最后几个最大池化层，而在随后的卷积层中利用卷积核进行上采样，从而以更高的采样率计算特征图。卷积核上采样即空洞卷积。在实际应用中，我们通过空洞卷积组合恢复全分辨率特征图，更密集地计算特征映射，然后对原始图像大小进行简单的双线性插值。该方案为在密集预测任务中使用反卷积层提供了一个简单而强大的替代方案。与具有较大滤波器的常规卷积相比，空洞卷积允许我们在不增加参数数量或计算量的情况下有效地扩大感受野。<br>
+    第二个挑战是图像中存在多个尺度的物体造成的。处理这一问题的一个标准方法是将同一图像的重新缩放版本再进行一次卷积，然后聚合特征。我们证明了这种方法确实提高了我们系统的性能，但是以输入图像的多个缩放版本计算所有DCNN层的特征图为代价的。相反，在空间金字塔池的启发下，我们提出了一种计算效率高的方案，即在卷积之前以多个比例重新采样给定的特征层。这相当于使用具有互补的感受野的多个卷积核来探测原始图像，从而在多个尺度上捕获目标和有用的图像上下文。我们没有真正重新采样特征，而是使用多个具有不同采样率的平行卷积层有效地实现了这个映射；我们称提出的技术为“空间金字塔池”(ASPP，atrous spatial pyramid pooling)。<br>
+    第三个挑战是目标中心分类器需要对空间转换的不变性，这限制了DCNN的空间准确性。缓解这一问题的一种方法是，在计算最终的分割结果时，使用skip层从多个网络层中提取特征。我们通过使用全连接条件随机场(CRF)来提高我们的模型捕获细节的能力。<br>
+    如下图所示，深度卷积神经网络进行以下修改：（1）将所有完连接层转换为卷积层，即全卷积网络；（2）通过空洞卷积层提高特征分辨率，使我们对原始图像进行下采样8倍而不是32倍；（3）使用双线性插值对特征图进行8倍的上采样，以达到原始图像的分辨率；（4）将输入输出到一个全连接的CRF，以细化分割结果。
+<img src="/img/deeplabv2-1.PNG" alt="">
+    与原始的DeepLab，有以下改进：（1）可以通过多尺度输入处理或提出的ASPP更好地分割对象；（2）我们采用最先进的ResNet图像分类DCNN，建立了DeepLab的残差网络变体，与基于VGG-16的原始模型相比，获得了更好的语义分割性能。<br>
+    自从这项工作的第一个版本公开以来，语义分割领域取得了巨大的进展。大多数性能好的方法都采用了我们DeepLab系统的一个或两个关键成分：空洞卷积，有效的密集特征提取，并通过全连接的CRF细化边界。</p>
+<h2 id="methods">Methods</h2>
+<h3 id="atrous-convolution-for-dense-feature-extraction-and-field-of-view-enlargement">Atrous Convolution for Dense Feature Extraction and Field-of-View Enlargement</h3>
+<p>空洞卷积用于密集特征提取和扩大感受野<br>
+    卷积网络用于语义分割常用的方法是使用全卷积方式，但是在这些网络的连续层上重复的最大池和下采样组合显著降低了结果特征图的空间分辨率。在最近的卷积网络中，通常将输入图像的分辨率下采样32倍。部分补救方法是使用“反卷积”层，但这需要额外的内存和时间。<br>
+    我们提出使用空洞卷积，该算法允许我们在任何理想的分辨率下计算任何层的特征图。考虑一维信号，输入为$x[i]$，卷积核大小$w[k]$，其中长度为$K$，输出为$y[i]$，那么空洞卷积的公式如下：
+$$
+y[i]=\sum_{k=1}^{K} x[i+r ×k]w[k]
+$$
+    其中，参数$r$对应我们对输入信号进行采样时的步幅，标准的卷积是$r=1$的一种特殊情况，如下图所示：
+<img src="/img/deeplabv2-2.PNG" alt="">
+    我们通过下图中的一个简单例子来说明算法的二维操作：给定一个图像，假设首先有一个降采样操作，将分辨率降低2倍，然后进行卷积。如果我们将所得到的特征图植入到原始图像坐标中，我们就会意识到我们只在1/4的图像位置得到了结果。相反，如果我们将全分辨率图像与一个带空洞的卷积核进行卷积，我们可以计算所有图像位置的结果，其中我们将原始卷积核上采样2倍，并在卷积核之间引入零。虽然有效卷积核的大小增加了，但我们只需要考虑非零卷积的值，因此卷积核的参数的数量和每个位置的操作次数都保持不变。<br>
+    通过网络一路使用这种方法可以让我们在原始图像分辨率下计算特征图，但这样做太昂贵了。我们采用了一种混合方法，实现良好的效率和精度的权衡，使用空洞卷积将计算特征图的密度增加4倍，然后使用双线性插值，以恢复原始图像分辨率下的特征图。在此设置下，双线性插值是足够的，与反卷积方法不同，该方法将图像分类网络转换为密集的特征提取器，而不需要学习任何额外的参数，从而在实践中实现更快的DCNN训练。空洞卷积还允许我们任意放大任何DCNN层的感受野。</p>
+<h3 id="multiscale-image-representations-using-atrous-spatial-pyramid-pooling">Multiscale Image Representations using Atrous Spatial Pyramid Pooling</h3>
+<p>    明确地考虑对象的尺寸大小可以提高DCNN成功处理大型和小对象的能力。<br>
+    我们通过两种方法来处理语义分割中的尺度变化：（1）相当于标准的多尺度处理：我们使用共享相同参数的并行DCNN分支，从多个重新缩放的原始图像版本中提取DCNN特征图。为了得到最终的结果，我们将平行DCNN分支的特征图双向插值到原始图像分辨率，并通过取不同尺度进行融合。多尺度处理显著提高了性能，但代价是对多尺度输入的所有DCNN层的特征图进行计算。（2）灵感来自于的R-CNN空间金字塔池方法的成功，该方法表明，通过对单尺度上提取的卷积特征进行重采样，可以准确有效地分类任意尺度的区域。在该方法中，使用具有不同采样率的多个并行空洞卷积层。对每个采样率提取的特征在不同的分支中进行进一步处理，并进行融合，生成最终结果，如下图所示：
+<img src="/img/deeplabv2-3.PNG" alt=""></p>
+<p><img src="/img/deeplabv2-4.PNG" alt=""></p>
+<h3 id="structured-prediction-with-fully-connected-conditional-random-fields-for-accurate-boundary-recovery">Structured Prediction with Fully-Connected Conditional Random Fields for Accurate Boundary Recovery</h3>
+<p>    与DeepLab V1相同</p>
+<h2 id="实验">实验</h2>
+<h3 id="field-of-view-and-crf">Field of View and CRF</h3>
+<p>    下表展示了感受野大小与CRF的实验结果，通过改变fc6层的卷积核大小的空洞卷积的扩张率r得到的。我们从VGG-16网的直接修改开始，使用原始的7×7卷积核和r=4，该模型在CRF后的性能为67.64%，但相对较慢；通过将卷积核大小降低到4×4，我们已经将模型速度提高到每秒2.9张图像，并且通过改变扩张率，分别设置为r=4和r=8，得到r=8效果更好；最后采用卷积核大小为3×3，更大的扩张率r=12，得到的模型速度更快，参数更少。
+<img src="/img/deeplabv2-5.PNG" alt=""></p>
+<h3 id="atrous-spatial-pyramid-pooling">Atrous Spatial Pyramid Pooling</h3>
+<p>    LargeFOV：基线LargeFOV模型，r=12的单一分支；ASPP-S：有四个分支，具有较小的扩张率(r={2、4、8、12})；ASPP-L：有四个分支和更大的扩张率(r={6、12、18、24})。
+<img src="/img/deeplabv2-6.PNG" alt=""></p>
+<h3 id="deeper-networks-and-multiscale-processing">Deeper Networks and Multiscale Processing</h3>
+<p>    使用ResNet-101网络，而不是VGG网络。其中，MSC指多尺度输入，即分别将图像的不同尺度（0.5，0.75，1）作为输入，并将其融合；COCO指使用COCO预训练模型；Aug指数据增强。
+<img src="/img/deeplabv2-7.PNG" alt=""></p>
+<h3 id="vgg-16-vs-resnet-101">VGG-16 vs. ResNet-101</h3>
+<p>    我们观察到，基于ResNet-101的DeepLab比使用VGG-16在物体边界上提供了更好的分割结果。
+<img src="/img/deeplabv2-8.PNG" alt=""></p>
+<h3 id="comparison-with-other-state-of-art-methods">Comparison with other state-of-art methods</h3>
+<h4 id="pascal-context-dataset">PASCAL-Context dataset</h4>
+<p><img src="/img/deeplabv2-9.PNG" alt=""></p>
+<h4 id="pascal-person-part-dataset">PASCAL-Person-Part dataset</h4>
+<p><img src="/img/deeplabv2-10.PNG" alt=""></p>
+<h4 id="cityscapes-dataset">Cityscapes dataset</h4>
+<p><img src="/img/deeplabv2-11.PNG" alt=""></p>
+<h2 id="conclusion">Conclusion</h2>
+<p>    我们提出的“DeepLab”网络通过使用带有上采样卷积核的“空洞卷积”，将经过图像分类训练的网络重新用于语义分割任务。我们进一步将其扩展到空间金字塔池，编码对象和图像上下文。为了产生语义上准确的预测和沿着对象边界的详细分割图，我们还结合了来自深度卷积神经网络和全条件随机场的思想。</p>
+<h1 id="v3">V3</h1>
+<p>Rethinking Atrous Convolution for Semantic Image Segmentation<br>
+原文链接：<a href="https://arxiv.org/pdf/1706.05587.pdf">DeepLab V3</a></p>
+<h2 id="abstract-2">Abstract</h2>
+<p>    在该工作中，我们重新思考了空洞卷积，其可以显式地调整卷积核的的感受野，并控制由深度卷积神经网络计算的特征图的分辨率。为了解决多尺度分割对象的问题，我们设计了采用级联或并行卷积的模块，采用多尺度扩张率来捕获多尺度上下文。此外，我们提出改进之前提出的空洞空间金字塔池模块，该模块在多个尺度上探测卷积特征，图像级特征编码全局上下文，并进一步提高性能。</p>
+<h2 id="introduction-2">Introduction</h2>
+<p>    语义分割有两个挑战。第一个是连续的池化操作或卷积跨步导致的特征分辨率降低，该问题通过利用空洞卷积来解决；第二个问题是物体的多尺度，我们主要考虑四种方式，如下图所示，第一个是将网络应用于一个图像金字塔，以提取每个尺度输入的特征，其中不同尺度的对象在不同的特征图上变得突出，第二个是编码器-解码器结构，利用编码器部分的多尺度特征，从解码器部分恢复空间分辨率，第三个是额外的模块被级联在原始网络之上，用于捕获远程信息，第四个是空间金字塔池化，通过不同卷积核或以多个扩张率和多个感受野的池化操作来捕捉传入的特征图，从而在多个尺度上捕获对象。
+<img src="/img/deeplabv3-1.PNG" alt="">
+    在该工作中，我们重新应用了空洞卷积，它使我们能够有效地在卷积网络和空间金字塔池化的框架下，扩大卷积核的感受野，以获取多尺度上下文。特别地，我们提出的模块由具有各种扩张率的空洞卷积和批归一化层组成。</p>
+<h2 id="related-work">Related Work</h2>
+<h3 id="image-pyramid">Image pyramid</h3>
+<p>    模型相同，通常具有共享的权重，被应用于多尺度的输入。来自小尺度输入的特征图编码了远程上下文，而大尺度输入保留了小对象的细节。这类模型的主要缺点是，由于有限的GPU内存，它不能很好地扩展到更大/更深的网络中，因此它通常应用于推理阶段。</p>
+<h3 id="encoder-decoder">Encoder-decoder</h3>
+<p>    该模型由两部分组成：（1）编码器，特征图的空间维数逐渐减少，因此更深的编码器输出更容易捕获更长范围的信息；（2）解码器，对象细节和空间维数逐渐恢复。</p>
+<h3 id="context-module">Context module</h3>
+<p>    该模型包含以级联形式排列的额外模块，用于编码远程上下文，一种有效的方法是将DenseCRF合并到卷积网络中。</p>
+<h3 id="spatial-pyramid-pooling">Spatial pyramid pooling</h3>
+<p>    该模型使用空间金字塔池来捕获多个范围内的上下文，DeepLabv2提出了空洞空间金字塔池(ASPP)，其中具有不同扩张率的并行空洞卷积层捕获多尺度信息。</p>
+<h2 id="methods-1">Methods</h2>
+<h3 id="atrous-convolution-for-dense-feature-extraction">Atrous Convolution for Dense Feature Extraction</h3>
+<p>    空洞卷积如下图所示，扩张率r即为在卷积核中插入$r-1$行和列的0元素，标准卷积是$r=1$的一种特殊情况，空洞卷积允许我们通过改变扩张率来自适应地修改卷积核的感受野。
+<img src="/img/deeplabv3-2.PNG" alt="">
+    空洞卷积还允许我们控制在全卷积网络中得到的特征图的尺寸。在这里，我们用output_stride表示输入图像空间分辨率与最终输出分辨率的比值。对于用于图像分类任务的卷积网络，最终的特征图比输入的图像小32倍，因此output_stride=32。如果想要将特征图的尺寸增加一倍（即output_stride=16），则将降低分辨率的最后一个池化或卷积层的步幅设置为1，然后，将所有后续的卷积层替换为扩张率为r=2的空洞卷积层，这允许我们提取分辨率更大的特征图，而不需要学习任何额外的参数。</p>
+<h3 id="going-deeper-with-atrous-convolution">Going Deeper with Atrous Convolution</h3>
+<p>    首先探索在级联中的空洞卷积的模块。具体来说，我们复制了最后一个ResNet块的几个副本，即下图中的block4，并将它们排列为级联。在这些块中有三个3×3卷积，最后一个卷积的stride=2，除了最后一步，其余的类似于原始的ResNet。这个模型背后的动机是，引入的大stride使它很容易在更深的块中捕获远程信息。例如，整个图像特征可以总结在最后一个小分辨率特征图中，如下图中的（a）所示。然而，我们发现连续的跨步对语义分割是有害的，由于细节信息是大量抽取的，因此我们使用由output_stride决定的带扩张率的卷积层，如下图的（b）所示，其中output_stride=16。
+<img src="/img/deeplabv3-3.PNG" alt="">
+    在提出的模型中，我们将block4、block5、block6、block7都如block4一样，使用空洞卷积，如果没有应用空洞卷积，其output_stride=256。</p>
+<h4 id="multi-grid-method">Multi-grid Method</h4>
+<p>    基于多网格方法，采用不同大小的网格层次，在我们提出的模型中，block4到block7采样不同的扩张率。特别地，将从block4到block7内的三个卷积层的单元扩张率定义为$MultiGrid=(r_{1},r_{2},r_{3})$。卷积层的最终扩张率等于单位扩张率（unit rate）和相应扩张率（corresponding rate）相乘。例如，当output_stride=16，并且$MultiGrid=(1,2,4)$时，block4中的三个卷积层的扩张率分别为：$rates=2×(1,2,4)=(2,4,8)$。</p>
+<h3 id="atrous-spatial-pyramid-pooling-1">Atrous Spatial Pyramid Pooling</h3>
+<p>    我们重新讨论在DeepLab V2中提出的空间金字塔池，其中在特征图的顶部应用了四个不同扩张率的空洞卷积。ASPP的灵感来自于空间金字塔池的成功，这表明在不同尺度上重新采样特征是有效的，可以准确有效地对任意尺度的区域进行分类。与DeepLab V2不同，我们在ASPP中加入了Batch Normalization。<br>
+    不同扩张率的ASPP能够有效地捕获多尺度信息。然而，我们发现，随着采样率的增大，有效卷积权值的数量（即应用于有效特征区域的权值，而不是填充零）变小。如下图所示，为在65×65大小的特征图上应用不同扩张率的3×3卷积核，在扩张率接近特征图大小的极端情况下，3×3卷积核不再捕获整个图像得上下文，而是退化为一个简单的1×1卷积，因为只有中心卷积核的权重是有效的。
+<img src="/img/deeplabv3-4.PNG" alt="">
+    具体来说，我们在最后一个特征图上应用全局平均池化，将得到的图像级特征与256个卷积核进行1×1卷积（加入Batch Normalization），然后利用双线性插值法进行上采样，得到预期的空间维度。最后，我们改进的ASPP由两部分组成：（a）当output_stride=16时，使用一个1×1卷积和3个3×3卷积（扩张率为6，12，18），都使用256个卷积核和Batch Normalization；（b）图像级特征，即全局平均池化层。注意，当output_stride=8时，扩张率增大一倍。然后，来自所有分支的结果特征被连接起来，并通过另一个1×1卷积（也有256个过滤器和BN），然后在最后的1×1卷积中生成最终的结果，如上图所示。</p>
+<h2 id="实验-1">实验</h2>
+<h3 id="going-deeper-with-atrous-convolution-1">Going Deeper with Atrous Convolution</h3>
+<p>    如下表所示，实验output_stride的影响，在output_stride=256（即根本没有使用空洞卷积）的情况下，性能比其他的要差得多。当output_stride变大并相应地应用空洞卷积时，性能从20.29%提高到75.18%，这表明在级联构建更多用于语义分割的块时，空洞卷积是必不可少的。
+<img src="/img/deeplabv3-5.PNG" alt=""></p>
+<h3 id="atrous-spatial-pyramid-pooling-2">Atrous Spatial Pyramid Pooling</h3>
+<h4 id="aspp">ASPP</h4>
+<p><img src="/img/deeplabv3-6.PNG" alt=""></p>
+<h4 id="performance-on-pascal-voc-2012-test-set">Performance on PASCAL VOC 2012 test set</h4>
+<p><img src="/img/deeplabv3-7.PNG" alt=""></p>
+<h2 id="conclusion-1">Conclusion</h2>
+<p>    我们提出的模型“DeepLabv3”使用了空洞卷积来提取密集的特征图并捕获远程上下文信息。具体来说，为了编码多尺度信息，我们提出的级联模块逐渐将扩张率加倍，而我们提出的扩张空间金字塔池模块加入了图像级特征，用多采样率和有效的感受野。</p>
+<h1 id="v3-1">V3+</h1>
+<p>Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation<br>
+原文链接：<a href="https://arxiv.org/pdf/1802.02611.pdf">DeepLab V3+</a></p>
+<h2 id="abstract-3">Abstract</h2>
+<p>    空间金字塔池模块和编码器-解码器结构用于深度神经网络进行语义分割任务。前者能够通过多比例的卷积核或多个有效感受野捕捉传入的特征来编码多尺度上下文信息，而后者可以通过逐步恢复空间信息来捕获更清晰的目标边界。在该工作中，我们结合这两种方法的优点。具体来说，我们提出的模型，DeepLabv3+，通过扩展DeepLabv3，添加了一个简单而有效的解码器模块来细化分割结果，特别是对象的边界。我们将深度可分离卷积应用于空洞空间金字塔池化和解码器模块，从而得到一个更快更强的编码器-解码器网络。</p>
+<h2 id="introduction-3">Introduction</h2>
+<p>    在该工作中，我们考虑使用空间金字塔池模块和编码器-解码器结构进行语义分割的神经网络，前者通过汇集不同分辨率的特征来捕获丰富的上下文信息，而后者能够获得清晰的对象边界。<br>
+    为了在多个尺度上捕获上下文信息，DeepLabv3应用了几个不同扩张率的并行空洞卷积（称为空洞空间金字塔池，ASPP），尽管在最后一个特征图中编码了丰富的语义信息，但由于网络主干内的stride操作的池化或卷积，导致与对象边界相关的详细信息缺失。这可以通过使用空洞卷积来提取更密集的特征图来缓解。<br>
+    然而，考虑到最先进的神经网络的设计和有限的GPU内存，提取输出比输入分辨率小8倍甚至4倍的输出特征图是不合适的。以ResNet-101为例，当应用空洞卷积提取比输入分辨率小16倍的输出特征时，最后3个残差块内9层的的特征必须进行扩展。编码器-解码器模型有利于在编码器路径中进行更快的计算（因为没有特征被扩张），并在解码器路径中逐渐恢复目标边界。为了结合这两种方法的优点，我们提出通过合并多尺度上下文信息来丰富编码器-解码器网络中的编码器模块。<br>
+    我们提出的模型，称为DeepLabv3+，通过添加了一个简单而有效的解码器模块，扩展了DeepLabv3来恢复对象边界，如下图所示：丰富的语义信息被编码在DeepLabv3的输出中，通过空洞卷积，可以控制编码器的特征尺寸，解码器模块允许详细的对象边界恢复。
+<img src="/img/deeplabv3+-1.PNG" alt="">
+    由于最近深度分离卷积的成功，我们也探索这个操作应用在语义分割任务带来的速度和精度上的提升，通过应用Xception模块和将空洞可分离卷积应用于ASPP和解码器模块。<br>
+<em><strong>Contributions</strong></em>：<br>
+（1）我们提出了一种新的编码器-解码器结构，它采用DeepLabv3作为一个强大的编码器模块和一个简单而有效的解码器模块；<br>
+（2）在我们的结构中，可以通过空洞卷积来任意控制编码器提取的特征的分辨率，以权衡精度和运行时间；<br>
+（3）我们将Xception模型应用于分割任务，并将深度分离卷积应用于ASPP模块和解码器模块，从而得到更快更强的编码器-解码器网络；<br>
+（4）我们提出的网络在pascalVOC2012和Cityscapes数据集上获得了最先进的性能。</p>
+<h2 id="related-work-1">Related Work</h2>
+<h3 id="spatial-pyramid-pooling-1">Spatial pyramid pooling</h3>
+<p>    如DeepLab V2和DeepLab V3等模型，在多个网格尺度上进行空间金字塔池，或应用多个不同扩张率的并行空洞卷积（称为空洞空间金字塔池，ASPP），通过利用多尺度信息，在几个分割基准上显示出了良好的结果。</p>
+<h3 id="encoder-decoder-1">Encoder-decoder</h3>
+<p>    编码器-解码器网络包含（1）编码器：逐渐缩小特征图并捕获更高的语义信息；（2）解码器：逐渐恢复空间信息。在此基础上，我们提出使用DeepLabv3作为编码器模块，并添加一个简单而有效的解码器模块，以获得更清晰的边界。</p>
+<h3 id="depthwise-separable-convolution">Depthwise separable convolution</h3>
+<p>    深度可分离卷积或组卷积可以降低计算成本和参数的数量，同时保持相似（或稍微更好）的性能，如Xception模块。</p>
+<h2 id="methods-2">Methods</h2>
+<h3 id="encoder-decoder-with-atrous-convolution">Encoder-Decoder with Atrous Convolution</h3>
+<h4 id="atrous-convolution空洞卷积">Atrous convolution空洞卷积</h4>
+<p>$$
+y[i]=\sum_{k=1}^{K} x[i+r ×k]w[k]
+$$
+    与DeepLabV2相同</p>
+<h4 id="depthwise-separable-convolution-1">Depthwise separable convolution</h4>
+<p>    深度可分离卷积，将标准卷积分解为两步：逐通道卷积，逐点卷积（即1×1卷积），大大降低了计算复杂度。具体地说，逐通道卷积对每个输入通道独立地进行卷积，而使用逐点卷积来融合逐通道卷积的输出。如下图所示，我们将逐通道卷积与空洞卷积结合，称为空洞可分离卷积（atrous
+separable convolution），并发现空洞可分离卷积在保持相似（或更好）的计算性能的同时，显著降低了所提模型的计算复杂度。
+<img src="/img/deeplabv3+-2.PNG" alt=""></p>
+<h4 id="deeplabv3-as-encoder">DeepLabv3 as encoder</h4>
+<p>    DeepLabv3采用空洞卷积可以提取任意分辨率的特征图。在这里，我们用output_stride表示输入图像分辨率与最终输出特征图分辨率的比率。对于图像分类任务，最终特征图的分辨率通常比输入图像分辨率小32倍，即output_stride=32。对于语义分割的任务，output_stride=16输出更密集的特征图，通过删除最后一个或两个池化或stride卷积，同时加入空洞卷积（比如：分别使用扩张率r=2和r=4来实现output_stride=8）。<br>
+    此外，DeepLabv3引入了空洞空间金字塔池模块，该模块通过使用不同速率的空洞卷积和图像级特征，在多个尺度上提取特征。我们使用原始的DeepLabv3中的最后一个特征图作为编码器-解码器结构中的编码器输出。其输出特征图包含256个通道和丰富的语义信息。</p>
+<h4 id="proposed-decoder">Proposed decoder</h4>
+<p>    来自DeepLabv3的编码器特征图通常output_stride=16，在DeepLabv3中，这些特征直接被上采样了16倍，这是不合适的，简单的解码器模块可能无法成功地恢复目标分割的细节。因此，我们提出了一个简单而有效的解码器模块，如下图所示：
+<img src="/img/deeplabv3+-3.PNG" alt="">
+    （1）编码器最终特征图首先上采样4倍，然后与网络主干中具有相同分辨率的相应低级特征图连接(例如，在ResNet-101中stride之前的Conv2)；<br>
+    （2）然后使用1×1卷积低层特性图以减少通道的数量，因为相应的低层特性通常包含大量的通道（例如，256或512）可能超过编码器输出特性图的重要性（只有256通道）；<br>
+    （3）在连接之后，我们使用几个3×3卷积来细化特征；<br>
+    （4）使用简单的双线性上采样将特征图的尺寸扩大4倍。<br>
+使用output_stride=16的编码器模块，可以在速度和准确性之间的最佳权衡，当编码器模块使用output_stride=8时，性能略有提高，但代价是额外的计算复杂度。</p>
+<h3 id="modified-aligned-xception">Modified Aligned Xception</h3>
+<p>    Xception模型在ImageNet上以快速的计算能力显示出了很好的图像分类结果；我们将Xception模型应用于语义图像分割任务。具体来说，我们做了一些修改，如下图所示：
+<img src="/img/deeplabv3+-4.PNG" alt="">
+    （1）更深的Xception结构，Middle flow重复16次，原来的是8次；<br>
+    （2）所有的max pooling结构被stride=2的深度可分离卷积代替，这样可以改成空洞卷积；<br>
+    （3）每个3x3的depthwise convolution都跟BN和Relu。</p>
+<h2 id="实验-2">实验</h2>
+<h3 id="decoder-design-choices">Decoder Design Choices</h3>
+<p>    DeepLabv3+将解码器模块添加到编码器输出之上，在解码器模块，我们考虑三个设计选择，（1）1×1卷积用于减少通道；（2）3×3卷积用于获得清晰的分割结果；（3）编码器的低级特征图来源。<br>
+    为了评估解码器模块中1×1卷积的影响，修改不同通道数，其实验结果如下表所示，可以看出将低级特征图的通道减少到48或32，可以获得更好的性能，因此，我们采用[1×1,48]来进行通道减少。
+<img src="/img/deeplabv3+-5.PNG" alt="">
+    我们实验了解码器模块的3×3卷积结构，如下表所示，我们发现，将Conv2特征图（在stride之前）与DeepLabv3的特征图连接，并使用256个卷积核的两个3×3卷积更有效；我们还实验了在解码器模块中同时利用Conv2和Conv3特征图的情况，即解码器输出的特征图先上采样2倍，与Conv3连接，然后再与Conv2连接，每个特征图都将通过[3×3,256]操作进行细化，然而，并没有观察到显著的改善。因此，最后采用：DeepLabv3特征图和通道减少的Conv2特征图的连接，然后通过两个[3×3,256]卷积操作进行细化。注意，我们提出的DeepLabv3+模型的output_stride=4，即最后要对特征图使用双线性上采样4倍，由于有限的GPU资源，我们不去追求更密集的输出特性图，即output_stride小于4。
+<img src="/img/deeplabv3+-6.PNG" alt=""></p>
+<h3 id="backbone">Backbone</h3>
+<p>    下表为ResNet与Xception在ImageNet上预训练之后的结果：
+<img src="/img/deeplabv3+-7.PNG" alt="">
+    下表为将ResNet-101作为Backbone的结果，其中，train OS为训练阶段的output_stride；eval OS为测试阶段的output_stride；Decoder为使用解码器；MS为测试期间使用多尺度输入；Flip为添加左右翻转输入。
+<img src="/img/deeplabv3+-8.PNG" alt="">
+    下表为将Xception作为Backbone的结果，其中，train OS为训练阶段的output_stride；eval OS为测试阶段的output_stride；Decoder为使用解码器；MS为测试期间使用多尺度输入；Flip为添加左右翻转输入；SC为对ASPP模块和解码器模块均采用深度可分离卷积；COCO为使用COCO数据集进行预训练；JFT为用JFT数据集进行预训练。
+<img src="/img/deeplabv3+-9.PNG" alt=""></p>
+<h3 id="xception">Xception</h3>
+<p><img src="/img/deeplabv3+-12.PNG" alt=""></p>
+<h3 id="compete-with-other-state-of-art-models">Compete with other state-of-art models</h3>
+<p><img src="/img/deeplabv3+-10.PNG" alt="">
+<img src="/img/deeplabv3+-11.PNG" alt="">
+    Coarse是指同时使用额外的粗注释的训练集</p>
+<h2 id="conclusion-2">Conclusion</h2>
+<p>    DeepLabv3+采用编码器-解码器结构，其中使用DeepLabv3来编码丰富的上下文信息，并采用了一个简单而有效的解码器模块来恢复对象边界，可以根据可用的计算资源，应用空洞卷积以获得任意分辨率的特征图。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

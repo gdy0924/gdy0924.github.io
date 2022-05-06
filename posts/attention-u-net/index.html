@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/attention-u-net/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/attention-u-net/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "Attention U-Net",
+      "headline" : "Attention U-Net",
+      "description" : "Attention U-Net：Learning Where to Look for the Pancreas\n原文链接：Attention U-Net\nAbstract  我们提出了一种用于医学图像的attention gate（AG）模型，该模型可以自动学习如何关注不同形状和大小的目标对象。使用AGs训练的模型可以隐式的学习在输入图像中抑制不相关的区域，同时突出显示对特定任务有用的显著特征。AGs可以很容易地集成到CNN架构中，如U-Net，以最小的计算开销，同时提高模型的灵敏度和预测精度。\nIntroduction  由于人工、密集地标记大量医学图像是一项繁琐且容易出错的任务，自动医学图像分割在图像分析领域得到了广泛的研究。\n随着卷积神经网络(CNNs)的出现，全卷积网络(FCNs)和U-Net是两种常用的架构。尽管这些结构具有良好的代表性，但当目标器官在形状和大小上表现出较大的差异时，这些结构依赖于多阶段的级联CNN架构。级联框架提取一个感兴趣的区域(ROI)，并对该特定的ROI做出密集的预测。\n然而，这种方法导致了计算资源和模型参数的过度和冗余使用，例如：级联内的所有模型都重复提取类似的低级特征。为了解决这个普遍的问题，我们提出了一个简单而有效的解决方案，即attention gates(AGs)。\n带有AGs的CNN模型可以以类似于FCN模型的训练标准方式从头开始训练，并且AGs自动学习在没有额外监督的情况下关注目标对象。此外，它们不引入显著的计算开销，也不需要像在多模型框架的情况下那样需要大量的模型参数。所提出的AGs通过抑制无关区域的特征，提高了模型对密集标签预测的灵敏度和准确性。这样，就可以在保持高预测精度的同时，消除使用额外定位模型的必要性。\n在本文中，我们提出了一种新的自注意门控模块，可用于语义分割中的密集标签预测。此外，我们还探讨了AGs对医学图像分析的好处，特别是在图像分割的背景下。\nContributions：\n（1）我们提出了基于网格的门控模块，可以使注意力系数更特定于局部区域，与基于全局特征向量的门控模块相比，提高了性能；\n（2）首次在医学图像的CNN中使用Soft Attention，该模块可以替代分类任务中的Hard attention和器官定位任务中的定位模块；\n（3）将U-Net改进为Attention U-Net，增加了模型对前景像素的敏感度，并设计实验证明了这种改进是通用的。\nRelated Work Attention Gates  一般AG会被用在自然图像分析、知识图谱、图像描述、机器翻译和分类任务上。Attention机制最开始是通过解释输出类别分数相对于输入图像的梯度来探索注意力图。可训练的Attention机制根据设计可分为Hard attention和Soft attention。Hard attention主要是由迭代区域候选和区域裁剪，通常是不可微的，因此会使模型很难训练，通常依赖强化学习的其他参数；Soft attention是基于概率的，可以正常反向传播梯度。逐通道的attention可以突出某些维度的特征，效果极好(如SENet)；注意力机制可以消除对外部信息（external gating information）的依赖。\nMethodology Fully Convolutional Network (FCN)  全卷积网络已经成为医学图像的基准模型，如FCN、U-Net、DeepMedic等，其效果要优于传统的方法，主要是由于：SGD优化，卷积核的参数共享、卷积操作很好地捕捉到了医学图像中的结构信息。卷积层通过逐层捕捉局部信息，逐步提取高维图像表示$x^{l}$，最终，最终在高维空间的离散像素会具有语义信息和巨大的感受野。在第$l$层的输出处，依次通过一个线性变换和一个非线性激活函数，得到了特征图$x^{l}$。\n在本文中，我们在一个标准的U-Net架构之上加入注意力模型。U-Net网络的优势主要是与在多个图像尺度上提取图像特征有关。粗粒度的特征图能够捕获上下文信息，并突出显示前景对象的类别和位置。在多个尺度上提取的特征图随后将通过skip连接进行合并，以结合粗粒度级别和细粒度级别的密集预测，如下图所示： Attention Gates for Image Analysis  为了捕获足够大的感受野，从而获取上下文信息，在标准的卷积网络中，特征图的尺寸经过下采样逐渐变小。这样，在粗粒度特征图中的特征才能以全局的尺寸建模位置和关系。但是对于小物体，形变程度大，很难降低false-positive预测。为了提高精度，当前的分割框架依赖于额外的目标定位模型，将任务简化为单独的定位和分割两步骤。其实，通过在一个标准的CNN模型中集成注意门(AGs)来也可以实现。这不需要训练多个模型和大量额外的模型参数，AG会抑制无关背景区域中的特征响应，而无需在网络之间裁剪ROI。\n注意力系数（attention coefficients），$\\alpha_{i}\\in [0,1]$，是为了突出显著的图像区域和抑制任务无关的特征响应，以只保留与特定任务相关的激活，如下图所示。 AGs的输出是输入特征图和注意力系数的元素级相乘（对应元素逐个相乘）：$\\hat{x}_ {i,c}^{l}=x_ {i,c}^{l}\\cdot \\alpha_{i}^{l}$。通常，为每个像素向量$x_{i}^{l}\\in \\mathbb{R}^{F_{l}}$计算一个注意力标量，其中，$F_{l}$对应于第$l$层中特征图的通道数。在多语义标签类中，我们提出使用多维注意力系数。因此，每个AG都学习专注于目标对象的一个子集，如下图所示： 每个像素$i$使用门控向量$g_{i}\\in \\mathbb{R}^{F_{g}}$来决定聚焦区域。门控向量包含上下文信息，以修剪低级特征响应。在本文中，选择使用加法注意力机制，相比于乘法注意力，其效果更好，公式如下： $$ q_{att}^{l}=\\psi^{T}(\\sigma_{1}(W_{x}^{T}x_{i}^{l}\u002bW_{g}^{T}g_{i}\u002bb_{g}))\u002bb_{\\psi} $$ $$ \\alpha_{i}^{l}=\\sigma_{2}(q_{att}^{l}(x_{i}^{l},g_{i};\\Theta_{att})) $$ 其中，$\\sigma_{2}$是sigmoid激活函数，AG由一组参数$\\Theta_{att}$表示，包括：线性变换$W_{x} \\in \\mathbb{R}^{F_{l}\\times F_{int}}$，$W_{g} \\in \\mathbb{R}^{F_{g}\\times F_{int}}$，$\\psi \\in \\mathbb{R}^{F_{int}\\times 1}$和偏置项$b_{\\psi} \\in \\mathbb{R}$，$b_{g} \\in \\mathbb{R}^{F_{int}}$。线性变换是通过1x1卷积来实现的。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-05-05 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-05-05 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/attention-u-net\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>Attention U-Net</title>
+  <meta property="og:title" content="Attention U-Net" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="Attention U-Net：Learning Where to Look for the Pancreas
+原文链接：Attention U-Net
+Abstract  我们提出了一种用于医学图像的attention gate（AG）模型，该模型可以自动学习如何关注不同形状和大小的目标对象。使用AGs训练的模型可以隐式的学习在输入图像中抑制不相关的区域，同时突出显示对特定任务有用的显著特征。AGs可以很容易地集成到CNN架构中，如U-Net，以最小的计算开销，同时提高模型的灵敏度和预测精度。
+Introduction  由于人工、密集地标记大量医学图像是一项繁琐且容易出错的任务，自动医学图像分割在图像分析领域得到了广泛的研究。
+随着卷积神经网络(CNNs)的出现，全卷积网络(FCNs)和U-Net是两种常用的架构。尽管这些结构具有良好的代表性，但当目标器官在形状和大小上表现出较大的差异时，这些结构依赖于多阶段的级联CNN架构。级联框架提取一个感兴趣的区域(ROI)，并对该特定的ROI做出密集的预测。
+然而，这种方法导致了计算资源和模型参数的过度和冗余使用，例如：级联内的所有模型都重复提取类似的低级特征。为了解决这个普遍的问题，我们提出了一个简单而有效的解决方案，即attention gates(AGs)。
+带有AGs的CNN模型可以以类似于FCN模型的训练标准方式从头开始训练，并且AGs自动学习在没有额外监督的情况下关注目标对象。此外，它们不引入显著的计算开销，也不需要像在多模型框架的情况下那样需要大量的模型参数。所提出的AGs通过抑制无关区域的特征，提高了模型对密集标签预测的灵敏度和准确性。这样，就可以在保持高预测精度的同时，消除使用额外定位模型的必要性。
+在本文中，我们提出了一种新的自注意门控模块，可用于语义分割中的密集标签预测。此外，我们还探讨了AGs对医学图像分析的好处，特别是在图像分割的背景下。
+Contributions：
+（1）我们提出了基于网格的门控模块，可以使注意力系数更特定于局部区域，与基于全局特征向量的门控模块相比，提高了性能；
+（2）首次在医学图像的CNN中使用Soft Attention，该模块可以替代分类任务中的Hard attention和器官定位任务中的定位模块；
+（3）将U-Net改进为Attention U-Net，增加了模型对前景像素的敏感度，并设计实验证明了这种改进是通用的。
+Related Work Attention Gates  一般AG会被用在自然图像分析、知识图谱、图像描述、机器翻译和分类任务上。Attention机制最开始是通过解释输出类别分数相对于输入图像的梯度来探索注意力图。可训练的Attention机制根据设计可分为Hard attention和Soft attention。Hard attention主要是由迭代区域候选和区域裁剪，通常是不可微的，因此会使模型很难训练，通常依赖强化学习的其他参数；Soft attention是基于概率的，可以正常反向传播梯度。逐通道的attention可以突出某些维度的特征，效果极好(如SENet)；注意力机制可以消除对外部信息（external gating information）的依赖。
+Methodology Fully Convolutional Network (FCN)  全卷积网络已经成为医学图像的基准模型，如FCN、U-Net、DeepMedic等，其效果要优于传统的方法，主要是由于：SGD优化，卷积核的参数共享、卷积操作很好地捕捉到了医学图像中的结构信息。卷积层通过逐层捕捉局部信息，逐步提取高维图像表示$x^{l}$，最终，最终在高维空间的离散像素会具有语义信息和巨大的感受野。在第$l$层的输出处，依次通过一个线性变换和一个非线性激活函数，得到了特征图$x^{l}$。
+在本文中，我们在一个标准的U-Net架构之上加入注意力模型。U-Net网络的优势主要是与在多个图像尺度上提取图像特征有关。粗粒度的特征图能够捕获上下文信息，并突出显示前景对象的类别和位置。在多个尺度上提取的特征图随后将通过skip连接进行合并，以结合粗粒度级别和细粒度级别的密集预测，如下图所示： Attention Gates for Image Analysis  为了捕获足够大的感受野，从而获取上下文信息，在标准的卷积网络中，特征图的尺寸经过下采样逐渐变小。这样，在粗粒度特征图中的特征才能以全局的尺寸建模位置和关系。但是对于小物体，形变程度大，很难降低false-positive预测。为了提高精度，当前的分割框架依赖于额外的目标定位模型，将任务简化为单独的定位和分割两步骤。其实，通过在一个标准的CNN模型中集成注意门(AGs)来也可以实现。这不需要训练多个模型和大量额外的模型参数，AG会抑制无关背景区域中的特征响应，而无需在网络之间裁剪ROI。
+注意力系数（attention coefficients），$\alpha_{i}\in [0,1]$，是为了突出显著的图像区域和抑制任务无关的特征响应，以只保留与特定任务相关的激活，如下图所示。 AGs的输出是输入特征图和注意力系数的元素级相乘（对应元素逐个相乘）：$\hat{x}_ {i,c}^{l}=x_ {i,c}^{l}\cdot \alpha_{i}^{l}$。通常，为每个像素向量$x_{i}^{l}\in \mathbb{R}^{F_{l}}$计算一个注意力标量，其中，$F_{l}$对应于第$l$层中特征图的通道数。在多语义标签类中，我们提出使用多维注意力系数。因此，每个AG都学习专注于目标对象的一个子集，如下图所示： 每个像素$i$使用门控向量$g_{i}\in \mathbb{R}^{F_{g}}$来决定聚焦区域。门控向量包含上下文信息，以修剪低级特征响应。在本文中，选择使用加法注意力机制，相比于乘法注意力，其效果更好，公式如下： $$ q_{att}^{l}=\psi^{T}(\sigma_{1}(W_{x}^{T}x_{i}^{l}&#43;W_{g}^{T}g_{i}&#43;b_{g}))&#43;b_{\psi} $$ $$ \alpha_{i}^{l}=\sigma_{2}(q_{att}^{l}(x_{i}^{l},g_{i};\Theta_{att})) $$ 其中，$\sigma_{2}$是sigmoid激活函数，AG由一组参数$\Theta_{att}$表示，包括：线性变换$W_{x} \in \mathbb{R}^{F_{l}\times F_{int}}$，$W_{g} \in \mathbb{R}^{F_{g}\times F_{int}}$，$\psi \in \mathbb{R}^{F_{int}\times 1}$和偏置项$b_{\psi} \in \mathbb{R}$，$b_{g} \in \mathbb{R}^{F_{int}}$。线性变换是通过1x1卷积来实现的。" />
+  <meta name="description" content="Attention U-Net：Learning Where to Look for the Pancreas
+原文链接：Attention U-Net
+Abstract  我们提出了一种用于医学图像的attention gate（AG）模型，该模型可以自动学习如何关注不同形状和大小的目标对象。使用AGs训练的模型可以隐式的学习在输入图像中抑制不相关的区域，同时突出显示对特定任务有用的显著特征。AGs可以很容易地集成到CNN架构中，如U-Net，以最小的计算开销，同时提高模型的灵敏度和预测精度。
+Introduction  由于人工、密集地标记大量医学图像是一项繁琐且容易出错的任务，自动医学图像分割在图像分析领域得到了广泛的研究。
+随着卷积神经网络(CNNs)的出现，全卷积网络(FCNs)和U-Net是两种常用的架构。尽管这些结构具有良好的代表性，但当目标器官在形状和大小上表现出较大的差异时，这些结构依赖于多阶段的级联CNN架构。级联框架提取一个感兴趣的区域(ROI)，并对该特定的ROI做出密集的预测。
+然而，这种方法导致了计算资源和模型参数的过度和冗余使用，例如：级联内的所有模型都重复提取类似的低级特征。为了解决这个普遍的问题，我们提出了一个简单而有效的解决方案，即attention gates(AGs)。
+带有AGs的CNN模型可以以类似于FCN模型的训练标准方式从头开始训练，并且AGs自动学习在没有额外监督的情况下关注目标对象。此外，它们不引入显著的计算开销，也不需要像在多模型框架的情况下那样需要大量的模型参数。所提出的AGs通过抑制无关区域的特征，提高了模型对密集标签预测的灵敏度和准确性。这样，就可以在保持高预测精度的同时，消除使用额外定位模型的必要性。
+在本文中，我们提出了一种新的自注意门控模块，可用于语义分割中的密集标签预测。此外，我们还探讨了AGs对医学图像分析的好处，特别是在图像分割的背景下。
+Contributions：
+（1）我们提出了基于网格的门控模块，可以使注意力系数更特定于局部区域，与基于全局特征向量的门控模块相比，提高了性能；
+（2）首次在医学图像的CNN中使用Soft Attention，该模块可以替代分类任务中的Hard attention和器官定位任务中的定位模块；
+（3）将U-Net改进为Attention U-Net，增加了模型对前景像素的敏感度，并设计实验证明了这种改进是通用的。
+Related Work Attention Gates  一般AG会被用在自然图像分析、知识图谱、图像描述、机器翻译和分类任务上。Attention机制最开始是通过解释输出类别分数相对于输入图像的梯度来探索注意力图。可训练的Attention机制根据设计可分为Hard attention和Soft attention。Hard attention主要是由迭代区域候选和区域裁剪，通常是不可微的，因此会使模型很难训练，通常依赖强化学习的其他参数；Soft attention是基于概率的，可以正常反向传播梯度。逐通道的attention可以突出某些维度的特征，效果极好(如SENet)；注意力机制可以消除对外部信息（external gating information）的依赖。
+Methodology Fully Convolutional Network (FCN)  全卷积网络已经成为医学图像的基准模型，如FCN、U-Net、DeepMedic等，其效果要优于传统的方法，主要是由于：SGD优化，卷积核的参数共享、卷积操作很好地捕捉到了医学图像中的结构信息。卷积层通过逐层捕捉局部信息，逐步提取高维图像表示$x^{l}$，最终，最终在高维空间的离散像素会具有语义信息和巨大的感受野。在第$l$层的输出处，依次通过一个线性变换和一个非线性激活函数，得到了特征图$x^{l}$。
+在本文中，我们在一个标准的U-Net架构之上加入注意力模型。U-Net网络的优势主要是与在多个图像尺度上提取图像特征有关。粗粒度的特征图能够捕获上下文信息，并突出显示前景对象的类别和位置。在多个尺度上提取的特征图随后将通过skip连接进行合并，以结合粗粒度级别和细粒度级别的密集预测，如下图所示： Attention Gates for Image Analysis  为了捕获足够大的感受野，从而获取上下文信息，在标准的卷积网络中，特征图的尺寸经过下采样逐渐变小。这样，在粗粒度特征图中的特征才能以全局的尺寸建模位置和关系。但是对于小物体，形变程度大，很难降低false-positive预测。为了提高精度，当前的分割框架依赖于额外的目标定位模型，将任务简化为单独的定位和分割两步骤。其实，通过在一个标准的CNN模型中集成注意门(AGs)来也可以实现。这不需要训练多个模型和大量额外的模型参数，AG会抑制无关背景区域中的特征响应，而无需在网络之间裁剪ROI。
+注意力系数（attention coefficients），$\alpha_{i}\in [0,1]$，是为了突出显著的图像区域和抑制任务无关的特征响应，以只保留与特定任务相关的激活，如下图所示。 AGs的输出是输入特征图和注意力系数的元素级相乘（对应元素逐个相乘）：$\hat{x}_ {i,c}^{l}=x_ {i,c}^{l}\cdot \alpha_{i}^{l}$。通常，为每个像素向量$x_{i}^{l}\in \mathbb{R}^{F_{l}}$计算一个注意力标量，其中，$F_{l}$对应于第$l$层中特征图的通道数。在多语义标签类中，我们提出使用多维注意力系数。因此，每个AG都学习专注于目标对象的一个子集，如下图所示： 每个像素$i$使用门控向量$g_{i}\in \mathbb{R}^{F_{g}}$来决定聚焦区域。门控向量包含上下文信息，以修剪低级特征响应。在本文中，选择使用加法注意力机制，相比于乘法注意力，其效果更好，公式如下： $$ q_{att}^{l}=\psi^{T}(\sigma_{1}(W_{x}^{T}x_{i}^{l}&#43;W_{g}^{T}g_{i}&#43;b_{g}))&#43;b_{\psi} $$ $$ \alpha_{i}^{l}=\sigma_{2}(q_{att}^{l}(x_{i}^{l},g_{i};\Theta_{att})) $$ 其中，$\sigma_{2}$是sigmoid激活函数，AG由一组参数$\Theta_{att}$表示，包括：线性变换$W_{x} \in \mathbb{R}^{F_{l}\times F_{int}}$，$W_{g} \in \mathbb{R}^{F_{g}\times F_{int}}$，$\psi \in \mathbb{R}^{F_{int}\times 1}$和偏置项$b_{\psi} \in \mathbb{R}$，$b_{g} \in \mathbb{R}^{F_{int}}$。线性变换是通过1x1卷积来实现的。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">Attention U-Net</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-05-05 00:00:00 UTC">
+                05 May 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Attention U-Net：Learning Where to Look for the Pancreas<br>
+原文链接：<a href="https://arxiv.org/pdf/1804.03999.pdf">Attention U-Net</a></p>
+<h2 id="abstract">Abstract</h2>
+<p>    我们提出了一种用于医学图像的attention gate（AG）模型，该模型可以自动学习如何关注不同形状和大小的目标对象。使用AGs训练的模型可以隐式的学习在输入图像中抑制不相关的区域，同时突出显示对特定任务有用的显著特征。AGs可以很容易地集成到CNN架构中，如U-Net，以最小的计算开销，同时提高模型的灵敏度和预测精度。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    由于人工、密集地标记大量医学图像是一项繁琐且容易出错的任务，自动医学图像分割在图像分析领域得到了广泛的研究。<br>
+    随着卷积神经网络(CNNs)的出现，全卷积网络(FCNs)和U-Net是两种常用的架构。尽管这些结构具有良好的代表性，但当目标器官在形状和大小上表现出较大的差异时，这些结构依赖于多阶段的级联CNN架构。级联框架提取一个感兴趣的区域(ROI)，并对该特定的ROI做出密集的预测。<br>
+    然而，这种方法导致了计算资源和模型参数的过度和冗余使用，例如：级联内的所有模型都重复提取类似的低级特征。为了解决这个普遍的问题，我们提出了一个简单而有效的解决方案，即attention gates(AGs)。<br>
+    带有AGs的CNN模型可以以类似于FCN模型的训练标准方式从头开始训练，并且AGs自动学习在没有额外监督的情况下关注目标对象。此外，它们不引入显著的计算开销，也不需要像在多模型框架的情况下那样需要大量的模型参数。所提出的AGs通过抑制无关区域的特征，提高了模型对密集标签预测的灵敏度和准确性。这样，就可以在保持高预测精度的同时，消除使用额外定位模型的必要性。<br>
+    在本文中，我们提出了一种新的自注意门控模块，可用于语义分割中的密集标签预测。此外，我们还探讨了AGs对医学图像分析的好处，特别是在图像分割的背景下。<br>
+<em><strong>Contributions</strong></em>：<br>
+    （1）我们提出了基于网格的门控模块，可以使注意力系数更特定于局部区域，与基于全局特征向量的门控模块相比，提高了性能；<br>
+    （2）首次在医学图像的CNN中使用Soft Attention，该模块可以替代分类任务中的Hard attention和器官定位任务中的定位模块；<br>
+    （3）将U-Net改进为Attention U-Net，增加了模型对前景像素的敏感度，并设计实验证明了这种改进是通用的。</p>
+<h2 id="related-work">Related Work</h2>
+<h3 id="attention-gates">Attention Gates</h3>
+<p>    一般AG会被用在自然图像分析、知识图谱、图像描述、机器翻译和分类任务上。Attention机制最开始是通过解释输出类别分数相对于输入图像的梯度来探索注意力图。可训练的Attention机制根据设计可分为Hard attention和Soft attention。Hard attention主要是由迭代区域候选和区域裁剪，通常是不可微的，因此会使模型很难训练，通常依赖强化学习的其他参数；Soft attention是基于概率的，可以正常反向传播梯度。逐通道的attention可以突出某些维度的特征，效果极好(如SENet)；注意力机制可以消除对外部信息（external gating information）的依赖。</p>
+<h2 id="methodology">Methodology</h2>
+<h3 id="fully-convolutional-network-fcn">Fully Convolutional Network (FCN)</h3>
+<p>    全卷积网络已经成为医学图像的基准模型，如FCN、U-Net、DeepMedic等，其效果要优于传统的方法，主要是由于：SGD优化，卷积核的参数共享、卷积操作很好地捕捉到了医学图像中的结构信息。卷积层通过逐层捕捉局部信息，逐步提取高维图像表示$x^{l}$，最终，最终在高维空间的离散像素会具有语义信息和巨大的感受野。在第$l$层的输出处，依次通过一个线性变换和一个非线性激活函数，得到了特征图$x^{l}$。<br>
+    在本文中，我们在一个标准的U-Net架构之上加入注意力模型。U-Net网络的优势主要是与在多个图像尺度上提取图像特征有关。粗粒度的特征图能够捕获上下文信息，并突出显示前景对象的类别和位置。在多个尺度上提取的特征图随后将通过skip连接进行合并，以结合粗粒度级别和细粒度级别的密集预测，如下图所示：
+<img src="/img/attentionu-net1.PNG" alt=""></p>
+<h3 id="attention-gates-for-image-analysis">Attention Gates for Image Analysis</h3>
+<p>    为了捕获足够大的感受野，从而获取上下文信息，在标准的卷积网络中，特征图的尺寸经过下采样逐渐变小。这样，在粗粒度特征图中的特征才能以全局的尺寸建模位置和关系。但是对于小物体，形变程度大，很难降低false-positive预测。为了提高精度，当前的分割框架依赖于额外的目标定位模型，将任务简化为单独的定位和分割两步骤。其实，通过在一个标准的CNN模型中集成注意门(AGs)来也可以实现。这不需要训练多个模型和大量额外的模型参数，AG会抑制无关背景区域中的特征响应，而无需在网络之间裁剪ROI。<br>
+    注意力系数（attention coefficients），$\alpha_{i}\in [0,1]$，是为了突出显著的图像区域和抑制任务无关的特征响应，以只保留与特定任务相关的激活，如下图所示。
+<img src="/img/attentionu-net2.PNG" alt="">
+    AGs的输出是输入特征图和注意力系数的元素级相乘（对应元素逐个相乘）：$\hat{x}_ {i,c}^{l}=x_ {i,c}^{l}\cdot \alpha_{i}^{l}$。通常，为每个像素向量$x_{i}^{l}\in \mathbb{R}^{F_{l}}$计算一个注意力标量，其中，$F_{l}$对应于第$l$层中特征图的通道数。在多语义标签类中，我们提出使用多维注意力系数。因此，每个AG都学习专注于目标对象的一个子集，如下图所示：
+<img src="/img/attentionu-net3.PNG" alt="">
+    每个像素$i$使用门控向量$g_{i}\in \mathbb{R}^{F_{g}}$来决定聚焦区域。门控向量包含上下文信息，以修剪低级特征响应。在本文中，选择使用加法注意力机制，相比于乘法注意力，其效果更好，公式如下：
+$$
+q_{att}^{l}=\psi^{T}(\sigma_{1}(W_{x}^{T}x_{i}^{l}+W_{g}^{T}g_{i}+b_{g}))+b_{\psi}
+$$
+$$
+\alpha_{i}^{l}=\sigma_{2}(q_{att}^{l}(x_{i}^{l},g_{i};\Theta_{att}))
+$$
+    其中，$\sigma_{2}$是sigmoid激活函数，AG由一组参数$\Theta_{att}$表示，包括：线性变换$W_{x} \in \mathbb{R}^{F_{l}\times F_{int}}$，$W_{g} \in \mathbb{R}^{F_{g}\times F_{int}}$，$\psi \in \mathbb{R}^{F_{int}\times 1}$和偏置项$b_{\psi} \in \mathbb{R}$，$b_{g} \in \mathbb{R}^{F_{int}}$。线性变换是通过1x1卷积来实现的。<br>
+    通常，使用softmax激活函数来标准化注意力系数（$\sigma_{2}$）；然而，连续使用softmax在输出时会产生更稀疏的激活，因此，我们选择sigmoid激活函数。最后的reshape操作是为了将特征图重采样到的原来的大小（$x^{l}$）。在该工作中，门控信号不是所有图像像素的全局单向量，而是基于图像空间信息的网格信号（即不是hard attention而是soft attention）。<br>
+    具体操作示例：（参考链接：<a href="https://baijiahao.baidu.com/s?id=1665497032085045092">Attention U-Net简介及其在Keras中实现示例</a>）<br>
+    1、注意门接受两个输入，向量$x$和$g$；<br>
+    2、向量$g$是从网络的下一层取的，考虑到向量来自于更深的网络，它具有较小的维数和较好的特征表示；<br>
+    3、以向量$x$的大小为64x64x64，向量$g$的大小为32x32x32为例；<br>
+    4、向量$x$经过strided卷积，其大小变为64x32x32，向量$g$经过1x1卷积，其大小变为64x32x32；<br>
+    5、将两个向量逐元素相加，此过程导致对齐的权重变大，而未对齐的权重相对变小（即将相同的感兴趣区域的信号加强，各自不同的区域也在其中作为辅助或）；<br>
+    6、合成的向量经过ReLU激活层和1x1卷积，从而将维数压缩到1x32x32；<br>
+    7、这个向量经过一个sigmoid层，产生Attention系数(权重)；<br>
+    8、使用三线性插值将Attention系数向上采样到$x$向量的原始维度(64x64)，Attention系数按元素顺序与原始$x$向量相乘。</p>
+<h3 id="attention-gates-in-u-net-model">Attention Gates in U-Net Model</h3>
+<p>    提出的AGs被合并到标准的U-Net架构中，通过skip连接传递显著的特性，即从粗粒度特征图中提取的信息用于门控，以消除skip连接中的不相关区域和噪声。这是在连接操作之前执行的，以便只合并相关的激活。</p>
+<h2 id="实验">实验</h2>
+<p>    本论文中提出的AG模型是模块化的，是独立于应用类型的，因此，它可以很容易地适用于分类和回归任务。</p>
+<h3 id="attention-map-analysis">Attention Map Analysis</h3>
+<p><img src="/img/attentionu-net4.PNG" alt="">
+    图中显示了不同训练epochs（3,6,10,60,150）的注意系数图，我们通常观察到，AGs最初在所有位置都有均匀的分布和特征传递，并逐渐定位到目标器官的边界。此外，在粗粒度的特征图上上，AGs提供了一个粗略的器官轮廓，在更精细的分辨率下逐渐细化。</p>
+<h3 id="comparison">Comparison</h3>
+<p><img src="/img/attentionu-net5.PNG" alt="">
+<img src="/img/attentionu-net6.PNG" alt="">
+    BFT：obtained before fine tuning<br>
+    AFT：obtained after fine tuning<br>
+    SCR：training the models from scratch</p>
+<h2 id="discussion-and-conclusion">Discussion and Conclusion</h2>
+<p>    本文提出了一种新的用于医学图像分割的注意门控模型，该方法是通用的和模块化的，因此它可以很容易地应用于图像分类和回归问题。实验结果表明，所提出的AGs非常有利于组织/器官的分类和定位。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

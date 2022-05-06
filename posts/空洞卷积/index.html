@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/summary/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/summary/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/%E7%A9%BA%E6%B4%9E%E5%8D%B7%E7%A7%AF/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/%E7%A9%BA%E6%B4%9E%E5%8D%B7%E7%A7%AF/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Summary",
-      "headline" : "Summary",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "空洞卷积",
+      "headline" : "空洞卷积",
+      "description" : "原文链接：MULTI-SCALE CONTEXT AGGREGATION BY DILATED CONVOLUTIONS\n参考链接：如何理解空洞卷积（dilated convolution）？\n吃透空洞卷积(Dilated Convolutions)\nDilated Convolution  空洞卷积（膨胀卷积\/扩张卷积），最初的提出是为了解决图像分割的问题，常见的图像分割算法通常使用池化层和卷积层来增加感受野(Receptive Filed)，对图像进行特征提取，同时也缩小了特征图尺寸，然后再利用上采样还原图像尺寸，特征图缩小再放大的过程造成了精度上的损失。因此需要一种操作可以在增加感受野的同时保持特征图的尺寸不变，从而代替下采样和上采样操作。\n在VGG网络中，提出了关键一点：1个 7 x 7 的卷积层的正则等效于 3 个 3 x 3 的卷积层的叠加，而利用卷积的叠加可以大幅度的减少参数，有正则化的效果，参数少了就没那么容易发生过拟合。这也是现在绝大部分基于卷积的深层网络都在用小卷积核的原因，常常使用3 x 3的卷积核。\n神经元感受野的值越大表示其能接触到的原始图像范围就越大，也意味着它可能蕴含更为全局，语义层次更高的特征。在deep net中为了增加感受野且降低计算量，总要进行降采样(pooling或s2\/conv)，这样虽然可以增加感受野，但空间分辨率降低了。为了能不丢失分辨率，且仍然扩大感受野，可以使用空洞卷积，即在卷积核中添加间距。\n空洞卷积引入了一个称为 “扩张率(dilation rate)”的超参数(hyper-parameter)，该参数定义了卷积核处理数据时各值的间距。因此，当设置不同dilation rate时，感受野就会不一样，也即获取了多尺度信息。\n如下图所示，其中：（a）为3x3大小的1-dilated conv，与普通的卷积操作一样；（b）为3x3的2-dilated conv，实际的卷积核大小还是3x3，但是空洞为1，也就是对应一个7x7的图像patch，只有9个红色的点和3x3的kernel发生卷积操作，其余的点略过，也可以理解为卷积核的大小为7x7，但是只有图中的9个点的权重不为0，其余都为0；（c）为4-dilated conv操作。 空洞卷积的好处是不做pooling损失信息的情况下，加大了感受野，让每个卷积输出都包含较大范围的信息。在图像需要全局信息或者语音文本需要较长的sequence信息依赖的问题中，都能很好的应用dilated conv。\n相比于上采样和池化层，主要缺点有：内部数据结构丢失；空间层级化信息丢失；小物体信息无法重建（假设有四个pooling layer 则 任何小于 2^4 = 16 pixel 的物体信息将理论上无法重建），而空洞卷积都可以避免上述问题。\n潜在的问题 The Gridding Effect  如果仅仅多次叠加 dilation rate为2 的 3 x 3 kernel 的话，则会出现这个问题： 从上图可以看出 kernel 并不连续，也就是并不是所有的 pixel 都用来计算了，因此这里将信息看做棋盘格（checker-board）的方式会损失信息的连续性，这对 pixel-level dense prediction 的任务来说是致命的。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -69,15 +69,33 @@ code.has-jax {
       "copyrightYear" : "2022",
       "datePublished": "2022-05-04 00:00:00 \u002b0000 UTC",
       "dateModified" : "2022-05-04 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/summary\/",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/%E7%A9%BA%E6%B4%9E%E5%8D%B7%E7%A7%AF\/",
       "keywords" : [  ]
   }
 </script>
-<title>Summary</title>
-  <meta property="og:title" content="Summary" />
+<title>空洞卷积</title>
+  <meta property="og:title" content="空洞卷积" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="原文链接：MULTI-SCALE CONTEXT AGGREGATION BY DILATED CONVOLUTIONS
+参考链接：如何理解空洞卷积（dilated convolution）？
+吃透空洞卷积(Dilated Convolutions)
+Dilated Convolution  空洞卷积（膨胀卷积/扩张卷积），最初的提出是为了解决图像分割的问题，常见的图像分割算法通常使用池化层和卷积层来增加感受野(Receptive Filed)，对图像进行特征提取，同时也缩小了特征图尺寸，然后再利用上采样还原图像尺寸，特征图缩小再放大的过程造成了精度上的损失。因此需要一种操作可以在增加感受野的同时保持特征图的尺寸不变，从而代替下采样和上采样操作。
+在VGG网络中，提出了关键一点：1个 7 x 7 的卷积层的正则等效于 3 个 3 x 3 的卷积层的叠加，而利用卷积的叠加可以大幅度的减少参数，有正则化的效果，参数少了就没那么容易发生过拟合。这也是现在绝大部分基于卷积的深层网络都在用小卷积核的原因，常常使用3 x 3的卷积核。
+神经元感受野的值越大表示其能接触到的原始图像范围就越大，也意味着它可能蕴含更为全局，语义层次更高的特征。在deep net中为了增加感受野且降低计算量，总要进行降采样(pooling或s2/conv)，这样虽然可以增加感受野，但空间分辨率降低了。为了能不丢失分辨率，且仍然扩大感受野，可以使用空洞卷积，即在卷积核中添加间距。
+空洞卷积引入了一个称为 “扩张率(dilation rate)”的超参数(hyper-parameter)，该参数定义了卷积核处理数据时各值的间距。因此，当设置不同dilation rate时，感受野就会不一样，也即获取了多尺度信息。
+如下图所示，其中：（a）为3x3大小的1-dilated conv，与普通的卷积操作一样；（b）为3x3的2-dilated conv，实际的卷积核大小还是3x3，但是空洞为1，也就是对应一个7x7的图像patch，只有9个红色的点和3x3的kernel发生卷积操作，其余的点略过，也可以理解为卷积核的大小为7x7，但是只有图中的9个点的权重不为0，其余都为0；（c）为4-dilated conv操作。 空洞卷积的好处是不做pooling损失信息的情况下，加大了感受野，让每个卷积输出都包含较大范围的信息。在图像需要全局信息或者语音文本需要较长的sequence信息依赖的问题中，都能很好的应用dilated conv。
+相比于上采样和池化层，主要缺点有：内部数据结构丢失；空间层级化信息丢失；小物体信息无法重建（假设有四个pooling layer 则 任何小于 2^4 = 16 pixel 的物体信息将理论上无法重建），而空洞卷积都可以避免上述问题。
+潜在的问题 The Gridding Effect  如果仅仅多次叠加 dilation rate为2 的 3 x 3 kernel 的话，则会出现这个问题： 从上图可以看出 kernel 并不连续，也就是并不是所有的 pixel 都用来计算了，因此这里将信息看做棋盘格（checker-board）的方式会损失信息的连续性，这对 pixel-level dense prediction 的任务来说是致命的。" />
+  <meta name="description" content="原文链接：MULTI-SCALE CONTEXT AGGREGATION BY DILATED CONVOLUTIONS
+参考链接：如何理解空洞卷积（dilated convolution）？
+吃透空洞卷积(Dilated Convolutions)
+Dilated Convolution  空洞卷积（膨胀卷积/扩张卷积），最初的提出是为了解决图像分割的问题，常见的图像分割算法通常使用池化层和卷积层来增加感受野(Receptive Filed)，对图像进行特征提取，同时也缩小了特征图尺寸，然后再利用上采样还原图像尺寸，特征图缩小再放大的过程造成了精度上的损失。因此需要一种操作可以在增加感受野的同时保持特征图的尺寸不变，从而代替下采样和上采样操作。
+在VGG网络中，提出了关键一点：1个 7 x 7 的卷积层的正则等效于 3 个 3 x 3 的卷积层的叠加，而利用卷积的叠加可以大幅度的减少参数，有正则化的效果，参数少了就没那么容易发生过拟合。这也是现在绝大部分基于卷积的深层网络都在用小卷积核的原因，常常使用3 x 3的卷积核。
+神经元感受野的值越大表示其能接触到的原始图像范围就越大，也意味着它可能蕴含更为全局，语义层次更高的特征。在deep net中为了增加感受野且降低计算量，总要进行降采样(pooling或s2/conv)，这样虽然可以增加感受野，但空间分辨率降低了。为了能不丢失分辨率，且仍然扩大感受野，可以使用空洞卷积，即在卷积核中添加间距。
+空洞卷积引入了一个称为 “扩张率(dilation rate)”的超参数(hyper-parameter)，该参数定义了卷积核处理数据时各值的间距。因此，当设置不同dilation rate时，感受野就会不一样，也即获取了多尺度信息。
+如下图所示，其中：（a）为3x3大小的1-dilated conv，与普通的卷积操作一样；（b）为3x3的2-dilated conv，实际的卷积核大小还是3x3，但是空洞为1，也就是对应一个7x7的图像patch，只有9个红色的点和3x3的kernel发生卷积操作，其余的点略过，也可以理解为卷积核的大小为7x7，但是只有图中的9个点的权重不为0，其余都为0；（c）为4-dilated conv操作。 空洞卷积的好处是不做pooling损失信息的情况下，加大了感受野，让每个卷积输出都包含较大范围的信息。在图像需要全局信息或者语音文本需要较长的sequence信息依赖的问题中，都能很好的应用dilated conv。
+相比于上采样和池化层，主要缺点有：内部数据结构丢失；空间层级化信息丢失；小物体信息无法重建（假设有四个pooling layer 则 任何小于 2^4 = 16 pixel 的物体信息将理论上无法重建），而空洞卷积都可以避免上述问题。
+潜在的问题 The Gridding Effect  如果仅仅多次叠加 dilation rate为2 的 3 x 3 kernel 的话，则会出现这个问题： 从上图可以看出 kernel 并不连续，也就是并不是所有的 pixel 都用来计算了，因此这里将信息看做棋盘格（checker-board）的方式会损失信息的连续性，这对 pixel-level dense prediction 的任务来说是致命的。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +121,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,151 +154,108 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term">Summary</h1>
-        <div id="posts-list">
-          <section>
-            <h1 class="site-date-catalog">2022</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-04 00:00:00 UTC">May 04</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E7%A9%BA%E6%B4%9E%E5%8D%B7%E7%A7%AF/">空洞卷积</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-26 00:00:00 UTC">Apr 26</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/upsampling/">Upsampling</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-25 00:00:00 UTC">Apr 25</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%BB%8F%E5%85%B8%E8%AE%BA%E6%96%87%E6%80%BB%E7%BB%93/">图像分割经典论文总结</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-25 00:00:00 UTC">Apr 25</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/transformer%E4%B8%AD%E7%9A%84%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81/">Transformer中的位置编码</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-12 00:00:00 UTC">Apr 12</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/r-cnn%E7%B3%BB%E5%88%97%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93/">R-CNN系列简单总结</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-11 00:00:00 UTC">Apr 11</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/iounms/">IoU&amp;NMS</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-08 00:00:00 UTC">Apr 08</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/attentionself-attention/">Attention&amp;Self-Attention</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-06 00:00:00 UTC">Apr 06</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E5%88%86%E7%BB%84%E5%8D%B7%E7%A7%AF%E5%8F%AF%E5%88%86%E7%A6%BB%E5%8D%B7%E7%A7%AF/">分组卷积&amp;可分离卷积</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-01-24 00:00:00 UTC">Jan 24</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/batchnormalization/">BatchNormalization</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          <section>
-            <h1 class="site-date-catalog">2021</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2021-12-11 15:52:51 CST">Dec 11</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87/">模型评价指标</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">空洞卷积</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-05-04 00:00:00 UTC">
+                04 May 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>原文链接：<a href="https://arxiv.org/pdf/1511.07122.pdf">MULTI-SCALE CONTEXT AGGREGATION BY DILATED CONVOLUTIONS</a><br>
+参考链接：<a href="https://www.zhihu.com/question/54149221/answer/323880412">如何理解空洞卷积（dilated convolution）？</a><br>
+<a href="https://zhuanlan.zhihu.com/p/113285797">吃透空洞卷积(Dilated Convolutions)</a></p>
+<h2 id="dilated-convolution">Dilated Convolution</h2>
+<p>    空洞卷积（膨胀卷积/扩张卷积），最初的提出是为了解决图像分割的问题，常见的图像分割算法通常使用池化层和卷积层来增加感受野(Receptive Filed)，对图像进行特征提取，同时也缩小了特征图尺寸，然后再利用上采样还原图像尺寸，特征图缩小再放大的过程造成了精度上的损失。因此需要一种操作可以在增加感受野的同时保持特征图的尺寸不变，从而代替下采样和上采样操作。<br>
+    在VGG网络中，提出了关键一点：1个 7 x 7 的卷积层的正则等效于 3 个 3 x 3 的卷积层的叠加，而利用卷积的叠加可以大幅度的减少参数，有正则化的效果，参数少了就没那么容易发生过拟合。这也是现在绝大部分基于卷积的深层网络都在用小卷积核的原因，常常使用3 x 3的卷积核。<br>
+    神经元感受野的值越大表示其能接触到的原始图像范围就越大，也意味着它可能蕴含更为全局，语义层次更高的特征。在deep net中为了增加感受野且降低计算量，总要进行降采样(pooling或s2/conv)，这样虽然可以增加感受野，但空间分辨率降低了。为了能不丢失分辨率，且仍然扩大感受野，可以使用空洞卷积，即在卷积核中添加间距。<br>
+    空洞卷积引入了一个称为 “扩张率(dilation rate)”的超参数(hyper-parameter)，该参数定义了卷积核处理数据时各值的间距。因此，当设置不同dilation rate时，感受野就会不一样，也即获取了多尺度信息。<br>
+    如下图所示，其中：（a）为3x3大小的1-dilated conv，与普通的卷积操作一样；（b）为3x3的2-dilated conv，实际的卷积核大小还是3x3，但是空洞为1，也就是对应一个7x7的图像patch，只有9个红色的点和3x3的kernel发生卷积操作，其余的点略过，也可以理解为卷积核的大小为7x7，但是只有图中的9个点的权重不为0，其余都为0；（c）为4-dilated conv操作。
+<img src="/img/dilatedconv1.jpg" alt="">
+    空洞卷积的好处是不做pooling损失信息的情况下，加大了感受野，让每个卷积输出都包含较大范围的信息。在图像需要全局信息或者语音文本需要较长的sequence信息依赖的问题中，都能很好的应用dilated conv。<br>
+    相比于上采样和池化层，主要缺点有：内部数据结构丢失；空间层级化信息丢失；小物体信息无法重建（假设有四个pooling layer 则 任何小于 2^4 = 16 pixel 的物体信息将理论上无法重建），而空洞卷积都可以避免上述问题。</p>
+<h2 id="潜在的问题">潜在的问题</h2>
+<h3 id="the-gridding-effect">The Gridding Effect</h3>
+<p>    如果仅仅多次叠加 dilation rate为2 的 3 x 3 kernel 的话，则会出现这个问题：
+<img src="/img/dilatedconv2.jpg" alt="">
+    从上图可以看出 kernel 并不连续，也就是并不是所有的 pixel 都用来计算了，因此这里将信息看做棋盘格（checker-board）的方式会损失信息的连续性，这对 pixel-level dense prediction 的任务来说是致命的。</p>
+<h3 id="long-ranged-information-might-be-not-relevant">Long-ranged information might be not relevant.</h3>
+<p>    我们从 dilated convolution 的设计背景来看就能推测出这样的设计是用来获取 long-ranged information。然而光采用大 dilation rate 的信息或许只对一些大物体分割有效果，而对小物体来说可能则有弊无利了，如何同时处理不同大小的物体的关系，则是设计好 dilated convolution 网络的关键。</p>
+<h2 id="解决办法hybrid-dilated-convolution-hdc">解决办法：Hybrid Dilated Convolution (HDC)</h2>
+<p>    原文链接：<a href="https://arxiv.org/pdf/1702.08502.pdf">Understanding Convolution for Semantic Segmentation</a><br>
+    （1）叠加卷积的dilation rate不能有大于1的公约数，比如 [2, 4, 6] 则不是一个好的三层卷积，依然会出现 gridding effect；<br>
+    （2）我们将dilation rate设计成 锯齿状结构，例如 [1, 2, 5, 1, 2, 5] 循环结构；<br>
+    （3）需要满足以下式子：
+$$
+M_{i}=max[M_{i+1}-2r_{i},M_{i+1}-2(M_{i+1}-r_{i}),r_{i}]
+$$
+    考虑$n$个卷积核大小为$K×K$的扩张卷积，对应扩张率为$[r_{1},&hellip;,r_{i},&hellip;,r_{n}]$，目标是让最后的感受野全覆盖整个区域（没有任何空洞或丢失边缘），$M_{i}$为两个非零点之间的最大距离，且$M_{n}=r_{n}$，目标是使$M_{2}\leq K$。以一个具体例子来说：<br>
+    （1）对于扩张卷积核大小为$K=3$，如果$r=[1,2,5]$，则$M_{2}=max[M_{3}-2r_{2},-M_{3}+2r_{2},r_{2}]=max[1,-1,2]=2$，此时$M_{2}\leq K$，满足要求；<br>
+    （2）如果$r=[1,2,9]$，则$M_{2}=max[M_{3}-2r_{2},-M_{3}+2r_{2},r_{2}]=max[5,-5,2]=5$，此时$M_{2}&gt;  K$，不满足要求。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -299,6 +275,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

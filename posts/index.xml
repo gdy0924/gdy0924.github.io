@@ -6,7 +6,72 @@
     <description>Recent content in Posts on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 29 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 05 May 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Attention U-Net</title>
+      <link>https://gdy0924.github.io/posts/attention-u-net/</link>
+      <pubDate>Thu, 05 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/attention-u-net/</guid>
+      <description>Attention U-Net：Learning Where to Look for the Pancreas
+原文链接：Attention U-Net
+Abstract  我们提出了一种用于医学图像的attention gate（AG）模型，该模型可以自动学习如何关注不同形状和大小的目标对象。使用AGs训练的模型可以隐式的学习在输入图像中抑制不相关的区域，同时突出显示对特定任务有用的显著特征。AGs可以很容易地集成到CNN架构中，如U-Net，以最小的计算开销，同时提高模型的灵敏度和预测精度。
+Introduction  由于人工、密集地标记大量医学图像是一项繁琐且容易出错的任务，自动医学图像分割在图像分析领域得到了广泛的研究。
+随着卷积神经网络(CNNs)的出现，全卷积网络(FCNs)和U-Net是两种常用的架构。尽管这些结构具有良好的代表性，但当目标器官在形状和大小上表现出较大的差异时，这些结构依赖于多阶段的级联CNN架构。级联框架提取一个感兴趣的区域(ROI)，并对该特定的ROI做出密集的预测。
+然而，这种方法导致了计算资源和模型参数的过度和冗余使用，例如：级联内的所有模型都重复提取类似的低级特征。为了解决这个普遍的问题，我们提出了一个简单而有效的解决方案，即attention gates(AGs)。
+带有AGs的CNN模型可以以类似于FCN模型的训练标准方式从头开始训练，并且AGs自动学习在没有额外监督的情况下关注目标对象。此外，它们不引入显著的计算开销，也不需要像在多模型框架的情况下那样需要大量的模型参数。所提出的AGs通过抑制无关区域的特征，提高了模型对密集标签预测的灵敏度和准确性。这样，就可以在保持高预测精度的同时，消除使用额外定位模型的必要性。
+在本文中，我们提出了一种新的自注意门控模块，可用于语义分割中的密集标签预测。此外，我们还探讨了AGs对医学图像分析的好处，特别是在图像分割的背景下。
+Contributions：
+（1）我们提出了基于网格的门控模块，可以使注意力系数更特定于局部区域，与基于全局特征向量的门控模块相比，提高了性能；
+（2）首次在医学图像的CNN中使用Soft Attention，该模块可以替代分类任务中的Hard attention和器官定位任务中的定位模块；
+（3）将U-Net改进为Attention U-Net，增加了模型对前景像素的敏感度，并设计实验证明了这种改进是通用的。
+Related Work Attention Gates  一般AG会被用在自然图像分析、知识图谱、图像描述、机器翻译和分类任务上。Attention机制最开始是通过解释输出类别分数相对于输入图像的梯度来探索注意力图。可训练的Attention机制根据设计可分为Hard attention和Soft attention。Hard attention主要是由迭代区域候选和区域裁剪，通常是不可微的，因此会使模型很难训练，通常依赖强化学习的其他参数；Soft attention是基于概率的，可以正常反向传播梯度。逐通道的attention可以突出某些维度的特征，效果极好(如SENet)；注意力机制可以消除对外部信息（external gating information）的依赖。
+Methodology Fully Convolutional Network (FCN)  全卷积网络已经成为医学图像的基准模型，如FCN、U-Net、DeepMedic等，其效果要优于传统的方法，主要是由于：SGD优化，卷积核的参数共享、卷积操作很好地捕捉到了医学图像中的结构信息。卷积层通过逐层捕捉局部信息，逐步提取高维图像表示$x^{l}$，最终，最终在高维空间的离散像素会具有语义信息和巨大的感受野。在第$l$层的输出处，依次通过一个线性变换和一个非线性激活函数，得到了特征图$x^{l}$。
+在本文中，我们在一个标准的U-Net架构之上加入注意力模型。U-Net网络的优势主要是与在多个图像尺度上提取图像特征有关。粗粒度的特征图能够捕获上下文信息，并突出显示前景对象的类别和位置。在多个尺度上提取的特征图随后将通过skip连接进行合并，以结合粗粒度级别和细粒度级别的密集预测，如下图所示： Attention Gates for Image Analysis  为了捕获足够大的感受野，从而获取上下文信息，在标准的卷积网络中，特征图的尺寸经过下采样逐渐变小。这样，在粗粒度特征图中的特征才能以全局的尺寸建模位置和关系。但是对于小物体，形变程度大，很难降低false-positive预测。为了提高精度，当前的分割框架依赖于额外的目标定位模型，将任务简化为单独的定位和分割两步骤。其实，通过在一个标准的CNN模型中集成注意门(AGs)来也可以实现。这不需要训练多个模型和大量额外的模型参数，AG会抑制无关背景区域中的特征响应，而无需在网络之间裁剪ROI。
+注意力系数（attention coefficients），$\alpha_{i}\in [0,1]$，是为了突出显著的图像区域和抑制任务无关的特征响应，以只保留与特定任务相关的激活，如下图所示。 AGs的输出是输入特征图和注意力系数的元素级相乘（对应元素逐个相乘）：$\hat{x}_ {i,c}^{l}=x_ {i,c}^{l}\cdot \alpha_{i}^{l}$。通常，为每个像素向量$x_{i}^{l}\in \mathbb{R}^{F_{l}}$计算一个注意力标量，其中，$F_{l}$对应于第$l$层中特征图的通道数。在多语义标签类中，我们提出使用多维注意力系数。因此，每个AG都学习专注于目标对象的一个子集，如下图所示： 每个像素$i$使用门控向量$g_{i}\in \mathbb{R}^{F_{g}}$来决定聚焦区域。门控向量包含上下文信息，以修剪低级特征响应。在本文中，选择使用加法注意力机制，相比于乘法注意力，其效果更好，公式如下： $$ q_{att}^{l}=\psi^{T}(\sigma_{1}(W_{x}^{T}x_{i}^{l}+W_{g}^{T}g_{i}+b_{g}))+b_{\psi} $$ $$ \alpha_{i}^{l}=\sigma_{2}(q_{att}^{l}(x_{i}^{l},g_{i};\Theta_{att})) $$ 其中，$\sigma_{2}$是sigmoid激活函数，AG由一组参数$\Theta_{att}$表示，包括：线性变换$W_{x} \in \mathbb{R}^{F_{l}\times F_{int}}$，$W_{g} \in \mathbb{R}^{F_{g}\times F_{int}}$，$\psi \in \mathbb{R}^{F_{int}\times 1}$和偏置项$b_{\psi} \in \mathbb{R}$，$b_{g} \in \mathbb{R}^{F_{int}}$。线性变换是通过1x1卷积来实现的。</description>
+    </item>
+    
+    <item>
+      <title>DeepLab系列</title>
+      <link>https://gdy0924.github.io/posts/deeplab%E7%B3%BB%E5%88%97/</link>
+      <pubDate>Wed, 04 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/deeplab%E7%B3%BB%E5%88%97/</guid>
+      <description>V1 SEMANTIC IMAGE SEGMENTATION WITH DEEP CONVOLUTIONAL NETS AND FULLY CONNECTED CRFS 原文链接：DeepLab V1
+Abstract  深度卷积神经网络(DCNNs)最近在视觉任务中显示出了最先进的性能，如图像分类和目标检测。该工作结合了DCNNs和概率图形模型的方法，用于解决像素级分类的任务，即语义分割。我们通过将DCNN的最后一层与一个全连接的条件随机场(CRF)相结合，克服了深度网络的定位能力弱的特性。
+Introduction  将DCNN应用在语义分割任务中有两个挑战：降采样，空间“不敏感”（不变性）。降采样是指在网络每层重复进行最大池和降采样（步长）导致图像分辨率降低；而通过“空洞”卷积算法，能够有效地密集计算DCNN响应。
+第二个问题是指从分类器获得以对象为中心的预测需要对空间转换的不变性，这限制了DCNN模型的空间准确性。我们通过使用全连接条件随机场(CRF)，提高了模型捕捉细节的能力。在我们的工作中，我们证明了当与基于DCNN的像素级分类器相结合时，它会有最先进的结果。
+DeepLab三个主要优势是：
+（1）速度：利用“空洞卷积”算法；
+（2）精度：我们获得了最先进的结果；
+（3）简单：我们的系统是由两个相当完善的模块组成，DCNNs和CRFs。
+Convolutional Neural Networks For Dense Image Labeling Efficient Dense Sliding Window Feature Extraction With Hole Algorithm 利用空洞卷积算法有效地提取密集滑动窗口特征
+密集的空间结果有助于特征提取器的成功，作为实现这一目标的第一步，我们将VGG-16的全连接层转换为卷积层，并在原始分辨率的图像上以卷积方式运行网络。然而，这是不够的，因为它产生非常稀疏计算的检测结果（步幅为32像素，即下采样32倍）。为了使下采样变为8倍，修改为：删除最后两个max pooling层（或者stride修改为1），由于max pooling的修改，影响了其后的卷积层，使其视野分别下降了 2x 和 4x，为了保持其原来的视野，便将其改成空洞卷积，dilation 分别为 2 和 4，这种方法普遍适用，并允许我们在任何下采样中有效地计算密集的CNN特征映射，而不引入任何其他的参数。
+训练时将预训练的VGG16的权重做fine-tune，损失函数取是输出的特征图与ground truth下采样8倍做交叉熵和；测试时取输出图双线性上采样8倍得到结果。我们使用简单的双线性插值来将最终的特征图的分辨率提高8倍，而计算成本可以忽略不计。FCN网络中没有使用空洞卷积算法，并且在CNN输出处产生非常粗糙的特征图（下采样率为32倍），这迫使他们使用学习的上采样层（转置卷积），显著增加了他们系统的复杂性和训练时间。
+CONTROLLING THE RECEPTIVE FIELD SIZE AND ACCELERATING DENSE COMPUTATION WITH CONVOLUTIONAL NETS 利用空洞卷积控制感受野的大小，加速密集计算
+最近的基于DCNN的图像识别方法依赖于在图像集大规模分类任务上预先训练的网络。这些网络通常具有较大的感受野大小：对于我们考虑的VGG-16网络，它的感受野是224×224（零填充），如果网络被卷积应用，则为404×404像素。在将网络转换为完全卷积层后，第一个全连接层大小为7×7×4096，成为我们密集预测结果的计算瓶颈。
+我们通过对第一个FC层（通过简单的抽取）进行空间下采样到4×4（或3×3）的空间大小来解决这个实际问题。这将网络的感受野减少到128×128（零填充）或308×308（卷积模式），并将第一FC层的计算时间减少了2−3倍。具体来说：给定一个306×306输入图像，它在测试期间以大约8帧/秒的速度在网络顶部产生39×39密集的原始特征分数。训练期间的速度是3帧/秒。我们还成功地尝试了将全连接层的通道数从4096个减少到1024个，在不牺牲性能的情况下，大大减少了计算时间和内存占用。
+Detailed Boundary Recovery：Fully-Connected Conditional Random Fields and Multi-Scale Prediction 详细的边界恢复：全连接条件随机场和多尺度预测</description>
+    </item>
+    
+    <item>
+      <title>空洞卷积</title>
+      <link>https://gdy0924.github.io/posts/%E7%A9%BA%E6%B4%9E%E5%8D%B7%E7%A7%AF/</link>
+      <pubDate>Wed, 04 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/%E7%A9%BA%E6%B4%9E%E5%8D%B7%E7%A7%AF/</guid>
+      <description>原文链接：MULTI-SCALE CONTEXT AGGREGATION BY DILATED CONVOLUTIONS
+参考链接：如何理解空洞卷积（dilated convolution）？
+吃透空洞卷积(Dilated Convolutions)
+Dilated Convolution  空洞卷积（膨胀卷积/扩张卷积），最初的提出是为了解决图像分割的问题，常见的图像分割算法通常使用池化层和卷积层来增加感受野(Receptive Filed)，对图像进行特征提取，同时也缩小了特征图尺寸，然后再利用上采样还原图像尺寸，特征图缩小再放大的过程造成了精度上的损失。因此需要一种操作可以在增加感受野的同时保持特征图的尺寸不变，从而代替下采样和上采样操作。
+在VGG网络中，提出了关键一点：1个 7 x 7 的卷积层的正则等效于 3 个 3 x 3 的卷积层的叠加，而利用卷积的叠加可以大幅度的减少参数，有正则化的效果，参数少了就没那么容易发生过拟合。这也是现在绝大部分基于卷积的深层网络都在用小卷积核的原因，常常使用3 x 3的卷积核。
+神经元感受野的值越大表示其能接触到的原始图像范围就越大，也意味着它可能蕴含更为全局，语义层次更高的特征。在deep net中为了增加感受野且降低计算量，总要进行降采样(pooling或s2/conv)，这样虽然可以增加感受野，但空间分辨率降低了。为了能不丢失分辨率，且仍然扩大感受野，可以使用空洞卷积，即在卷积核中添加间距。
+空洞卷积引入了一个称为 “扩张率(dilation rate)”的超参数(hyper-parameter)，该参数定义了卷积核处理数据时各值的间距。因此，当设置不同dilation rate时，感受野就会不一样，也即获取了多尺度信息。
+如下图所示，其中：（a）为3x3大小的1-dilated conv，与普通的卷积操作一样；（b）为3x3的2-dilated conv，实际的卷积核大小还是3x3，但是空洞为1，也就是对应一个7x7的图像patch，只有9个红色的点和3x3的kernel发生卷积操作，其余的点略过，也可以理解为卷积核的大小为7x7，但是只有图中的9个点的权重不为0，其余都为0；（c）为4-dilated conv操作。 空洞卷积的好处是不做pooling损失信息的情况下，加大了感受野，让每个卷积输出都包含较大范围的信息。在图像需要全局信息或者语音文本需要较长的sequence信息依赖的问题中，都能很好的应用dilated conv。
+相比于上采样和池化层，主要缺点有：内部数据结构丢失；空间层级化信息丢失；小物体信息无法重建（假设有四个pooling layer 则 任何小于 2^4 = 16 pixel 的物体信息将理论上无法重建），而空洞卷积都可以避免上述问题。
+潜在的问题 The Gridding Effect  如果仅仅多次叠加 dilation rate为2 的 3 x 3 kernel 的话，则会出现这个问题： 从上图可以看出 kernel 并不连续，也就是并不是所有的 pixel 都用来计算了，因此这里将信息看做棋盘格（checker-board）的方式会损失信息的连续性，这对 pixel-level dense prediction 的任务来说是致命的。</description>
+    </item>
+    
     <item>
       <title>SegNet</title>
       <link>https://gdy0924.github.io/posts/segnet/</link>
