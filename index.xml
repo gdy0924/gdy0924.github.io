@@ -6,7 +6,62 @@
     <description>Recent content on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 05 May 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 07 May 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>SegFormer</title>
+      <link>https://gdy0924.github.io/posts/segformer/</link>
+      <pubDate>Sat, 07 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/segformer/</guid>
+      <description>原文链接：SegFormer: Simple and Efficient Design for Semantic Segmentation with Transformers
+Abstract  我们提出了一个SegFormer，将transformer与多层感知器(MLP)解码器统一起来。SegFormer有两个特点：（1）其包括一个层次架构transformer编码器，输出多尺度特征，不需要位置编码，从而避免当测试分辨率与训练不同时，位置编码插值会导致性能下降；（2）避免了复杂的解码器，使用的MLP解码器融合来自不同层的信息，从而结合了局部和全局的注意力机制。将该方法进行扩展，获得了从SegFormer-B0到SegFormer-B5的一系列模型，达到了比以前的模型更好的性能和效率。
+Introduction  ViT将transformer用于图像分类，将一个图像分割成多个线性embedding的patch，并将其输入到一个带有位置embedding的transformer中，在ImageNet上取得了令人印象深刻的性能。在语义分割中，SETR的提出证明了transformer的可行性。
+SETR采用ViT作为backbone，并合并了几个CNN解码器来扩大特征分辨率。尽管ViT性能良好，但也有一些局限性：
+（1）ViT输出单尺度低分辨率特征，而不是多尺度特征；
+（2）它在大图像上的计算成本较高。
+为了解决这些限制，提出了一种金字塔视觉transformer(pyramid vision Transformer，PVT)，这是一种具有金字塔结构的ViT的扩展，用于密集预测。PVT在目标检测和语义分割方面比ResNet有相当大的改进。
+本文介绍了SegFormer，一个前沿的语义分割transformer框架，同时考虑了效率、准确性和鲁棒性。与以前的方法相比，我们的框架重新设计了编码器和解码器。
+Contribution：
+（1）一种新的无位置编码的分层transformer编码器；
+（2）一种轻量级的仅用MLP作为解码器的设计，没有复杂的计算；
+（3）在三个公开的语义分割数据集上的效率、准确性和鲁棒性方面都达到了最优。
+首先，该编码器在对分辨率与训练图像不同的图像进行预测时，避免了位置编码插值，因此，该编码器可以很容易地适应任意分辨率的测试图像，而不影响性能；其次，分层结构使编码器能够同时生成高分辨率的细粒度特征和低分辨率的粗粒度特征，这与ViT只能生成固定分辨率的特征图形成了对比；最后，我们提出了一个轻量级的MLP解码器，其关键思想是利用transformer的内在特点，即较低层的注意力倾向于局部信息，而最高层的注意力是全局的的。通过融合来自不同层的信息，MLP解码器同时结合了局部和全局的信息。
+Related Work Semantic Segmentation  语义分割可以看作是图像分类从图像级到像素级的一种扩展，最早的语义分割模型为FCN，一个全卷积的网络，以端到端的方式进行像素到像素的分类。之后，一些修改：扩大感受野；细化上下文信息；引入边界信息；引入注意力模块等。最近的方法（SETR）已经证明了基于transformer的架构对语义分割任务的有效性，但是，这些方法仍然需要大量计算。
+Transformer backbones  ViT是第一个完全利用transformer在图像分类中达到最优性能的工作；随后，DeiT进一步探索了一种数据高效的训练策略和一种蒸馏方法；PVT是第一个在transformer中引入金字塔结构的工作；Swin、CvT、CoaT、LeViT和Twins等方法增强了特征的局部连续性，去掉了固定大小的位置embedding，提高了transformer在密集预测任务中的性能。
+Transformers for specific tasks  DETR是第一个使用transformer构建一个无NMS的端到端的目标检测框架。在语义分割方面，SETR采用ViT作为backbone来提取特征，取得了令人印象深刻的性能。然而，这些基于transformer的方法效率非常低，因此很难在实时应用程序中部署。
+Method 如上图所示，主要包括两部分：
+（1）分层transformer编码器：生成高分辨率粗粒度特征和低分辨率细粒度特征；
+（2）轻量级的MLP解码器：融合多层特性，生成最终的语义分割结果。
+首先给定一个大小为$H×W×3$的图像，我们首先将其分成大小为$4×4$的patch，与ViT使用大小为$16×16$的patch不同，使用较小的patch更有利于密集预测任务；然后，将这些patch作为分层transformer编码器的输入，以获得原始图像分辨率的{1/4、1/8、1/16、1/32}的多层次特征；将这些多层次特征传递给MLP解码器，以预测$\frac{H}{4}\times \frac{W}{4}\times N_{cls}$分辨率下的分割结果，其中$N_{cls}$是类别的数量。
+Hierarchical Transformer Encoder  我们设计了一系列的Mix Transformer编码器(MiT)，MiT-B0到MiT-B5，具有相同的架构，但大小不同：MiT-B0用于快速预测的轻量级模型，而MiT-B5是获得最佳性能的最大模型。MiT的设计受ViT的启发，但为语义分割任务定制与优化。
+Hierarchical Feature Representation  与ViT只能生成单分辨率的特征图不同，该模块的目标是，给定一个输入图像，生成类似CNN的多层次特征图。这些特性图同时提供了高分辨率的粗粒度特征和低分辨率的细粒度特征。具体来说，给定一个分辨率为$H×W×3$的输入图像，通过patch 合并（patch merging）获得层次化的特征图$F_{i}$，每个特征图的分辨率为$\frac{H}{2^{i+1}}\times \frac{W}{2^{i+1}}\times C_{i}$，其中$i\in \lbrace 1,2,3,4 \rbrace$，$C_{i+1}$ 比$C_{i}$大。</description>
+    </item>
+    
+    <item>
+      <title>SETR</title>
+      <link>https://gdy0924.github.io/posts/setr/</link>
+      <pubDate>Sat, 07 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/setr/</guid>
+      <description>原文链接：Rethinking Semantic Segmentation from a Sequence-to-Sequence Perspectivewith Transformers
+Abstract  最近的语义分割方法采用encoder-decoder结构的全卷积网络：编码器逐步降低分辨率，并捕捉更抽象的特征和更大的感受野。但是由于上下文信息对于分割任务很重要，最近的研究集中在通过空洞卷积或引入注意力模块来增加感受野，不过都是在encoder-decoder结构中进行修改。
+在本文中，我们将语义分割作为一个序列到序列的预测任务。具体来说：提出一个纯Transformer，即没有卷积和降低分辨率，将图像编码为一系列patch，在Transformer的每一层都使用全局上下文信息。该encoder可以与一个简单的decoder结合，提供一个强大的分割模型，称为SEgmentation TRansformer（SETR）。
+Introduction  标准的全卷积网络具有encoder-decoder架构：encoder用于捕捉特征，decoder对由编码器产生的特征进行像素级分类。其中，encoder由堆叠的卷积层组成，特征图的分辨率逐渐降低，encoder能够学习更多的抽象特征，并且逐渐增大感受野。但是存在一些限制，即不能学习远程的依赖信息，感受野有限对于语义分割任务是不好的。
+为了克服上述的限制，一种方法是直接修改卷积操作：大的卷积核大小，空洞卷积和图像/特征金字塔结构；另一种方法是将注意力模块引入FCN架构中：旨在建模特征图中所有像素的全局交互信息。当应用于语义分割任务时，一种常见的设计是将注意力模块与FCN体系结构相结合，并将注意层放置在顶部。针对上述两种方法，标准的encoder-decoder架构是不变的。最近，开始尝试摆脱卷积，关注纯注意力模型，但是，即使没有卷积，也不会改变模型结构的本质：encoder（下采样）-decoder（上采样）架构。
+在本文中，我们提出用纯Transformer代替基于堆叠卷积层的编码器，从而产生一种新的分割模型，称为SEgmentation TRansformer（SETR）。该Transformer编码器将输入图像视为图像patch序列，并使用全局自注意力机制对该序列进行转换，用于特征学习。具体地说：首先将一个图像分解成一个固定大小的patch，形成patch序列；然后，对每个patch的像素向量应用线性变换层，得到一系列特征embedding向量作为Transformer的输入；得到Transformer输出的特征，使用decoder来恢复原始图像的分辨率。图像分辨率没有下采样，在Transformer的每一层都进行全局上下文建模。（灵感来源于ViT）
+Contributions：
+（1）将图像分割问题作为一个序列到序列的预测任务，以替换全卷积网络；
+（2）利用Transformer框架，实现纯注意力机制的特征表示encoder；
+（3）进一步提出了三种不同复杂性的decoder架构。
+Related work Semantic segmentation  最近的许多研究都集中在解决有限的感受野/上下文信息建模问题：DeepLab引入空洞卷积，PSANet提出用于动态捕捉远程上下文的空间注意力模块；DANet提出空间注意力和通道注意力。所有这些方法都基于FCNs，特征编码和提取部分都是基于经典卷积网络，如VGG和ResNet。在该工作中，我们从不同的角度重新思考语义分割任务。
+Transformer  AANet将卷积和自注意力机制集中训练，LRNet探索局部自注意力，以避免全局自注意力带来的大量计算，DETR使用Transformer进行目标检测，其中Transformer被附加在检测头中，STTR和LSTR分别采用Transformer进行视差估计和车道形状预测。最近，ViT是第一个纯Transformer图像分类模型，达到了最优的结果，为语义分割任务中使用纯Transformer的编码器设计提供了灵感。
+Method FCN-based semantic segmentation  在基于FCN的语义分割网络中，encoder由堆叠的卷积层组成：第一层以图像作为输入，大小为$H×W×3$；后续层的输入是一个大小为$h×w×d$的三维张量，由于卷积操作的局域性，感受野随层数的增加而增加，取决于卷积核核的大小（通常是3×3）。因此，只有具有大感受野的更高层次才能在这个FCN架构中捕捉更多的上下文信息。然而，一旦达到一定深度，增加更多层的优势会迅速减少。因此，对上下文建模的感受野有限是经典FCN结构的限制。
+最近，一些研究发现，将FCN与注意机制相结合是学习上下文信息的一种有效的策略。这些方法为例减少计算量，将注意力机制限制在较小尺寸的更高层次的特征图中，导致缺乏对较低层次特征图的学习，为了克服这一限制，我们提出了一种完全基于自注意力机制的编码器，称为SEgmentation TRansformers（SETR）。
+Segmentation transformers (SETR) Image to sequence  SETR遵循NLP的输入-输出形式，具体地，Transformer，如上图的（a）所示，以一维的特征embedding序列$Z\in \mathbb{R} ^{L\times C}$作为输入，$L$为序列的长度，$C$为隐含通道的大小。因此，图像序列化需要将输入图像$x\in \mathbb{R} ^{H\times W\times 3}$转换为$Z$。
+图像序列化的一种简单方法是将图像像素值flatten为一个大小为$3HW$的一维向量，对于大小为$480×480×3$的典型图像，得到的向量长度将为$691200$。考虑到Transformer的二次复杂度，这种高维向量不可能在空间和时间上同时被处理。因此，将每个像素作为转换器的输入是不可能的。
+最终，决定设置Transformer的输入序列长度$L$为$\frac{H}{16}\times \frac{W}{16}=\frac{HW}{256}$。为了获得$\frac{HW}{256}$长的输入序列，我们将一个图像$x\in \mathbb{R} ^{H\times W\times 3}$均匀地划分成为$\frac{H}{16}\times \frac{W}{16}$个patch，每个patch的大小为$16×16$，然后将patch flatten为一个序列。利用线性变换函数$f:p\rightarrow e\in \mathbb{R} ^{C}$，将每个向量化的patch进一步映射到潜在的高维embedding空间，得到图像$x$的一维patch embedding序列。为了对patch的空间信息进行编码，每个位置$i$学习一个特定的embedding $p_{i}$，以形成最终的输入序列：$E=\lbrace e_{1}+p_{1},e_{2}+p_{2},&amp;hellip;,e_{L}+p_{L} \rbrace$。</description>
+    </item>
+    
     <item>
       <title>Attention U-Net</title>
       <link>https://gdy0924.github.io/posts/attention-u-net/</link>

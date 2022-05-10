@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/segformer/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/segformer/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "SegFormer",
+      "headline" : "SegFormer",
+      "description" : "原文链接：SegFormer: Simple and Efficient Design for Semantic Segmentation with Transformers\nAbstract  我们提出了一个SegFormer，将transformer与多层感知器(MLP)解码器统一起来。SegFormer有两个特点：（1）其包括一个层次架构transformer编码器，输出多尺度特征，不需要位置编码，从而避免当测试分辨率与训练不同时，位置编码插值会导致性能下降；（2）避免了复杂的解码器，使用的MLP解码器融合来自不同层的信息，从而结合了局部和全局的注意力机制。将该方法进行扩展，获得了从SegFormer-B0到SegFormer-B5的一系列模型，达到了比以前的模型更好的性能和效率。\nIntroduction  ViT将transformer用于图像分类，将一个图像分割成多个线性embedding的patch，并将其输入到一个带有位置embedding的transformer中，在ImageNet上取得了令人印象深刻的性能。在语义分割中，SETR的提出证明了transformer的可行性。\nSETR采用ViT作为backbone，并合并了几个CNN解码器来扩大特征分辨率。尽管ViT性能良好，但也有一些局限性：\n（1）ViT输出单尺度低分辨率特征，而不是多尺度特征；\n（2）它在大图像上的计算成本较高。\n为了解决这些限制，提出了一种金字塔视觉transformer(pyramid vision Transformer，PVT)，这是一种具有金字塔结构的ViT的扩展，用于密集预测。PVT在目标检测和语义分割方面比ResNet有相当大的改进。\n本文介绍了SegFormer，一个前沿的语义分割transformer框架，同时考虑了效率、准确性和鲁棒性。与以前的方法相比，我们的框架重新设计了编码器和解码器。\nContribution：\n（1）一种新的无位置编码的分层transformer编码器；\n（2）一种轻量级的仅用MLP作为解码器的设计，没有复杂的计算；\n（3）在三个公开的语义分割数据集上的效率、准确性和鲁棒性方面都达到了最优。\n首先，该编码器在对分辨率与训练图像不同的图像进行预测时，避免了位置编码插值，因此，该编码器可以很容易地适应任意分辨率的测试图像，而不影响性能；其次，分层结构使编码器能够同时生成高分辨率的细粒度特征和低分辨率的粗粒度特征，这与ViT只能生成固定分辨率的特征图形成了对比；最后，我们提出了一个轻量级的MLP解码器，其关键思想是利用transformer的内在特点，即较低层的注意力倾向于局部信息，而最高层的注意力是全局的的。通过融合来自不同层的信息，MLP解码器同时结合了局部和全局的信息。\nRelated Work Semantic Segmentation  语义分割可以看作是图像分类从图像级到像素级的一种扩展，最早的语义分割模型为FCN，一个全卷积的网络，以端到端的方式进行像素到像素的分类。之后，一些修改：扩大感受野；细化上下文信息；引入边界信息；引入注意力模块等。最近的方法（SETR）已经证明了基于transformer的架构对语义分割任务的有效性，但是，这些方法仍然需要大量计算。\nTransformer backbones  ViT是第一个完全利用transformer在图像分类中达到最优性能的工作；随后，DeiT进一步探索了一种数据高效的训练策略和一种蒸馏方法；PVT是第一个在transformer中引入金字塔结构的工作；Swin、CvT、CoaT、LeViT和Twins等方法增强了特征的局部连续性，去掉了固定大小的位置embedding，提高了transformer在密集预测任务中的性能。\nTransformers for specific tasks  DETR是第一个使用transformer构建一个无NMS的端到端的目标检测框架。在语义分割方面，SETR采用ViT作为backbone来提取特征，取得了令人印象深刻的性能。然而，这些基于transformer的方法效率非常低，因此很难在实时应用程序中部署。\nMethod 如上图所示，主要包括两部分：\n（1）分层transformer编码器：生成高分辨率粗粒度特征和低分辨率细粒度特征；\n（2）轻量级的MLP解码器：融合多层特性，生成最终的语义分割结果。\n首先给定一个大小为$H×W×3$的图像，我们首先将其分成大小为$4×4$的patch，与ViT使用大小为$16×16$的patch不同，使用较小的patch更有利于密集预测任务；然后，将这些patch作为分层transformer编码器的输入，以获得原始图像分辨率的{1\/4、1\/8、1\/16、1\/32}的多层次特征；将这些多层次特征传递给MLP解码器，以预测$\\frac{H}{4}\\times \\frac{W}{4}\\times N_{cls}$分辨率下的分割结果，其中$N_{cls}$是类别的数量。\nHierarchical Transformer Encoder  我们设计了一系列的Mix Transformer编码器(MiT)，MiT-B0到MiT-B5，具有相同的架构，但大小不同：MiT-B0用于快速预测的轻量级模型，而MiT-B5是获得最佳性能的最大模型。MiT的设计受ViT的启发，但为语义分割任务定制与优化。\nHierarchical Feature Representation  与ViT只能生成单分辨率的特征图不同，该模块的目标是，给定一个输入图像，生成类似CNN的多层次特征图。这些特性图同时提供了高分辨率的粗粒度特征和低分辨率的细粒度特征。具体来说，给定一个分辨率为$H×W×3$的输入图像，通过patch 合并（patch merging）获得层次化的特征图$F_{i}$，每个特征图的分辨率为$\\frac{H}{2^{i\u002b1}}\\times \\frac{W}{2^{i\u002b1}}\\times C_{i}$，其中$i\\in \\lbrace 1,2,3,4 \\rbrace$，$C_{i\u002b1}$ 比$C_{i}$大。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-05-07 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-05-07 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/segformer\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>SegFormer</title>
+  <meta property="og:title" content="SegFormer" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="原文链接：SegFormer: Simple and Efficient Design for Semantic Segmentation with Transformers
+Abstract  我们提出了一个SegFormer，将transformer与多层感知器(MLP)解码器统一起来。SegFormer有两个特点：（1）其包括一个层次架构transformer编码器，输出多尺度特征，不需要位置编码，从而避免当测试分辨率与训练不同时，位置编码插值会导致性能下降；（2）避免了复杂的解码器，使用的MLP解码器融合来自不同层的信息，从而结合了局部和全局的注意力机制。将该方法进行扩展，获得了从SegFormer-B0到SegFormer-B5的一系列模型，达到了比以前的模型更好的性能和效率。
+Introduction  ViT将transformer用于图像分类，将一个图像分割成多个线性embedding的patch，并将其输入到一个带有位置embedding的transformer中，在ImageNet上取得了令人印象深刻的性能。在语义分割中，SETR的提出证明了transformer的可行性。
+SETR采用ViT作为backbone，并合并了几个CNN解码器来扩大特征分辨率。尽管ViT性能良好，但也有一些局限性：
+（1）ViT输出单尺度低分辨率特征，而不是多尺度特征；
+（2）它在大图像上的计算成本较高。
+为了解决这些限制，提出了一种金字塔视觉transformer(pyramid vision Transformer，PVT)，这是一种具有金字塔结构的ViT的扩展，用于密集预测。PVT在目标检测和语义分割方面比ResNet有相当大的改进。
+本文介绍了SegFormer，一个前沿的语义分割transformer框架，同时考虑了效率、准确性和鲁棒性。与以前的方法相比，我们的框架重新设计了编码器和解码器。
+Contribution：
+（1）一种新的无位置编码的分层transformer编码器；
+（2）一种轻量级的仅用MLP作为解码器的设计，没有复杂的计算；
+（3）在三个公开的语义分割数据集上的效率、准确性和鲁棒性方面都达到了最优。
+首先，该编码器在对分辨率与训练图像不同的图像进行预测时，避免了位置编码插值，因此，该编码器可以很容易地适应任意分辨率的测试图像，而不影响性能；其次，分层结构使编码器能够同时生成高分辨率的细粒度特征和低分辨率的粗粒度特征，这与ViT只能生成固定分辨率的特征图形成了对比；最后，我们提出了一个轻量级的MLP解码器，其关键思想是利用transformer的内在特点，即较低层的注意力倾向于局部信息，而最高层的注意力是全局的的。通过融合来自不同层的信息，MLP解码器同时结合了局部和全局的信息。
+Related Work Semantic Segmentation  语义分割可以看作是图像分类从图像级到像素级的一种扩展，最早的语义分割模型为FCN，一个全卷积的网络，以端到端的方式进行像素到像素的分类。之后，一些修改：扩大感受野；细化上下文信息；引入边界信息；引入注意力模块等。最近的方法（SETR）已经证明了基于transformer的架构对语义分割任务的有效性，但是，这些方法仍然需要大量计算。
+Transformer backbones  ViT是第一个完全利用transformer在图像分类中达到最优性能的工作；随后，DeiT进一步探索了一种数据高效的训练策略和一种蒸馏方法；PVT是第一个在transformer中引入金字塔结构的工作；Swin、CvT、CoaT、LeViT和Twins等方法增强了特征的局部连续性，去掉了固定大小的位置embedding，提高了transformer在密集预测任务中的性能。
+Transformers for specific tasks  DETR是第一个使用transformer构建一个无NMS的端到端的目标检测框架。在语义分割方面，SETR采用ViT作为backbone来提取特征，取得了令人印象深刻的性能。然而，这些基于transformer的方法效率非常低，因此很难在实时应用程序中部署。
+Method 如上图所示，主要包括两部分：
+（1）分层transformer编码器：生成高分辨率粗粒度特征和低分辨率细粒度特征；
+（2）轻量级的MLP解码器：融合多层特性，生成最终的语义分割结果。
+首先给定一个大小为$H×W×3$的图像，我们首先将其分成大小为$4×4$的patch，与ViT使用大小为$16×16$的patch不同，使用较小的patch更有利于密集预测任务；然后，将这些patch作为分层transformer编码器的输入，以获得原始图像分辨率的{1/4、1/8、1/16、1/32}的多层次特征；将这些多层次特征传递给MLP解码器，以预测$\frac{H}{4}\times \frac{W}{4}\times N_{cls}$分辨率下的分割结果，其中$N_{cls}$是类别的数量。
+Hierarchical Transformer Encoder  我们设计了一系列的Mix Transformer编码器(MiT)，MiT-B0到MiT-B5，具有相同的架构，但大小不同：MiT-B0用于快速预测的轻量级模型，而MiT-B5是获得最佳性能的最大模型。MiT的设计受ViT的启发，但为语义分割任务定制与优化。
+Hierarchical Feature Representation  与ViT只能生成单分辨率的特征图不同，该模块的目标是，给定一个输入图像，生成类似CNN的多层次特征图。这些特性图同时提供了高分辨率的粗粒度特征和低分辨率的细粒度特征。具体来说，给定一个分辨率为$H×W×3$的输入图像，通过patch 合并（patch merging）获得层次化的特征图$F_{i}$，每个特征图的分辨率为$\frac{H}{2^{i&#43;1}}\times \frac{W}{2^{i&#43;1}}\times C_{i}$，其中$i\in \lbrace 1,2,3,4 \rbrace$，$C_{i&#43;1}$ 比$C_{i}$大。" />
+  <meta name="description" content="原文链接：SegFormer: Simple and Efficient Design for Semantic Segmentation with Transformers
+Abstract  我们提出了一个SegFormer，将transformer与多层感知器(MLP)解码器统一起来。SegFormer有两个特点：（1）其包括一个层次架构transformer编码器，输出多尺度特征，不需要位置编码，从而避免当测试分辨率与训练不同时，位置编码插值会导致性能下降；（2）避免了复杂的解码器，使用的MLP解码器融合来自不同层的信息，从而结合了局部和全局的注意力机制。将该方法进行扩展，获得了从SegFormer-B0到SegFormer-B5的一系列模型，达到了比以前的模型更好的性能和效率。
+Introduction  ViT将transformer用于图像分类，将一个图像分割成多个线性embedding的patch，并将其输入到一个带有位置embedding的transformer中，在ImageNet上取得了令人印象深刻的性能。在语义分割中，SETR的提出证明了transformer的可行性。
+SETR采用ViT作为backbone，并合并了几个CNN解码器来扩大特征分辨率。尽管ViT性能良好，但也有一些局限性：
+（1）ViT输出单尺度低分辨率特征，而不是多尺度特征；
+（2）它在大图像上的计算成本较高。
+为了解决这些限制，提出了一种金字塔视觉transformer(pyramid vision Transformer，PVT)，这是一种具有金字塔结构的ViT的扩展，用于密集预测。PVT在目标检测和语义分割方面比ResNet有相当大的改进。
+本文介绍了SegFormer，一个前沿的语义分割transformer框架，同时考虑了效率、准确性和鲁棒性。与以前的方法相比，我们的框架重新设计了编码器和解码器。
+Contribution：
+（1）一种新的无位置编码的分层transformer编码器；
+（2）一种轻量级的仅用MLP作为解码器的设计，没有复杂的计算；
+（3）在三个公开的语义分割数据集上的效率、准确性和鲁棒性方面都达到了最优。
+首先，该编码器在对分辨率与训练图像不同的图像进行预测时，避免了位置编码插值，因此，该编码器可以很容易地适应任意分辨率的测试图像，而不影响性能；其次，分层结构使编码器能够同时生成高分辨率的细粒度特征和低分辨率的粗粒度特征，这与ViT只能生成固定分辨率的特征图形成了对比；最后，我们提出了一个轻量级的MLP解码器，其关键思想是利用transformer的内在特点，即较低层的注意力倾向于局部信息，而最高层的注意力是全局的的。通过融合来自不同层的信息，MLP解码器同时结合了局部和全局的信息。
+Related Work Semantic Segmentation  语义分割可以看作是图像分类从图像级到像素级的一种扩展，最早的语义分割模型为FCN，一个全卷积的网络，以端到端的方式进行像素到像素的分类。之后，一些修改：扩大感受野；细化上下文信息；引入边界信息；引入注意力模块等。最近的方法（SETR）已经证明了基于transformer的架构对语义分割任务的有效性，但是，这些方法仍然需要大量计算。
+Transformer backbones  ViT是第一个完全利用transformer在图像分类中达到最优性能的工作；随后，DeiT进一步探索了一种数据高效的训练策略和一种蒸馏方法；PVT是第一个在transformer中引入金字塔结构的工作；Swin、CvT、CoaT、LeViT和Twins等方法增强了特征的局部连续性，去掉了固定大小的位置embedding，提高了transformer在密集预测任务中的性能。
+Transformers for specific tasks  DETR是第一个使用transformer构建一个无NMS的端到端的目标检测框架。在语义分割方面，SETR采用ViT作为backbone来提取特征，取得了令人印象深刻的性能。然而，这些基于transformer的方法效率非常低，因此很难在实时应用程序中部署。
+Method 如上图所示，主要包括两部分：
+（1）分层transformer编码器：生成高分辨率粗粒度特征和低分辨率细粒度特征；
+（2）轻量级的MLP解码器：融合多层特性，生成最终的语义分割结果。
+首先给定一个大小为$H×W×3$的图像，我们首先将其分成大小为$4×4$的patch，与ViT使用大小为$16×16$的patch不同，使用较小的patch更有利于密集预测任务；然后，将这些patch作为分层transformer编码器的输入，以获得原始图像分辨率的{1/4、1/8、1/16、1/32}的多层次特征；将这些多层次特征传递给MLP解码器，以预测$\frac{H}{4}\times \frac{W}{4}\times N_{cls}$分辨率下的分割结果，其中$N_{cls}$是类别的数量。
+Hierarchical Transformer Encoder  我们设计了一系列的Mix Transformer编码器(MiT)，MiT-B0到MiT-B5，具有相同的架构，但大小不同：MiT-B0用于快速预测的轻量级模型，而MiT-B5是获得最佳性能的最大模型。MiT的设计受ViT的启发，但为语义分割任务定制与优化。
+Hierarchical Feature Representation  与ViT只能生成单分辨率的特征图不同，该模块的目标是，给定一个输入图像，生成类似CNN的多层次特征图。这些特性图同时提供了高分辨率的粗粒度特征和低分辨率的细粒度特征。具体来说，给定一个分辨率为$H×W×3$的输入图像，通过patch 合并（patch merging）获得层次化的特征图$F_{i}$，每个特征图的分辨率为$\frac{H}{2^{i&#43;1}}\times \frac{W}{2^{i&#43;1}}\times C_{i}$，其中$i\in \lbrace 1,2,3,4 \rbrace$，$C_{i&#43;1}$ 比$C_{i}$大。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">SegFormer</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-05-07 00:00:00 UTC">
+                07 May 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>原文链接：<a href="https://arxiv.org/pdf/2105.15203.pdf">SegFormer: Simple and Efficient Design for Semantic Segmentation with Transformers</a></p>
+<h2 id="abstract">Abstract</h2>
+<p>    我们提出了一个SegFormer，将transformer与多层感知器(MLP)解码器统一起来。SegFormer有两个特点：（1）其包括一个层次架构transformer编码器，输出多尺度特征，不需要位置编码，从而避免当测试分辨率与训练不同时，位置编码插值会导致性能下降；（2）避免了复杂的解码器，使用的MLP解码器融合来自不同层的信息，从而结合了局部和全局的注意力机制。将该方法进行扩展，获得了从SegFormer-B0到SegFormer-B5的一系列模型，达到了比以前的模型更好的性能和效率。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    ViT将transformer用于图像分类，将一个图像分割成多个线性embedding的patch，并将其输入到一个带有位置embedding的transformer中，在ImageNet上取得了令人印象深刻的性能。在语义分割中，SETR的提出证明了transformer的可行性。<br>
+    SETR采用ViT作为backbone，并合并了几个CNN解码器来扩大特征分辨率。尽管ViT性能良好，但也有一些局限性：<br>
+    （1）ViT输出单尺度低分辨率特征，而不是多尺度特征；<br>
+    （2）它在大图像上的计算成本较高。<br>
+    为了解决这些限制，提出了一种金字塔视觉transformer(pyramid vision Transformer，PVT)，这是一种具有金字塔结构的ViT的扩展，用于密集预测。PVT在目标检测和语义分割方面比ResNet有相当大的改进。<br>
+    本文介绍了SegFormer，一个前沿的语义分割transformer框架，同时考虑了效率、准确性和鲁棒性。与以前的方法相比，我们的框架重新设计了编码器和解码器。<br>
+    <em><strong>Contribution</strong></em>：<br>
+    （1）一种新的无位置编码的分层transformer编码器；<br>
+    （2）一种轻量级的仅用MLP作为解码器的设计，没有复杂的计算；<br>
+    （3）在三个公开的语义分割数据集上的效率、准确性和鲁棒性方面都达到了最优。<br>
+    首先，该编码器在对分辨率与训练图像不同的图像进行预测时，避免了位置编码插值，因此，该编码器可以很容易地适应任意分辨率的测试图像，而不影响性能；其次，分层结构使编码器能够同时生成高分辨率的细粒度特征和低分辨率的粗粒度特征，这与ViT只能生成固定分辨率的特征图形成了对比；最后，我们提出了一个轻量级的MLP解码器，其关键思想是利用transformer的内在特点，即较低层的注意力倾向于局部信息，而最高层的注意力是全局的的。通过融合来自不同层的信息，MLP解码器同时结合了局部和全局的信息。</p>
+<h2 id="related-work">Related Work</h2>
+<h3 id="semantic-segmentation">Semantic Segmentation</h3>
+<p>    语义分割可以看作是图像分类从图像级到像素级的一种扩展，最早的语义分割模型为FCN，一个全卷积的网络，以端到端的方式进行像素到像素的分类。之后，一些修改：扩大感受野；细化上下文信息；引入边界信息；引入注意力模块等。最近的方法（SETR）已经证明了基于transformer的架构对语义分割任务的有效性，但是，这些方法仍然需要大量计算。</p>
+<h3 id="transformer-backbones">Transformer backbones</h3>
+<p>    ViT是第一个完全利用transformer在图像分类中达到最优性能的工作；随后，DeiT进一步探索了一种数据高效的训练策略和一种蒸馏方法；PVT是第一个在transformer中引入金字塔结构的工作；Swin、CvT、CoaT、LeViT和Twins等方法增强了特征的局部连续性，去掉了固定大小的位置embedding，提高了transformer在密集预测任务中的性能。</p>
+<h3 id="transformers-for-specific-tasks">Transformers for specific tasks</h3>
+<p>    DETR是第一个使用transformer构建一个无NMS的端到端的目标检测框架。在语义分割方面，SETR采用ViT作为backbone来提取特征，取得了令人印象深刻的性能。然而，这些基于transformer的方法效率非常低，因此很难在实时应用程序中部署。</p>
+<h2 id="method">Method</h2>
+<p><img src="/img/segformer1.PNG" alt="">
+    如上图所示，主要包括两部分：<br>
+    （1）分层transformer编码器：生成高分辨率粗粒度特征和低分辨率细粒度特征；<br>
+    （2）轻量级的MLP解码器：融合多层特性，生成最终的语义分割结果。<br>
+    首先给定一个大小为$H×W×3$的图像，我们首先将其分成大小为$4×4$的patch，与ViT使用大小为$16×16$的patch不同，使用较小的patch更有利于密集预测任务；然后，将这些patch作为分层transformer编码器的输入，以获得原始图像分辨率的{1/4、1/8、1/16、1/32}的多层次特征；将这些多层次特征传递给MLP解码器，以预测$\frac{H}{4}\times \frac{W}{4}\times N_{cls}$分辨率下的分割结果，其中$N_{cls}$是类别的数量。</p>
+<h3 id="hierarchical-transformer-encoder">Hierarchical Transformer Encoder</h3>
+<p>    我们设计了一系列的Mix Transformer编码器(MiT)，MiT-B0到MiT-B5，具有相同的架构，但大小不同：MiT-B0用于快速预测的轻量级模型，而MiT-B5是获得最佳性能的最大模型。MiT的设计受ViT的启发，但为语义分割任务定制与优化。</p>
+<h4 id="hierarchical-feature-representation">Hierarchical Feature Representation</h4>
+<p>    与ViT只能生成单分辨率的特征图不同，该模块的目标是，给定一个输入图像，生成类似CNN的多层次特征图。这些特性图同时提供了高分辨率的粗粒度特征和低分辨率的细粒度特征。具体来说，给定一个分辨率为$H×W×3$的输入图像，通过patch 合并（patch merging）获得层次化的特征图$F_{i}$，每个特征图的分辨率为$\frac{H}{2^{i+1}}\times \frac{W}{2^{i+1}}\times C_{i}$，其中$i\in \lbrace 1,2,3,4 \rbrace$，$C_{i+1}$ 比$C_{i}$大。</p>
+<h4 id="overlapped-patch-merging">Overlapped Patch Merging</h4>
+<p>    给定一个图像patch，ViT中的patch merging操作，将一个$N×N×3$patch转换为一个$1×1×C$的向量。这可以很容易地扩展到将一个$2×2×C_{i}$特征路径统一为一个$1×1×C_{i+1}$向量，以获得层次特征图。使用patch merging可以将层次结构特征图从$F_{1}(\frac{H}{4}\times \frac{W}{4}\times C_{1})$缩小到$F_{2}(\frac{H}{8}\times \frac{W}{8}\times C_{2})$，然后迭代层次结构中的任何其他特征图。（patch merging为swin transformer中的内容，如下图所示）
+<img src="/img/segformer2.PNG" alt="">
+    刚开始的设计为不重叠的图像或特征patch，不能保持这些patch周围的局部连续性。所以，使用了一个重叠的patch merging操作：我们定义了K、S和P，其中K为patch大小，S是两个相邻patch之间的stride，P是padding大小。在实验中，设置K=7、S=4、P=3和K=3、S=2、P=1进行重叠patch merging，产生与非重叠过程相同大小的特征图。</p>
+<h4 id="efficient-self-attention">Efficient Self-Attention</h4>
+<p>    编码器的主要计算瓶颈是自注意力层。在原始的多头自注意层中，每个头中的Q、K、V都具有相同的维度$N×C$，其中$N=H×W$为序列的长度，自注意力机制计算公式如下：
+$$
+Attention(Q,K,V)=softmax(\frac{QK^{T}}{\sqrt{d_{head}}})V
+$$
+    该过程的计算复杂度为$O(n^{2})$，这对于大的图像分辨率是爆炸的。因此，我们引入序列缩减过程，该过程使用比值$R$来减小序列的长度：
+$$
+\hat{K}=Reshape(\frac{N}{R},C\cdot R)(K)
+$$
+$$
+k=Linear(C\cdot R,C)(\hat{K})
+$$
+    其中，$K$是要减小的序列，$Reshape(\frac{N}{R},C\cdot R)(K)$是指将$K$reshape为$\frac{N}{R}×(C\cdot R)$形状，$Linear(C_{in},C_{out})(\cdot)$是指一个线性层将一个$C_{in}$维的张量作为输入，产生一个$C_{out}$维的张量作为输出。因此，$K$的新维数为$\frac{N}{R}×C$。这样，自注意机制的复杂性从$O(n^{2})$降低到$O(\frac{N^{2}}{R})$。在实验中，从第一阶段到第四阶段将$R$分别设置为$[64,16,4,1]$。
+<img src="/img/segformer9.jpg" alt=""></p>
+<h4 id="mix-ffn">Mix-FFN</h4>
+<p>    ViT使用位置编码来引入位置信息，但是位置编码的分辨率是固定的，因此，当测试分辨率与训练分辨率不同时，需要位置编码差值，这往往会导致精度下降。其实位置编码并不是语义分割所必需的，因此，引入Mix-FFN：考虑零填充对缺少位置信息的影响。通过直接在前馈网络(FFN)中添加3×3卷积来实现：
+$$
+x_{out}=MLP(GELU(Conv_{3×3}(MLP(x_{in}))))+x_{in}
+$$
+    其中，$x_{in}$是自注意力模块的输出特征，Mix-FFN在每个FFN中混合一个3×3的卷积和一个MLP。通过实验证明，3×3卷积足以为transformer提供位置信息，并且通过使用逐通道卷积来减少参数的数量和提高效率。</p>
+<h3 id="lightweight-all-mlp-decoder">Lightweight All-MLP Decoder</h3>
+<p>    SegFormer集成了一个只由MLP层组成的轻量级decoder，实现这样一个简单的解码器的关键是，我们的分层transformer编码器比传统的CNN编码器具有更大的有效感受野。<br>
+    所提出的All-MLP解码器包括四个主要步骤：<br>
+    （1）来自MiT编码器的多级特性$F_{i}$通过一个MLP层来统一通道数；<br>
+    （2）所有特征被上采样原图尺寸的1/4，并concat在一起；<br>
+    （3）利用MLP层来融合连接的特征$F$；<br>
+    （4）另一个MLP层利用融合特征来预测分辨率为$\frac{H}{4}\times \frac{W}{4}\times N_{cls}$的分割掩码，其中$N_{cls}$为类别数。<br>
+    即：
+$$
+\hat{F}_ {i}=Linear(C_{i},C)(F_{i}),\forall i
+$$
+$$
+\hat{F}_ {i}=Upsample(\frac{W}{4}\times \frac{H}{4})(F_{i}),\forall i
+$$
+$$
+F=Linear(4C,C)(Concat(\hat{F}_ {i})),\forall i
+$$
+$$
+M=Linear(C,N_{cls})(F)
+$$
+    其中，$M$为预测的掩码；$Linear(C_{in},C_{out})(\cdot)$代表以$C_{in}$为输入向量维度，以$C_{out}$为输出向量维度的线性层。</p>
+<h4 id="effective-receptive-field-analysis">Effective Receptive Field Analysis</h4>
+<p><img src="/img/segformer3.PNG" alt="">
+    上图可视化了DeepLabv3+和SegFormer中四个编码器stage和解码器head的有效感受野，可以看出：<br>
+    （1）DeepLabv3+的有效感受野，即使在最深阶段stage-4也相对较小；<br>
+    （2）SegFormer的编码器产生类似于较低阶段卷积的局部注意力，同时能够输出高度全局注意力，在stage-4有效地捕获到上下文信息；<br>
+    （3）将上图中的patch放大，MLP中head（蓝框）的有效感受野与stage-4（红框）不同，除了全局注意力外，还有明显的局部注意力。</p>
+<h3 id="relationship-to-setr">Relationship to SETR</h3>
+<p>    与SETR相比，SegFormer包含了多个更高效和更强大的设计：<br>
+    （1）SegFormer只使用ImageNet-1K进行预训练，而SETR中的ViT在更大的ImageNet-22K上进行预训练；<br>
+    （2）SegFormer的编码器具有分层架构，比ViT小，可以捕获高分辨率的粗粒度特征和低分辨率的细粒度特征，相比之下，SETR的ViT编码器只能生成单一的低分辨率特征图；<br>
+    （3）SegFormer删除了编码器中的位置embedding，而SETR使用固定形状的位置embedding，当预测时的分辨率与训练时的分辨率不同时，会降低精度；<br>
+    （4）SegFormer的MLP解码器比SETR中的解码器更紧凑，计算要求也更低。</p>
+<h2 id="实验">实验</h2>
+<h3 id="ablation-studies">Ablation studies</h3>
+<h4 id="model-size">model size</h4>
+<p><img src="/img/segformer4.PNG" alt=""></p>
+<h4 id="encoder">encoder</h4>
+<p>    分析了Mix-FFN与位置编码的影响：
+<img src="/img/segformer5.PNG" alt="">
+    对于给定的分辨率，我们使用Mix-FFN的方法明显优于使用位置编码的方法。此外，我们的方法对测试分辨率的差异不那么敏感：当使用较低分辨率的位置编码时，准确率下降了3.3%；相比之下，当我们使用提议的Mix-FFN时，性能下降下降到只有0.7%。</p>
+<h4 id="decoder">decoder</h4>
+<p><img src="/img/segformer6.PNG" alt="">
+    分析在MLP解码器中的通道维度C对结果的影响：性能随着C的增加而增加，但是它会导致更大、效率更低的模型。</p>
+<h3 id="comparison-to-state-of-the-art-methods">Comparison to state of the art methods</h3>
+<h4 id="ade20k-and-cityscapes">ADE20K and Cityscapes</h4>
+<p><img src="/img/segformer7.PNG" alt=""></p>
+<h4 id="coco-stuff">COCO-Stuff</h4>
+<p><img src="/img/segformer8.PNG" alt=""></p>
+<h2 id="conclusion">Conclusion</h2>
+<p>    在本文中，我们提出了一种简单且强大的语义分割方法，包含一个无位置编码的分层transformer编码器和一个轻量级的All-MLP解码器。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>
