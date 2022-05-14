@@ -6,7 +6,43 @@
     <description>Recent content in Code on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 30 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/code/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 07 May 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/code/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>SETR</title>
+      <link>https://gdy0924.github.io/posts/setrcode/</link>
+      <pubDate>Sat, 07 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/setrcode/</guid>
+      <description>Decoder naive 1class SETR_Naive(SegmentationTransformer): 2 def __init__( 3 self, 4 img_dim, 5 patch_dim, 6 num_channels, 7 num_classes, 8 embedding_dim, 9 num_heads, 10 num_layers, 11 hidden_dim, 12 dropout_rate=0.0, 13 attn_dropout_rate=0.0, 14 conv_patch_representation=False, 15 positional_encoding_type=&amp;#34;learned&amp;#34;, 16 ): 17 super(SETR_Naive, self).__init__( 18 img_dim=img_dim, 19 patch_dim=patch_dim, 20 num_channels=num_channels, 21 embedding_dim=embedding_dim, 22 num_heads=num_heads, 23 num_layers=num_layers, 24 hidden_dim=hidden_dim, 25 dropout_rate=dropout_rate, 26 attn_dropout_rate=attn_dropout_rate, 27 conv_patch_representation=conv_patch_representation, 28 positional_encoding_type=positional_encoding_type, 29 ) 30 31 self.num_classes = num_classes 32 self._init_decode() 33 34 #两个（1×1卷积+BN+ReLU）+上采样 35 def _init_decode(self): 36 self.</description>
+    </item>
+    
+    <item>
+      <title>DeepLab系列</title>
+      <link>https://gdy0924.github.io/posts/deeplab%E7%B3%BB%E5%88%97code/</link>
+      <pubDate>Wed, 04 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/deeplab%E7%B3%BB%E5%88%97code/</guid>
+      <description>V1 1import torch 2import torch.nn as nn 3import torch.nn.functional as F 4 5# 使用torch的nn模块中BatchNorm/在encoding文件中定义的BatchNorm 6try: 7 from encoding.nn import SyncBatchNorm 8 _BATCH_NORM = SyncBatchNorm 9except: 10 _BATCH_NORM = nn.BatchNorm2d 11_BOTTLENECK_EXPANSION = 4 12 13#卷积+BN+非线性激活 14class _ConvBnReLU(nn.Sequential): 15 BATCH_NORM = _BATCH_NORM 16 def __init__(self, in_ch, out_ch, kernel_size, stride, padding, dilation, relu=True): 17 super(_ConvBnReLU, self).__init__() 18 self.add_module( 19 &amp;#34;conv&amp;#34;,nn.Conv2d(in_ch, out_ch, kernel_size, stride, padding, dilation, bias=False), 20 ) 21 self.add_module(&amp;#34;bn&amp;#34;, _BATCH_NORM(out_ch, eps=1e-5, momentum=0.999)) 22 23 if relu: 24 self.</description>
+    </item>
+    
+    <item>
+      <title>U-Net</title>
+      <link>https://gdy0924.github.io/posts/u-netcode/</link>
+      <pubDate>Wed, 27 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/u-netcode/</guid>
+      <description>1import torch 2import torch.nn as nn 3import torch.nn.functional as F 4 5#下采样卷积block（3×3卷积+3×3卷积） 6class UNetConvBlock(nn.Module): 7 def __init__(self, in_chans, out_chans, padding, batch_norm): 8 super(UNetConvBlock, self).__init__() 9 block=[] 10 11 block.append(nn.Conv2d(in_chans, out_chans, kernel_size=3, padding=int(padding)) 12 block.append(nn.ReLU()) 13 14 if batch_norm : 15 block.append(nn.BatchNorm2d(out_chans)) 16 17 block.append(nn.Conv2d(out_chans, out_chans, kernel_size=3, padding=int(padding)) 18 block.append(nn.ReLU()) 19 20 if batch_norm: 21 block.append(nn.BatchNorm2d(out_chans)) 22 23 self.block = nn.Sequential(*block) 24 25 def forward(self, x): 26 out = self.block(x) 27 return out 28 29#上采样block 30class UNetUpBlock(nn.</description>
+    </item>
+    
+    <item>
+      <title>FCN</title>
+      <link>https://gdy0924.github.io/posts/fcncode/</link>
+      <pubDate>Mon, 25 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/fcncode/</guid>
+      <description>1class FCNs(nn.Module): 2 def __init__(self, num_classes, backbone=&amp;#34;vgg&amp;#34;): 3 super(FCNs, self).__init__() 4 self.num_classes = num_classes 5 #VGG为提取特征的网络 6 if backbone == &amp;#34;vgg&amp;#34;: 7 self.features = VGG() 8 #转置卷积(输入通道数，输出通道数，卷积核大小，步长，零填充将添加到输入中每个维度的两侧，在输出形状的每个尺寸的一侧添加的附加大小) 9 #每次上采样2倍，共上采样5次 10 # deconv1 1/16 11 self.deconv1 = nn.ConvTranspose2d(512, 512, kernel_size=3, stride=2, padding=1, output_padding=1) 12 self.bn1 = nn.BatchNorm2d(512) 13 self.relu1 = nn.ReLU() 14 15 # deconv1 1/8 16 self.deconv2 = nn.ConvTranspose2d(512, 256, kernel_size=3, stride=2, padding=1, output_padding=1) 17 self.bn2 = nn.BatchNorm2d(256) 18 self.relu2 = nn.</description>
+    </item>
+    
     <item>
       <title>GoogleNet</title>
       <link>https://gdy0924.github.io/posts/googlenetcode/</link>

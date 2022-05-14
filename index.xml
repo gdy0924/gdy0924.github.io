@@ -39,6 +39,15 @@ Hierarchical Feature Representation  与ViT只能生成单分辨率的特征�
     
     <item>
       <title>SETR</title>
+      <link>https://gdy0924.github.io/posts/setrcode/</link>
+      <pubDate>Sat, 07 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/setrcode/</guid>
+      <description>Decoder naive 1class SETR_Naive(SegmentationTransformer): 2 def __init__( 3 self, 4 img_dim, 5 patch_dim, 6 num_channels, 7 num_classes, 8 embedding_dim, 9 num_heads, 10 num_layers, 11 hidden_dim, 12 dropout_rate=0.0, 13 attn_dropout_rate=0.0, 14 conv_patch_representation=False, 15 positional_encoding_type=&amp;#34;learned&amp;#34;, 16 ): 17 super(SETR_Naive, self).__init__( 18 img_dim=img_dim, 19 patch_dim=patch_dim, 20 num_channels=num_channels, 21 embedding_dim=embedding_dim, 22 num_heads=num_heads, 23 num_layers=num_layers, 24 hidden_dim=hidden_dim, 25 dropout_rate=dropout_rate, 26 attn_dropout_rate=attn_dropout_rate, 27 conv_patch_representation=conv_patch_representation, 28 positional_encoding_type=positional_encoding_type, 29 ) 30 31 self.num_classes = num_classes 32 self._init_decode() 33 34 #两个（1×1卷积+BN+ReLU）+上采样 35 def _init_decode(self): 36 self.</description>
+    </item>
+    
+    <item>
+      <title>SETR</title>
       <link>https://gdy0924.github.io/posts/setr/</link>
       <pubDate>Sat, 07 May 2022 00:00:00 +0000</pubDate>
       
@@ -84,6 +93,15 @@ Related Work Attention Gates  一般AG会被用在自然图像分析、知识�
 Methodology Fully Convolutional Network (FCN)  全卷积网络已经成为医学图像的基准模型，如FCN、U-Net、DeepMedic等，其效果要优于传统的方法，主要是由于：SGD优化，卷积核的参数共享、卷积操作很好地捕捉到了医学图像中的结构信息。卷积层通过逐层捕捉局部信息，逐步提取高维图像表示$x^{l}$，最终，最终在高维空间的离散像素会具有语义信息和巨大的感受野。在第$l$层的输出处，依次通过一个线性变换和一个非线性激活函数，得到了特征图$x^{l}$。
 在本文中，我们在一个标准的U-Net架构之上加入注意力模型。U-Net网络的优势主要是与在多个图像尺度上提取图像特征有关。粗粒度的特征图能够捕获上下文信息，并突出显示前景对象的类别和位置。在多个尺度上提取的特征图随后将通过skip连接进行合并，以结合粗粒度级别和细粒度级别的密集预测，如下图所示： Attention Gates for Image Analysis  为了捕获足够大的感受野，从而获取上下文信息，在标准的卷积网络中，特征图的尺寸经过下采样逐渐变小。这样，在粗粒度特征图中的特征才能以全局的尺寸建模位置和关系。但是对于小物体，形变程度大，很难降低false-positive预测。为了提高精度，当前的分割框架依赖于额外的目标定位模型，将任务简化为单独的定位和分割两步骤。其实，通过在一个标准的CNN模型中集成注意门(AGs)来也可以实现。这不需要训练多个模型和大量额外的模型参数，AG会抑制无关背景区域中的特征响应，而无需在网络之间裁剪ROI。
 注意力系数（attention coefficients），$\alpha_{i}\in [0,1]$，是为了突出显著的图像区域和抑制任务无关的特征响应，以只保留与特定任务相关的激活，如下图所示。 AGs的输出是输入特征图和注意力系数的元素级相乘（对应元素逐个相乘）：$\hat{x}_ {i,c}^{l}=x_ {i,c}^{l}\cdot \alpha_{i}^{l}$。通常，为每个像素向量$x_{i}^{l}\in \mathbb{R}^{F_{l}}$计算一个注意力标量，其中，$F_{l}$对应于第$l$层中特征图的通道数。在多语义标签类中，我们提出使用多维注意力系数。因此，每个AG都学习专注于目标对象的一个子集，如下图所示： 每个像素$i$使用门控向量$g_{i}\in \mathbb{R}^{F_{g}}$来决定聚焦区域。门控向量包含上下文信息，以修剪低级特征响应。在本文中，选择使用加法注意力机制，相比于乘法注意力，其效果更好，公式如下： $$ q_{att}^{l}=\psi^{T}(\sigma_{1}(W_{x}^{T}x_{i}^{l}+W_{g}^{T}g_{i}+b_{g}))+b_{\psi} $$ $$ \alpha_{i}^{l}=\sigma_{2}(q_{att}^{l}(x_{i}^{l},g_{i};\Theta_{att})) $$ 其中，$\sigma_{2}$是sigmoid激活函数，AG由一组参数$\Theta_{att}$表示，包括：线性变换$W_{x} \in \mathbb{R}^{F_{l}\times F_{int}}$，$W_{g} \in \mathbb{R}^{F_{g}\times F_{int}}$，$\psi \in \mathbb{R}^{F_{int}\times 1}$和偏置项$b_{\psi} \in \mathbb{R}$，$b_{g} \in \mathbb{R}^{F_{int}}$。线性变换是通过1x1卷积来实现的。</description>
+    </item>
+    
+    <item>
+      <title>DeepLab系列</title>
+      <link>https://gdy0924.github.io/posts/deeplab%E7%B3%BB%E5%88%97code/</link>
+      <pubDate>Wed, 04 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/deeplab%E7%B3%BB%E5%88%97code/</guid>
+      <description>V1 1import torch 2import torch.nn as nn 3import torch.nn.functional as F 4 5# 使用torch的nn模块中BatchNorm/在encoding文件中定义的BatchNorm 6try: 7 from encoding.nn import SyncBatchNorm 8 _BATCH_NORM = SyncBatchNorm 9except: 10 _BATCH_NORM = nn.BatchNorm2d 11_BOTTLENECK_EXPANSION = 4 12 13#卷积+BN+非线性激活 14class _ConvBnReLU(nn.Sequential): 15 BATCH_NORM = _BATCH_NORM 16 def __init__(self, in_ch, out_ch, kernel_size, stride, padding, dilation, relu=True): 17 super(_ConvBnReLU, self).__init__() 18 self.add_module( 19 &amp;#34;conv&amp;#34;,nn.Conv2d(in_ch, out_ch, kernel_size, stride, padding, dilation, bias=False), 20 ) 21 self.add_module(&amp;#34;bn&amp;#34;, _BATCH_NORM(out_ch, eps=1e-5, momentum=0.999)) 22 23 if relu: 24 self.</description>
     </item>
     
     <item>
@@ -168,6 +186,15 @@ Conclusion  我们提出了SegNet，一种用于语义分割的深度卷积网
     </item>
     
     <item>
+      <title>U-Net</title>
+      <link>https://gdy0924.github.io/posts/u-netcode/</link>
+      <pubDate>Wed, 27 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/u-netcode/</guid>
+      <description>1import torch 2import torch.nn as nn 3import torch.nn.functional as F 4 5#下采样卷积block（3×3卷积+3×3卷积） 6class UNetConvBlock(nn.Module): 7 def __init__(self, in_chans, out_chans, padding, batch_norm): 8 super(UNetConvBlock, self).__init__() 9 block=[] 10 11 block.append(nn.Conv2d(in_chans, out_chans, kernel_size=3, padding=int(padding)) 12 block.append(nn.ReLU()) 13 14 if batch_norm : 15 block.append(nn.BatchNorm2d(out_chans)) 16 17 block.append(nn.Conv2d(out_chans, out_chans, kernel_size=3, padding=int(padding)) 18 block.append(nn.ReLU()) 19 20 if batch_norm: 21 block.append(nn.BatchNorm2d(out_chans)) 22 23 self.block = nn.Sequential(*block) 24 25 def forward(self, x): 26 out = self.block(x) 27 return out 28 29#上采样block 30class UNetUpBlock(nn.</description>
+    </item>
+    
+    <item>
       <title>U-Net&amp;U-Net&#43;&#43;</title>
       <link>https://gdy0924.github.io/posts/u-netu-net&#43;&#43;/</link>
       <pubDate>Wed, 27 Apr 2022 00:00:00 +0000</pubDate>
@@ -202,6 +229,15 @@ Training  利用输入的图像及其对应的分割图，通过随机梯度�
 转置卷积（反卷积） 参考链接：47 转置卷积【动手学深度学习v2】 抽丝剥茧，带你理解转置卷积（反卷积） 原始卷积  直观的理解就是固定大小的卷积核在原始的输入图像进行滑动，通过矩阵加权计算得到输出特征，如下图所示： 但是实际在计算机中计算的时候，并不是像这样一个位置一个位置的进行滑动计算，因为这样的效率太低了。计算机会将卷积核转换成等效的矩阵，将输入转换为向量。通过输入向量和卷积核矩阵的相乘获得输出向量。输出的向量经过整形便可得到我们的二维输出特征。具体的操作如下图所示，由于我们的3x3卷积核要在输入上不同的位置卷积4次，所以通过补零的方法将卷积核分别置于一个4x4矩阵的四个角落。这样我们的输入可以直接和这四个4x4的矩阵进行卷积，而舍去了滑动这一操作步骤。 进一步，将输入拉成长向量，四个4x4卷积核也拉成长向量并进行拼接，如下图所示： 记向量化的图像为$I$，向量化的卷积矩阵为$C$，输出特征向量为$O$，则有： $$ I^{T}×C=O^{T} $$ 上述过程将一个$1×16$的行向量乘以$16×4$的矩阵，得到了$1×4$的行向量。那么反过来将一个$1×4$的向量乘以一个$4×16$的矩阵应该就能得到一个$1×16$的行向量，这就是转置卷积的思想。
 转置卷积  对应上面公式，我们有转置卷积的公式： $$ O^{T}×C^{T}=I^{T} $$ 需要注意的是这两个操作并不是可逆的，对于同一个卷积核，经过转置卷积操作之后并不能恢复到原始的数值，保留的只有原始的形状。
 代码 1import tensorflow as tf 2 3x = tf.reshape(tf.constant([[1,2], 4 [4,5]],dtype=tf.float32), [1, 2, 2, 1]) 5kernel = tf.reshape(tf.constant([[1,2,3], 6 [4,5,6], 7 [7,8,9]],dtype=tf.float32), [3, 3, 1, 1]) 8transpose_conv = tf.nn.conv2d_transpose(x, kernel, output_shape=[1, 4, 4, 1], strides=[1,1,1,1], padding=&amp;#39;VALID&amp;#39;) 9sess = tf.Session() 10print(sess.run(x)) 11print(sess.run(kernel)) 12print(sess.run(transpose_conv)) 示例  当padding=0，stride=1时，具体例子计算如下：  在原始的卷积操作中，加入padding，会使输出比无填充时尺寸更大，相反，在转置卷积中，加入padding会使输出更小，如下图所示（具体来说，就是在计算完成得到输出后，padding为多少，就把输出结果的几圈去掉）：  在原始的卷积操作中，加入stride，会使输出比无填充时尺寸更小，相反，在转置卷积中，加入stride会使输出更大，如下图所示（stride对应的为补0操作，并且是在内部行列之间进行补0）： 反池化（UnPooling）  max pooling的逆操作，即在max pool的时候记录一个池化的索引，就是记录取得的这个值是在哪个位置。在反池化的时候，输入的值根据索引放回原来的位置，其余位置填0，如下图所示： </description>
+    </item>
+    
+    <item>
+      <title>FCN</title>
+      <link>https://gdy0924.github.io/posts/fcncode/</link>
+      <pubDate>Mon, 25 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/fcncode/</guid>
+      <description>1class FCNs(nn.Module): 2 def __init__(self, num_classes, backbone=&amp;#34;vgg&amp;#34;): 3 super(FCNs, self).__init__() 4 self.num_classes = num_classes 5 #VGG为提取特征的网络 6 if backbone == &amp;#34;vgg&amp;#34;: 7 self.features = VGG() 8 #转置卷积(输入通道数，输出通道数，卷积核大小，步长，零填充将添加到输入中每个维度的两侧，在输出形状的每个尺寸的一侧添加的附加大小) 9 #每次上采样2倍，共上采样5次 10 # deconv1 1/16 11 self.deconv1 = nn.ConvTranspose2d(512, 512, kernel_size=3, stride=2, padding=1, output_padding=1) 12 self.bn1 = nn.BatchNorm2d(512) 13 self.relu1 = nn.ReLU() 14 15 # deconv1 1/8 16 self.deconv2 = nn.ConvTranspose2d(512, 256, kernel_size=3, stride=2, padding=1, output_padding=1) 17 self.bn2 = nn.BatchNorm2d(256) 18 self.relu2 = nn.</description>
     </item>
     
     <item>

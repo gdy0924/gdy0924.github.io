@@ -15,6 +15,9 @@
                 href="https://gdy0924.github.io/categories/"
                 />
   </url><url>
+    <loc>https://gdy0924.github.io/categories/code/</loc>
+    <lastmod>2022-05-07T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://gdy0924.github.io/categories/paper/</loc>
     <lastmod>2022-05-07T00:00:00+00:00</lastmod>
   </url><url>
@@ -32,6 +35,9 @@
                 />
   </url><url>
     <loc>https://gdy0924.github.io/posts/segformer/</loc>
+    <lastmod>2022-05-07T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/setrcode/</loc>
     <lastmod>2022-05-07T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/setr/</loc>
@@ -53,6 +59,9 @@
     <loc>https://gdy0924.github.io/posts/attention-u-net/</loc>
     <lastmod>2022-05-05T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://gdy0924.github.io/posts/deeplab%E7%B3%BB%E5%88%97code/</loc>
+    <lastmod>2022-05-04T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://gdy0924.github.io/posts/deeplab%E7%B3%BB%E5%88%97/</loc>
     <lastmod>2022-05-04T00:00:00+00:00</lastmod>
   </url><url>
@@ -65,11 +74,17 @@
     <loc>https://gdy0924.github.io/posts/segnet/</loc>
     <lastmod>2022-04-29T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://gdy0924.github.io/posts/u-netcode/</loc>
+    <lastmod>2022-04-27T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://gdy0924.github.io/posts/u-netu-net&#43;&#43;/</loc>
     <lastmod>2022-04-27T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/upsampling/</loc>
     <lastmod>2022-04-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/fcncode/</loc>
+    <lastmod>2022-04-25T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/fcn/</loc>
     <lastmod>2022-04-25T00:00:00+00:00</lastmod>
@@ -115,9 +130,6 @@
   </url><url>
     <loc>https://gdy0924.github.io/posts/resnet/</loc>
     <lastmod>2022-04-05T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://gdy0924.github.io/categories/code/</loc>
-    <lastmod>2022-03-30T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/googlenetcode/</loc>
     <lastmod>2022-03-30T00:00:00+00:00</lastmod>
