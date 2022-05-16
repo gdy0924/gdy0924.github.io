@@ -6,7 +6,16 @@
     <description>Recent content in Categories on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 07 May 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 15 May 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Summary</title>
+      <link>https://gdy0924.github.io/categories/summary/</link>
+      <pubDate>Sun, 15 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/categories/summary/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>Code</title>
       <link>https://gdy0924.github.io/categories/code/</link>
@@ -22,15 +31,6 @@
       <pubDate>Sat, 07 May 2022 00:00:00 +0000</pubDate>
       
       <guid>https://gdy0924.github.io/categories/paper/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Summary</title>
-      <link>https://gdy0924.github.io/categories/summary/</link>
-      <pubDate>Wed, 04 May 2022 00:00:00 +0000</pubDate>
-      
-      <guid>https://gdy0924.github.io/categories/summary/</guid>
       <description></description>
     </item>
     

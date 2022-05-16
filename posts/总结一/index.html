@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/%E6%80%BB%E7%BB%93%E4%B8%80/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/%E6%80%BB%E7%BB%93%E4%B8%80/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "总结（一）",
+      "headline" : "总结（一）",
+      "description" : "简单点总结 图像分类 AlexNet：ReLU；Dropout。\nVGG：堆叠的小卷积增大感受野，代替大卷积核（加深网络）；全卷积网络（输入任意尺寸的图像）。\nGoogleNet：Inception模块（融合不同尺度的特征）；辅助分类器（解决更深网络中的梯度回传问题）。\nResNet：残差网络；shortcut连接。（极大的增加网络深度）\nResNeXt：split-transform-merge思想；将分组卷积引入ResNet（减少计算量）。\nShuffleNet：分组卷积（减少计算量与内存使用量）；channel shuffle操作。\n目标检测 R-CNN：two-stage；Selective Search；多次卷积；SVM\u002bregression。\nFast R-CNN：two-stage；Selective Search；一次卷积；softmax\u002bregression。\nFaster R-CNN：two-stage；RNP网络（解决Selective Search算法时间长问题）；RPN与特征提取共享卷积层；引入anchor（一个中心点9个锚框）；softmax\u002bregression。\nYOLO：one-stage；全卷积网络；图像分为S×S的网格，一个网格预测两个bounding-box和一个对象类别；最终的通道数对应每个网格要预测的所有数值。\nSSD：one-stage；全卷积网络；default box（anchor思想，一个中心点5个锚框，解决YOLO一个网格只能预测一个对象的问题）；多尺度融合，即每种分辨率大小的特征图都经过一个detector后融合。\n图像分割 FCN：全卷积网络；转置卷积提高分辨率；融合不同分辨率的特征（add）。\nSegNet：全卷积网络；反池化\u002b卷积操作提高分辨率（相比转置卷积减少内存使用与计算量）。\nU-Net：encoder-decoder架构；转置卷积提高分辨率；skip连接融合特征（concat）。\nAttention U-Net：在U-Net的基础上，引入attention gate（突出重点区域）。\nDeepLab：空洞卷积（扩大感受野但不降低分辨率）；空间金字塔池架构（融合不同尺度的特征）；在v3\u002b中加入一个decoder，融合浅层特征，形成encoder-decoder架构。\nSETR：encoder-decoder结构；用transformer中的encoder提取特征，patch embedding\u002b位置 embedding（相比CNN，感受野更大，捕获更全局的信息）；提出三种不同的decoder提高分辨率（线性插值）。\nSegFormer：encoder-decoder结构；修改SETR结构；Overlapped Patch Merging（overlap保留局部特征，patch merging在每个stage生成分辨率不同的特征）；Efficient Self-Attention（减少自注意力模块中的计算量与参数量）；Mix-FFN添加一个卷积层（引入相对位置信息，取消位置embedding）；完全基于MLP的decoder（计算简单）。\n图像分类 LeNet AlexNet 1、使用ReLU非线性激活：缓解梯度消失问题；\n2、多GPU训练：放在2个GPU上进行训练，在特定的层进行通信交流；\n3、LRN：局部响应标准化(Local Response Normalization)；\n4、Overlapping Pooling：池化窗口大小和步长不同，缓解过拟合问题；\n5、Dropout：随机的丢弃一些神经元，以防止过拟合。\nVGG 1、堆叠的小卷积代替大卷积：两个3×3大小的感受野堆叠起来的感受野与一个5×5大小的感受野相同，三个3×3大小的感受野堆叠起来的感受野与一个7×7大小的感受野相同。用小卷积多次引入非线性变换，并且减少网络参数。（使网络更深）\n2、全卷积网络：将最后的全连接层换成卷积层，可以输入任意尺寸大小的图片。\nGoogleNet 提出Inception结构：保持网络结构的稀疏性，又能利用密集矩阵的高计算性能。通过不同分支融合不同尺度的特征，1×1卷积实现通道数的减少。\n辅助分类器：解决梯度回传的问题，额外添加两个辅助的softmax用于向前传导梯度。\n后续改进：堆叠小卷积代替大卷积，加入BN，残差连接。\nResNet  当更深层次的网络能够开始收敛时，出现网络退化的问题，即随着网络深度的增加，精度达到饱和，然后迅速下降。\n提出Residual Block：（如果增加的层可以构造成恒等映射，那么更深的模型的训练误差应该不大于对应较浅的模型）引入Shortcut连接，即$y=F(x)\u002bx$，左边是网络层数较少时使用（18，34），右边用于更深的网络（50，101，152）；1×1卷积实现通道数的改变，降维减少计算量；add需要保证特征维度相同，使用1×1卷积实现Shortcut路径上特征尺寸和通道数的改变。 ResNeXt  在Residual Block中引入Inception Block的思想（split-transform-merge），即将输入的特征split，然后进行卷积操作，最后在merge合并（分组卷积的思想）： ShuffleNet  轻量级网络，通过改进深度可分离卷积，降低计算量与参数量。\nResNeXt中，在分组卷积之后会跟着1×1的卷积，来融合不同通道的信息（深度可分离卷积也是同样），此时的1×1卷积相对来说计算量比较大，因此也考虑使用分组卷积。但是连续使用分组卷积会导致各组之间没有信息融合，因此引入channel shuffle操作。下图中a是连续使用几次分组卷积的结果，b表示将上一层中每个组中的通道划分为几个子组，然后向下一层中的每个组提供不同的子组，c为channel shuffle操作。 ShuffleNet Block：引入残差连接和深度可分离卷积思想（a）；将1×1卷积替换为分组卷积并引入channel shuffle操作（b）；通道拼接代替元素相加，进一步减少计算量（c）。 目标检测  目标检测方法主要分为两类：two-stage和one-stage。two-stage是先由算法生成一系列作为样本的候选框，再通过卷积神经网络进行样本分类，在检测准确率和定位精度上占优，如R-CNN系列；ne-stage则不用产生候选框，直接将目标边框定位的问题转化为回归问题处理，在算法速度上占优，如YOLO，SSD等。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-05-15 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-05-15 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/%E6%80%BB%E7%BB%93%E4%B8%80\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>总结（一）</title>
+  <meta property="og:title" content="总结（一）" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="简单点总结 图像分类 AlexNet：ReLU；Dropout。
+VGG：堆叠的小卷积增大感受野，代替大卷积核（加深网络）；全卷积网络（输入任意尺寸的图像）。
+GoogleNet：Inception模块（融合不同尺度的特征）；辅助分类器（解决更深网络中的梯度回传问题）。
+ResNet：残差网络；shortcut连接。（极大的增加网络深度）
+ResNeXt：split-transform-merge思想；将分组卷积引入ResNet（减少计算量）。
+ShuffleNet：分组卷积（减少计算量与内存使用量）；channel shuffle操作。
+目标检测 R-CNN：two-stage；Selective Search；多次卷积；SVM&#43;regression。
+Fast R-CNN：two-stage；Selective Search；一次卷积；softmax&#43;regression。
+Faster R-CNN：two-stage；RNP网络（解决Selective Search算法时间长问题）；RPN与特征提取共享卷积层；引入anchor（一个中心点9个锚框）；softmax&#43;regression。
+YOLO：one-stage；全卷积网络；图像分为S×S的网格，一个网格预测两个bounding-box和一个对象类别；最终的通道数对应每个网格要预测的所有数值。
+SSD：one-stage；全卷积网络；default box（anchor思想，一个中心点5个锚框，解决YOLO一个网格只能预测一个对象的问题）；多尺度融合，即每种分辨率大小的特征图都经过一个detector后融合。
+图像分割 FCN：全卷积网络；转置卷积提高分辨率；融合不同分辨率的特征（add）。
+SegNet：全卷积网络；反池化&#43;卷积操作提高分辨率（相比转置卷积减少内存使用与计算量）。
+U-Net：encoder-decoder架构；转置卷积提高分辨率；skip连接融合特征（concat）。
+Attention U-Net：在U-Net的基础上，引入attention gate（突出重点区域）。
+DeepLab：空洞卷积（扩大感受野但不降低分辨率）；空间金字塔池架构（融合不同尺度的特征）；在v3&#43;中加入一个decoder，融合浅层特征，形成encoder-decoder架构。
+SETR：encoder-decoder结构；用transformer中的encoder提取特征，patch embedding&#43;位置 embedding（相比CNN，感受野更大，捕获更全局的信息）；提出三种不同的decoder提高分辨率（线性插值）。
+SegFormer：encoder-decoder结构；修改SETR结构；Overlapped Patch Merging（overlap保留局部特征，patch merging在每个stage生成分辨率不同的特征）；Efficient Self-Attention（减少自注意力模块中的计算量与参数量）；Mix-FFN添加一个卷积层（引入相对位置信息，取消位置embedding）；完全基于MLP的decoder（计算简单）。
+图像分类 LeNet AlexNet 1、使用ReLU非线性激活：缓解梯度消失问题；
+2、多GPU训练：放在2个GPU上进行训练，在特定的层进行通信交流；
+3、LRN：局部响应标准化(Local Response Normalization)；
+4、Overlapping Pooling：池化窗口大小和步长不同，缓解过拟合问题；
+5、Dropout：随机的丢弃一些神经元，以防止过拟合。
+VGG 1、堆叠的小卷积代替大卷积：两个3×3大小的感受野堆叠起来的感受野与一个5×5大小的感受野相同，三个3×3大小的感受野堆叠起来的感受野与一个7×7大小的感受野相同。用小卷积多次引入非线性变换，并且减少网络参数。（使网络更深）
+2、全卷积网络：将最后的全连接层换成卷积层，可以输入任意尺寸大小的图片。
+GoogleNet 提出Inception结构：保持网络结构的稀疏性，又能利用密集矩阵的高计算性能。通过不同分支融合不同尺度的特征，1×1卷积实现通道数的减少。
+辅助分类器：解决梯度回传的问题，额外添加两个辅助的softmax用于向前传导梯度。
+后续改进：堆叠小卷积代替大卷积，加入BN，残差连接。
+ResNet  当更深层次的网络能够开始收敛时，出现网络退化的问题，即随着网络深度的增加，精度达到饱和，然后迅速下降。
+提出Residual Block：（如果增加的层可以构造成恒等映射，那么更深的模型的训练误差应该不大于对应较浅的模型）引入Shortcut连接，即$y=F(x)&#43;x$，左边是网络层数较少时使用（18，34），右边用于更深的网络（50，101，152）；1×1卷积实现通道数的改变，降维减少计算量；add需要保证特征维度相同，使用1×1卷积实现Shortcut路径上特征尺寸和通道数的改变。 ResNeXt  在Residual Block中引入Inception Block的思想（split-transform-merge），即将输入的特征split，然后进行卷积操作，最后在merge合并（分组卷积的思想）： ShuffleNet  轻量级网络，通过改进深度可分离卷积，降低计算量与参数量。
+ResNeXt中，在分组卷积之后会跟着1×1的卷积，来融合不同通道的信息（深度可分离卷积也是同样），此时的1×1卷积相对来说计算量比较大，因此也考虑使用分组卷积。但是连续使用分组卷积会导致各组之间没有信息融合，因此引入channel shuffle操作。下图中a是连续使用几次分组卷积的结果，b表示将上一层中每个组中的通道划分为几个子组，然后向下一层中的每个组提供不同的子组，c为channel shuffle操作。 ShuffleNet Block：引入残差连接和深度可分离卷积思想（a）；将1×1卷积替换为分组卷积并引入channel shuffle操作（b）；通道拼接代替元素相加，进一步减少计算量（c）。 目标检测  目标检测方法主要分为两类：two-stage和one-stage。two-stage是先由算法生成一系列作为样本的候选框，再通过卷积神经网络进行样本分类，在检测准确率和定位精度上占优，如R-CNN系列；ne-stage则不用产生候选框，直接将目标边框定位的问题转化为回归问题处理，在算法速度上占优，如YOLO，SSD等。" />
+  <meta name="description" content="简单点总结 图像分类 AlexNet：ReLU；Dropout。
+VGG：堆叠的小卷积增大感受野，代替大卷积核（加深网络）；全卷积网络（输入任意尺寸的图像）。
+GoogleNet：Inception模块（融合不同尺度的特征）；辅助分类器（解决更深网络中的梯度回传问题）。
+ResNet：残差网络；shortcut连接。（极大的增加网络深度）
+ResNeXt：split-transform-merge思想；将分组卷积引入ResNet（减少计算量）。
+ShuffleNet：分组卷积（减少计算量与内存使用量）；channel shuffle操作。
+目标检测 R-CNN：two-stage；Selective Search；多次卷积；SVM&#43;regression。
+Fast R-CNN：two-stage；Selective Search；一次卷积；softmax&#43;regression。
+Faster R-CNN：two-stage；RNP网络（解决Selective Search算法时间长问题）；RPN与特征提取共享卷积层；引入anchor（一个中心点9个锚框）；softmax&#43;regression。
+YOLO：one-stage；全卷积网络；图像分为S×S的网格，一个网格预测两个bounding-box和一个对象类别；最终的通道数对应每个网格要预测的所有数值。
+SSD：one-stage；全卷积网络；default box（anchor思想，一个中心点5个锚框，解决YOLO一个网格只能预测一个对象的问题）；多尺度融合，即每种分辨率大小的特征图都经过一个detector后融合。
+图像分割 FCN：全卷积网络；转置卷积提高分辨率；融合不同分辨率的特征（add）。
+SegNet：全卷积网络；反池化&#43;卷积操作提高分辨率（相比转置卷积减少内存使用与计算量）。
+U-Net：encoder-decoder架构；转置卷积提高分辨率；skip连接融合特征（concat）。
+Attention U-Net：在U-Net的基础上，引入attention gate（突出重点区域）。
+DeepLab：空洞卷积（扩大感受野但不降低分辨率）；空间金字塔池架构（融合不同尺度的特征）；在v3&#43;中加入一个decoder，融合浅层特征，形成encoder-decoder架构。
+SETR：encoder-decoder结构；用transformer中的encoder提取特征，patch embedding&#43;位置 embedding（相比CNN，感受野更大，捕获更全局的信息）；提出三种不同的decoder提高分辨率（线性插值）。
+SegFormer：encoder-decoder结构；修改SETR结构；Overlapped Patch Merging（overlap保留局部特征，patch merging在每个stage生成分辨率不同的特征）；Efficient Self-Attention（减少自注意力模块中的计算量与参数量）；Mix-FFN添加一个卷积层（引入相对位置信息，取消位置embedding）；完全基于MLP的decoder（计算简单）。
+图像分类 LeNet AlexNet 1、使用ReLU非线性激活：缓解梯度消失问题；
+2、多GPU训练：放在2个GPU上进行训练，在特定的层进行通信交流；
+3、LRN：局部响应标准化(Local Response Normalization)；
+4、Overlapping Pooling：池化窗口大小和步长不同，缓解过拟合问题；
+5、Dropout：随机的丢弃一些神经元，以防止过拟合。
+VGG 1、堆叠的小卷积代替大卷积：两个3×3大小的感受野堆叠起来的感受野与一个5×5大小的感受野相同，三个3×3大小的感受野堆叠起来的感受野与一个7×7大小的感受野相同。用小卷积多次引入非线性变换，并且减少网络参数。（使网络更深）
+2、全卷积网络：将最后的全连接层换成卷积层，可以输入任意尺寸大小的图片。
+GoogleNet 提出Inception结构：保持网络结构的稀疏性，又能利用密集矩阵的高计算性能。通过不同分支融合不同尺度的特征，1×1卷积实现通道数的减少。
+辅助分类器：解决梯度回传的问题，额外添加两个辅助的softmax用于向前传导梯度。
+后续改进：堆叠小卷积代替大卷积，加入BN，残差连接。
+ResNet  当更深层次的网络能够开始收敛时，出现网络退化的问题，即随着网络深度的增加，精度达到饱和，然后迅速下降。
+提出Residual Block：（如果增加的层可以构造成恒等映射，那么更深的模型的训练误差应该不大于对应较浅的模型）引入Shortcut连接，即$y=F(x)&#43;x$，左边是网络层数较少时使用（18，34），右边用于更深的网络（50，101，152）；1×1卷积实现通道数的改变，降维减少计算量；add需要保证特征维度相同，使用1×1卷积实现Shortcut路径上特征尺寸和通道数的改变。 ResNeXt  在Residual Block中引入Inception Block的思想（split-transform-merge），即将输入的特征split，然后进行卷积操作，最后在merge合并（分组卷积的思想）： ShuffleNet  轻量级网络，通过改进深度可分离卷积，降低计算量与参数量。
+ResNeXt中，在分组卷积之后会跟着1×1的卷积，来融合不同通道的信息（深度可分离卷积也是同样），此时的1×1卷积相对来说计算量比较大，因此也考虑使用分组卷积。但是连续使用分组卷积会导致各组之间没有信息融合，因此引入channel shuffle操作。下图中a是连续使用几次分组卷积的结果，b表示将上一层中每个组中的通道划分为几个子组，然后向下一层中的每个组提供不同的子组，c为channel shuffle操作。 ShuffleNet Block：引入残差连接和深度可分离卷积思想（a）；将1×1卷积替换为分组卷积并引入channel shuffle操作（b）；通道拼接代替元素相加，进一步减少计算量（c）。 目标检测  目标检测方法主要分为两类：two-stage和one-stage。two-stage是先由算法生成一系列作为样本的候选框，再通过卷积神经网络进行样本分类，在检测准确率和定位精度上占优，如R-CNN系列；ne-stage则不用产生候选框，直接将目标边框定位的问题转化为回归问题处理，在算法速度上占优，如YOLO，SSD等。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">总结（一）</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-05-15 00:00:00 UTC">
+                15 May 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <h1 id="简单点总结">简单点总结</h1>
+<h3 id="图像分类">图像分类</h3>
+<p><strong>AlexNet</strong>：ReLU；Dropout。<br>
+<strong>VGG</strong>：堆叠的小卷积增大感受野，代替大卷积核（加深网络）；全卷积网络（输入任意尺寸的图像）。<br>
+<strong>GoogleNet</strong>：Inception模块（融合不同尺度的特征）；辅助分类器（解决更深网络中的梯度回传问题）。<br>
+<strong>ResNet</strong>：残差网络；shortcut连接。（极大的增加网络深度）<br>
+<strong>ResNeXt</strong>：split-transform-merge思想；将分组卷积引入ResNet（减少计算量）。<br>
+<strong>ShuffleNet</strong>：分组卷积（减少计算量与内存使用量）；channel shuffle操作。</p>
+<h3 id="目标检测">目标检测</h3>
+<p><strong>R-CNN</strong>：two-stage；Selective Search；多次卷积；SVM+regression。<br>
+<strong>Fast R-CNN</strong>：two-stage；Selective Search；一次卷积；softmax+regression。<br>
+<strong>Faster R-CNN</strong>：two-stage；RNP网络（解决Selective Search算法时间长问题）；RPN与特征提取共享卷积层；引入anchor（一个中心点9个锚框）；softmax+regression。<br>
+<strong>YOLO</strong>：one-stage；全卷积网络；图像分为S×S的网格，一个网格预测两个bounding-box和一个对象类别；最终的通道数对应每个网格要预测的所有数值。<br>
+<strong>SSD</strong>：one-stage；全卷积网络；default box（anchor思想，一个中心点5个锚框，解决YOLO一个网格只能预测一个对象的问题）；多尺度融合，即每种分辨率大小的特征图都经过一个detector后融合。</p>
+<h3 id="图像分割">图像分割</h3>
+<p><strong>FCN</strong>：全卷积网络；转置卷积提高分辨率；融合不同分辨率的特征（add）。<br>
+<strong>SegNet</strong>：全卷积网络；反池化+卷积操作提高分辨率（相比转置卷积减少内存使用与计算量）。<br>
+<strong>U-Net</strong>：encoder-decoder架构；转置卷积提高分辨率；skip连接融合特征（concat）。<br>
+<strong>Attention U-Net</strong>：在U-Net的基础上，引入attention gate（突出重点区域）。<br>
+<strong>DeepLab</strong>：空洞卷积（扩大感受野但不降低分辨率）；空间金字塔池架构（融合不同尺度的特征）；在v3+中加入一个decoder，融合浅层特征，形成encoder-decoder架构。<br>
+<strong>SETR</strong>：encoder-decoder结构；用transformer中的encoder提取特征，patch embedding+位置 embedding（相比CNN，感受野更大，捕获更全局的信息）；提出三种不同的decoder提高分辨率（线性插值）。<br>
+<strong>SegFormer</strong>：encoder-decoder结构；修改SETR结构；Overlapped Patch Merging（overlap保留局部特征，patch merging在每个stage生成分辨率不同的特征）；Efficient Self-Attention（减少自注意力模块中的计算量与参数量）；Mix-FFN添加一个卷积层（引入相对位置信息，取消位置embedding）；完全基于MLP的decoder（计算简单）。</p>
+<h1 id="图像分类-1">图像分类</h1>
+<h2 id="lenet">LeNet</h2>
+<p><img src="/img/LeNet1.PNG" alt=""></p>
+<h2 id="alexnet">AlexNet</h2>
+<p><img src="/img/AlexNet1.PNG" alt="">
+1、使用<strong>ReLU</strong>非线性激活：缓解梯度消失问题；<br>
+2、<strong>多GPU</strong>训练：放在2个GPU上进行训练，在特定的层进行通信交流；<br>
+3、LRN：局部响应标准化(Local Response Normalization)；<br>
+4、Overlapping Pooling：池化窗口大小和步长不同，缓解过拟合问题；<br>
+5、<strong>Dropout</strong>：随机的丢弃一些神经元，以防止过拟合。</p>
+<h2 id="vgg">VGG</h2>
+<p><img src="/img/VGG1.jpg" alt="">
+    1、堆叠的<strong>小卷积代替大卷积</strong>：两个3×3大小的感受野堆叠起来的感受野与一个5×5大小的感受野相同，三个3×3大小的感受野堆叠起来的感受野与一个7×7大小的感受野相同。用小卷积多次引入非线性变换，并且减少网络参数。（使网络更深）<br>
+    2、<strong>全卷积网络</strong>：将最后的全连接层换成卷积层，可以输入任意尺寸大小的图片。</p>
+<h2 id="googlenet">GoogleNet</h2>
+<p><img src="/img/GoogleNetV1-2.PNG" alt="">
+    提出<strong>Inception</strong>结构：保持网络结构的稀疏性，又能利用密集矩阵的高计算性能。通过<strong>不同分支</strong>融合不同尺度的特征，1×1卷积实现通道数的减少。<br>
+    辅助分类器：解决梯度回传的问题，额外添加两个辅助的softmax用于向前传导梯度。<br>
+    后续改进：堆叠小卷积代替大卷积，加入BN，残差连接。</p>
+<h2 id="resnet">ResNet</h2>
+<p>    当更深层次的网络能够开始收敛时，出现<strong>网络退化</strong>的问题，即随着网络深度的增加，精度达到饱和，然后迅速下降。<br>
+    提出<strong>Residual Block</strong>：（如果增加的层可以构造成恒等映射，那么更深的模型的训练误差应该不大于对应较浅的模型）引入<strong>Shortcut</strong>连接，即$y=F(x)+x$，左边是网络层数较少时使用（18，34），右边用于更深的网络（50，101，152）；<strong>1×1卷积</strong>实现通道数的改变，降维减少计算量；add需要保证特征维度相同，使用<strong>1×1卷积</strong>实现Shortcut路径上特征尺寸和通道数的改变。
+<img src="/img/resnet2.png" alt=""></p>
+<h2 id="resnext">ResNeXt</h2>
+<p>    在<strong>Residual Block</strong>中引入<strong>Inception Block</strong>的思想（<strong>split-transform-merge</strong>），即将输入的特征split，然后进行卷积操作，最后在merge合并（<strong>分组卷积</strong>的思想）：
+<img src="/img/resnext3.PNG" alt=""></p>
+<h2 id="shufflenet">ShuffleNet</h2>
+<p>    轻量级网络，通过改进深度可分离卷积，降低计算量与参数量。<br>
+    ResNeXt中，在分组卷积之后会跟着1×1的卷积，来融合不同通道的信息（深度可分离卷积也是同样），此时的1×1卷积相对来说计算量比较大，因此也考虑使用分组卷积。但是连续使用分组卷积会导致各组之间没有信息融合，因此引入<strong>channel shuffle操作</strong>。下图中a是连续使用几次分组卷积的结果，b表示将上一层中每个组中的通道划分为几个子组，然后向下一层中的每个组提供不同的子组，c为channel shuffle操作。
+<img src="/img/shufflenet1.PNG" alt="">
+    ShuffleNet Block：引入<strong>残差连接</strong>和<strong>深度可分离卷积</strong>思想（a）；将1×1卷积替换为分组卷积并引入<strong>channel shuffle</strong>操作（b）；通道拼接代替元素相加，进一步减少计算量（c）。
+<img src="/img/shufflenet3.PNG" alt=""></p>
+<h1 id="目标检测-1">目标检测</h1>
+<p>    目标检测方法主要分为两类：<strong>two-stage</strong>和<strong>one-stage</strong>。two-stage是先由算法生成一系列作为样本的<strong>候选框</strong>，再通过<strong>卷积</strong>神经网络进行样本分类，在检测准确率和定位精度上占优，如R-CNN系列；ne-stage则不用产生候选框，直接将目标边框定位的问题转化为<strong>回归问题</strong>处理，在算法速度上占优，如YOLO，SSD等。</p>
+<h2 id="r-cnn">R-CNN</h2>
+<p><img src="/img/sum1-1.png" alt="">
+    包含三个步骤：<br>
+    （1）<strong>Selective Search</strong>生成候选区域：从小区域开始，逐步合并两个最相关的相邻区域，重复此步骤，直到图像合并为一个区域，最后输出候选区域；<br>
+    （2）<strong>CNN</strong>网络提取特征：将region proposal缩放至统一大小，分别输入网络；<br>
+    （3）分类与边界回归：将得到的特征向量送进每一类的<strong>SVM</strong>进行分类，同时将特征向量做回归（左上角右下角的四个坐标），修正region proposal的位置。</p>
+<h2 id="fast-r-cnn">Fast R-CNN</h2>
+<p>    R-CNN中每个候选框都要进行一次卷积操作，浪费时间。
+<img src="/img/sum1-2.png" alt="">
+    包含四个步骤：<br>
+    （1）<strong>Selective Search</strong>生成候选区域；<br>
+    （2）CNN提取特征：将任意size的图片输入CNN，得到特征图，此步骤只进行<strong>一次卷积</strong>；<br>
+    （3）<strong>RoI Pooling</strong>：在特征图中找到每一个region proposal对应的特征框，使用RoI池化层将每个特征框池化到<strong>统一大小</strong>；<br>
+    （4）分类与边界回归：使用<strong>softmax</strong>代替了R-CNN里面的多个SVM分类器。</p>
+<h2 id="faster-r-cnn">Faster R-CNN</h2>
+<p>    Selective Search算法生成候选框时间太久，因此提出<strong>RPN网络</strong>，用卷积网络生成region proposal，<strong>减少时间</strong>。<br>
+    两个分支：<strong>cls分支</strong>输出W×H×(2×9)，代表一个中心点上9个锚框的前景和背景概率；<strong>reg分支</strong>输出W×H×(4×9 )，代表9个锚框的坐标偏移。
+<img src="/img/sum1-3.png" alt="">
+    锚框<strong>Anchor</strong>：每个中心点生成不同尺寸大小和高宽比例的锚框，例如：3种尺寸和3中比例，可以生成9个不同的锚框。
+<img src="/img/fasterr-cnn3.PNG" alt="">
+    Faster R-CNN包括四个步骤：<br>
+    （1）<strong>CNN</strong>提取特征：输入固定大小的图片，进过卷积层提取特征图feature map；<br>
+    （2）生成region proposals: <strong>RPN网络</strong>生成region proposals，通过softmax判断anchors属于foreground还是background，再利用bounding box 回归修正anchors获得精确的proposals（候选区域），该步骤属于一个简单的目标检测模型，以生成一些效果还可以的候选框；<br>
+    （3）<strong>ROI Pooling</strong>：统一尺寸；<br>
+    （4）分类与边界回归：softmax+regression。
+<img src="/img/fasterr-cnn4.jpg" alt=""></p>
+<h2 id="yolo">YOLO</h2>
+<p>    主要思想：将输入图像分割成一个<strong>S×S网格</strong>，如下图所示：
+<img src="/img/sum1-4.png" alt="">
+    如果一个对象的中心落入某一网格单元格中，则该网格单元格负责检测该对象；每个网格预测两个<strong>bounding-box</strong>，且只能预测<strong>一个对象</strong>（缺点）。举例来说：S=7，B=2，每个bounding-box预测5个数值（置信度和坐标），再加上C个类别，最终预测S×S×(B∗5+C) 个数值，对应最后的通道数为30。
+<img src="/img/yolo1-3.PNG" alt="">
+    后续<strong>改进</strong>：<br>
+    1、针对每个单元格只能预测一个对象的问题，YOLO9000选择使每个单元格预测5个bounding-box，并且每个bounding-box都可以预测一个对象的类别；<br>
+    2、修改backbone；<br>
+    3、融合浅层的特征图。
+<img src="/img/yolo3-3.jfif" alt="">
+    上边为YOLO V3的架构，其中：DBL是YOLOv3的基本组件，即卷积+BN+Leaky relu；resn为残差block；concat指张量拼接，即将网络中间层与后面某一层的特征图的上采样进行拼接。</p>
+<h2 id="ssd">SSD</h2>
+<p>    主要思想：<strong>不同尺度</strong>的特征融合+default box（<strong>锚框</strong>的思想）。<br>
+    <strong>default box</strong>：每个位置生成一组不同高宽比的默认框，并且针对不同尺度的特征图，高宽比不同，可以解决目标尺度不同的问题。
+<img src="/img/ssd1.PNG" alt="">
+    <strong>不同尺度</strong>的特征融合：特征金字塔的思想，每种尺寸的特征图都经过一个detector，最后进行融合。
+<img src="/img/sum1-5.png" alt=""></p>
+<p>    <strong>SSD vs. YOLO</strong>
+<img src="/img/ssd2.PNG" alt=""></p>
+<h1 id="图像分割-1">图像分割</h1>
+<h2 id="fcn">FCN</h2>
+<p><img src="/img/FCN2.PNG" alt="">
+    （1）全卷积网络：输入任意大小的图片；<br>
+    （2）融合（add操作）不同分辨率的特征形成三种不同的网络（FCN-32s，FCN-16s，FCN-8s）；<br>
+    （3）通过<strong>转置卷积</strong>提高特征分辨率。</p>
+<h2 id="segnet">SegNet</h2>
+<p><img src="/img/segnet1.PNG" alt="">
+    （1）全卷积网络：输入任意大小的图片；<br>
+    （2）通过<strong>反池化</strong>操作，存储下采样过程中最大池化的索引位置，以减少内存使用量，反池化后跟卷积操作。</p>
+<h2 id="u-net">U-Net</h2>
+<p><img src="/img/unet1.PNG" alt="">
+    （1）<strong>encoder-decoder</strong>架构：encoder为下采样阶段（卷积+池化），decoder为上采样阶段（拼接+转置卷积）；<br>
+    （2）<strong>skip</strong>连接：浅层特征通过拼接的方式与上采样得到的特征进行融合（卷积）；<br>
+    （3）针对医学图像的特点，提出Overlap-Tile和镜像。</p>
+<h2 id="u-net-1">U-Net++</h2>
+<p><img src="/img/unet++1.PNG" alt="">
+    （1）在U-Net的基础上，将网络内部“<strong>充实</strong>”，长连接+短连接（类似于DenseNet相比于ResNet的改进）；<br>
+    （2）引入深监督（<strong>Deep supervision</strong>）操作：在每个分支都计算损失函数，在验证时可以对网络进行<strong>剪枝</strong>，以确定针对不同数据集最优的网络深度。</p>
+<h2 id="attention-u-net">Attention U-Net</h2>
+<p><img src="/img/attentionu-net1.PNG" alt="">
+    引入注意力门控机制<strong>attention gate</strong>，以突出显著的图像区域和抑制无关的特征响应，输入为该层特征与下一层特征，使用add操作，使一致的区域更突出（更加相关的特征），其余特征保留作为辅助。
+<img src="/img/attentionu-net3.PNG" alt=""></p>
+<h2 id="deeplab">DeepLab</h2>
+<p><img src="/img/deeplab2-1.PNG" alt="">
+<img src="/img/deeplab2-3.PNG" alt="">
+    （1）使用<strong>空洞卷积</strong>：在扩大感受野的同时保证特征分辨率不降低；<br>
+    （2）<strong>空间金字塔</strong>池atrous spatial pyramid pooling：解决目标尺寸大小不同的问题，使用不同扩张率的空洞卷积分别对特征进行提取，最后进行融合（add）；<br>
+    （3）CRF：细化边界信息。<br>
+    后续改进：<br>
+    （1）空间金字塔池结构中添加1×1卷积分支和图像级特征分支：
+<img src="/img/deeplabv3-4.PNG" alt="">
+    （2）结合encoder-decoder结构：添加一个decoder融合不同分辨率的特征并逐步进行上采样（线性插值法）：
+<img src="/img/deeplabv3+-3.PNG" alt=""></p>
+<h2 id="setr">SETR</h2>
+<p><img src="/img/setr1.PNG" alt="">
+    第一个将transformer架构用于语义分割的网络：<br>
+    （1）encoder-decoder架构：encoder为<strong>transformer</strong>的encoder部分，decoder对encoder的输出进行上采样（线性插值法）；<br>
+    （2）设计三种不同结构的decoder：<strong>SETR-Naive</strong>直接上采样16倍；<strong>SETR-PUP</strong>分四次逐步上采样，每次上采样2倍（b）；<strong>SETR-MLA</strong>融合encoder中不同层的特征，进行两次上采样操作（c）。</p>
+<h2 id="segformer">Segformer</h2>
+<p><img src="/img/segformer1.PNG" alt="">
+    对SETR的一些缺点进行改进：<br>
+    （1）Patch Merging：输出<strong>不同分辨率的特征</strong>，encoder中每阶段都进行尺寸减半通道加倍的操作，用于decoder阶段进行融合；
+<img src="/img/segformer2.PNG" alt="">
+    （2）Efficient Self-Attention：对自注意力机制中的K和V的<strong>个数进行减少</strong>（$N×C$变为$N/R×C$），以减少计算量；
+<img src="/img/segformer9.jpg" alt="">
+    （3）Mix-FFN：通过在多头自注意力模块后的全连接层中添加一个3×3的卷积，引入<strong>相对位置信息</strong>，从而不使用位置embedding；
+<img src="/img/sum1-6.png" alt="">
+    （4）<strong>All-MLP</strong> Decoder：仅使用MLP作为decoder，通过MLP融合不同层的特征（统一尺寸和通道数后concat起来）。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

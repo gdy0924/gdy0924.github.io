@@ -6,7 +6,46 @@
     <description>Recent content on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 07 May 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 15 May 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>总结（一）</title>
+      <link>https://gdy0924.github.io/posts/%E6%80%BB%E7%BB%93%E4%B8%80/</link>
+      <pubDate>Sun, 15 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/%E6%80%BB%E7%BB%93%E4%B8%80/</guid>
+      <description>简单点总结 图像分类 AlexNet：ReLU；Dropout。
+VGG：堆叠的小卷积增大感受野，代替大卷积核（加深网络）；全卷积网络（输入任意尺寸的图像）。
+GoogleNet：Inception模块（融合不同尺度的特征）；辅助分类器（解决更深网络中的梯度回传问题）。
+ResNet：残差网络；shortcut连接。（极大的增加网络深度）
+ResNeXt：split-transform-merge思想；将分组卷积引入ResNet（减少计算量）。
+ShuffleNet：分组卷积（减少计算量与内存使用量）；channel shuffle操作。
+目标检测 R-CNN：two-stage；Selective Search；多次卷积；SVM+regression。
+Fast R-CNN：two-stage；Selective Search；一次卷积；softmax+regression。
+Faster R-CNN：two-stage；RNP网络（解决Selective Search算法时间长问题）；RPN与特征提取共享卷积层；引入anchor（一个中心点9个锚框）；softmax+regression。
+YOLO：one-stage；全卷积网络；图像分为S×S的网格，一个网格预测两个bounding-box和一个对象类别；最终的通道数对应每个网格要预测的所有数值。
+SSD：one-stage；全卷积网络；default box（anchor思想，一个中心点5个锚框，解决YOLO一个网格只能预测一个对象的问题）；多尺度融合，即每种分辨率大小的特征图都经过一个detector后融合。
+图像分割 FCN：全卷积网络；转置卷积提高分辨率；融合不同分辨率的特征（add）。
+SegNet：全卷积网络；反池化+卷积操作提高分辨率（相比转置卷积减少内存使用与计算量）。
+U-Net：encoder-decoder架构；转置卷积提高分辨率；skip连接融合特征（concat）。
+Attention U-Net：在U-Net的基础上，引入attention gate（突出重点区域）。
+DeepLab：空洞卷积（扩大感受野但不降低分辨率）；空间金字塔池架构（融合不同尺度的特征）；在v3+中加入一个decoder，融合浅层特征，形成encoder-decoder架构。
+SETR：encoder-decoder结构；用transformer中的encoder提取特征，patch embedding+位置 embedding（相比CNN，感受野更大，捕获更全局的信息）；提出三种不同的decoder提高分辨率（线性插值）。
+SegFormer：encoder-decoder结构；修改SETR结构；Overlapped Patch Merging（overlap保留局部特征，patch merging在每个stage生成分辨率不同的特征）；Efficient Self-Attention（减少自注意力模块中的计算量与参数量）；Mix-FFN添加一个卷积层（引入相对位置信息，取消位置embedding）；完全基于MLP的decoder（计算简单）。
+图像分类 LeNet AlexNet 1、使用ReLU非线性激活：缓解梯度消失问题；
+2、多GPU训练：放在2个GPU上进行训练，在特定的层进行通信交流；
+3、LRN：局部响应标准化(Local Response Normalization)；
+4、Overlapping Pooling：池化窗口大小和步长不同，缓解过拟合问题；
+5、Dropout：随机的丢弃一些神经元，以防止过拟合。
+VGG 1、堆叠的小卷积代替大卷积：两个3×3大小的感受野堆叠起来的感受野与一个5×5大小的感受野相同，三个3×3大小的感受野堆叠起来的感受野与一个7×7大小的感受野相同。用小卷积多次引入非线性变换，并且减少网络参数。（使网络更深）
+2、全卷积网络：将最后的全连接层换成卷积层，可以输入任意尺寸大小的图片。
+GoogleNet 提出Inception结构：保持网络结构的稀疏性，又能利用密集矩阵的高计算性能。通过不同分支融合不同尺度的特征，1×1卷积实现通道数的减少。
+辅助分类器：解决梯度回传的问题，额外添加两个辅助的softmax用于向前传导梯度。
+后续改进：堆叠小卷积代替大卷积，加入BN，残差连接。
+ResNet  当更深层次的网络能够开始收敛时，出现网络退化的问题，即随着网络深度的增加，精度达到饱和，然后迅速下降。
+提出Residual Block：（如果增加的层可以构造成恒等映射，那么更深的模型的训练误差应该不大于对应较浅的模型）引入Shortcut连接，即$y=F(x)+x$，左边是网络层数较少时使用（18，34），右边用于更深的网络（50，101，152）；1×1卷积实现通道数的改变，降维减少计算量；add需要保证特征维度相同，使用1×1卷积实现Shortcut路径上特征尺寸和通道数的改变。 ResNeXt  在Residual Block中引入Inception Block的思想（split-transform-merge），即将输入的特征split，然后进行卷积操作，最后在merge合并（分组卷积的思想）： ShuffleNet  轻量级网络，通过改进深度可分离卷积，降低计算量与参数量。
+ResNeXt中，在分组卷积之后会跟着1×1的卷积，来融合不同通道的信息（深度可分离卷积也是同样），此时的1×1卷积相对来说计算量比较大，因此也考虑使用分组卷积。但是连续使用分组卷积会导致各组之间没有信息融合，因此引入channel shuffle操作。下图中a是连续使用几次分组卷积的结果，b表示将上一层中每个组中的通道划分为几个子组，然后向下一层中的每个组提供不同的子组，c为channel shuffle操作。 ShuffleNet Block：引入残差连接和深度可分离卷积思想（a）；将1×1卷积替换为分组卷积并引入channel shuffle操作（b）；通道拼接代替元素相加，进一步减少计算量（c）。 目标检测  目标检测方法主要分为两类：two-stage和one-stage。two-stage是先由算法生成一系列作为样本的候选框，再通过卷积神经网络进行样本分类，在检测准确率和定位精度上占优，如R-CNN系列；ne-stage则不用产生候选框，直接将目标边框定位的问题转化为回归问题处理，在算法速度上占优，如YOLO，SSD等。</description>
+    </item>
+    
     <item>
       <title>SegFormer</title>
       <link>https://gdy0924.github.io/posts/segformer/</link>

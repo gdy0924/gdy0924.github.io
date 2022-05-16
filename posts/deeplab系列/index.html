@@ -253,138 +253,126 @@ $$
     我们通过两种方法来处理语义分割中的尺度变化：（1）相当于标准的多尺度处理：我们使用共享相同参数的并行DCNN分支，从多个重新缩放的原始图像版本中提取DCNN特征图。为了得到最终的结果，我们将平行DCNN分支的特征图双向插值到原始图像分辨率，并通过取不同尺度进行融合。多尺度处理显著提高了性能，但代价是对多尺度输入的所有DCNN层的特征图进行计算。（2）灵感来自于的R-CNN空间金字塔池方法的成功，该方法表明，通过对单尺度上提取的卷积特征进行重采样，可以准确有效地分类任意尺度的区域。在该方法中，使用具有不同采样率的多个并行空洞卷积层。对每个采样率提取的特征在不同的分支中进行进一步处理，并进行融合，生成最终结果，如下图所示：
 <img src="/img/deeplabv2-3.PNG" alt=""></p>
 <p><img src="/img/deeplabv2-4.PNG" alt=""></p>
-<p>``Python
-#ASPP模块
-class _ASPP(nn.Module):
-def <strong>init</strong>(self, in_ch, out_ch, rates):
-super(_ASPP, self).<strong>init</strong>()
-for i, rate in enumerate(rates):
-self.add_module(
-&ldquo;c{}&quot;.format(i),
-nn.Conv2d(in_ch, out_ch, 3, 1, padding=rate, dilation=rate, bias=True),
-)</p>
-<pre><code>    for m in self.children():
-        nn.init.normal_(m.weight, mean=0, std=0.01)
-        nn.init.constant_(m.bias, 0)
-
-def forward(self, x):
-    return sum([stage(x) for stage in self.children()])
-</code></pre>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span>### Structured Prediction with Fully-Connected Conditional Random Fields for Accurate Boundary Recovery
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;与DeepLab V1相同
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>## 实验
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>### Field of View and CRF
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;下表展示了感受野大小与CRF的实验结果，通过改变fc6层的卷积核大小的空洞卷积的扩张率r得到的。我们从VGG-16网的直接修改开始，使用原始的7×7卷积核和r=4，该模型在CRF后的性能为67.64%，但相对较慢；通过将卷积核大小降低到4×4，我们已经将模型速度提高到每秒2.9张图像，并且通过改变扩张率，分别设置为r=4和r=8，得到r=8效果更好；最后采用卷积核大小为3×3，更大的扩张率r=12，得到的模型速度更快，参数更少。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>![](/img/deeplabv2-5.PNG)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>### Atrous Spatial Pyramid Pooling
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;LargeFOV：基线LargeFOV模型，r=12的单一分支；ASPP-S：有四个分支，具有较小的扩张率(r={2、4、8、12})；ASPP-L：有四个分支和更大的扩张率(r={6、12、18、24})。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>![](/img/deeplabv2-6.PNG)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>### Deeper Networks and Multiscale Processing
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;使用ResNet-101网络，而不是VGG网络。其中，MSC指多尺度输入，即分别将图像的不同尺度（0.5，0.75，1）作为输入，并将其融合；COCO指使用COCO预训练模型；Aug指数据增强。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>![](/img/deeplabv2-7.PNG)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>### VGG-16 vs. ResNet-101
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;我们观察到，基于ResNet-101的DeepLab比使用VGG-16在物体边界上提供了更好的分割结果。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>![](/img/deeplabv2-8.PNG)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>### Comparison with other state-of-art methods
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>#### PASCAL-Context dataset
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>![](/img/deeplabv2-9.PNG)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>#### PASCAL-Person-Part dataset
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>![](/img/deeplabv2-10.PNG)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>#### Cityscapes dataset
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>![](/img/deeplabv2-11.PNG)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>## Conclusion
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;我们提出的“DeepLab”网络通过使用带有上采样卷积核的“空洞卷积”，将经过图像分类训练的网络重新用于语义分割任务。我们进一步将其扩展到空间金字塔池，编码对象和图像上下文。为了产生语义上准确的预测和沿着对象边界的详细分割图，我们还结合了来自深度卷积神经网络和全条件随机场的思想。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span># V3
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span>Rethinking Atrous Convolution for Semantic Image Segmentation\
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span>原文链接：[DeepLab V3](https://arxiv.org/pdf/1706.05587.pdf)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span>## Abstract
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;在该工作中，我们重新思考了空洞卷积，其可以显式地调整卷积核的的感受野，并控制由深度卷积神经网络计算的特征图的分辨率。为了解决多尺度分割对象的问题，我们设计了采用级联或并行卷积的模块，采用多尺度扩张率来捕获多尺度上下文。此外，我们提出改进之前提出的空洞空间金字塔池模块，该模块在多个尺度上探测卷积特征，图像级特征编码全局上下文，并进一步提高性能。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span>## Introduction
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;语义分割有两个挑战。第一个是连续的池化操作或卷积跨步导致的特征分辨率降低，该问题通过利用空洞卷积来解决；第二个问题是物体的多尺度，我们主要考虑四种方式，如下图所示，第一个是将网络应用于一个图像金字塔，以提取每个尺度输入的特征，其中不同尺度的对象在不同的特征图上变得突出，第二个是编码器-解码器结构，利用编码器部分的多尺度特征，从解码器部分恢复空间分辨率，第三个是额外的模块被级联在原始网络之上，用于捕获远程信息，第四个是空间金字塔池化，通过不同卷积核或以多个扩张率和多个感受野的池化操作来捕捉传入的特征图，从而在多个尺度上捕获对象。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span>![](/img/deeplabv3-1.PNG)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;在该工作中，我们重新应用了空洞卷积，它使我们能够有效地在卷积网络和空间金字塔池化的框架下，扩大卷积核的感受野，以获取多尺度上下文。特别地，我们提出的模块由具有各种扩张率的空洞卷积和批归一化层组成。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40</span>## Related Work
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41</span>### Image pyramid
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;模型相同，通常具有共享的权重，被应用于多尺度的输入。来自小尺度输入的特征图编码了远程上下文，而大尺度输入保留了小对象的细节。这类模型的主要缺点是，由于有限的GPU内存，它不能很好地扩展到更大/更深的网络中，因此它通常应用于推理阶段。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43</span>### Encoder-decoder
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;该模型由两部分组成：（1）编码器，特征图的空间维数逐渐减少，因此更深的编码器输出更容易捕获更长范围的信息；（2）解码器，对象细节和空间维数逐渐恢复。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45</span>### Context module
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">46</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;该模型包含以级联形式排列的额外模块，用于编码远程上下文，一种有效的方法是将DenseCRF合并到卷积网络中。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">47</span>### Spatial pyramid pooling
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">48</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;该模型使用空间金字塔池来捕获多个范围内的上下文，DeepLabv2提出了空洞空间金字塔池(ASPP)，其中具有不同扩张率的并行空洞卷积层捕获多尺度信息。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">49</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">50</span>## Methods
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">51</span>###  Atrous Convolution for Dense Feature Extraction
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">52</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;空洞卷积如下图所示，扩张率r即为在卷积核中插入$r-1$行和列的0元素，标准卷积是$r=1$的一种特殊情况，空洞卷积允许我们通过改变扩张率来自适应地修改卷积核的感受野。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">53</span>![](/img/deeplabv3-2.PNG)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">54</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;空洞卷积还允许我们控制在全卷积网络中得到的特征图的尺寸。在这里，我们用output_stride表示输入图像空间分辨率与最终输出分辨率的比值。对于用于图像分类任务的卷积网络，最终的特征图比输入的图像小32倍，因此output_stride=32。如果想要将特征图的尺寸增加一倍（即output_stride=16），则将降低分辨率的最后一个池化或卷积层的步幅设置为1，然后，将所有后续的卷积层替换为扩张率为r=2的空洞卷积层，这允许我们提取分辨率更大的特征图，而不需要学习任何额外的参数。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">55</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">56</span>### Going Deeper with Atrous Convolution
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">57</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;首先探索在级联中的空洞卷积的模块。具体来说，我们复制了最后一个ResNet块的几个副本，即下图中的block4，并将它们排列为级联。在这些块中有三个3×3卷积，最后一个卷积的stride=2，除了最后一步，其余的类似于原始的ResNet。这个模型背后的动机是，引入的大stride使它很容易在更深的块中捕获远程信息。例如，整个图像特征可以总结在最后一个小分辨率特征图中，如下图中的（a）所示。然而，我们发现连续的跨步对语义分割是有害的，由于细节信息是大量抽取的，因此我们使用由output_stride决定的带扩张率的卷积层，如下图的（b）所示，其中output_stride=16。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">58</span>![](/img/deeplabv3-3.PNG)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">59</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;在提出的模型中，我们将block4、block5、block6、block7都如block4一样，使用空洞卷积，如果没有应用空洞卷积，其output_stride=256。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">60</span>#### Multi-grid Method
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">61</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;基于多网格方法，采用不同大小的网格层次，在我们提出的模型中，block4到block7采样不同的扩张率。特别地，将从block4到block7内的三个卷积层的单元扩张率定义为$MultiGrid=(r_{1},r_{2},r_{3})$。卷积层的最终扩张率等于单位扩张率（unit rate）和相应扩张率（corresponding rate）相乘。例如，当output_stride=16，并且$MultiGrid=(1,2,4)$时，block4中的三个卷积层的扩张率分别为：$rates=2×(1,2,4)=(2,4,8)$。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">62</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">63</span>### Atrous Spatial Pyramid Pooling
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">64</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;我们重新讨论在DeepLab V2中提出的空间金字塔池，其中在特征图的顶部应用了四个不同扩张率的空洞卷积。ASPP的灵感来自于空间金字塔池的成功，这表明在不同尺度上重新采样特征是有效的，可以准确有效地对任意尺度的区域进行分类。与DeepLab V2不同，我们在ASPP中加入了Batch Normalization。\
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">65</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;不同扩张率的ASPP能够有效地捕获多尺度信息。然而，我们发现，随着采样率的增大，有效卷积权值的数量（即应用于有效特征区域的权值，而不是填充零）变小。如下图所示，为在65×65大小的特征图上应用不同扩张率的3×3卷积核，在扩张率接近特征图大小的极端情况下，3×3卷积核不再捕获整个图像得上下文，而是退化为一个简单的1×1卷积，因为只有中心卷积核的权重是有效的。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">66</span>![](/img/deeplabv3-4.PNG)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">67</span>&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;具体来说，我们在最后一个特征图上应用全局平均池化，将得到的图像级特征与256个卷积核进行1×1卷积（加入Batch Normalization），然后利用双线性插值法进行上采样，得到预期的空间维度。最后，我们改进的ASPP由两部分组成：（a）当output_stride=16时，使用一个1×1卷积和3个3×3卷积（扩张率为6，12，18），都使用256个卷积核和Batch Normalization；（b）图像级特征，即全局平均池化层。注意，当output_stride=8时，扩张率增大一倍。然后，来自所有分支的结果特征被连接起来，并通过另一个1×1卷积（也有256个过滤器和BN），然后在最后的1×1卷积中生成最终的结果，如上图所示。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">68</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">69</span>```Python
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">70</span># 全局平均池化+256个通道的1*1卷积中+双线性上采样
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">71</span>class _ImagePool(nn.Module):
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">72</span>    def __init__(self, in_ch, out_ch):
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">73</span>        super().__init__()
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">74</span>        self.pool = nn.AdaptiveAvgPool2d(1)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">75</span>        self.conv = _ConvBnReLU(in_ch, out_ch, 1, 1, 0, 1)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">76</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">77</span>    def forward(self, x):
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">78</span>        _, _, H, W = x.shape
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">79</span>        h = self.pool(x)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">80</span>        h = self.conv(h)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">81</span>        h = F.interpolate(h, size=(H, W), mode=&#34;bilinear&#34;, align_corners=False)
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">82</span>        return h
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">83</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">84</span>#ASPP模块：新增了1*1卷积+全局池化。
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">85</span>class _ASPP(nn.Module):
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">86</span>    def __init__(self, in_ch, out_ch, rates):
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">87</span>        super(_ASPP, self).__init__()
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">88</span>        self.stages = nn.Module()
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">89</span>        self.stages.add_module(&#34;c0&#34;, _ConvBnReLU(in_ch, out_ch, 1, 1, 0, 1))
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">90</span>        for i, rate in enumerate(rates):
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">91</span>            self.stages.add_module(
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">92</span>                &#34;c{}&#34;.format(i + 1),
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">93</span>                _ConvBnReLU(in_ch, out_ch, 3, 1, padding=rate, dilation=rate),
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">94</span>            )
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">95</span>        self.stages.add_module(&#34;imagepool&#34;, _ImagePool(in_ch, out_ch))
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">96</span>
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">97</span>    def forward(self, x):
-<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">98</span>        return torch.cat([stage(x) for stage in self.stages.children()], dim=1)
-</code></pre></div><h2 id="实验">实验</h2>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Python" data-lang="Python"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#998;font-style:italic">#ASPP模块</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">_ASPP</span>(nn<span style="color:#000;font-weight:bold">.</span>Module):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>    <span style="color:#000;font-weight:bold">def</span> __init__(<span style="color:#999">self</span>, in_ch, out_ch, rates):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>        <span style="color:#0086b3">super</span>(_ASPP, <span style="color:#999">self</span>)<span style="color:#000;font-weight:bold">.</span>__init__()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>        <span style="color:#000;font-weight:bold">for</span> i, rate <span style="color:#000;font-weight:bold">in</span> <span style="color:#0086b3">enumerate</span>(rates):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>            <span style="color:#999">self</span><span style="color:#000;font-weight:bold">.</span>add_module(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>                <span style="color:#d14">&#34;c</span><span style="color:#d14">{}</span><span style="color:#d14">&#34;</span><span style="color:#000;font-weight:bold">.</span>format(i),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>                nn<span style="color:#000;font-weight:bold">.</span>Conv2d(in_ch, out_ch, <span style="color:#099">3</span>, <span style="color:#099">1</span>, padding<span style="color:#000;font-weight:bold">=</span>rate, dilation<span style="color:#000;font-weight:bold">=</span>rate, bias<span style="color:#000;font-weight:bold">=</span><span style="color:#000;font-weight:bold">True</span>),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>            )
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>        <span style="color:#000;font-weight:bold">for</span> m <span style="color:#000;font-weight:bold">in</span> <span style="color:#999">self</span><span style="color:#000;font-weight:bold">.</span>children():
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>            nn<span style="color:#000;font-weight:bold">.</span>init<span style="color:#000;font-weight:bold">.</span>normal_(m<span style="color:#000;font-weight:bold">.</span>weight, mean<span style="color:#000;font-weight:bold">=</span><span style="color:#099">0</span>, std<span style="color:#000;font-weight:bold">=</span><span style="color:#099">0.01</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>            nn<span style="color:#000;font-weight:bold">.</span>init<span style="color:#000;font-weight:bold">.</span>constant_(m<span style="color:#000;font-weight:bold">.</span>bias, <span style="color:#099">0</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span>    <span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">forward</span>(<span style="color:#999">self</span>, x):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span>        <span style="color:#000;font-weight:bold">return</span> <span style="color:#0086b3">sum</span>([stage(x) <span style="color:#000;font-weight:bold">for</span> stage <span style="color:#000;font-weight:bold">in</span> <span style="color:#999">self</span><span style="color:#000;font-weight:bold">.</span>children()])
+</code></pre></div><h3 id="structured-prediction-with-fully-connected-conditional-random-fields-for-accurate-boundary-recovery">Structured Prediction with Fully-Connected Conditional Random Fields for Accurate Boundary Recovery</h3>
+<p>    与DeepLab V1相同</p>
+<h2 id="实验">实验</h2>
+<h3 id="field-of-view-and-crf">Field of View and CRF</h3>
+<p>    下表展示了感受野大小与CRF的实验结果，通过改变fc6层的卷积核大小的空洞卷积的扩张率r得到的。我们从VGG-16网的直接修改开始，使用原始的7×7卷积核和r=4，该模型在CRF后的性能为67.64%，但相对较慢；通过将卷积核大小降低到4×4，我们已经将模型速度提高到每秒2.9张图像，并且通过改变扩张率，分别设置为r=4和r=8，得到r=8效果更好；最后采用卷积核大小为3×3，更大的扩张率r=12，得到的模型速度更快，参数更少。
+<img src="/img/deeplabv2-5.PNG" alt=""></p>
+<h3 id="atrous-spatial-pyramid-pooling">Atrous Spatial Pyramid Pooling</h3>
+<p>    LargeFOV：基线LargeFOV模型，r=12的单一分支；ASPP-S：有四个分支，具有较小的扩张率(r={2、4、8、12})；ASPP-L：有四个分支和更大的扩张率(r={6、12、18、24})。
+<img src="/img/deeplabv2-6.PNG" alt=""></p>
+<h3 id="deeper-networks-and-multiscale-processing">Deeper Networks and Multiscale Processing</h3>
+<p>    使用ResNet-101网络，而不是VGG网络。其中，MSC指多尺度输入，即分别将图像的不同尺度（0.5，0.75，1）作为输入，并将其融合；COCO指使用COCO预训练模型；Aug指数据增强。
+<img src="/img/deeplabv2-7.PNG" alt=""></p>
+<h3 id="vgg-16-vs-resnet-101">VGG-16 vs. ResNet-101</h3>
+<p>    我们观察到，基于ResNet-101的DeepLab比使用VGG-16在物体边界上提供了更好的分割结果。
+<img src="/img/deeplabv2-8.PNG" alt=""></p>
+<h3 id="comparison-with-other-state-of-art-methods">Comparison with other state-of-art methods</h3>
+<h4 id="pascal-context-dataset">PASCAL-Context dataset</h4>
+<p><img src="/img/deeplabv2-9.PNG" alt=""></p>
+<h4 id="pascal-person-part-dataset">PASCAL-Person-Part dataset</h4>
+<p><img src="/img/deeplabv2-10.PNG" alt=""></p>
+<h4 id="cityscapes-dataset">Cityscapes dataset</h4>
+<p><img src="/img/deeplabv2-11.PNG" alt=""></p>
+<h2 id="conclusion">Conclusion</h2>
+<p>    我们提出的“DeepLab”网络通过使用带有上采样卷积核的“空洞卷积”，将经过图像分类训练的网络重新用于语义分割任务。我们进一步将其扩展到空间金字塔池，编码对象和图像上下文。为了产生语义上准确的预测和沿着对象边界的详细分割图，我们还结合了来自深度卷积神经网络和全条件随机场的思想。</p>
+<h1 id="v3">V3</h1>
+<p>Rethinking Atrous Convolution for Semantic Image Segmentation<br>
+原文链接：<a href="https://arxiv.org/pdf/1706.05587.pdf">DeepLab V3</a></p>
+<h2 id="abstract-2">Abstract</h2>
+<p>    在该工作中，我们重新思考了空洞卷积，其可以显式地调整卷积核的的感受野，并控制由深度卷积神经网络计算的特征图的分辨率。为了解决多尺度分割对象的问题，我们设计了采用级联或并行卷积的模块，采用多尺度扩张率来捕获多尺度上下文。此外，我们提出改进之前提出的空洞空间金字塔池模块，该模块在多个尺度上探测卷积特征，图像级特征编码全局上下文，并进一步提高性能。</p>
+<h2 id="introduction-2">Introduction</h2>
+<p>    语义分割有两个挑战。第一个是连续的池化操作或卷积跨步导致的特征分辨率降低，该问题通过利用空洞卷积来解决；第二个问题是物体的多尺度，我们主要考虑四种方式，如下图所示，第一个是将网络应用于一个图像金字塔，以提取每个尺度输入的特征，其中不同尺度的对象在不同的特征图上变得突出，第二个是编码器-解码器结构，利用编码器部分的多尺度特征，从解码器部分恢复空间分辨率，第三个是额外的模块被级联在原始网络之上，用于捕获远程信息，第四个是空间金字塔池化，通过不同卷积核或以多个扩张率和多个感受野的池化操作来捕捉传入的特征图，从而在多个尺度上捕获对象。
+<img src="/img/deeplabv3-1.PNG" alt="">
+    在该工作中，我们重新应用了空洞卷积，它使我们能够有效地在卷积网络和空间金字塔池化的框架下，扩大卷积核的感受野，以获取多尺度上下文。特别地，我们提出的模块由具有各种扩张率的空洞卷积和批归一化层组成。</p>
+<h2 id="related-work">Related Work</h2>
+<h3 id="image-pyramid">Image pyramid</h3>
+<p>    模型相同，通常具有共享的权重，被应用于多尺度的输入。来自小尺度输入的特征图编码了远程上下文，而大尺度输入保留了小对象的细节。这类模型的主要缺点是，由于有限的GPU内存，它不能很好地扩展到更大/更深的网络中，因此它通常应用于推理阶段。</p>
+<h3 id="encoder-decoder">Encoder-decoder</h3>
+<p>    该模型由两部分组成：（1）编码器，特征图的空间维数逐渐减少，因此更深的编码器输出更容易捕获更长范围的信息；（2）解码器，对象细节和空间维数逐渐恢复。</p>
+<h3 id="context-module">Context module</h3>
+<p>    该模型包含以级联形式排列的额外模块，用于编码远程上下文，一种有效的方法是将DenseCRF合并到卷积网络中。</p>
+<h3 id="spatial-pyramid-pooling">Spatial pyramid pooling</h3>
+<p>    该模型使用空间金字塔池来捕获多个范围内的上下文，DeepLabv2提出了空洞空间金字塔池(ASPP)，其中具有不同扩张率的并行空洞卷积层捕获多尺度信息。</p>
+<h2 id="methods-1">Methods</h2>
+<h3 id="atrous-convolution-for-dense-feature-extraction">Atrous Convolution for Dense Feature Extraction</h3>
+<p>    空洞卷积如下图所示，扩张率r即为在卷积核中插入$r-1$行和列的0元素，标准卷积是$r=1$的一种特殊情况，空洞卷积允许我们通过改变扩张率来自适应地修改卷积核的感受野。
+<img src="/img/deeplabv3-2.PNG" alt="">
+    空洞卷积还允许我们控制在全卷积网络中得到的特征图的尺寸。在这里，我们用output_stride表示输入图像空间分辨率与最终输出分辨率的比值。对于用于图像分类任务的卷积网络，最终的特征图比输入的图像小32倍，因此output_stride=32。如果想要将特征图的尺寸增加一倍（即output_stride=16），则将降低分辨率的最后一个池化或卷积层的步幅设置为1，然后，将所有后续的卷积层替换为扩张率为r=2的空洞卷积层，这允许我们提取分辨率更大的特征图，而不需要学习任何额外的参数。</p>
 <h3 id="going-deeper-with-atrous-convolution">Going Deeper with Atrous Convolution</h3>
+<p>    首先探索在级联中的空洞卷积的模块。具体来说，我们复制了最后一个ResNet块的几个副本，即下图中的block4，并将它们排列为级联。在这些块中有三个3×3卷积，最后一个卷积的stride=2，除了最后一步，其余的类似于原始的ResNet。这个模型背后的动机是，引入的大stride使它很容易在更深的块中捕获远程信息。例如，整个图像特征可以总结在最后一个小分辨率特征图中，如下图中的（a）所示。然而，我们发现连续的跨步对语义分割是有害的，由于细节信息是大量抽取的，因此我们使用由output_stride决定的带扩张率的卷积层，如下图的（b）所示，其中output_stride=16。
+<img src="/img/deeplabv3-3.PNG" alt="">
+    在提出的模型中，我们将block4、block5、block6、block7都如block4一样，使用空洞卷积，如果没有应用空洞卷积，其output_stride=256。</p>
+<h4 id="multi-grid-method">Multi-grid Method</h4>
+<p>    基于多网格方法，采用不同大小的网格层次，在我们提出的模型中，block4到block7采样不同的扩张率。特别地，将从block4到block7内的三个卷积层的单元扩张率定义为$MultiGrid=(r_{1},r_{2},r_{3})$。卷积层的最终扩张率等于单位扩张率（unit rate）和相应扩张率（corresponding rate）相乘。例如，当output_stride=16，并且$MultiGrid=(1,2,4)$时，block4中的三个卷积层的扩张率分别为：$rates=2×(1,2,4)=(2,4,8)$。</p>
+<h3 id="atrous-spatial-pyramid-pooling-1">Atrous Spatial Pyramid Pooling</h3>
+<p>    我们重新讨论在DeepLab V2中提出的空间金字塔池，其中在特征图的顶部应用了四个不同扩张率的空洞卷积。ASPP的灵感来自于空间金字塔池的成功，这表明在不同尺度上重新采样特征是有效的，可以准确有效地对任意尺度的区域进行分类。与DeepLab V2不同，我们在ASPP中加入了Batch Normalization。<br>
+    不同扩张率的ASPP能够有效地捕获多尺度信息。然而，我们发现，随着采样率的增大，有效卷积权值的数量（即应用于有效特征区域的权值，而不是填充零）变小。如下图所示，为在65×65大小的特征图上应用不同扩张率的3×3卷积核，在扩张率接近特征图大小的极端情况下，3×3卷积核不再捕获整个图像得上下文，而是退化为一个简单的1×1卷积，因为只有中心卷积核的权重是有效的。
+<img src="/img/deeplabv3-4.PNG" alt="">
+    具体来说，我们在最后一个特征图上应用全局平均池化，将得到的图像级特征与256个卷积核进行1×1卷积（加入Batch Normalization），然后利用双线性插值法进行上采样，得到预期的空间维度。最后，我们改进的ASPP由两部分组成：（a）当output_stride=16时，使用一个1×1卷积和3个3×3卷积（扩张率为6，12，18），都使用256个卷积核和Batch Normalization；（b）图像级特征，即全局平均池化层。注意，当output_stride=8时，扩张率增大一倍。然后，来自所有分支的结果特征被连接起来，并通过另一个1×1卷积（也有256个过滤器和BN），然后在最后的1×1卷积中生成最终的结果，如上图所示。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Python" data-lang="Python"><span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span style="color:#998;font-style:italic"># 全局平均池化+256个通道的1*1卷积中+双线性上采样</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">_ImagePool</span>(nn<span style="color:#000;font-weight:bold">.</span>Module):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span>    <span style="color:#000;font-weight:bold">def</span> __init__(<span style="color:#999">self</span>, in_ch, out_ch):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span>        <span style="color:#0086b3">super</span>()<span style="color:#000;font-weight:bold">.</span>__init__()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span>        <span style="color:#999">self</span><span style="color:#000;font-weight:bold">.</span>pool <span style="color:#000;font-weight:bold">=</span> nn<span style="color:#000;font-weight:bold">.</span>AdaptiveAvgPool2d(<span style="color:#099">1</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span>        <span style="color:#999">self</span><span style="color:#000;font-weight:bold">.</span>conv <span style="color:#000;font-weight:bold">=</span> _ConvBnReLU(in_ch, out_ch, <span style="color:#099">1</span>, <span style="color:#099">1</span>, <span style="color:#099">0</span>, <span style="color:#099">1</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span>    <span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">forward</span>(<span style="color:#999">self</span>, x):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span>        _, _, H, W <span style="color:#000;font-weight:bold">=</span> x<span style="color:#000;font-weight:bold">.</span>shape
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span>        h <span style="color:#000;font-weight:bold">=</span> <span style="color:#999">self</span><span style="color:#000;font-weight:bold">.</span>pool(x)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span>        h <span style="color:#000;font-weight:bold">=</span> <span style="color:#999">self</span><span style="color:#000;font-weight:bold">.</span>conv(h)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span>        h <span style="color:#000;font-weight:bold">=</span> F<span style="color:#000;font-weight:bold">.</span>interpolate(h, size<span style="color:#000;font-weight:bold">=</span>(H, W), mode<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;bilinear&#34;</span>, align_corners<span style="color:#000;font-weight:bold">=</span><span style="color:#000;font-weight:bold">False</span>)
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span>        <span style="color:#000;font-weight:bold">return</span> h
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span style="color:#998;font-style:italic">#ASPP模块：新增了1*1卷积+全局池化。</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">_ASPP</span>(nn<span style="color:#000;font-weight:bold">.</span>Module):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span>    <span style="color:#000;font-weight:bold">def</span> __init__(<span style="color:#999">self</span>, in_ch, out_ch, rates):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span>        <span style="color:#0086b3">super</span>(_ASPP, <span style="color:#999">self</span>)<span style="color:#000;font-weight:bold">.</span>__init__()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span>        <span style="color:#999">self</span><span style="color:#000;font-weight:bold">.</span>stages <span style="color:#000;font-weight:bold">=</span> nn<span style="color:#000;font-weight:bold">.</span>Module()
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span>        <span style="color:#999">self</span><span style="color:#000;font-weight:bold">.</span>stages<span style="color:#000;font-weight:bold">.</span>add_module(<span style="color:#d14">&#34;c0&#34;</span>, _ConvBnReLU(in_ch, out_ch, <span style="color:#099">1</span>, <span style="color:#099">1</span>, <span style="color:#099">0</span>, <span style="color:#099">1</span>))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span>        <span style="color:#000;font-weight:bold">for</span> i, rate <span style="color:#000;font-weight:bold">in</span> <span style="color:#0086b3">enumerate</span>(rates):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span>            <span style="color:#999">self</span><span style="color:#000;font-weight:bold">.</span>stages<span style="color:#000;font-weight:bold">.</span>add_module(
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span>                <span style="color:#d14">&#34;c</span><span style="color:#d14">{}</span><span style="color:#d14">&#34;</span><span style="color:#000;font-weight:bold">.</span>format(i <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">1</span>),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span>                _ConvBnReLU(in_ch, out_ch, <span style="color:#099">3</span>, <span style="color:#099">1</span>, padding<span style="color:#000;font-weight:bold">=</span>rate, dilation<span style="color:#000;font-weight:bold">=</span>rate),
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span>            )
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span>        <span style="color:#999">self</span><span style="color:#000;font-weight:bold">.</span>stages<span style="color:#000;font-weight:bold">.</span>add_module(<span style="color:#d14">&#34;imagepool&#34;</span>, _ImagePool(in_ch, out_ch))
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span>
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span>    <span style="color:#000;font-weight:bold">def</span> <span style="color:#900;font-weight:bold">forward</span>(<span style="color:#999">self</span>, x):
+<span style="margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span>        <span style="color:#000;font-weight:bold">return</span> torch<span style="color:#000;font-weight:bold">.</span>cat([stage(x) <span style="color:#000;font-weight:bold">for</span> stage <span style="color:#000;font-weight:bold">in</span> <span style="color:#999">self</span><span style="color:#000;font-weight:bold">.</span>stages<span style="color:#000;font-weight:bold">.</span>children()], dim<span style="color:#000;font-weight:bold">=</span><span style="color:#099">1</span>)
+</code></pre></div><h2 id="实验-1">实验</h2>
+<h3 id="going-deeper-with-atrous-convolution-1">Going Deeper with Atrous Convolution</h3>
 <p>    如下表所示，实验output_stride的影响，在output_stride=256（即根本没有使用空洞卷积）的情况下，性能比其他的要差得多。当output_stride变大并相应地应用空洞卷积时，性能从20.29%提高到75.18%，这表明在级联构建更多用于语义分割的块时，空洞卷积是必不可少的。
 <img src="/img/deeplabv3-5.PNG" alt=""></p>
-<h3 id="atrous-spatial-pyramid-pooling">Atrous Spatial Pyramid Pooling</h3>
+<h3 id="atrous-spatial-pyramid-pooling-2">Atrous Spatial Pyramid Pooling</h3>
 <h4 id="aspp">ASPP</h4>
 <p><img src="/img/deeplabv3-6.PNG" alt=""></p>
 <h4 id="performance-on-pascal-voc-2012-test-set">Performance on PASCAL VOC 2012 test set</h4>
 <p><img src="/img/deeplabv3-7.PNG" alt=""></p>
-<h2 id="conclusion">Conclusion</h2>
+<h2 id="conclusion-1">Conclusion</h2>
 <p>    我们提出的模型“DeepLabv3”使用了空洞卷积来提取密集的特征图并捕获远程上下文信息。具体来说，为了编码多尺度信息，我们提出的级联模块逐渐将扩张率加倍，而我们提出的扩张空间金字塔池模块加入了图像级特征，用多采样率和有效的感受野。</p>
-<h1 id="v3">V3+</h1>
+<h1 id="v3-1">V3+</h1>
 <p>Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation<br>
 原文链接：<a href="https://arxiv.org/pdf/1802.02611.pdf">DeepLab V3+</a></p>
-<h2 id="abstract-2">Abstract</h2>
+<h2 id="abstract-3">Abstract</h2>
 <p>    空间金字塔池模块和编码器-解码器结构用于深度神经网络进行语义分割任务。前者能够通过多比例的卷积核或多个有效感受野捕捉传入的特征来编码多尺度上下文信息，而后者可以通过逐步恢复空间信息来捕获更清晰的目标边界。在该工作中，我们结合这两种方法的优点。具体来说，我们提出的模型，DeepLabv3+，通过扩展DeepLabv3，添加了一个简单而有效的解码器模块来细化分割结果，特别是对象的边界。我们将深度可分离卷积应用于空洞空间金字塔池化和解码器模块，从而得到一个更快更强的编码器-解码器网络。</p>
-<h2 id="introduction-2">Introduction</h2>
+<h2 id="introduction-3">Introduction</h2>
 <p>    在该工作中，我们考虑使用空间金字塔池模块和编码器-解码器结构进行语义分割的神经网络，前者通过汇集不同分辨率的特征来捕获丰富的上下文信息，而后者能够获得清晰的对象边界。<br>
     为了在多个尺度上捕获上下文信息，DeepLabv3应用了几个不同扩张率的并行空洞卷积（称为空洞空间金字塔池，ASPP），尽管在最后一个特征图中编码了丰富的语义信息，但由于网络主干内的stride操作的池化或卷积，导致与对象边界相关的详细信息缺失。这可以通过使用空洞卷积来提取更密集的特征图来缓解。<br>
     然而，考虑到最先进的神经网络的设计和有限的GPU内存，提取输出比输入分辨率小8倍甚至4倍的输出特征图是不合适的。以ResNet-101为例，当应用空洞卷积提取比输入分辨率小16倍的输出特征时，最后3个残差块内9层的的特征必须进行扩展。编码器-解码器模型有利于在编码器路径中进行更快的计算（因为没有特征被扩张），并在解码器路径中逐渐恢复目标边界。为了结合这两种方法的优点，我们提出通过合并多尺度上下文信息来丰富编码器-解码器网络中的编码器模块。<br>
@@ -396,14 +384,14 @@ def forward(self, x):
 （2）在我们的结构中，可以通过空洞卷积来任意控制编码器提取的特征的分辨率，以权衡精度和运行时间；<br>
 （3）我们将Xception模型应用于分割任务，并将深度分离卷积应用于ASPP模块和解码器模块，从而得到更快更强的编码器-解码器网络；<br>
 （4）我们提出的网络在pascalVOC2012和Cityscapes数据集上获得了最先进的性能。</p>
-<h2 id="related-work">Related Work</h2>
-<h3 id="spatial-pyramid-pooling">Spatial pyramid pooling</h3>
+<h2 id="related-work-1">Related Work</h2>
+<h3 id="spatial-pyramid-pooling-1">Spatial pyramid pooling</h3>
 <p>    如DeepLab V2和DeepLab V3等模型，在多个网格尺度上进行空间金字塔池，或应用多个不同扩张率的并行空洞卷积（称为空洞空间金字塔池，ASPP），通过利用多尺度信息，在几个分割基准上显示出了良好的结果。</p>
-<h3 id="encoder-decoder">Encoder-decoder</h3>
+<h3 id="encoder-decoder-1">Encoder-decoder</h3>
 <p>    编码器-解码器网络包含（1）编码器：逐渐缩小特征图并捕获更高的语义信息；（2）解码器：逐渐恢复空间信息。在此基础上，我们提出使用DeepLabv3作为编码器模块，并添加一个简单而有效的解码器模块，以获得更清晰的边界。</p>
 <h3 id="depthwise-separable-convolution">Depthwise separable convolution</h3>
 <p>    深度可分离卷积或组卷积可以降低计算成本和参数的数量，同时保持相似（或稍微更好）的性能，如Xception模块。</p>
-<h2 id="methods-1">Methods</h2>
+<h2 id="methods-2">Methods</h2>
 <h3 id="encoder-decoder-with-atrous-convolution">Encoder-Decoder with Atrous Convolution</h3>
 <h4 id="atrous-convolution空洞卷积">Atrous convolution空洞卷积</h4>
 <p>$$
@@ -431,7 +419,7 @@ separable convolution），并发现空洞可分离卷积在保持相似（或�
     （1）更深的Xception结构，Middle flow重复16次，原来的是8次；<br>
     （2）所有的max pooling结构被stride=2的深度可分离卷积代替，这样可以改成空洞卷积；<br>
     （3）每个3x3的depthwise convolution都跟BN和Relu。</p>
-<h2 id="实验-1">实验</h2>
+<h2 id="实验-2">实验</h2>
 <h3 id="decoder-design-choices">Decoder Design Choices</h3>
 <p>    DeepLabv3+将解码器模块添加到编码器输出之上，在解码器模块，我们考虑三个设计选择，（1）1×1卷积用于减少通道；（2）3×3卷积用于获得清晰的分割结果；（3）编码器的低级特征图来源。<br>
     为了评估解码器模块中1×1卷积的影响，修改不同通道数，其实验结果如下表所示，可以看出将低级特征图的通道减少到48或32，可以获得更好的性能，因此，我们采用[1×1,48]来进行通道减少。
@@ -451,7 +439,7 @@ separable convolution），并发现空洞可分离卷积在保持相似（或�
 <p><img src="/img/deeplabv3+-10.PNG" alt="">
 <img src="/img/deeplabv3+-11.PNG" alt="">
     Coarse是指同时使用额外的粗注释的训练集</p>
-<h2 id="conclusion-1">Conclusion</h2>
+<h2 id="conclusion-2">Conclusion</h2>
 <p>    DeepLabv3+采用编码器-解码器结构，其中使用DeepLabv3来编码丰富的上下文信息，并采用了一个简单而有效的解码器模块来恢复对象边界，可以根据可用的计算资源，应用空洞卷积以获得任意分辨率的特征图。</p>
 
         </div>
