@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/deit/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/deit/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "DeiT",
+      "headline" : "DeiT",
+      "description" : "Training data-efficient image transformers \u0026amp; distillation through attention\n原文链接：DeiT\nAbstract  最近，基于注意力机制的神经网络用于计算机视觉领域，但是这些网络需要大量数据进行预训练，从而限制了其使用。\n在该论文中，我们参考ViT网络，引入一种蒸馏方式，使得student网络可以通过注意力机制从teacher网络中进行学习。\nIntroduction  Vision Transformer（ViT）使用自注意力机制用于图像分类，以图像补丁作为输入，但是transformer架构在数据量不足的训练下不能很好地泛化，而这些模型的训练涉及大量的计算资源。\n在本文中，我们提出DeiT网络，引入了一个一种基于token的策略，contributions：\n（1）我们的方法证明使用不包含卷积层的神经网络可以在没有外部数据的情况下，可以与在ImageNet数据集上最好结果的模型相比较，并且我们提出的模型DeiT-S和DeiT-Ti有很少的参数；\n（2）引入了一种新的基于蒸馏标记的蒸馏方式：复制由teacher网络得到的label，与类标记作用相同，这两种label相互作用以提高精度。\nRelated work Image Classification  虽然有许多尝试使用transformer来实现图像分类，但其性能不如卷积网络。最近，Vision Transformer（ViT）没有使用任何卷积，达到了卷积的水平，然而，ViT需要大量的数据进行预训练，才能使transformer架构有效。在本文中，不需要大型训练数据集，也实现了强大的性能，即只使用Imagenet1k数据集。\nTransformer architecture Knowledge Distillation  知识蒸馏，由Hinton提出，是指student网络利用来自强大的teacher网络中得到的“soft”标签进行训练。soft标签（如：0.2，0.3，0.5）是softmax函数的输出，而不是hard标签（如：0，0，1），这种训练方式提高了student网络的性能（或者它可以看作是将teacher网络压缩成一个更小的模型——student网络）。一方面，teacher的soft标签将有类似于标签平滑的效果；另一方面，teacher的监督考虑了数据增强的影响：例如，一张很大的场景下有一只小猫缩在角落，其标签为猫，如果对其进行crop操作，这只猫就不会在crop后的图中了，这也改变了图片的标签。利用teacher网络中的soft标签可以用一种soft的方式将偏差转移到student网络中，例如：使用卷积网络作为teacher，在transformer中引入由卷积得到的偏差，是可以提升网络性能的。\nVision transformer: overview Multi-head Self Attention layers (MSA) $$ Attention(Q,K,V)=Softmax(\\frac{QK^{T}}{\\sqrt{d}})V $$ 其中，$Q=XW_{Q}$，$K=XW_{K}$，$V=XW_{V}$\nTransformer block for images  Transformer中，MSA后跟着前馈网络（FFN），由两个线性层组成，中间有GeLU非线性激活函数，第一个线性层将维数从$D$扩展到$4D$，第二层将维数从$4D$减少为$D$。\nViT将图片当作序列一样处理，将图像分成大小为$16×16$的patch，作为transformer的输入，并结合位置信息（position embedding）。\nThe class token  可训练的向量，在第一层附加在patch tokens中，该向量通过transformer，最后用一个线性层来预测类别。这种架构迫使自注意力机制在patch tokens和class token之间传播信息：在训练时，监督信号只来自class token，patch tokens是模型唯一的变量输入。\nFixing the positional encoding across resolutions  使用较低分辨的图像对网络进行预训练，使用较高分辨率的图像对网络进行微调，可以加快训练。当增加输入图像的分辨率时，我们保持patch大小不变，那么输入patch的数量就会发生变化。采用插值法对位置embedding进行调整。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-05-17 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-05-17 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/deit\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>DeiT</title>
+  <meta property="og:title" content="DeiT" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="Training data-efficient image transformers &amp;amp; distillation through attention
+原文链接：DeiT
+Abstract  最近，基于注意力机制的神经网络用于计算机视觉领域，但是这些网络需要大量数据进行预训练，从而限制了其使用。
+在该论文中，我们参考ViT网络，引入一种蒸馏方式，使得student网络可以通过注意力机制从teacher网络中进行学习。
+Introduction  Vision Transformer（ViT）使用自注意力机制用于图像分类，以图像补丁作为输入，但是transformer架构在数据量不足的训练下不能很好地泛化，而这些模型的训练涉及大量的计算资源。
+在本文中，我们提出DeiT网络，引入了一个一种基于token的策略，contributions：
+（1）我们的方法证明使用不包含卷积层的神经网络可以在没有外部数据的情况下，可以与在ImageNet数据集上最好结果的模型相比较，并且我们提出的模型DeiT-S和DeiT-Ti有很少的参数；
+（2）引入了一种新的基于蒸馏标记的蒸馏方式：复制由teacher网络得到的label，与类标记作用相同，这两种label相互作用以提高精度。
+Related work Image Classification  虽然有许多尝试使用transformer来实现图像分类，但其性能不如卷积网络。最近，Vision Transformer（ViT）没有使用任何卷积，达到了卷积的水平，然而，ViT需要大量的数据进行预训练，才能使transformer架构有效。在本文中，不需要大型训练数据集，也实现了强大的性能，即只使用Imagenet1k数据集。
+Transformer architecture Knowledge Distillation  知识蒸馏，由Hinton提出，是指student网络利用来自强大的teacher网络中得到的“soft”标签进行训练。soft标签（如：0.2，0.3，0.5）是softmax函数的输出，而不是hard标签（如：0，0，1），这种训练方式提高了student网络的性能（或者它可以看作是将teacher网络压缩成一个更小的模型——student网络）。一方面，teacher的soft标签将有类似于标签平滑的效果；另一方面，teacher的监督考虑了数据增强的影响：例如，一张很大的场景下有一只小猫缩在角落，其标签为猫，如果对其进行crop操作，这只猫就不会在crop后的图中了，这也改变了图片的标签。利用teacher网络中的soft标签可以用一种soft的方式将偏差转移到student网络中，例如：使用卷积网络作为teacher，在transformer中引入由卷积得到的偏差，是可以提升网络性能的。
+Vision transformer: overview Multi-head Self Attention layers (MSA) $$ Attention(Q,K,V)=Softmax(\frac{QK^{T}}{\sqrt{d}})V $$ 其中，$Q=XW_{Q}$，$K=XW_{K}$，$V=XW_{V}$
+Transformer block for images  Transformer中，MSA后跟着前馈网络（FFN），由两个线性层组成，中间有GeLU非线性激活函数，第一个线性层将维数从$D$扩展到$4D$，第二层将维数从$4D$减少为$D$。
+ViT将图片当作序列一样处理，将图像分成大小为$16×16$的patch，作为transformer的输入，并结合位置信息（position embedding）。
+The class token  可训练的向量，在第一层附加在patch tokens中，该向量通过transformer，最后用一个线性层来预测类别。这种架构迫使自注意力机制在patch tokens和class token之间传播信息：在训练时，监督信号只来自class token，patch tokens是模型唯一的变量输入。
+Fixing the positional encoding across resolutions  使用较低分辨的图像对网络进行预训练，使用较高分辨率的图像对网络进行微调，可以加快训练。当增加输入图像的分辨率时，我们保持patch大小不变，那么输入patch的数量就会发生变化。采用插值法对位置embedding进行调整。" />
+  <meta name="description" content="Training data-efficient image transformers &amp;amp; distillation through attention
+原文链接：DeiT
+Abstract  最近，基于注意力机制的神经网络用于计算机视觉领域，但是这些网络需要大量数据进行预训练，从而限制了其使用。
+在该论文中，我们参考ViT网络，引入一种蒸馏方式，使得student网络可以通过注意力机制从teacher网络中进行学习。
+Introduction  Vision Transformer（ViT）使用自注意力机制用于图像分类，以图像补丁作为输入，但是transformer架构在数据量不足的训练下不能很好地泛化，而这些模型的训练涉及大量的计算资源。
+在本文中，我们提出DeiT网络，引入了一个一种基于token的策略，contributions：
+（1）我们的方法证明使用不包含卷积层的神经网络可以在没有外部数据的情况下，可以与在ImageNet数据集上最好结果的模型相比较，并且我们提出的模型DeiT-S和DeiT-Ti有很少的参数；
+（2）引入了一种新的基于蒸馏标记的蒸馏方式：复制由teacher网络得到的label，与类标记作用相同，这两种label相互作用以提高精度。
+Related work Image Classification  虽然有许多尝试使用transformer来实现图像分类，但其性能不如卷积网络。最近，Vision Transformer（ViT）没有使用任何卷积，达到了卷积的水平，然而，ViT需要大量的数据进行预训练，才能使transformer架构有效。在本文中，不需要大型训练数据集，也实现了强大的性能，即只使用Imagenet1k数据集。
+Transformer architecture Knowledge Distillation  知识蒸馏，由Hinton提出，是指student网络利用来自强大的teacher网络中得到的“soft”标签进行训练。soft标签（如：0.2，0.3，0.5）是softmax函数的输出，而不是hard标签（如：0，0，1），这种训练方式提高了student网络的性能（或者它可以看作是将teacher网络压缩成一个更小的模型——student网络）。一方面，teacher的soft标签将有类似于标签平滑的效果；另一方面，teacher的监督考虑了数据增强的影响：例如，一张很大的场景下有一只小猫缩在角落，其标签为猫，如果对其进行crop操作，这只猫就不会在crop后的图中了，这也改变了图片的标签。利用teacher网络中的soft标签可以用一种soft的方式将偏差转移到student网络中，例如：使用卷积网络作为teacher，在transformer中引入由卷积得到的偏差，是可以提升网络性能的。
+Vision transformer: overview Multi-head Self Attention layers (MSA) $$ Attention(Q,K,V)=Softmax(\frac{QK^{T}}{\sqrt{d}})V $$ 其中，$Q=XW_{Q}$，$K=XW_{K}$，$V=XW_{V}$
+Transformer block for images  Transformer中，MSA后跟着前馈网络（FFN），由两个线性层组成，中间有GeLU非线性激活函数，第一个线性层将维数从$D$扩展到$4D$，第二层将维数从$4D$减少为$D$。
+ViT将图片当作序列一样处理，将图像分成大小为$16×16$的patch，作为transformer的输入，并结合位置信息（position embedding）。
+The class token  可训练的向量，在第一层附加在patch tokens中，该向量通过transformer，最后用一个线性层来预测类别。这种架构迫使自注意力机制在patch tokens和class token之间传播信息：在训练时，监督信号只来自class token，patch tokens是模型唯一的变量输入。
+Fixing the positional encoding across resolutions  使用较低分辨的图像对网络进行预训练，使用较高分辨率的图像对网络进行微调，可以加快训练。当增加输入图像的分辨率时，我们保持patch大小不变，那么输入patch的数量就会发生变化。采用插值法对位置embedding进行调整。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">DeiT</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-05-17 00:00:00 UTC">
+                17 May 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Training data-efficient image transformers &amp; distillation through attention<br>
+原文链接：<a href="https://arxiv.org/pdf/2012.12877.pdf">DeiT</a></p>
+<h2 id="abstract">Abstract</h2>
+<p>    最近，基于注意力机制的神经网络用于计算机视觉领域，但是这些网络需要大量数据进行预训练，从而限制了其使用。<br>
+    在该论文中，我们参考ViT网络，引入一种蒸馏方式，使得student网络可以通过注意力机制从teacher网络中进行学习。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    Vision Transformer（ViT）使用自注意力机制用于图像分类，以图像补丁作为输入，但是transformer架构在数据量不足的训练下不能很好地泛化，而这些模型的训练涉及大量的计算资源。<br>
+    在本文中，我们提出DeiT网络，引入了一个一种基于token的策略，contributions：<br>
+    （1）我们的方法证明使用不包含卷积层的神经网络可以在没有外部数据的情况下，可以与在ImageNet数据集上最好结果的模型相比较，并且我们提出的模型DeiT-S和DeiT-Ti有很少的参数；<br>
+    （2）引入了一种新的基于蒸馏标记的蒸馏方式：复制由teacher网络得到的label，与类标记作用相同，这两种label相互作用以提高精度。</p>
+<h2 id="related-work">Related work</h2>
+<h3 id="image-classification">Image Classification</h3>
+<p>    虽然有许多尝试使用transformer来实现图像分类，但其性能不如卷积网络。最近，Vision Transformer（ViT）没有使用任何卷积，达到了卷积的水平，然而，ViT需要大量的数据进行预训练，才能使transformer架构有效。在本文中，不需要大型训练数据集，也实现了强大的性能，即只使用Imagenet1k数据集。</p>
+<h3 id="transformer-architecture">Transformer architecture</h3>
+<h3 id="knowledge-distillation">Knowledge Distillation</h3>
+<p>    知识蒸馏，由Hinton提出，是指student网络利用来自强大的teacher网络中得到的“soft”标签进行训练。soft标签（如：0.2，0.3，0.5）是softmax函数的输出，而不是hard标签（如：0，0，1），这种训练方式提高了student网络的性能（或者它可以看作是将teacher网络压缩成一个更小的模型——student网络）。一方面，teacher的soft标签将有类似于标签平滑的效果；另一方面，teacher的监督考虑了数据增强的影响：例如，一张很大的场景下有一只小猫缩在角落，其标签为猫，如果对其进行crop操作，这只猫就不会在crop后的图中了，这也改变了图片的标签。利用teacher网络中的soft标签可以用一种soft的方式将偏差转移到student网络中，例如：使用卷积网络作为teacher，在transformer中引入由卷积得到的偏差，是可以提升网络性能的。</p>
+<h2 id="vision-transformer-overview">Vision transformer: overview</h2>
+<h3 id="multi-head-self-attention-layers-msa">Multi-head Self Attention layers (MSA)</h3>
+<p>$$
+Attention(Q,K,V)=Softmax(\frac{QK^{T}}{\sqrt{d}})V
+$$
+其中，$Q=XW_{Q}$，$K=XW_{K}$，$V=XW_{V}$</p>
+<h3 id="transformer-block-for-images">Transformer block for images</h3>
+<p>    Transformer中，MSA后跟着前馈网络（FFN），由两个线性层组成，中间有GeLU非线性激活函数，第一个线性层将维数从$D$扩展到$4D$，第二层将维数从$4D$减少为$D$。<br>
+    ViT将图片当作序列一样处理，将图像分成大小为$16×16$的patch，作为transformer的输入，并结合位置信息（position embedding）。</p>
+<h3 id="the-class-token">The class token</h3>
+<p>    可训练的向量，在第一层附加在patch tokens中，该向量通过transformer，最后用一个线性层来预测类别。这种架构迫使自注意力机制在patch tokens和class token之间传播信息：在训练时，监督信号只来自class token，patch tokens是模型唯一的变量输入。</p>
+<h3 id="fixing-the-positional-encoding-across-resolutions">Fixing the positional encoding across resolutions</h3>
+<p>    使用较低分辨的图像对网络进行预训练，使用较高分辨率的图像对网络进行微调，可以加快训练。当增加输入图像的分辨率时，我们保持patch大小不变，那么输入patch的数量就会发生变化。采用插值法对位置embedding进行调整。</p>
+<h2 id="distillation-through-attention">Distillation through attention</h2>
+<p>    在本节中，假设使用一个性能很好的图像分类器作为teacher网络，可以是卷积网络，也可以是混合网络。解决了如何利用teacher网络来学习transformer的问题。包括两个轴的比较：hard蒸馏和soft蒸馏，经典蒸馏与token蒸馏。</p>
+<h3 id="soft-distillation">Soft distillation</h3>
+<p>    最小化teacher网络和student网络中softmax分数的KL散度。<br>
+    $Z_{t}$是teacher网络的logits输出，$Z_{s}$是student网络的logits输出（logits输出简单来说就是全连接层的输出）。定义蒸馏的温度是$\tau $，$\lambda$是平衡散度损失和交叉熵损失的平衡系数，$y$是ground truth标签，$\psi $是softmax函数：
+$$
+L_{global}=(1-\lambda )L_{CE}(\psi (Z_{s}),y)+\lambda \tau ^{2}KL(\psi (\frac{Z_{s}}{\tau }),\psi (\frac{Z_{t}}{\tau }))
+$$</p>
+<h3 id="hard-label-distillation">Hard-label distillation</h3>
+<p>    引入蒸馏的变体，将teacher网络的hard 结果作为真正的label，使$y_{t}=argmax_{c}Z_{t}(c)$作为teacher的hard结果：
+$$
+L_{global}^{hard Distill}=\frac{1}{2}L_{CE}(\psi (Z_{s}),y)+\frac{1}{2}L_{CE}(\psi (Z_{s}),y_{t})
+$$
+    对于一个给定的图像，与teacher相关hard标签可能会随着特定的数据增强而改变。<br>
+    通过之后的实验可以看出，该蒸馏方法比传统的方法要好，该方法没有参数，且简单：teacher的预测结果$y_{t}$与真正的标签$y$扮演相同的角色。</p>
+<h3 id="distillation-token">Distillation token</h3>
+<p><img src="/img/deit1.PNG" alt="">
+    我们在初始embedding（patch embedding和class embedding）中添加一个新的token，distillation token。该token与class token使用方式相同，通过自注意力层与其他token进行信息交互，并在最后一层输出向量，该向量的优化目标由损失函数中的蒸馏部分给出。distillation token使得模型可以从teacher的输出中进行学习。<br>
+    同时，我们观察到，class token和distillation token收敛于不同的向量，随着计算，网络越深它们变得更加相似，最后一层的相似性高（0.93），但仍不是1。因为他们的目标使产生相似但不完全相同的目标。<br>
+    同时通过实验证明，distillation token是向模型中添加了一些东西的，即有从teacher网络中学习到内容并对student网络进行改进的，而不是简单的添加了一个与class token类似的额外token：对具有两个class token的模型进行对比，在训练过程中，它们是收敛于相同向量的，因此额外的class token不会对分类性能产生影响。</p>
+<h3 id="fine-tuning-with-distillation">Fine-tuning with distillation</h3>
+<p>    在使用更高分辨率的图像对网络进行微调时，也使用真实的标签和teacher网络的预测，进行知识蒸馏。</p>
+<h3 id="classification-with-our-approach-joint-classifiers">Classification with our approach: joint classifiers</h3>
+<p>    在测试时，由transformer产生的class token和distillation token都能够预测图像标签，我们的方法是将其进行融合，为此，我们添加了两个分类器的softmax输出来进行预测。</p>
+<h2 id="实验">实验</h2>
+<h3 id="distillation">Distillation</h3>
+<h4 id="convnets-teachers">Convnets teachers</h4>
+<p><img src="/img/deit2.PNG" alt=""></p>
+<p>    由上表可以看出：the convnet is a better teacher</p>
+<h3 id="comparison-of-distillation-methods">Comparison of distillation methods</h3>
+<p><img src="/img/deit3.PNG" alt="">
+    从上表可以看出：针对transformer架构，hart蒸馏要比soft蒸馏要好；并且两个token提供了对分类有用的互补信息；distillation token的结果要优于class token，与卷积网络相关，可能是它从卷积中学习到的更多。</p>
+<h3 id="a-comparative-study-with-convnets">a comparative study with convnets</h3>
+<p><img src="/img/deit4.PNG" alt="">
+<img src="/img/deit5.PNG" alt="">
+    上图为在Imagenet1k数据集上训练出的网络，对其吞吐量和准确性进行对比。</p>
+<h2 id="training-details">Training details</h2>
+<h3 id="initialization-and-hyper-parameters">Initialization and hyper-parameters</h3>
+<p>    transformer对初始化相对敏感，我们在实验中测试了几个选项，其中一些没有收敛，最终使用截断的正态分布来初始化权值。</p>
+<h3 id="data-augmentation">Data-Augmentation</h3>
+<p>    我们比较了Auto-Augment，Rand-Augment和random erasing，最终选择使用Rand-Augment。</p>
+<h3 id="regularization--optimizers">Regularization &amp; Optimizers</h3>
+<p>    我们测试了不同的优化器、学习率与权重衰减。</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>    在本文中，我们介绍了DeiT，一种不需要大量数据来训练的vision transformer，主要是引入了新的蒸馏方法。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

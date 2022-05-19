@@ -6,7 +6,58 @@
     <description>Recent content in Paper on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 07 May 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/paper/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 18 May 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/paper/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Reformer</title>
+      <link>https://gdy0924.github.io/posts/reformer/</link>
+      <pubDate>Wed, 18 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/reformer/</guid>
+      <description>REFORMER: THE EFFICIENT TRANSFORMER
+原文链接：DeiT
+上表为内存使用量和时间复杂度的比较，其中$l$为序列的长度，$b$为batch size的大小，$n_{h}$为头数，$n_{c}$为LSH的chunk数量，$n_{r}$为hash重复的次数。
+Abstract  Transformer在许多任务上都实现了最先进的结果，但是其训练代价是很昂贵的，特别是在长序列上。因此，我们提出两种提高transformer的技术：（1）局部敏感哈希（locality-sensitive hashing），将复杂度从$O(L^2)$降低到$O(L log L)$；（2）使用可逆残差层而不是标准残差，使得在训练过程中只存储最后一层的激活值（激活函数的输入值），而不是N次，N为层数。
+Introduction  基于transformer的大型模型甚至不能在单个GPU上进行微调，因为它们的内存需求需要多加速器硬件设置。transformer架构中的主要内存使用在以下几个方面：
+（1）一个包含N层的模型，其内存比单层模型使用的内存大N倍，因为需要存储激活值以进行反向传播，即每一层的激活值都需要存储下来；
+（2）transformer block中的全连接层FFN中的深度往往比$d_{model}$大得多，如：FFN的输入维度为512，那么中间的维度可能是2048，这也占了内存的很大部分；
+（3）注意力机制在计算序列长度为$L$的序列时，在计算和内存的复杂度上都是$O(L^2)$。
+我们提出以下方法来解决上述问题：
+（1）可逆层：使得整个网络只用存储最后一层的激活值，而不是所有层，之前层的激活值可以通过最后一层推算出来；
+（2）在FFN层中分割激活值，将他们以快的形式进行处理；
+（3）基于局部敏感哈希的近似注意力，将复杂度从$O(L^2)$降低到$O(L log L)$。
+LOCALITY-SENSITIVE HASHING ATTENTION Dot-product attention  transformer中使用点乘计算注意力，输入是维度为$d_{k}$的query和key，以及维度为$d_{v}$的value，计算公式如下： $$ Attention(Q,K,V)=softmax(\frac{QK^{T}}{\sqrt{d_{k}}})V $$
+Multi-head attention  使用可学习的矩阵$W_{Q}$、$W_{K}$和$W_{V}$来处理query、key和value。
+Memory-efficient attention  假设Q、K、V的大小都是$L×d_{model}$，那么$QK^{T}$的计算结果的大小就是$L×L$的，当序列长度很长时，是需要一定的内存去存储的，这就限制了transformer的使用。
+Where do Q, K, V come from?  Q、K、V是将输入经过三个不同的线性层来得到的。对于LSH注意力模型，我们希望query和keys（Q和K）是相同的，这可以通过一个使用同一个线性层来实现，这种方式称为shared-QK Transformer，并经过实验验证，这种方式并不会影响性能。
+Hashing attention  对于LSH注意力模型，从Q=K和V开始，大小为$L×d_{model}$，并根据之前的公式，主要问题在于$QK^{T}$部分的计算。但是，我们最终是只关心softmax的结果，并且softmax是由最大元素来主导的。也就是说，对于每个query$q_{i}$，我们只需要关注在K中最接近$q_{i}$的那些key。比如：假设长度为64K，对于每个$q_{i}$，我们只考虑一个小子集，32或64个最接近的key的集合，这样就可以减少计算量，那么如何在K中找到“最近的邻居”呢？
+Locality sensitive hashing  在高维空间中快速寻找最近邻的问题可以通过局部敏感哈希(LSH)来解决：使用一种哈希函数$H(x)$，使得两个个相似度很高的数据以较高的概率映射成同一个hash值，而令两个相似度很低的数据以极低的概率映射成同一个hash值，该函数称为局部敏感哈希。
+我们通过随即投影来实现，如下图。为了得到，我们先创建一个随机矩阵，大小为$[d_{k},b/2]$，然后定义$h(x)=argmax([xR;-xR])$，其中$[u;v]$表示两个向量的连接。 在上图中，为角度局部敏感哈希，使用球投影点的随即旋转角度，在上图的二维描述中，上边一行的两个点x和y不太可能在一个中hash buckets，而在下边一行中的x和y的球投影是彼此接近的。
+LSH attention 上图为LSH attention中：hash-bucketing、排序、chunking分块和计算attention结果的简化描述；下图中的(a)-(d)是步骤中的矩阵形式：</description>
+    </item>
+    
+    <item>
+      <title>DeiT</title>
+      <link>https://gdy0924.github.io/posts/deit/</link>
+      <pubDate>Tue, 17 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/deit/</guid>
+      <description>Training data-efficient image transformers &amp;amp; distillation through attention
+原文链接：DeiT
+Abstract  最近，基于注意力机制的神经网络用于计算机视觉领域，但是这些网络需要大量数据进行预训练，从而限制了其使用。
+在该论文中，我们参考ViT网络，引入一种蒸馏方式，使得student网络可以通过注意力机制从teacher网络中进行学习。
+Introduction  Vision Transformer（ViT）使用自注意力机制用于图像分类，以图像补丁作为输入，但是transformer架构在数据量不足的训练下不能很好地泛化，而这些模型的训练涉及大量的计算资源。
+在本文中，我们提出DeiT网络，引入了一个一种基于token的策略，contributions：
+（1）我们的方法证明使用不包含卷积层的神经网络可以在没有外部数据的情况下，可以与在ImageNet数据集上最好结果的模型相比较，并且我们提出的模型DeiT-S和DeiT-Ti有很少的参数；
+（2）引入了一种新的基于蒸馏标记的蒸馏方式：复制由teacher网络得到的label，与类标记作用相同，这两种label相互作用以提高精度。
+Related work Image Classification  虽然有许多尝试使用transformer来实现图像分类，但其性能不如卷积网络。最近，Vision Transformer（ViT）没有使用任何卷积，达到了卷积的水平，然而，ViT需要大量的数据进行预训练，才能使transformer架构有效。在本文中，不需要大型训练数据集，也实现了强大的性能，即只使用Imagenet1k数据集。
+Transformer architecture Knowledge Distillation  知识蒸馏，由Hinton提出，是指student网络利用来自强大的teacher网络中得到的“soft”标签进行训练。soft标签（如：0.2，0.3，0.5）是softmax函数的输出，而不是hard标签（如：0，0，1），这种训练方式提高了student网络的性能（或者它可以看作是将teacher网络压缩成一个更小的模型——student网络）。一方面，teacher的soft标签将有类似于标签平滑的效果；另一方面，teacher的监督考虑了数据增强的影响：例如，一张很大的场景下有一只小猫缩在角落，其标签为猫，如果对其进行crop操作，这只猫就不会在crop后的图中了，这也改变了图片的标签。利用teacher网络中的soft标签可以用一种soft的方式将偏差转移到student网络中，例如：使用卷积网络作为teacher，在transformer中引入由卷积得到的偏差，是可以提升网络性能的。
+Vision transformer: overview Multi-head Self Attention layers (MSA) $$ Attention(Q,K,V)=Softmax(\frac{QK^{T}}{\sqrt{d}})V $$ 其中，$Q=XW_{Q}$，$K=XW_{K}$，$V=XW_{V}$
+Transformer block for images  Transformer中，MSA后跟着前馈网络（FFN），由两个线性层组成，中间有GeLU非线性激活函数，第一个线性层将维数从$D$扩展到$4D$，第二层将维数从$4D$减少为$D$。
+ViT将图片当作序列一样处理，将图像分成大小为$16×16$的patch，作为transformer的输入，并结合位置信息（position embedding）。
+The class token  可训练的向量，在第一层附加在patch tokens中，该向量通过transformer，最后用一个线性层来预测类别。这种架构迫使自注意力机制在patch tokens和class token之间传播信息：在训练时，监督信号只来自class token，patch tokens是模型唯一的变量输入。
+Fixing the positional encoding across resolutions  使用较低分辨的图像对网络进行预训练，使用较高分辨率的图像对网络进行微调，可以加快训练。当增加输入图像的分辨率时，我们保持patch大小不变，那么输入patch的数量就会发生变化。采用插值法对位置embedding进行调整。</description>
+    </item>
+    
     <item>
       <title>SegFormer</title>
       <link>https://gdy0924.github.io/posts/segformer/</link>
