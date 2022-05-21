@@ -3,7 +3,7 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://gdy0924.github.io/categories/</loc>
-    <lastmod>2022-05-18T00:00:00+00:00</lastmod>
+    <lastmod>2022-05-20T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -15,11 +15,14 @@
                 href="https://gdy0924.github.io/categories/"
                 />
   </url><url>
+    <loc>https://gdy0924.github.io/posts/reformer-%E5%89%AF%E6%9C%AC/</loc>
+    <lastmod>2022-05-20T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://gdy0924.github.io/categories/paper/</loc>
-    <lastmod>2022-05-18T00:00:00+00:00</lastmod>
+    <lastmod>2022-05-20T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/</loc>
-    <lastmod>2022-05-18T00:00:00+00:00</lastmod>
+    <lastmod>2022-05-20T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -31,11 +34,8 @@
                 href="https://gdy0924.github.io/posts/"
                 />
   </url><url>
-    <loc>https://gdy0924.github.io/posts/reformer/</loc>
-    <lastmod>2022-05-18T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://gdy0924.github.io/</loc>
-    <lastmod>2022-05-18T00:00:00+00:00</lastmod>
+    <lastmod>2022-05-20T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -46,6 +46,9 @@
                 hreflang="cn"
                 href="https://gdy0924.github.io/"
                 />
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/reformer/</loc>
+    <lastmod>2022-05-18T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/deit/</loc>
     <lastmod>2022-05-17T00:00:00+00:00</lastmod>
