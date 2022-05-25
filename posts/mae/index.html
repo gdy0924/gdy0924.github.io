@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/mae/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/mae/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "MAE",
+      "headline" : "MAE",
+      "description" : "Masked Autoencoders Are Scalable Vision Learners\nAbstract  本文证明了掩码自动编码器(Masked Autoencoders, MAE)是一种可扩展的自监督学习模型，其方法很简单：随机mask输入图像的patch，并重建缺失的像素。首先，开发了一个非对称的encoder-decoder架构，encoder只对可见的patch进行处理（即没有mask的patch），一个轻量级的decoder，从潜在的表示和mask token种重构原始图像。其次，我们发现mask更高比例的输入图像（如75%），能够产生更有意义的自监督任务。\nIntroduction  基于GPT中的自回归语言建模和BERT中的mask自编码的解决方案在概念上很简单：它们mask部分数据，并学习预测被mask的内容。mask自编码的思想，是一种更一般的去噪自编码器的形式，也适用于计算机视觉。这会有个问题：是什么使mask的自编码在视觉和语言领域之间有所不同？\n我们试图从以下角度来回答这个问题：\n（1）到目前为止，两者的架构都是不同的：在视觉中，卷积在很长时间都占了主导地位。卷积通常在规则的网格上运行，将mask token和位置embedding等添加到卷积网络中并不简单，但是随着ViT的提出，该问题已经得到了解决；\n（2）语言于视觉之间的信息密度是不同的：语言具有高度语义性和信息密集性，当训练一个模型预测句子中缺失的一些单词时，该任务可以诱导复杂的语言理解；相反，图像具有大量的空间冗余信息，如一个缺失的patch可以从相邻的patch中恢复，而很少有高度理解的部分；为了克服上述这种差异，我们提出mask非常多的patch，这种方式在很大程度上减少了冗余，创造了一个具有挑战性的自监督任务；\n（3）自编码器中的decoder，将潜在的表示映射回输入端，在重建文本和图像之间起的作用不同：在视觉中，decoder重建像素，其输出的语义级别比较低；但是在语言中，预测包含丰富语义信息的单词，因此，对于图像，decoder的设计在确定学习到的语义水平中起着关键作用。\n基于上述分析，我们提出了一种简单的、有效的、可扩展的mask自编码器（Masked Autoencoders,MAE），用于学习视觉表示。\nMAE从输入图像中随机mask patch，并重建像素空间中mask掉的patch。非对称的encoder-decoder架构，其中，encoder只对未mask的patch进行操作，轻量级的decoder从潜在表示和mask token中重建输入，如下图所示： Related Work Masked language modeling  掩码语言模型和自回归模型是自然语言处理领域非常成功的方法，如：Bert、GPT。该方法mask输入中的某些内容，并训练模型来预测mask掉的内容，这种训练可以很好的推广到各种下游任务中。\nAutoencoding  自编码中包含一个encoder和一个decoder，encoder将输入映射到潜在表示，decoder重构输入。MAE是去噪自编码的一种形式，但在许多方面与经典的DAE不同。\nMasked image encoding  掩码图像编码从被掩码的图像中学习表示。\nSelf-supervised learning Approach  MAE是一种自编码模型，可以重建原始输入的部分内容。包含一个encoder，将输入映射到一个潜在的表示，一个decoder，从潜在的表示中重构原始输入；与原始的自编码器不同，我们设计的是非对称的结果，即encoder只对未mask的输入进行操作，轻量级的decoder从潜在表示和mask token中重建完整的输入。\nMasking  与ViT相同，我们将输入图像分割成规则的patch，接着对patch进行随机采样，对其进行mask。该随机采样的比例很高，即被mask掉的patch比例很高，在很大程度上消除了冗余，从而创建了一个不容易通过从可见的相邻patch进行推断来解决的任务。\nMAE encoder  encoder是一个ViT架构，但只应用于未mask的patch。与ViT相同，将patch embedding和位置embedding相加作为输入，然后通过一系列的transformer block来处理输入，但是，该encoder只处理整个输入图像的一小个子集。mask patch被移除了，这使得只是用一小部分的计算量和内存来训练一个大的encoder。完整的输入图像由轻量级的decoder来处理。\nMAE decoder  MAE中decoder的输入是完整的token集合，包括encoder处理的token和mask token。每个mask token是一个共享的、可学习的向量，用来表示该patch是否需要预测。同时向完整的token集合中加入位置embedding，输入到另外的transformer block中。\nMAE的decoder仅在预训练阶段用于实现像素重建，因此是独立于encoder的；并且decoder比encoder更窄更浅，计算量更小。通过这种不对称的设计，完整的token集合只由轻量级的decoder来处理，大大减少了预训练的时间。\nReconstruction target  MAE通过预测每个掩码patch的像素值类重建输入图像，encoder中输出的每个元素代表一个patch的像素向量，decoder的最后一层是一个线性层，其输出通道的数量等于一个patch中像素的数量。decoder的输出经过reshape，重建成原始图像。损失函数使用MSE，并且只计算mask patch上的损失。\n我们还提出了一个变体，其重建目标是每个mask patch的归一化像素值，在实验中，使用归一化像素值作为重建目标，提高了数据表示的质量。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-05-21 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-05-21 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/mae\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>MAE</title>
+  <meta property="og:title" content="MAE" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="Masked Autoencoders Are Scalable Vision Learners
+Abstract  本文证明了掩码自动编码器(Masked Autoencoders, MAE)是一种可扩展的自监督学习模型，其方法很简单：随机mask输入图像的patch，并重建缺失的像素。首先，开发了一个非对称的encoder-decoder架构，encoder只对可见的patch进行处理（即没有mask的patch），一个轻量级的decoder，从潜在的表示和mask token种重构原始图像。其次，我们发现mask更高比例的输入图像（如75%），能够产生更有意义的自监督任务。
+Introduction  基于GPT中的自回归语言建模和BERT中的mask自编码的解决方案在概念上很简单：它们mask部分数据，并学习预测被mask的内容。mask自编码的思想，是一种更一般的去噪自编码器的形式，也适用于计算机视觉。这会有个问题：是什么使mask的自编码在视觉和语言领域之间有所不同？
+我们试图从以下角度来回答这个问题：
+（1）到目前为止，两者的架构都是不同的：在视觉中，卷积在很长时间都占了主导地位。卷积通常在规则的网格上运行，将mask token和位置embedding等添加到卷积网络中并不简单，但是随着ViT的提出，该问题已经得到了解决；
+（2）语言于视觉之间的信息密度是不同的：语言具有高度语义性和信息密集性，当训练一个模型预测句子中缺失的一些单词时，该任务可以诱导复杂的语言理解；相反，图像具有大量的空间冗余信息，如一个缺失的patch可以从相邻的patch中恢复，而很少有高度理解的部分；为了克服上述这种差异，我们提出mask非常多的patch，这种方式在很大程度上减少了冗余，创造了一个具有挑战性的自监督任务；
+（3）自编码器中的decoder，将潜在的表示映射回输入端，在重建文本和图像之间起的作用不同：在视觉中，decoder重建像素，其输出的语义级别比较低；但是在语言中，预测包含丰富语义信息的单词，因此，对于图像，decoder的设计在确定学习到的语义水平中起着关键作用。
+基于上述分析，我们提出了一种简单的、有效的、可扩展的mask自编码器（Masked Autoencoders,MAE），用于学习视觉表示。
+MAE从输入图像中随机mask patch，并重建像素空间中mask掉的patch。非对称的encoder-decoder架构，其中，encoder只对未mask的patch进行操作，轻量级的decoder从潜在表示和mask token中重建输入，如下图所示： Related Work Masked language modeling  掩码语言模型和自回归模型是自然语言处理领域非常成功的方法，如：Bert、GPT。该方法mask输入中的某些内容，并训练模型来预测mask掉的内容，这种训练可以很好的推广到各种下游任务中。
+Autoencoding  自编码中包含一个encoder和一个decoder，encoder将输入映射到潜在表示，decoder重构输入。MAE是去噪自编码的一种形式，但在许多方面与经典的DAE不同。
+Masked image encoding  掩码图像编码从被掩码的图像中学习表示。
+Self-supervised learning Approach  MAE是一种自编码模型，可以重建原始输入的部分内容。包含一个encoder，将输入映射到一个潜在的表示，一个decoder，从潜在的表示中重构原始输入；与原始的自编码器不同，我们设计的是非对称的结果，即encoder只对未mask的输入进行操作，轻量级的decoder从潜在表示和mask token中重建完整的输入。
+Masking  与ViT相同，我们将输入图像分割成规则的patch，接着对patch进行随机采样，对其进行mask。该随机采样的比例很高，即被mask掉的patch比例很高，在很大程度上消除了冗余，从而创建了一个不容易通过从可见的相邻patch进行推断来解决的任务。
+MAE encoder  encoder是一个ViT架构，但只应用于未mask的patch。与ViT相同，将patch embedding和位置embedding相加作为输入，然后通过一系列的transformer block来处理输入，但是，该encoder只处理整个输入图像的一小个子集。mask patch被移除了，这使得只是用一小部分的计算量和内存来训练一个大的encoder。完整的输入图像由轻量级的decoder来处理。
+MAE decoder  MAE中decoder的输入是完整的token集合，包括encoder处理的token和mask token。每个mask token是一个共享的、可学习的向量，用来表示该patch是否需要预测。同时向完整的token集合中加入位置embedding，输入到另外的transformer block中。
+MAE的decoder仅在预训练阶段用于实现像素重建，因此是独立于encoder的；并且decoder比encoder更窄更浅，计算量更小。通过这种不对称的设计，完整的token集合只由轻量级的decoder来处理，大大减少了预训练的时间。
+Reconstruction target  MAE通过预测每个掩码patch的像素值类重建输入图像，encoder中输出的每个元素代表一个patch的像素向量，decoder的最后一层是一个线性层，其输出通道的数量等于一个patch中像素的数量。decoder的输出经过reshape，重建成原始图像。损失函数使用MSE，并且只计算mask patch上的损失。
+我们还提出了一个变体，其重建目标是每个mask patch的归一化像素值，在实验中，使用归一化像素值作为重建目标，提高了数据表示的质量。" />
+  <meta name="description" content="Masked Autoencoders Are Scalable Vision Learners
+Abstract  本文证明了掩码自动编码器(Masked Autoencoders, MAE)是一种可扩展的自监督学习模型，其方法很简单：随机mask输入图像的patch，并重建缺失的像素。首先，开发了一个非对称的encoder-decoder架构，encoder只对可见的patch进行处理（即没有mask的patch），一个轻量级的decoder，从潜在的表示和mask token种重构原始图像。其次，我们发现mask更高比例的输入图像（如75%），能够产生更有意义的自监督任务。
+Introduction  基于GPT中的自回归语言建模和BERT中的mask自编码的解决方案在概念上很简单：它们mask部分数据，并学习预测被mask的内容。mask自编码的思想，是一种更一般的去噪自编码器的形式，也适用于计算机视觉。这会有个问题：是什么使mask的自编码在视觉和语言领域之间有所不同？
+我们试图从以下角度来回答这个问题：
+（1）到目前为止，两者的架构都是不同的：在视觉中，卷积在很长时间都占了主导地位。卷积通常在规则的网格上运行，将mask token和位置embedding等添加到卷积网络中并不简单，但是随着ViT的提出，该问题已经得到了解决；
+（2）语言于视觉之间的信息密度是不同的：语言具有高度语义性和信息密集性，当训练一个模型预测句子中缺失的一些单词时，该任务可以诱导复杂的语言理解；相反，图像具有大量的空间冗余信息，如一个缺失的patch可以从相邻的patch中恢复，而很少有高度理解的部分；为了克服上述这种差异，我们提出mask非常多的patch，这种方式在很大程度上减少了冗余，创造了一个具有挑战性的自监督任务；
+（3）自编码器中的decoder，将潜在的表示映射回输入端，在重建文本和图像之间起的作用不同：在视觉中，decoder重建像素，其输出的语义级别比较低；但是在语言中，预测包含丰富语义信息的单词，因此，对于图像，decoder的设计在确定学习到的语义水平中起着关键作用。
+基于上述分析，我们提出了一种简单的、有效的、可扩展的mask自编码器（Masked Autoencoders,MAE），用于学习视觉表示。
+MAE从输入图像中随机mask patch，并重建像素空间中mask掉的patch。非对称的encoder-decoder架构，其中，encoder只对未mask的patch进行操作，轻量级的decoder从潜在表示和mask token中重建输入，如下图所示： Related Work Masked language modeling  掩码语言模型和自回归模型是自然语言处理领域非常成功的方法，如：Bert、GPT。该方法mask输入中的某些内容，并训练模型来预测mask掉的内容，这种训练可以很好的推广到各种下游任务中。
+Autoencoding  自编码中包含一个encoder和一个decoder，encoder将输入映射到潜在表示，decoder重构输入。MAE是去噪自编码的一种形式，但在许多方面与经典的DAE不同。
+Masked image encoding  掩码图像编码从被掩码的图像中学习表示。
+Self-supervised learning Approach  MAE是一种自编码模型，可以重建原始输入的部分内容。包含一个encoder，将输入映射到一个潜在的表示，一个decoder，从潜在的表示中重构原始输入；与原始的自编码器不同，我们设计的是非对称的结果，即encoder只对未mask的输入进行操作，轻量级的decoder从潜在表示和mask token中重建完整的输入。
+Masking  与ViT相同，我们将输入图像分割成规则的patch，接着对patch进行随机采样，对其进行mask。该随机采样的比例很高，即被mask掉的patch比例很高，在很大程度上消除了冗余，从而创建了一个不容易通过从可见的相邻patch进行推断来解决的任务。
+MAE encoder  encoder是一个ViT架构，但只应用于未mask的patch。与ViT相同，将patch embedding和位置embedding相加作为输入，然后通过一系列的transformer block来处理输入，但是，该encoder只处理整个输入图像的一小个子集。mask patch被移除了，这使得只是用一小部分的计算量和内存来训练一个大的encoder。完整的输入图像由轻量级的decoder来处理。
+MAE decoder  MAE中decoder的输入是完整的token集合，包括encoder处理的token和mask token。每个mask token是一个共享的、可学习的向量，用来表示该patch是否需要预测。同时向完整的token集合中加入位置embedding，输入到另外的transformer block中。
+MAE的decoder仅在预训练阶段用于实现像素重建，因此是独立于encoder的；并且decoder比encoder更窄更浅，计算量更小。通过这种不对称的设计，完整的token集合只由轻量级的decoder来处理，大大减少了预训练的时间。
+Reconstruction target  MAE通过预测每个掩码patch的像素值类重建输入图像，encoder中输出的每个元素代表一个patch的像素向量，decoder的最后一层是一个线性层，其输出通道的数量等于一个patch中像素的数量。decoder的输出经过reshape，重建成原始图像。损失函数使用MSE，并且只计算mask patch上的损失。
+我们还提出了一个变体，其重建目标是每个mask patch的归一化像素值，在实验中，使用归一化像素值作为重建目标，提高了数据表示的质量。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">MAE</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-05-21 00:00:00 UTC">
+                21 May 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Masked Autoencoders Are Scalable Vision Learners</p>
+<h2 id="abstract">Abstract</h2>
+<p>    本文证明了掩码自动编码器(Masked Autoencoders, MAE)是一种可扩展的自监督学习模型，其方法很简单：随机mask输入图像的patch，并重建缺失的像素。首先，开发了一个非对称的encoder-decoder架构，encoder只对可见的patch进行处理（即没有mask的patch），一个轻量级的decoder，从潜在的表示和mask token种重构原始图像。其次，我们发现mask更高比例的输入图像（如75%），能够产生更有意义的自监督任务。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    基于GPT中的自回归语言建模和BERT中的mask自编码的解决方案在概念上很简单：它们mask部分数据，并学习预测被mask的内容。mask自编码的思想，是一种更一般的去噪自编码器的形式，也适用于计算机视觉。这会有个问题：是什么使mask的自编码在视觉和语言领域之间有所不同？<br>
+    我们试图从以下角度来回答这个问题：<br>
+    （1）到目前为止，两者的<strong>架构都是不同</strong>的：在视觉中，卷积在很长时间都占了主导地位。卷积通常在规则的网格上运行，将mask token和位置embedding等添加到卷积网络中并不简单，但是随着ViT的提出，该问题已经得到了解决；<br>
+    （2）语言于视觉之间的<strong>信息密度是不同的</strong>：语言具有高度语义性和信息密集性，当训练一个模型预测句子中缺失的一些单词时，该任务可以诱导复杂的语言理解；相反，图像具有大量的空间冗余信息，如一个缺失的patch可以从相邻的patch中恢复，而很少有高度理解的部分；为了克服上述这种差异，我们提出mask非常多的patch，这种方式在很大程度上减少了冗余，创造了一个具有挑战性的自监督任务；<br>
+    （3）自编码器中的<strong>decoder</strong>，将潜在的表示映射回输入端，在重建文本和图像之间起的<strong>作用不同</strong>：在视觉中，decoder重建像素，其输出的语义级别比较低；但是在语言中，预测包含丰富语义信息的单词，因此，对于图像，decoder的设计在确定学习到的语义水平中起着关键作用。<br>
+    基于上述分析，我们提出了一种简单的、有效的、可扩展的mask自编码器（Masked Autoencoders,MAE），用于学习视觉表示。<br>
+    MAE从输入图像中随机mask patch，并重建像素空间中mask掉的patch。非对称的encoder-decoder架构，其中，encoder只对未mask的patch进行操作，轻量级的decoder从潜在表示和mask token中重建输入，如下图所示：
+<img src="/img/mae1.PNG" alt=""></p>
+<h2 id="related-work">Related Work</h2>
+<h3 id="masked-language-modeling">Masked language modeling</h3>
+<p>    掩码语言模型和自回归模型是自然语言处理领域非常成功的方法，如：Bert、GPT。该方法mask输入中的某些内容，并训练模型来预测mask掉的内容，这种训练可以很好的推广到各种下游任务中。</p>
+<h3 id="autoencoding">Autoencoding</h3>
+<p>    自编码中包含一个encoder和一个decoder，encoder将输入映射到潜在表示，decoder重构输入。MAE是去噪自编码的一种形式，但在许多方面与经典的DAE不同。</p>
+<h3 id="masked-image-encoding">Masked image encoding</h3>
+<p>    掩码图像编码从被掩码的图像中学习表示。</p>
+<h3 id="self-supervised-learning">Self-supervised learning</h3>
+<h2 id="approach">Approach</h2>
+<p>    MAE是一种自编码模型，可以重建原始输入的部分内容。包含一个encoder，将输入映射到一个潜在的表示，一个decoder，从潜在的表示中重构原始输入；与原始的自编码器不同，我们设计的是非对称的结果，即encoder只对未mask的输入进行操作，轻量级的decoder从潜在表示和mask token中重建完整的输入。</p>
+<h3 id="masking">Masking</h3>
+<p>    与ViT相同，我们将输入图像分割成规则的patch，接着对patch进行随机采样，对其进行mask。该随机采样的比例很高，即被mask掉的patch比例很高，在很大程度上消除了冗余，从而创建了一个不容易通过从可见的相邻patch进行推断来解决的任务。</p>
+<h3 id="mae-encoder">MAE encoder</h3>
+<p>    encoder是一个ViT架构，但只应用于未mask的patch。与ViT相同，将patch embedding和位置embedding相加作为输入，然后通过一系列的transformer block来处理输入，但是，该encoder只处理整个输入图像的一小个子集。mask patch被移除了，这使得只是用一小部分的计算量和内存来训练一个大的encoder。完整的输入图像由轻量级的decoder来处理。</p>
+<h3 id="mae-decoder">MAE decoder</h3>
+<p>    MAE中decoder的输入是完整的token集合，包括encoder处理的token和mask token。每个mask token是一个共享的、可学习的向量，用来表示该patch是否需要预测。同时向完整的token集合中加入位置embedding，输入到另外的transformer block中。<br>
+    MAE的decoder仅在预训练阶段用于实现像素重建，因此是独立于encoder的；并且decoder比encoder更窄更浅，计算量更小。通过这种不对称的设计，完整的token集合只由轻量级的decoder来处理，大大减少了预训练的时间。</p>
+<h3 id="reconstruction-target">Reconstruction target</h3>
+<p>    MAE通过预测每个掩码patch的像素值类重建输入图像，encoder中输出的每个元素代表一个patch的像素向量，decoder的最后一层是一个线性层，其输出通道的数量等于一个patch中像素的数量。decoder的输出经过reshape，重建成原始图像。损失函数使用MSE，并且只计算mask patch上的损失。<br>
+    我们还提出了一个变体，其重建目标是每个mask patch的归一化像素值，在实验中，使用归一化像素值作为重建目标，提高了数据表示的质量。</p>
+<h3 id="simple-implementation">Simple implementation</h3>
+<p>    （1）生成patch embedding，加上位置embedding；<br>
+    （2）随机shuffle token列表，并根据mask比例删除列表的最后一部分，将留下的一部分输入到encoder中；<br>
+    （3）encoder之后，向token列表中添加mask token，并unshuffle，加上位置embedding，输入到decoder中。</p>
+<h2 id="实验">实验</h2>
+<p>    在ImageNet-1K上进行自监督的预训练，然后通过监督训练进行端到端的微调/直接添加线性层用于分类。</p>
+<h3 id="masking-ratio">Masking ratio</h3>
+<p><img src="/img/mae2.PNG" alt="">
+    上图显示了掩码比例的影响，可以看出75%的比例更有优势，与NLP不同，即BERT使用15%的比例；也可以看出线性层分类与端到端微调的不同，对于线性层分类，准确率逐步上升直到最高，而端到端微调对比例的敏感度较低，在很大范围内的效果都还不错。</p>
+<h3 id="decoder-design">Decoder design</h3>
+<p><img src="/img/mae3.PNG" alt="">
+    我们的decoder可以灵活的设计，如上图所示。从左边可以看出，自编码器的最后几层更专门用于重建，但与分类识别任务相关性较小，因此端到端的微调效果更好；同时，仅使用一块transformer block通过微调也有不错的性能；在（b）中，可以看出，一个较窄的decoder也可以很好的微调。（我们默认的MAE是上图的灰色块）</p>
+<h3 id="mask-token">Mask token</h3>
+<p><img src="/img/mae4.PNG" alt="">
+    上图比较了在encoder中是否mask token，可以看出，使用后效果更差，可能原因是在预训练中有大量的mask token，而在微调中是不存在的，因此导致存在差异；同时，不使用mask token大大减少了计算量。</p>
+<h3 id="reconstruction-target-1">Reconstruction target</h3>
+<p><img src="/img/mae5.PNG" alt="">
+    上图比较了不同的重建目标，可以看出使用归一化的像素可以提高性能，另一种方法是在patch空间中进行PCA操作，并使用最大PCA系数作为目标，会降低准确率。</p>
+<h3 id="data-augmentation">Data augmentation</h3>
+<p><img src="/img/mae6.PNG" alt="">
+    上图展示了数据增强的效果，可以看出，只是用剪裁这种方式，效果比较好；并且，不使用数据增强，效果也很好，这与严重依赖于数据增强的对比学习的方法非常不同。</p>
+<h3 id="mask-sampling-strategy">Mask sampling strategy</h3>
+<p><img src="/img/mae7.PNG" alt="">
+    上图对比了不同的采样策略：block-wise倾向于删除较大的block，如下图中的中间，使用MAE方法，在50%的掩码比例下效果可以，但在75%比例下精度下降；grid-wise固定保留每四个patch中的一个，如下图的右边，这种实现简单，但质量很低；简单的随机抽样更适合MAE，如下图的左边。
+<img src="/img/mae8.PNG" alt=""></p>
+<h3 id="comparisons-with-previous-results">Comparisons with Previous Results</h3>
+<p><img src="/img/mae9.PNG" alt=""></p>
+<h3 id="partial-fine-tuning">Partial fine-tuning</h3>
+<p><img src="/img/mae10.PNG" alt="">
+    微调层数与结果的比较：可以看出，微调几个块（4/6）可以接近完全微调的效果，</p>
+<h2 id="discussion-and-conclusion">Discussion and Conclusion</h2>
+<p>    规模小并且算法简单是深度学习的核心，在NLP中，简单的自监督学习方法很有效，但在视觉领域还是受到一些限制的。我们通过实验观察到，自编码器（类似NLP的自监督方法）提供了可扩展的模型。另一方面，我们注意到图像数据与语言数据的不同，需要仔细处理这些差异。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/pvt/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/pvt/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "PVT",
+      "headline" : "PVT",
+      "description" : "Pyramid Vision Transformer: A Versatile Backbone for Dense Prediction without Convolutions\nAbstract  本文提出了一个简单的、无卷积的网络结构，对许多密集预测任务都有用，与最近提出的图像分类的ViT网络不同，我们引入金字塔视觉transformer（Pyramid Vision Transformer，PVT），解决了将transformer用于密集预测任务的差异。\nPVT有以下几个优点：\n（1）与ViT生成低分辨率的输出，并且有较高的计算和内存成本，PVT不仅可以产生高分辨率的输出，而且通过渐进收缩金字塔模块（progressive shrinking pyramid）来减少计算量；\n（2）PVT继承了CNN和transformer的优点，使其成为各种视觉任务的不需要卷积的backbone，可以直接代替CNN backbones；\n（3）通过大量实验证明了PVT的有效性。\nIntroduction 上图为不同架构的比较：（a）CNN backbones使用金字塔架构来进行密集预测任务；（b）ViT；（c）引入CNN中的金字塔架构，提出PVT，可以作为许多任务的backbone。\n最近提出的ViT，使用无卷积模型来代替CNN backbones，如上图（b）所示：ViT为柱状结构，虽然适用于图像分类，但不适用于像素级密集预测任务，如目标检测、分割等。原因有两点：（1）ViT的输出特征图是单尺度和低分辨率的；（2）其计算量和内存使用量很高。\n为了解决上述问题，本文提出一个基于Transformer的架构，PVT，如上图的（c）所示，克服了传统transformer的困难：（1）以细粒度的图像patch作为输入（每个patch4×4像素），来学习高分辨率的表示；（2）随着网络的加深，通过渐进收缩的金字塔模块来减少transformer的序列长度，减少计算量；（3）采用空间注意力减少层（SRA）来进一步减少计算量和内存使用量。\n优势：\n（1）相比于CNN网络的局部感受野随着网络的加深而增加，PVT拥有全局的感受野；\n（2）与ViT相比，金字塔架构更适合密集预测任务；\n（3）可以与其特定任务的transformer decoder相结合，例如：PVT\u002bDETR。\nContributions：\n（1）提出PVT，用于密集预测任务的完全基于transformer的backbone；\n（2）通过渐进缩小的金字塔模块和空间注意力减少层，来减少资源消耗，使PVT学习多尺度和高分辨率的特征；\n（3）通过实验证明PVT结构的有效性。\nRelated Work CNN Backbones  与发展成熟的CNN不同，视觉transformer的发展仍在早期阶段，在本文中，我们通过提出一种适用于大多数视觉任务的transformer backbone来扩展视觉transformer的应用范围。\nDense Prediction Tasks  密集预测任务的目标是对特征图进行像素级分类或回归，目标检测和语义分割是两个具有代表性的密集预测任务，密集预测任务十分依赖于高分辨率和多尺度的特征图。DETR将CNN backbone和transformer decoder相结合，搭建了一个端到端的目标检测器。\nSelf-Attention and Transformer in Vision  与之前的模型不同，该工作将特征金字塔架构引入transformer，为密集预测任务提供一个transformer backbone。\nPyramid Vision Transformer (PVT) Overall Architecture  目标是将金字塔结构引入transformer框架，使其为密集预测任务生成多尺度特征图。如上图所示：\n该架构共包含四个阶段，生成不同尺度的特征图；每个阶段都是相似的架构，一个patch embedding层和$L_{i}$个Transformer encoder层。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-05-24 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-05-24 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/pvt\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>PVT</title>
+  <meta property="og:title" content="PVT" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="Pyramid Vision Transformer: A Versatile Backbone for Dense Prediction without Convolutions
+Abstract  本文提出了一个简单的、无卷积的网络结构，对许多密集预测任务都有用，与最近提出的图像分类的ViT网络不同，我们引入金字塔视觉transformer（Pyramid Vision Transformer，PVT），解决了将transformer用于密集预测任务的差异。
+PVT有以下几个优点：
+（1）与ViT生成低分辨率的输出，并且有较高的计算和内存成本，PVT不仅可以产生高分辨率的输出，而且通过渐进收缩金字塔模块（progressive shrinking pyramid）来减少计算量；
+（2）PVT继承了CNN和transformer的优点，使其成为各种视觉任务的不需要卷积的backbone，可以直接代替CNN backbones；
+（3）通过大量实验证明了PVT的有效性。
+Introduction 上图为不同架构的比较：（a）CNN backbones使用金字塔架构来进行密集预测任务；（b）ViT；（c）引入CNN中的金字塔架构，提出PVT，可以作为许多任务的backbone。
+最近提出的ViT，使用无卷积模型来代替CNN backbones，如上图（b）所示：ViT为柱状结构，虽然适用于图像分类，但不适用于像素级密集预测任务，如目标检测、分割等。原因有两点：（1）ViT的输出特征图是单尺度和低分辨率的；（2）其计算量和内存使用量很高。
+为了解决上述问题，本文提出一个基于Transformer的架构，PVT，如上图的（c）所示，克服了传统transformer的困难：（1）以细粒度的图像patch作为输入（每个patch4×4像素），来学习高分辨率的表示；（2）随着网络的加深，通过渐进收缩的金字塔模块来减少transformer的序列长度，减少计算量；（3）采用空间注意力减少层（SRA）来进一步减少计算量和内存使用量。
+优势：
+（1）相比于CNN网络的局部感受野随着网络的加深而增加，PVT拥有全局的感受野；
+（2）与ViT相比，金字塔架构更适合密集预测任务；
+（3）可以与其特定任务的transformer decoder相结合，例如：PVT&#43;DETR。
+Contributions：
+（1）提出PVT，用于密集预测任务的完全基于transformer的backbone；
+（2）通过渐进缩小的金字塔模块和空间注意力减少层，来减少资源消耗，使PVT学习多尺度和高分辨率的特征；
+（3）通过实验证明PVT结构的有效性。
+Related Work CNN Backbones  与发展成熟的CNN不同，视觉transformer的发展仍在早期阶段，在本文中，我们通过提出一种适用于大多数视觉任务的transformer backbone来扩展视觉transformer的应用范围。
+Dense Prediction Tasks  密集预测任务的目标是对特征图进行像素级分类或回归，目标检测和语义分割是两个具有代表性的密集预测任务，密集预测任务十分依赖于高分辨率和多尺度的特征图。DETR将CNN backbone和transformer decoder相结合，搭建了一个端到端的目标检测器。
+Self-Attention and Transformer in Vision  与之前的模型不同，该工作将特征金字塔架构引入transformer，为密集预测任务提供一个transformer backbone。
+Pyramid Vision Transformer (PVT) Overall Architecture  目标是将金字塔结构引入transformer框架，使其为密集预测任务生成多尺度特征图。如上图所示：
+该架构共包含四个阶段，生成不同尺度的特征图；每个阶段都是相似的架构，一个patch embedding层和$L_{i}$个Transformer encoder层。" />
+  <meta name="description" content="Pyramid Vision Transformer: A Versatile Backbone for Dense Prediction without Convolutions
+Abstract  本文提出了一个简单的、无卷积的网络结构，对许多密集预测任务都有用，与最近提出的图像分类的ViT网络不同，我们引入金字塔视觉transformer（Pyramid Vision Transformer，PVT），解决了将transformer用于密集预测任务的差异。
+PVT有以下几个优点：
+（1）与ViT生成低分辨率的输出，并且有较高的计算和内存成本，PVT不仅可以产生高分辨率的输出，而且通过渐进收缩金字塔模块（progressive shrinking pyramid）来减少计算量；
+（2）PVT继承了CNN和transformer的优点，使其成为各种视觉任务的不需要卷积的backbone，可以直接代替CNN backbones；
+（3）通过大量实验证明了PVT的有效性。
+Introduction 上图为不同架构的比较：（a）CNN backbones使用金字塔架构来进行密集预测任务；（b）ViT；（c）引入CNN中的金字塔架构，提出PVT，可以作为许多任务的backbone。
+最近提出的ViT，使用无卷积模型来代替CNN backbones，如上图（b）所示：ViT为柱状结构，虽然适用于图像分类，但不适用于像素级密集预测任务，如目标检测、分割等。原因有两点：（1）ViT的输出特征图是单尺度和低分辨率的；（2）其计算量和内存使用量很高。
+为了解决上述问题，本文提出一个基于Transformer的架构，PVT，如上图的（c）所示，克服了传统transformer的困难：（1）以细粒度的图像patch作为输入（每个patch4×4像素），来学习高分辨率的表示；（2）随着网络的加深，通过渐进收缩的金字塔模块来减少transformer的序列长度，减少计算量；（3）采用空间注意力减少层（SRA）来进一步减少计算量和内存使用量。
+优势：
+（1）相比于CNN网络的局部感受野随着网络的加深而增加，PVT拥有全局的感受野；
+（2）与ViT相比，金字塔架构更适合密集预测任务；
+（3）可以与其特定任务的transformer decoder相结合，例如：PVT&#43;DETR。
+Contributions：
+（1）提出PVT，用于密集预测任务的完全基于transformer的backbone；
+（2）通过渐进缩小的金字塔模块和空间注意力减少层，来减少资源消耗，使PVT学习多尺度和高分辨率的特征；
+（3）通过实验证明PVT结构的有效性。
+Related Work CNN Backbones  与发展成熟的CNN不同，视觉transformer的发展仍在早期阶段，在本文中，我们通过提出一种适用于大多数视觉任务的transformer backbone来扩展视觉transformer的应用范围。
+Dense Prediction Tasks  密集预测任务的目标是对特征图进行像素级分类或回归，目标检测和语义分割是两个具有代表性的密集预测任务，密集预测任务十分依赖于高分辨率和多尺度的特征图。DETR将CNN backbone和transformer decoder相结合，搭建了一个端到端的目标检测器。
+Self-Attention and Transformer in Vision  与之前的模型不同，该工作将特征金字塔架构引入transformer，为密集预测任务提供一个transformer backbone。
+Pyramid Vision Transformer (PVT) Overall Architecture  目标是将金字塔结构引入transformer框架，使其为密集预测任务生成多尺度特征图。如上图所示：
+该架构共包含四个阶段，生成不同尺度的特征图；每个阶段都是相似的架构，一个patch embedding层和$L_{i}$个Transformer encoder层。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">PVT</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-05-24 00:00:00 UTC">
+                24 May 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Pyramid Vision Transformer: A Versatile Backbone for Dense Prediction without Convolutions</p>
+<h2 id="abstract">Abstract</h2>
+<p>    本文提出了一个简单的、无卷积的网络结构，对许多密集预测任务都有用，与最近提出的图像分类的ViT网络不同，我们引入金字塔视觉transformer（Pyramid Vision Transformer，PVT），解决了将transformer用于密集预测任务的差异。<br>
+    PVT有以下几个优点：<br>
+    （1）与ViT生成低分辨率的输出，并且有较高的计算和内存成本，PVT不仅可以产生高分辨率的输出，而且通过渐进收缩金字塔模块（progressive shrinking pyramid）来减少计算量；<br>
+    （2）PVT继承了CNN和transformer的优点，使其成为各种视觉任务的不需要卷积的backbone，可以直接代替CNN backbones；<br>
+    （3）通过大量实验证明了PVT的有效性。</p>
+<h2 id="introduction">Introduction</h2>
+<p><img src="/img/pvt1-1.PNG" alt="">
+    上图为不同架构的比较：（a）CNN backbones使用金字塔架构来进行密集预测任务；（b）ViT；（c）引入CNN中的金字塔架构，提出PVT，可以作为许多任务的backbone。<br>
+    最近提出的ViT，使用无卷积模型来代替CNN backbones，如上图（b）所示：ViT为柱状结构，虽然适用于图像分类，但不适用于像素级密集预测任务，如目标检测、分割等。原因有两点：（1）ViT的输出特征图是单尺度和低分辨率的；（2）其计算量和内存使用量很高。<br>
+    为了解决上述问题，本文提出一个基于Transformer的架构，PVT，如上图的（c）所示，克服了传统transformer的困难：（1）以细粒度的图像patch作为输入（每个patch4×4像素），来学习高分辨率的表示；（2）随着网络的加深，通过渐进收缩的金字塔模块来减少transformer的序列长度，减少计算量；（3）采用空间注意力减少层（SRA）来进一步减少计算量和内存使用量。<br>
+    优势：<br>
+    （1）相比于CNN网络的局部感受野随着网络的加深而增加，PVT拥有全局的感受野；<br>
+    （2）与ViT相比，金字塔架构更适合密集预测任务；<br>
+    （3）可以与其特定任务的transformer decoder相结合，例如：PVT+DETR。<br>
+    <em><strong>Contributions</strong></em>：<br>
+    （1）提出PVT，用于密集预测任务的完全基于transformer的backbone；<br>
+    （2）通过渐进缩小的金字塔模块和空间注意力减少层，来减少资源消耗，使PVT学习多尺度和高分辨率的特征；<br>
+    （3）通过实验证明PVT结构的有效性。</p>
+<h2 id="related-work">Related Work</h2>
+<h3 id="cnn-backbones">CNN Backbones</h3>
+<p>    与发展成熟的CNN不同，视觉transformer的发展仍在早期阶段，在本文中，我们通过提出一种适用于大多数视觉任务的transformer backbone来扩展视觉transformer的应用范围。</p>
+<h3 id="dense-prediction-tasks">Dense Prediction Tasks</h3>
+<p>    密集预测任务的目标是对特征图进行像素级分类或回归，目标检测和语义分割是两个具有代表性的密集预测任务，密集预测任务十分依赖于高分辨率和多尺度的特征图。DETR将CNN backbone和transformer decoder相结合，搭建了一个端到端的目标检测器。</p>
+<h3 id="self-attention-and-transformer-in-vision">Self-Attention and Transformer in Vision</h3>
+<p>    与之前的模型不同，该工作将特征金字塔架构引入transformer，为密集预测任务提供一个transformer backbone。</p>
+<h2 id="pyramid-vision-transformer-pvt">Pyramid Vision Transformer (PVT)</h2>
+<p><img src="/img/pvt1-2.PNG" alt=""></p>
+<h3 id="overall-architecture">Overall Architecture</h3>
+<p>    目标是将金字塔结构引入transformer框架，使其为密集预测任务生成多尺度特征图。如上图所示：<br>
+    该架构共包含四个阶段，生成不同尺度的特征图；每个阶段都是相似的架构，一个patch embedding层和$L_{i}$个Transformer encoder层。<br>
+    首先对于给定大小的输入图像$H×W×3$，将其划分为$\frac{HW}{4^{2}}$个patch，每个patch大小为$4×4×3$，将每个patch flattened后输入到一个线性层中，得到大小为$\frac{HW}{4^{2}}×C_{1}$的patch embedding；<br>
+    然后，patch embedding和位置embedding相加，输入到$L_{1}$层的transformer encoder中，输出reshape成大小为$\frac{H}{4}×\frac{W}{4}×C_{1}$的特征图$F_{1}$；<br>
+    同样，使用前一阶段的特征图作为输入，可以分别得到特征图$F_{2}$、$F_{3}$和$F_{4}$，他们相对于原始图像大小的步幅分别为8、16和32，利用特征金字塔$\lbrace F_{1},F_{2},F_{3},F_{4} \rbrace$，该网络架构可以应用于大多数下游任务。</p>
+<h3 id="feature-pyramid-for-transformer">Feature Pyramid for Transformer</h3>
+<p>    我们通过patch embedding来控制特征图的尺寸。定义第$i$阶段的patch大小为$P_{i}$，在阶段$i$开始的时候，将输入特征图$F_{i-1}\in \mathbb{R}^{H_{i-1}\times W_{i-1}\times C_{i-1}}$划分为$\frac{H_{i-1}W_{i-1}}{P_{i}^{2}}$个patch，每个patch被flatten后投影到一个$C_{i}$维的embedding中；线性投影之后，patch embedding的大小为$\frac{H_{i-1}}{P_{i}}\times \frac{W_{i-1}}{P_{i}}\times C_{i}$，其中高度和宽度比输入小$P_{i}$倍。这样，就可以在每个阶段灵活的调整特征图的尺寸，形成特征金字塔架构。</p>
+<h3 id="transformer-encoder">Transformer Encoder</h3>
+<p>    在阶段$i$中共有$L_{i}$层encoder层，每个encoder层由一个注意力层和一个前馈层组成。由于PVT需要处理高分辨率的特征图，因此我们提出空间注意力减少层（SRA）来代替传统的多头注意力机制（MHA）。与MHA相似，SRA的输入为Q、K、V，并输出特征，不同的是，SRA在注意力操作之前减少了K和V的空间尺度，大大减少了计算与内存，与下图所示：
+<img src="/img/pvt1-3.PNG" alt="">
+    在阶段$i$中的SRA可以由下边公式表示：
+$$
+SRA(Q,K,V)=Concat(head_{0},&hellip;,head_{N_{i}})W^{O}
+$$
+$$
+head_{j}=Attention(QW_{j}^{Q},SR(K)W_{j}^{K},SR(V)W_{j}^{V})
+$$
+    其中，$Concat(\cdot )$是连接操作，$W_{j}^{Q}\in \mathbb{R}^{C_{i}\times d_{head}}$、$W_{j}^{K}\in \mathbb{R}^{C_{i}\times d_{head}}$、$W_{j}^{V}\in \mathbb{R}^{C_{i}\times d_{head}}$、$W^{O}\in \mathbb{R}^{C_{i}\times C_{i}}$是线性投影的参数。$N_{i}$是第$i$个阶段的注意力头数。因此，每个头的维度是$\frac{C_{i}}{N_{i}}$。$SR(\cdot)$是降低输入序列（K、V）的空间维度操作：
+$$
+SR(x)=Norm(Reshape(x,R_{i})W^{s})
+$$
+    其中，$x$是输入序列，$R_{i}$是第$i$阶段的注意力层的减少因子，$Reshape(x,R_{i})$是将输入序列$x$reshape成$\frac{H_{i}W_{i}}{R_{i}^{2}}\times (R_{i}^{2}C_{i})$的操作，$$是线性投影，将输入序列的维数将为$C_{i}$，$Norm(\cdot )$是Layer Norm。<br>
+    通过降低空间尺度，该注意力操作的计算量和内存比MHA降低了$R_{i}^{2}$。</p>
+<h3 id="discussion">Discussion</h3>
+<p>    PVT与ViT之间的关系与差异如下：<br>
+    （1）PVT与ViT都是无卷积的完全基于transformer的模型；<br>
+    （2）ViT的输入序列与输出系列长度相同，即其输出是单尺度的，ViT的输入是粗粒度的，即输入patch是16或者32的；<br>
+    （3）PVT引入渐进收缩金字塔模块，可以生成多尺度的特征图；<br>
+    （4）PVT使用SRA模块，以处理高分辨率的特征图，降低计算量与内存。<br>
+    因此，PVT相比于ViT有以下优势：<br>
+    （1）更灵活：可以生成多尺度的特征图；<br>
+    （2）更通用：可以用于大多数下游任务（ViT只能用于图像分类）；<br>
+    （3）更少的计算量和内存使用。</p>
+<h2 id="application-to-downstream-tasks">Application to Downstream Tasks</h2>
+<p>    Image-Level Prediction：与ViT和DeiT相同，在最后一个阶段的输入序列前边添加一个class token。<br>
+    Pixel-Level Dense Prediction：先预训练PVT，使用四个阶段的输出特征图作为FPN的输入进行预测，微调，位置embedding使用双线性插值法。</p>
+<h2 id="实验">实验</h2>
+<h3 id="image-classification">Image Classification</h3>
+<p><img src="/img/pvt1-4.PNG" alt="">
+    PVT在图像分类的数据上改进较小，是因为金字塔结构更有利于密集的预测任务，但对图像分类几乎没有什么改进。</p>
+<h3 id="object-detection">Object Detection</h3>
+<p><img src="/img/pvt1-5.PNG" alt="">
+<img src="/img/pvt1-6.PNG" alt=""></p>
+<h3 id="semantic-segmentation">Semantic Segmentation</h3>
+<p><img src="/img/pvt1-7.PNG" alt=""></p>
+<h3 id="pure-transformer-detection--segmentation">Pure Transformer Detection &amp; Segmentation</h3>
+<h4 id="pvtdetr">PVT+DETR</h4>
+<p><img src="/img/pvt1-8.PNG" alt=""></p>
+<h4 id="pvttrans2seg">PVT+Trans2Seg</h4>
+<p><img src="/img/pvt1-9.PNG" alt=""></p>
+<h3 id="ablation-study">Ablation Study</h3>
+<h4 id="pyramid-structure">Pyramid Structure</h4>
+<p><img src="/img/pvt1-10.PNG" alt=""></p>
+<h3 id="deeper-vs-wider">Deeper vs. Wider</h3>
+<p><img src="/img/pvt1-11.PNG" alt="">
+    Deeper：层数更多；Wider：通道数更多</p>
+<h2 id="conclusions">Conclusions</h2>
+<p>    我们引入了PVT，一个完全基于transformer的backbone的密集预测任务，如目标检测和语义分割。在有限的计算和内存资源下，提出了渐进收缩金字塔模型和空间注意力减少层来获得高分辨率和多尺度的特征图。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

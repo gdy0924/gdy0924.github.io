@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/transformer-xl/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/transformer-xl/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "Transformer-XL",
+      "headline" : "Transformer-XL",
+      "description" : "Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context\nAbstract  Transformer具有学习长期依赖的能力，但是在语言建模中，会受到固定长度上下文的限制。我们提出了transformer-xl，由一种segment级递归机制和一种新的位置编码方案组成。该方法不仅能够捕获较长期的依赖关系，而且还可以解决上下文碎片化问题。因此，transformer-xl学习的依赖比RNN和transformer都要长，在短序列和长序列上都有更好的性能。\nIntroduction  语言建模需要比较长期的依赖，LSTM模型平均使用200个上下文词，注意力机制使得学习长期依赖称为可能。有人提出使用辅助损失来训练更深的transformer网络，但是该模型只能捕获定义好的上下文长度，而不能捕获预定义外的任何长期关系。同时，固定的长度片段，没有考虑句子或其他的语义边界，因此，该模型不能够很好地预测前几个符号所需的必要的上下文信息，导致优化效率不足，性能较差。\n上述问题称为“上下文碎片化”（context fragmentation）。为了解决上述固定长度的上下文的局限性，我们提出transformer-xl（extra long）模型，将递归的概念引入自注意力机制中。没有为每个segment的开头重新计算隐藏状态，而是使用在前面segment中获得的隐藏状态，重用之前的状态作为当前segment的记忆，从而建立一个循环连接。上述方法使得建模长期的依赖关系成为可能，解决了context fragmentation问题，同时证明了相对位置编码的必要性，并提出了一个简单且更有效地相对位置编码。\nContributions：\n（1）在注意力机制中引入递归；\n（2）提出一种新的位置编码方案。\nRelated Work  为了在语言建模中捕获长期的上下文，一些工作直接将更广泛的上下文的表示作为额外的输入，输入到网络中。另外，在通用序列建模中，如何捕获长期依赖性一直是在研究的问题，LSTM可以可获更长的依赖性，并且泛化性能好，许多研究来解决其梯度消失问题和更好的初始化等。\n与它们不同的是，我们的工作是基于transformer架构，并表明语言建模需要学习长期依赖的能力。\nModel Vanilla Transformer Language Models 为了将transformer或自注意力机制应用于语言建模，其核心问题是如何训练transformer有效地将任意长度的上下文编码为固定大小的表示。在给定无限的内存和计算量的情况下，一个简单的解决方案是使用一个无条件的transformer解码器来处理整个上下文序列，然而，由于资源有限，在现实实验中是不可行的。\n一种可行但粗糙的近似方法是将整个语料库分割成更短的片段segment，并且只在每个片段segment内训练模型，忽略之前segment中的所有上下文信息，这是原始的transformer采用的方法，如上图（a）所示；这种方式信息流不会在segment之间流动，存在两个限制：（1）可能学习到的最大依赖长度是segment的长度，segment长度通常为几百个，因此，虽然transformer受梯度问题影响较小，但并不能充分利用这一优势；（2）出于效率的考虑，在划分segments的时候，不考虑句子的自然边界，而是根据固定的长度来划分序列，导致分割出来的segments在语义上是不完整的，这样会导致context fragmentation问题。\n在预测的时候，会对固定长度的segment做计算，一般取最后一个位置的隐向量作为输出。为了充分利用上下文关系，在每做完一次预测之后，就对整个序列向右移动一个位置，再做一次计算，如上图（b）所示，这个过程确保每个预测利用了最长的上下位，缓解了context fragmentation问题，但这导致计算效率非常低。\nSegment-Level Recurrence with State Reuse 为了解决使用固定长度上下文的局限性，我们在transformer中引入递归机制：在对当前segment进行处理的时候，缓存并利用上一个segment中所有layer的隐向量序列，而且上一个segment的所有隐向量序列只参与前向计算，不再进行反向传播，如上图的（a）所示。\n假设两个长度为$L$的连续segment分别为$s_{\\tau}=[x_{\\tau,1},\u0026hellip;,x_{\\tau,L}]$和$s_{\\tau\u002b1}=[x_{\\tau\u002b1,1},\u0026hellip;,x_{\\tau\u002b1,L}]$，由第$\\tau$个segment$s_{\\tau}$所产生的第$n$层隐藏状态序列为$h_{\\tau}^{n}\\in \\mathbb{R}^{L\\times d}$，其中$d$表示维数，那么第$\\tau\u002b1$个segment$s_{\\tau\u002b1}$所产生的第n层隐藏状态序列为： $$ \\tilde{h}_ {\\tau \u002b1}^{n-1}=[SG(h_{\\tau}^{n-1})\\circ h_{\\tau\u002b1}^{n-1}] $$ $$ q_{\\tau\u002b1}^{n},k_{\\tau\u002b1}^{n},v_{\\tau\u002b1}^{n}=h_{\\tau\u002b1}^{n-1}W_{q}^{T}, \\tilde{h}_ {\\tau\u002b1}^{n-1}W_{k}^{T},\\tilde{h}_ {\\tau\u002b1}^{n-1}W_{v}^{T} $$ $$ h_{\\tau \u002b1}^{n}=Transformer-Layer(q_{\\tau \u002b1}^{n},k_{\\tau \u002b1}^{n},v_{\\tau \u002b1}^{n}) $$ 其中，$SG(\\cdot )$表示stop-gradient，即不对$s_{\\tau}$的隐向量做反向传播；$[h_{u}\\circ h_{v}]$表示两个隐藏序列沿着长度的维度做拼接；$W$表示可学习的模型参数；在上述公式中，$\\tilde{h}_ {\\tau \u002b1}^{n-1}$的维度为$2L×d$，$q$的序列长度为$L$，而$k$和$v$的长度为$2L$，最终经过transformer之后得到的序列长度依旧为$L$。\n与标准transformer相比，关键的区别在于$k$和$v$用到了扩展的上下文$\\tilde{h}_ {\\tau\u002b1}^{n-1}$，即从上一个segment中存储的$\\tilde{h}_ {\\tau}^{n-1}$。如上图的（a）中的绿色线所示。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-05-23 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-05-23 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/transformer-xl\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>Transformer-XL</title>
+  <meta property="og:title" content="Transformer-XL" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context
+Abstract  Transformer具有学习长期依赖的能力，但是在语言建模中，会受到固定长度上下文的限制。我们提出了transformer-xl，由一种segment级递归机制和一种新的位置编码方案组成。该方法不仅能够捕获较长期的依赖关系，而且还可以解决上下文碎片化问题。因此，transformer-xl学习的依赖比RNN和transformer都要长，在短序列和长序列上都有更好的性能。
+Introduction  语言建模需要比较长期的依赖，LSTM模型平均使用200个上下文词，注意力机制使得学习长期依赖称为可能。有人提出使用辅助损失来训练更深的transformer网络，但是该模型只能捕获定义好的上下文长度，而不能捕获预定义外的任何长期关系。同时，固定的长度片段，没有考虑句子或其他的语义边界，因此，该模型不能够很好地预测前几个符号所需的必要的上下文信息，导致优化效率不足，性能较差。
+上述问题称为“上下文碎片化”（context fragmentation）。为了解决上述固定长度的上下文的局限性，我们提出transformer-xl（extra long）模型，将递归的概念引入自注意力机制中。没有为每个segment的开头重新计算隐藏状态，而是使用在前面segment中获得的隐藏状态，重用之前的状态作为当前segment的记忆，从而建立一个循环连接。上述方法使得建模长期的依赖关系成为可能，解决了context fragmentation问题，同时证明了相对位置编码的必要性，并提出了一个简单且更有效地相对位置编码。
+Contributions：
+（1）在注意力机制中引入递归；
+（2）提出一种新的位置编码方案。
+Related Work  为了在语言建模中捕获长期的上下文，一些工作直接将更广泛的上下文的表示作为额外的输入，输入到网络中。另外，在通用序列建模中，如何捕获长期依赖性一直是在研究的问题，LSTM可以可获更长的依赖性，并且泛化性能好，许多研究来解决其梯度消失问题和更好的初始化等。
+与它们不同的是，我们的工作是基于transformer架构，并表明语言建模需要学习长期依赖的能力。
+Model Vanilla Transformer Language Models 为了将transformer或自注意力机制应用于语言建模，其核心问题是如何训练transformer有效地将任意长度的上下文编码为固定大小的表示。在给定无限的内存和计算量的情况下，一个简单的解决方案是使用一个无条件的transformer解码器来处理整个上下文序列，然而，由于资源有限，在现实实验中是不可行的。
+一种可行但粗糙的近似方法是将整个语料库分割成更短的片段segment，并且只在每个片段segment内训练模型，忽略之前segment中的所有上下文信息，这是原始的transformer采用的方法，如上图（a）所示；这种方式信息流不会在segment之间流动，存在两个限制：（1）可能学习到的最大依赖长度是segment的长度，segment长度通常为几百个，因此，虽然transformer受梯度问题影响较小，但并不能充分利用这一优势；（2）出于效率的考虑，在划分segments的时候，不考虑句子的自然边界，而是根据固定的长度来划分序列，导致分割出来的segments在语义上是不完整的，这样会导致context fragmentation问题。
+在预测的时候，会对固定长度的segment做计算，一般取最后一个位置的隐向量作为输出。为了充分利用上下文关系，在每做完一次预测之后，就对整个序列向右移动一个位置，再做一次计算，如上图（b）所示，这个过程确保每个预测利用了最长的上下位，缓解了context fragmentation问题，但这导致计算效率非常低。
+Segment-Level Recurrence with State Reuse 为了解决使用固定长度上下文的局限性，我们在transformer中引入递归机制：在对当前segment进行处理的时候，缓存并利用上一个segment中所有layer的隐向量序列，而且上一个segment的所有隐向量序列只参与前向计算，不再进行反向传播，如上图的（a）所示。
+假设两个长度为$L$的连续segment分别为$s_{\tau}=[x_{\tau,1},&amp;hellip;,x_{\tau,L}]$和$s_{\tau&#43;1}=[x_{\tau&#43;1,1},&amp;hellip;,x_{\tau&#43;1,L}]$，由第$\tau$个segment$s_{\tau}$所产生的第$n$层隐藏状态序列为$h_{\tau}^{n}\in \mathbb{R}^{L\times d}$，其中$d$表示维数，那么第$\tau&#43;1$个segment$s_{\tau&#43;1}$所产生的第n层隐藏状态序列为： $$ \tilde{h}_ {\tau &#43;1}^{n-1}=[SG(h_{\tau}^{n-1})\circ h_{\tau&#43;1}^{n-1}] $$ $$ q_{\tau&#43;1}^{n},k_{\tau&#43;1}^{n},v_{\tau&#43;1}^{n}=h_{\tau&#43;1}^{n-1}W_{q}^{T}, \tilde{h}_ {\tau&#43;1}^{n-1}W_{k}^{T},\tilde{h}_ {\tau&#43;1}^{n-1}W_{v}^{T} $$ $$ h_{\tau &#43;1}^{n}=Transformer-Layer(q_{\tau &#43;1}^{n},k_{\tau &#43;1}^{n},v_{\tau &#43;1}^{n}) $$ 其中，$SG(\cdot )$表示stop-gradient，即不对$s_{\tau}$的隐向量做反向传播；$[h_{u}\circ h_{v}]$表示两个隐藏序列沿着长度的维度做拼接；$W$表示可学习的模型参数；在上述公式中，$\tilde{h}_ {\tau &#43;1}^{n-1}$的维度为$2L×d$，$q$的序列长度为$L$，而$k$和$v$的长度为$2L$，最终经过transformer之后得到的序列长度依旧为$L$。
+与标准transformer相比，关键的区别在于$k$和$v$用到了扩展的上下文$\tilde{h}_ {\tau&#43;1}^{n-1}$，即从上一个segment中存储的$\tilde{h}_ {\tau}^{n-1}$。如上图的（a）中的绿色线所示。" />
+  <meta name="description" content="Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context
+Abstract  Transformer具有学习长期依赖的能力，但是在语言建模中，会受到固定长度上下文的限制。我们提出了transformer-xl，由一种segment级递归机制和一种新的位置编码方案组成。该方法不仅能够捕获较长期的依赖关系，而且还可以解决上下文碎片化问题。因此，transformer-xl学习的依赖比RNN和transformer都要长，在短序列和长序列上都有更好的性能。
+Introduction  语言建模需要比较长期的依赖，LSTM模型平均使用200个上下文词，注意力机制使得学习长期依赖称为可能。有人提出使用辅助损失来训练更深的transformer网络，但是该模型只能捕获定义好的上下文长度，而不能捕获预定义外的任何长期关系。同时，固定的长度片段，没有考虑句子或其他的语义边界，因此，该模型不能够很好地预测前几个符号所需的必要的上下文信息，导致优化效率不足，性能较差。
+上述问题称为“上下文碎片化”（context fragmentation）。为了解决上述固定长度的上下文的局限性，我们提出transformer-xl（extra long）模型，将递归的概念引入自注意力机制中。没有为每个segment的开头重新计算隐藏状态，而是使用在前面segment中获得的隐藏状态，重用之前的状态作为当前segment的记忆，从而建立一个循环连接。上述方法使得建模长期的依赖关系成为可能，解决了context fragmentation问题，同时证明了相对位置编码的必要性，并提出了一个简单且更有效地相对位置编码。
+Contributions：
+（1）在注意力机制中引入递归；
+（2）提出一种新的位置编码方案。
+Related Work  为了在语言建模中捕获长期的上下文，一些工作直接将更广泛的上下文的表示作为额外的输入，输入到网络中。另外，在通用序列建模中，如何捕获长期依赖性一直是在研究的问题，LSTM可以可获更长的依赖性，并且泛化性能好，许多研究来解决其梯度消失问题和更好的初始化等。
+与它们不同的是，我们的工作是基于transformer架构，并表明语言建模需要学习长期依赖的能力。
+Model Vanilla Transformer Language Models 为了将transformer或自注意力机制应用于语言建模，其核心问题是如何训练transformer有效地将任意长度的上下文编码为固定大小的表示。在给定无限的内存和计算量的情况下，一个简单的解决方案是使用一个无条件的transformer解码器来处理整个上下文序列，然而，由于资源有限，在现实实验中是不可行的。
+一种可行但粗糙的近似方法是将整个语料库分割成更短的片段segment，并且只在每个片段segment内训练模型，忽略之前segment中的所有上下文信息，这是原始的transformer采用的方法，如上图（a）所示；这种方式信息流不会在segment之间流动，存在两个限制：（1）可能学习到的最大依赖长度是segment的长度，segment长度通常为几百个，因此，虽然transformer受梯度问题影响较小，但并不能充分利用这一优势；（2）出于效率的考虑，在划分segments的时候，不考虑句子的自然边界，而是根据固定的长度来划分序列，导致分割出来的segments在语义上是不完整的，这样会导致context fragmentation问题。
+在预测的时候，会对固定长度的segment做计算，一般取最后一个位置的隐向量作为输出。为了充分利用上下文关系，在每做完一次预测之后，就对整个序列向右移动一个位置，再做一次计算，如上图（b）所示，这个过程确保每个预测利用了最长的上下位，缓解了context fragmentation问题，但这导致计算效率非常低。
+Segment-Level Recurrence with State Reuse 为了解决使用固定长度上下文的局限性，我们在transformer中引入递归机制：在对当前segment进行处理的时候，缓存并利用上一个segment中所有layer的隐向量序列，而且上一个segment的所有隐向量序列只参与前向计算，不再进行反向传播，如上图的（a）所示。
+假设两个长度为$L$的连续segment分别为$s_{\tau}=[x_{\tau,1},&amp;hellip;,x_{\tau,L}]$和$s_{\tau&#43;1}=[x_{\tau&#43;1,1},&amp;hellip;,x_{\tau&#43;1,L}]$，由第$\tau$个segment$s_{\tau}$所产生的第$n$层隐藏状态序列为$h_{\tau}^{n}\in \mathbb{R}^{L\times d}$，其中$d$表示维数，那么第$\tau&#43;1$个segment$s_{\tau&#43;1}$所产生的第n层隐藏状态序列为： $$ \tilde{h}_ {\tau &#43;1}^{n-1}=[SG(h_{\tau}^{n-1})\circ h_{\tau&#43;1}^{n-1}] $$ $$ q_{\tau&#43;1}^{n},k_{\tau&#43;1}^{n},v_{\tau&#43;1}^{n}=h_{\tau&#43;1}^{n-1}W_{q}^{T}, \tilde{h}_ {\tau&#43;1}^{n-1}W_{k}^{T},\tilde{h}_ {\tau&#43;1}^{n-1}W_{v}^{T} $$ $$ h_{\tau &#43;1}^{n}=Transformer-Layer(q_{\tau &#43;1}^{n},k_{\tau &#43;1}^{n},v_{\tau &#43;1}^{n}) $$ 其中，$SG(\cdot )$表示stop-gradient，即不对$s_{\tau}$的隐向量做反向传播；$[h_{u}\circ h_{v}]$表示两个隐藏序列沿着长度的维度做拼接；$W$表示可学习的模型参数；在上述公式中，$\tilde{h}_ {\tau &#43;1}^{n-1}$的维度为$2L×d$，$q$的序列长度为$L$，而$k$和$v$的长度为$2L$，最终经过transformer之后得到的序列长度依旧为$L$。
+与标准transformer相比，关键的区别在于$k$和$v$用到了扩展的上下文$\tilde{h}_ {\tau&#43;1}^{n-1}$，即从上一个segment中存储的$\tilde{h}_ {\tau}^{n-1}$。如上图的（a）中的绿色线所示。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">Transformer-XL</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-05-23 00:00:00 UTC">
+                23 May 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context</p>
+<h2 id="abstract">Abstract</h2>
+<p>    Transformer具有学习长期依赖的能力，但是在语言建模中，会受到固定长度上下文的限制。我们提出了transformer-xl，由一种segment级递归机制和一种新的位置编码方案组成。该方法不仅能够捕获较长期的依赖关系，而且还可以解决上下文碎片化问题。因此，transformer-xl学习的依赖比RNN和transformer都要长，在短序列和长序列上都有更好的性能。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    语言建模需要比较长期的依赖，LSTM模型平均使用200个上下文词，注意力机制使得学习长期依赖称为可能。有人提出使用辅助损失来训练更深的transformer网络，但是该模型只能捕获定义好的上下文长度，而不能捕获预定义外的任何长期关系。同时，固定的长度片段，没有考虑句子或其他的语义边界，因此，该模型不能够很好地预测前几个符号所需的必要的上下文信息，导致优化效率不足，性能较差。<br>
+    上述问题称为“上下文碎片化”（context fragmentation）。为了解决上述固定长度的上下文的局限性，我们提出transformer-xl（extra long）模型，将递归的概念引入自注意力机制中。没有为每个segment的开头重新计算隐藏状态，而是使用在前面segment中获得的隐藏状态，重用之前的状态作为当前segment的记忆，从而建立一个循环连接。上述方法使得建模长期的依赖关系成为可能，解决了context fragmentation问题，同时证明了相对位置编码的必要性，并提出了一个简单且更有效地相对位置编码。<br>
+    <em><strong>Contributions</strong></em>：<br>
+    （1）在注意力机制中引入递归；<br>
+    （2）提出一种新的位置编码方案。</p>
+<h2 id="related-work">Related Work</h2>
+<p>    为了在语言建模中捕获长期的上下文，一些工作直接将更广泛的上下文的表示作为额外的输入，输入到网络中。另外，在通用序列建模中，如何捕获长期依赖性一直是在研究的问题，LSTM可以可获更长的依赖性，并且泛化性能好，许多研究来解决其梯度消失问题和更好的初始化等。<br>
+    与它们不同的是，我们的工作是基于transformer架构，并表明语言建模需要学习长期依赖的能力。</p>
+<h2 id="model">Model</h2>
+<h3 id="vanilla-transformer-language-models">Vanilla Transformer Language Models</h3>
+<p><img src="/img/transformerxl1.PNG" alt="">
+    为了将transformer或自注意力机制应用于语言建模，其核心问题是如何训练transformer有效地将任意长度的上下文编码为固定大小的表示。在给定无限的内存和计算量的情况下，一个简单的解决方案是使用一个无条件的transformer解码器来处理整个上下文序列，然而，由于资源有限，在现实实验中是不可行的。<br>
+    一种可行但粗糙的近似方法是将整个语料库分割成更短的片段segment，并且只在每个片段segment内训练模型，忽略之前segment中的所有上下文信息，这是原始的transformer采用的方法，如上图（a）所示；这种方式信息流不会在segment之间流动，存在两个限制：（1）可能学习到的最大依赖长度是segment的长度，segment长度通常为几百个，因此，虽然transformer受梯度问题影响较小，但并不能充分利用这一优势；（2）出于效率的考虑，在划分segments的时候，不考虑句子的自然边界，而是根据固定的长度来划分序列，导致分割出来的segments在语义上是不完整的，这样会导致context fragmentation问题。<br>
+    在预测的时候，会对固定长度的segment做计算，一般取最后一个位置的隐向量作为输出。为了充分利用上下文关系，在每做完一次预测之后，就对整个序列向右移动一个位置，再做一次计算，如上图（b）所示，这个过程确保每个预测利用了最长的上下位，缓解了context fragmentation问题，但这导致计算效率非常低。</p>
+<h3 id="segment-level-recurrence-with-state-reuse">Segment-Level Recurrence with State Reuse</h3>
+<p><img src="/img/transformerxl2.PNG" alt="">
+    为了解决使用固定长度上下文的局限性，我们在transformer中引入递归机制：在对当前segment进行处理的时候，缓存并利用上一个segment中所有layer的隐向量序列，而且上一个segment的所有隐向量序列只参与前向计算，不再进行反向传播，如上图的（a）所示。<br>
+    假设两个长度为$L$的连续segment分别为$s_{\tau}=[x_{\tau,1},&hellip;,x_{\tau,L}]$和$s_{\tau+1}=[x_{\tau+1,1},&hellip;,x_{\tau+1,L}]$，由第$\tau$个segment$s_{\tau}$所产生的第$n$层隐藏状态序列为$h_{\tau}^{n}\in \mathbb{R}^{L\times d}$，其中$d$表示维数，那么第$\tau+1$个segment$s_{\tau+1}$所产生的第n层隐藏状态序列为：
+$$
+\tilde{h}_ {\tau +1}^{n-1}=[SG(h_{\tau}^{n-1})\circ h_{\tau+1}^{n-1}]
+$$
+$$
+q_{\tau+1}^{n},k_{\tau+1}^{n},v_{\tau+1}^{n}=h_{\tau+1}^{n-1}W_{q}^{T}, \tilde{h}_ {\tau+1}^{n-1}W_{k}^{T},\tilde{h}_ {\tau+1}^{n-1}W_{v}^{T}
+$$
+$$
+h_{\tau +1}^{n}=Transformer-Layer(q_{\tau +1}^{n},k_{\tau +1}^{n},v_{\tau +1}^{n})
+$$
+    其中，$SG(\cdot )$表示stop-gradient，即不对$s_{\tau}$的隐向量做反向传播；$[h_{u}\circ h_{v}]$表示两个隐藏序列沿着长度的维度做拼接；$W$表示可学习的模型参数；在上述公式中，$\tilde{h}_ {\tau +1}^{n-1}$的维度为$2L×d$，$q$的序列长度为$L$，而$k$和$v$的长度为$2L$，最终经过transformer之后得到的序列长度依旧为$L$。<br>
+    与标准transformer相比，关键的区别在于$k$和$v$用到了扩展的上下文$\tilde{h}_ {\tau+1}^{n-1}$，即从上一个segment中存储的$\tilde{h}_ {\tau}^{n-1}$。如上图的（a）中的绿色线所示。<br>
+    在上图中，有一点值得注意的是：在当前segment中，第n层的每个隐向量的计算，都是利用之前一层中包括当前位置在内的，连续L个长度的隐向量；每一个位置的隐向量，除了自己的位置，都跟之前一层中前$(L-1)$个位置的token存在依赖关系，而且每往下走一层，依赖关系长度会增加$(L-1)$。因此，在该模型中，最长的依赖关系长度是$N(L-1)$，$N$为层数，如上图（b）中的阴影区域所示。<br>
+    除了实现超长的上下文和解决碎片化问题之外，递归机制的另一个好处是评估的速度更快：即在计算过程中，可以重用来自前一个segment的表示，而不是像之前那样从头开始计算。<br>
+    其实，递归方案不仅仅局限于前一个segment，理论上，在内存允许的范围内缓存之前的许多segment，将其都作为额外的上下文信息重用。</p>
+<h3 id="relative-positional-encodings">Relative Positional Encodings</h3>
+<p>    虽然之前提到的递归想法很好，但存在一个关键的问题：当我们重用隐藏状态序列时，如何保持位置信息的一致性？<br>
+    在标准transformer中，序列的顺序信息由位置编码提供，$U \in \mathbb{R}_ {L_{max}}^{d}$，其中，第$i$行$U_{i}$对应于一个segment中第$i$个的绝对位置，$L_{max}$规定了要建模的最大可能长度。然后将单词embedding和位置embedding相加作为transformer的输入。<br>
+    如果将上述位置编码方式简单的应用于递归机制，隐藏状态的序列将通过下述公式计算：
+$$
+h_{\tau +1}=f(h_{\tau },E_{s_{\tau +1}}+U_{1:L})
+$$
+$$
+h_{\tau}=f(h_{\tau -1},E_{s_{\tau}}+U_{1:L})
+$$
+    其中，$E_{s_{\tau}}\in \mathbb{R}^{L\times d}$是$s_{\tau}$的word embedding，$f$表示转换函数。注意，$E_{s_{\tau}}$和$E_{s_{\tau+1}}$与相同的位置编码$U_{1:L}$相关联，因此，模型没有信息来区分$x_{\tau,j}$和$x_{\tau +1,j}$之间的位置差异。<br>
+    为了解决上述问题，基本思想是：在隐藏层中对相对位置信息进行编码。位置编码就是给模型提供了一个线索，要去关注哪里。我们可以将位置信息注入到每层的注意力分数中，而不是静态的加入到初始输入embedding中。<br>
+    使用相对位置信息会更加只直观和通用。例如，当一个query向量$q_{\tau,i}$关注key向量$k_{\tau,\leq i}$时，不需要知道每个key的绝对位置来识别该segment的时间顺序。相反，知道每个key$k_{\tau,j}$与query$q_{\tau,i}$之间的相对位置就足够了，即$i-j$。可以创建一组相对位置编码$R\in \mathbb{R}^{L_{max}\times d}$，第$i$行$R_{i}$代表两个位置的相对距离为$i$。通过将相对距离引入注意力分数，可以很容易的区分$x_{\tau,j}$和$x_{\tau +1,j}$。<br>
+    首先，在标准transformer中，同一个segment中query向量$q_{i}$和key向量$k_{j}$之间的注意力分数可以通过下边公式计算：
+$$
+A_{i,j}^{abs}=q_{i}^{T}k_{j}
+$$
+$$
+=(W_{q}x_{i})^{T}(W_{k}x_{j})
+$$
+$$
+(W_{q}(E_{x_{i}}+U_{i}))^{T}(W_{k}(E_{x_{j}}+U_{j}))
+$$
+$$
+=(W_{q}E_{x_{i}}+W_{q}U_{i})^{T}(W_{k}E_{x_{j}}+W_{k}U_{j})
+$$
+$$
+=(E_{x_{i}}^{T}W_{q}^{T}+U_{i}^{T}W_{q}^{T})(W_{k}E_{x_{j}}+W_{k}U_{j})
+$$
+$$
+=E_{x_{i}}^{T}W_{q}^{T}W_{k}E_{x_{j}}+E_{x_{i}}^{T}W_{q}^{T}W_{k}U_{j}+U_{i}^{T}W_{q}^{T}W_{k}E_{x_{j}}+U_{i}^{T}W_{q}^{T}W_{k}U_{j}
+$$
+    考虑到相对位置，我们将上述四项重新参数化，得到：
+<img src="/img/transformerxl3.PNG" alt="">
+    （1）在（b）和（d）中的绝对位置embedding$U_{j}$替换为相对位置$R_{i-j}$，R为sinusoid编码矩阵，不包含可学习的参数；<br>
+    （2）引入一个可学习的参数$u\in \mathbb{R}^{d}$代替（c）中的$U_{i}^{T}W_{q}^{T}$，这种情况下，所有query位置的query向量都是相同的，即无论query位置在哪，对不同单词的注意力偏差是相同的，同时，引入一个可学习的参数$v\in \mathbb{R}^{d}$代替（d）中的$U_{i}^{T}W_{q}^{T}$；<br>
+    （3）分离成两个权重矩阵$W_{k,E}$和$W_{k,R}$，分别用于生成基于单词的key向量和基于位置的key向量。<br>
+    在上述新的公式中，每一项都有直观的含义：<br>
+    （a）content-based addressing：上下文之间的文本相关性信息；<br>
+    （b）a content-dependent positional bias：文本的文本偏置，即相对于当前位置的位置偏差；<br>
+    （c）a global content bias：全局的内容偏差，用于衡量key的重要程度；<br>
+    （d）a global positional bias：全局的位置偏差，用来衡量query和key的位置偏差的重要程度。<br>
+    基于上述相对位置编码机制，可以形式化transformer-xl架构，下边以单头N层为例，对于$n=1,&hellip;,N$，有：
+<img src="/img/transformerxl4.PNG" alt="">
+    其中，$h_{\tau}^{0}:= E_{s_{\tau}}$表示输入单词的embedding序列。</p>
+<h2 id="实验">实验</h2>
+<h3 id="comparison-with-state-of-the-art-results">Comparison with state-of-the-art results</h3>
+<h4 id="wikitext-103">WikiText-103</h4>
+<p><img src="/img/transformerxl5.PNG" alt="">
+    PPL：困惑度</p>
+<h4 id="enwik8">enwik8</h4>
+<p><img src="/img/transformerxl6.PNG" alt="">
+    12层的transformer-xl达到了与64层transformer相似的效果，但参数少了很多，因此训练了更大层数的transformer-xl。<br>
+    bpc：基于字符长度单位的混淆度</p>
+<h4 id="text8">text8</h4>
+<p><img src="/img/transformerxl7.PNG" alt=""></p>
+<h4 id="one-billion-word">One Billion Word</h4>
+<p><img src="/img/transformerxl8.PNG" alt="">
+    One Billion Word数据集不需要任何长期的依赖关系，因为句子已经被打乱了，但还是取得了最好的成绩，因此transformer-xl架构同时可以推广到短序列中。</p>
+<h3 id="ablation-study">Ablation Study</h3>
+<p>    验证两个方法的有效性：recurrence mechanism循环机制和positional encoding位置编码。
+<img src="/img/transformerxl9.PNG" alt="">
+    在上表中，Shaw等人使用的是相对位置，Vaswani和Al-Rfou等人使用的是绝对位置；“Full”和“Half”分别指对该段中的所有位置和最近的一半位置使用交叉熵损失。</p>
+<h2 id="conclusions">Conclusions</h2>
+<p>    transformer-xl获得了很好的结果，比RNN和transformer拥有更长期的依赖，在评估过程中实现了实质性的加速，并能够生成连贯的文本文章。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

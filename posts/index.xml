@@ -6,13 +6,91 @@
     <description>Recent content in Posts on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 20 May 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 25 May 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>LongFormer</title>
+      <link>https://gdy0924.github.io/posts/longformer/</link>
+      <pubDate>Wed, 25 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/longformer/</guid>
+      <description>Longformer: The Long-Document Transformer
+Abstract  基于transformer的模型由于自注意力操作，无法处理长序列，因为其计算量为$O(L^{2})$。为了解决这一问题，我们引入LongFormer，该注意力机制的计算量随序列的长度呈线性增长；其将局部窗口注意力（local windowed attention）与任务特定的全局注意力（task motivated global attention）相结合。
+Introduction  自注意力机制可以从整个序列中捕获上下文信息，虽然效果很好，但其计算量和内存使用量很大，与序列长度的平方成正比。为了解决上述问题，我们提出了改进的transformer架构，其自注意力操作的计算量与序列长度呈线性增长，如下图所示： 对于长文本分类、问题回答等任务，现有的方法是将上下文划分成segment，但这会导致跨segment之间的信息丢失，而为了解决这个问题，通常使用更复杂的架构来进行就交互；LongFormer能够使用多层注意力机制来构建整个上下文的表示，从而减少对特定任务的架构需要。
+LongFormer中的注意力机制结合了局部窗口自注意力和任务特定的全局注意力，局部自注意力用于构建上下文表征，全局自注意力构建用于预测的全序列表征。
+我们还引入了LongFormer的变体，拥有encoder-decoder架构，用于序列到序列的学习，称为Longformer-Encoder-Decoder （LED），在encoder中使用LongFormer的有效的注意力模式。
+Related Work Long-Document Transformers ltr： left-to-right，即以从左到右移动的块的形式处理文档。
+sparse：定义某种形式的稀疏注意力模块，来避免二次注意力的矩阵乘法，我们就属于这种方式。
+Task-specific Models for Long Documents  长序列的文本通常需要截断或分块，而LongFormer不需要，采用一种简单的方法来连接可用的上下文。
+Longformer  原始的transformer模型中的自注意力机制，具有$O(L^{2})$的时间和内存复杂度。为了解决这个问题，我们通过指定关注的输入位置对来稀疏原始的自注意力矩阵。与原始的自注意力不同，该注意力模式与输入序列呈线性相关。
+Attention Pattern Sliding Window  如上图（b）所示，考虑到局部信息的重要性，在该注意力模式中，在每个token周围使用一个固定大小的窗口来进行关注。使用多个局部窗口注意力的堆叠层，可以形成一个很大的感受野，因此在顶层可以访问所有的输入位置，并构建整合了所有输入信息的表征，类似于CNN。对于给定的固定窗口大小$w$，每个token分别关注其左右两边$\frac{1}{2}w$个token。该部分的复杂度为$O(L×w)$。在具有$l$层的transformer中，其顶层的感受野大小为$l×w$。
+Dilated Sliding Window  如上图（c）所示，为了在不增加计算量的情况下，进一步增加感受野，可以在滑动窗口中引入&amp;quot;扩张&amp;quot;，类似于空洞卷积的思想，即窗口拥有扩张率为$d$的gap，那么感受野就是$l×d×w$。
+在多头注意力机制中，设置每个注意力头拥有不同的扩张率，即一些注意力头更专注局部信息，一些更关注更长的信息，从而提高性能。
+Global Attention  如上图（d）所示，针对不同的任务，其最优的输入表征是因任务而异的。对于掩码语言建模，模型使用局部上下文来预测mask部分；针对分类任务，模型将整个序列的表示聚合为一个class token中；对于QA任务，问题与文本是连接在一起的，允许模型通过自注意力机制来将问题与文档进行比较。
+局部窗口和扩张注意力机制，无法学习特定任务的表征。因此，我们在少数的预先选择的输入位置上添加“全局关注”（global attention），即一个具有全局关注的token能够关注到序列中的所有token，序列中的所有token也可以关注该位置。
+如：在分类任务中，对class token使用全局注意；在QA任务中，对问题使用全局注意。由于这类token数量比序列长度要少，因此，局部与全局的注意力结合后的复杂性依旧是$O(L)$。
+Linear Projections for Global Attention  原始的注意力计算公式为： $$ Attention(Q,K,V)=softmax(\frac{QK^{T}}{\sqrt{d_{k}}})V $$ 我们使用两组投影：$Q_{s}$、$K_{s}$和$V_{s}$计算局部窗口自注意力中的注意力分数，$Q_{g}$、$K_{g}$和$V_{g}$计算全局注意力中的注意力分数。
+Implementation  实现了一种功能齐全、高度优化的自定义CUDA内核。</description>
+    </item>
+    
+    <item>
+      <title>PVT</title>
+      <link>https://gdy0924.github.io/posts/pvt/</link>
+      <pubDate>Tue, 24 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/pvt/</guid>
+      <description>Pyramid Vision Transformer: A Versatile Backbone for Dense Prediction without Convolutions
+Abstract  本文提出了一个简单的、无卷积的网络结构，对许多密集预测任务都有用，与最近提出的图像分类的ViT网络不同，我们引入金字塔视觉transformer（Pyramid Vision Transformer，PVT），解决了将transformer用于密集预测任务的差异。
+PVT有以下几个优点：
+（1）与ViT生成低分辨率的输出，并且有较高的计算和内存成本，PVT不仅可以产生高分辨率的输出，而且通过渐进收缩金字塔模块（progressive shrinking pyramid）来减少计算量；
+（2）PVT继承了CNN和transformer的优点，使其成为各种视觉任务的不需要卷积的backbone，可以直接代替CNN backbones；
+（3）通过大量实验证明了PVT的有效性。
+Introduction 上图为不同架构的比较：（a）CNN backbones使用金字塔架构来进行密集预测任务；（b）ViT；（c）引入CNN中的金字塔架构，提出PVT，可以作为许多任务的backbone。
+最近提出的ViT，使用无卷积模型来代替CNN backbones，如上图（b）所示：ViT为柱状结构，虽然适用于图像分类，但不适用于像素级密集预测任务，如目标检测、分割等。原因有两点：（1）ViT的输出特征图是单尺度和低分辨率的；（2）其计算量和内存使用量很高。
+为了解决上述问题，本文提出一个基于Transformer的架构，PVT，如上图的（c）所示，克服了传统transformer的困难：（1）以细粒度的图像patch作为输入（每个patch4×4像素），来学习高分辨率的表示；（2）随着网络的加深，通过渐进收缩的金字塔模块来减少transformer的序列长度，减少计算量；（3）采用空间注意力减少层（SRA）来进一步减少计算量和内存使用量。
+优势：
+（1）相比于CNN网络的局部感受野随着网络的加深而增加，PVT拥有全局的感受野；
+（2）与ViT相比，金字塔架构更适合密集预测任务；
+（3）可以与其特定任务的transformer decoder相结合，例如：PVT+DETR。
+Contributions：
+（1）提出PVT，用于密集预测任务的完全基于transformer的backbone；
+（2）通过渐进缩小的金字塔模块和空间注意力减少层，来减少资源消耗，使PVT学习多尺度和高分辨率的特征；
+（3）通过实验证明PVT结构的有效性。
+Related Work CNN Backbones  与发展成熟的CNN不同，视觉transformer的发展仍在早期阶段，在本文中，我们通过提出一种适用于大多数视觉任务的transformer backbone来扩展视觉transformer的应用范围。
+Dense Prediction Tasks  密集预测任务的目标是对特征图进行像素级分类或回归，目标检测和语义分割是两个具有代表性的密集预测任务，密集预测任务十分依赖于高分辨率和多尺度的特征图。DETR将CNN backbone和transformer decoder相结合，搭建了一个端到端的目标检测器。
+Self-Attention and Transformer in Vision  与之前的模型不同，该工作将特征金字塔架构引入transformer，为密集预测任务提供一个transformer backbone。
+Pyramid Vision Transformer (PVT) Overall Architecture  目标是将金字塔结构引入transformer框架，使其为密集预测任务生成多尺度特征图。如上图所示：
+该架构共包含四个阶段，生成不同尺度的特征图；每个阶段都是相似的架构，一个patch embedding层和$L_{i}$个Transformer encoder层。</description>
+    </item>
+    
+    <item>
+      <title>Transformer-XL</title>
+      <link>https://gdy0924.github.io/posts/transformer-xl/</link>
+      <pubDate>Mon, 23 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/transformer-xl/</guid>
+      <description>Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context
+Abstract  Transformer具有学习长期依赖的能力，但是在语言建模中，会受到固定长度上下文的限制。我们提出了transformer-xl，由一种segment级递归机制和一种新的位置编码方案组成。该方法不仅能够捕获较长期的依赖关系，而且还可以解决上下文碎片化问题。因此，transformer-xl学习的依赖比RNN和transformer都要长，在短序列和长序列上都有更好的性能。
+Introduction  语言建模需要比较长期的依赖，LSTM模型平均使用200个上下文词，注意力机制使得学习长期依赖称为可能。有人提出使用辅助损失来训练更深的transformer网络，但是该模型只能捕获定义好的上下文长度，而不能捕获预定义外的任何长期关系。同时，固定的长度片段，没有考虑句子或其他的语义边界，因此，该模型不能够很好地预测前几个符号所需的必要的上下文信息，导致优化效率不足，性能较差。
+上述问题称为“上下文碎片化”（context fragmentation）。为了解决上述固定长度的上下文的局限性，我们提出transformer-xl（extra long）模型，将递归的概念引入自注意力机制中。没有为每个segment的开头重新计算隐藏状态，而是使用在前面segment中获得的隐藏状态，重用之前的状态作为当前segment的记忆，从而建立一个循环连接。上述方法使得建模长期的依赖关系成为可能，解决了context fragmentation问题，同时证明了相对位置编码的必要性，并提出了一个简单且更有效地相对位置编码。
+Contributions：
+（1）在注意力机制中引入递归；
+（2）提出一种新的位置编码方案。
+Related Work  为了在语言建模中捕获长期的上下文，一些工作直接将更广泛的上下文的表示作为额外的输入，输入到网络中。另外，在通用序列建模中，如何捕获长期依赖性一直是在研究的问题，LSTM可以可获更长的依赖性，并且泛化性能好，许多研究来解决其梯度消失问题和更好的初始化等。
+与它们不同的是，我们的工作是基于transformer架构，并表明语言建模需要学习长期依赖的能力。
+Model Vanilla Transformer Language Models 为了将transformer或自注意力机制应用于语言建模，其核心问题是如何训练transformer有效地将任意长度的上下文编码为固定大小的表示。在给定无限的内存和计算量的情况下，一个简单的解决方案是使用一个无条件的transformer解码器来处理整个上下文序列，然而，由于资源有限，在现实实验中是不可行的。
+一种可行但粗糙的近似方法是将整个语料库分割成更短的片段segment，并且只在每个片段segment内训练模型，忽略之前segment中的所有上下文信息，这是原始的transformer采用的方法，如上图（a）所示；这种方式信息流不会在segment之间流动，存在两个限制：（1）可能学习到的最大依赖长度是segment的长度，segment长度通常为几百个，因此，虽然transformer受梯度问题影响较小，但并不能充分利用这一优势；（2）出于效率的考虑，在划分segments的时候，不考虑句子的自然边界，而是根据固定的长度来划分序列，导致分割出来的segments在语义上是不完整的，这样会导致context fragmentation问题。
+在预测的时候，会对固定长度的segment做计算，一般取最后一个位置的隐向量作为输出。为了充分利用上下文关系，在每做完一次预测之后，就对整个序列向右移动一个位置，再做一次计算，如上图（b）所示，这个过程确保每个预测利用了最长的上下位，缓解了context fragmentation问题，但这导致计算效率非常低。
+Segment-Level Recurrence with State Reuse 为了解决使用固定长度上下文的局限性，我们在transformer中引入递归机制：在对当前segment进行处理的时候，缓存并利用上一个segment中所有layer的隐向量序列，而且上一个segment的所有隐向量序列只参与前向计算，不再进行反向传播，如上图的（a）所示。
+假设两个长度为$L$的连续segment分别为$s_{\tau}=[x_{\tau,1},&amp;hellip;,x_{\tau,L}]$和$s_{\tau+1}=[x_{\tau+1,1},&amp;hellip;,x_{\tau+1,L}]$，由第$\tau$个segment$s_{\tau}$所产生的第$n$层隐藏状态序列为$h_{\tau}^{n}\in \mathbb{R}^{L\times d}$，其中$d$表示维数，那么第$\tau+1$个segment$s_{\tau+1}$所产生的第n层隐藏状态序列为： $$ \tilde{h}_ {\tau +1}^{n-1}=[SG(h_{\tau}^{n-1})\circ h_{\tau+1}^{n-1}] $$ $$ q_{\tau+1}^{n},k_{\tau+1}^{n},v_{\tau+1}^{n}=h_{\tau+1}^{n-1}W_{q}^{T}, \tilde{h}_ {\tau+1}^{n-1}W_{k}^{T},\tilde{h}_ {\tau+1}^{n-1}W_{v}^{T} $$ $$ h_{\tau +1}^{n}=Transformer-Layer(q_{\tau +1}^{n},k_{\tau +1}^{n},v_{\tau +1}^{n}) $$ 其中，$SG(\cdot )$表示stop-gradient，即不对$s_{\tau}$的隐向量做反向传播；$[h_{u}\circ h_{v}]$表示两个隐藏序列沿着长度的维度做拼接；$W$表示可学习的模型参数；在上述公式中，$\tilde{h}_ {\tau +1}^{n-1}$的维度为$2L×d$，$q$的序列长度为$L$，而$k$和$v$的长度为$2L$，最终经过transformer之后得到的序列长度依旧为$L$。
+与标准transformer相比，关键的区别在于$k$和$v$用到了扩展的上下文$\tilde{h}_ {\tau+1}^{n-1}$，即从上一个segment中存储的$\tilde{h}_ {\tau}^{n-1}$。如上图的（a）中的绿色线所示。</description>
+    </item>
+    
     <item>
       <title>MAE</title>
-      <link>https://gdy0924.github.io/posts/reformer-%E5%89%AF%E6%9C%AC/</link>
-      <pubDate>Fri, 20 May 2022 00:00:00 +0000</pubDate>
+      <link>https://gdy0924.github.io/posts/mae/</link>
+      <pubDate>Sat, 21 May 2022 00:00:00 +0000</pubDate>
       
-      <guid>https://gdy0924.github.io/posts/reformer-%E5%89%AF%E6%9C%AC/</guid>
+      <guid>https://gdy0924.github.io/posts/mae/</guid>
       <description>Masked Autoencoders Are Scalable Vision Learners
 Abstract  本文证明了掩码自动编码器(Masked Autoencoders, MAE)是一种可扩展的自监督学习模型，其方法很简单：随机mask输入图像的patch，并重建缺失的像素。首先，开发了一个非对称的encoder-decoder架构，encoder只对可见的patch进行处理（即没有mask的patch），一个轻量级的decoder，从潜在的表示和mask token种重构原始图像。其次，我们发现mask更高比例的输入图像（如75%），能够产生更有意义的自监督任务。
 Introduction  基于GPT中的自回归语言建模和BERT中的mask自编码的解决方案在概念上很简单：它们mask部分数据，并学习预测被mask的内容。mask自编码的思想，是一种更一般的去噪自编码器的形式，也适用于计算机视觉。这会有个问题：是什么使mask的自编码在视觉和语言领域之间有所不同？
