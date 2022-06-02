@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/crossvit/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/crossvit/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "CrossViT",
+      "headline" : "CrossViT",
+      "description" : "CrossViT: Cross-Attention Multi-Scale Vision Transformer for Image Classification\nAbstract  与卷积网络相比，Vision Transformer在图像分类方面取得了很好的效果。因此，本文研究了如何在transformer中学习多尺度的特征表示。提出了一种双分支transformer来融合不同大小的图像patch，以产生更强的图像特征，该方法利用两个不同分支分别处理小patch和大patch token，然后这些token通过注意力多次融合以相互补充。为了减少计算量，提出了一个简单而有效的基于交叉注意力的token融合模块，对每个分支使用一个token作为query，与其他分支交换信息。\nIntroduction  在本文中，我们研究了如何让transformer模型学习多尺度的特征表示，以进行图像识别。基于多分支CNN网络的有效性，如Big-Little Net和 Octave convolutions，我们提出了一种双分支transformer来处理不同大小的图像patch，以产生更强的视觉特征用于图像分类。我们利用两个不同复杂度的网络分支，分别处理大patch和小patch，这些token被融合在一起以相互补充。\n该研究的主要重点是：适合于视觉transformer的特征融合方法，我们通过一个有效的交叉注意力模块来实现，其中每个transformer分支创建一个non-patch token作为agent，通过注意力机制与另一个分支交换信息。\nContributions：\n（1）提出了一种新的双分支视觉transformer来提取多尺度特征表示用于图像分类；\n（2）提出了一种简单而有效的基于交叉注意力的token融合方法，并且复杂度是线性的；\n（3）性能优于或等于基于ViT的一些并行工作。\nRelated Works  我们的工作涉及三个主要的研究方向：带有注意力机制的卷积神经网络、视觉transformer和多尺度神经网络。\nCNN with Attention  不少工作将CNN与不同形式的自注意机制相结合，尽管有很好的结果，但由于其复杂性，关注范围限制在局部区域。与将卷积和自注意机制相结合的方法相比，我们的工作是完全建立在自注意力网络之上的，如ViT。\nVision Transformer  受transformer在机器翻译方面成功的启发，仅依赖于transformer层的无卷积模型已经在计算机视觉中传播。ViT是第一个基于transformer的方法来超过卷积网络进行图像分类的模型。与其他方法不同，我们提出了一种双路径架构来提取多尺度特征，以使用视觉transformer进行更好的视觉表示。\nMulti-Scale CNNs  多尺度特征表示在计算机视觉很常用，例如，图像金字塔，尺度空间表示，从粗粒度到细粒度的方法等。多尺度特征表示被用于多尺度的目标检测和识别。虽然多尺度特性已经证明有利于卷积网络，但它对视觉transformer的适用性仍然是一个新的未得到解决的问题。\nMethod  我们的方法是建立在ViT的基础上的。\nOverview of Vision Transformer  ViT将图像分割成patch，线性投影成token，额外添加一个class token，将token序列加入位置embedding后输入网络，最后使用class token进行分类。transformer layer包括多头自注意力层MSA和前馈层FFN。\nProposed Multi-Scale Vision Transformer  patch的会影响ViT的准确性和复杂度：使用细粒度的patch，ViT可以表现得更好，但会导致更高的FLOPs和内存消耗（patch大小为16的ViT比patch大小为32的ViT的结果高出6%，但FLOPs也高出4倍）因此，我们提出的方法试图利用细粒度patch的优势，同时平衡复杂性。即引入了一个双分支ViT，其中每个分支处理不同的patch大小，然后提出了一个简单而有效的模块来融合不同分支之间的信息。 如上图所示，该网络由K层多尺度Transformer Encoder组成，每个encoder包含两个分支：\n（1）L-Branch：大的（主要的）分支，处理粗粒度的patch（$P_{l}$），具有更多的Transformer Encoder和更大的embedding维度；\n（2）S-Branch：小的（互补的）分支，处理细粒度的patch（$P_{s}$），具有更少的Transformer Encoder和更小的embedding维度。\n两个分支被融合$L$次，并使用额外添加的class token进行预测。\nMulti-Scale Feature Fusion 有效的特征融合是学习多尺度特征表示的关键。我们提出了四种不同的融合策略，如上图所示。$x^{i}$是分支$i$的token序列，$i$可以是大（主要）分支的$l$，也可以是小（互补）分支的$s$，$x_{cls}^{i}$和$x_{patch}^{i}$分别代表分支$i$的class token和patch token。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-05-31 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-05-31 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/crossvit\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>CrossViT</title>
+  <meta property="og:title" content="CrossViT" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="CrossViT: Cross-Attention Multi-Scale Vision Transformer for Image Classification
+Abstract  与卷积网络相比，Vision Transformer在图像分类方面取得了很好的效果。因此，本文研究了如何在transformer中学习多尺度的特征表示。提出了一种双分支transformer来融合不同大小的图像patch，以产生更强的图像特征，该方法利用两个不同分支分别处理小patch和大patch token，然后这些token通过注意力多次融合以相互补充。为了减少计算量，提出了一个简单而有效的基于交叉注意力的token融合模块，对每个分支使用一个token作为query，与其他分支交换信息。
+Introduction  在本文中，我们研究了如何让transformer模型学习多尺度的特征表示，以进行图像识别。基于多分支CNN网络的有效性，如Big-Little Net和 Octave convolutions，我们提出了一种双分支transformer来处理不同大小的图像patch，以产生更强的视觉特征用于图像分类。我们利用两个不同复杂度的网络分支，分别处理大patch和小patch，这些token被融合在一起以相互补充。
+该研究的主要重点是：适合于视觉transformer的特征融合方法，我们通过一个有效的交叉注意力模块来实现，其中每个transformer分支创建一个non-patch token作为agent，通过注意力机制与另一个分支交换信息。
+Contributions：
+（1）提出了一种新的双分支视觉transformer来提取多尺度特征表示用于图像分类；
+（2）提出了一种简单而有效的基于交叉注意力的token融合方法，并且复杂度是线性的；
+（3）性能优于或等于基于ViT的一些并行工作。
+Related Works  我们的工作涉及三个主要的研究方向：带有注意力机制的卷积神经网络、视觉transformer和多尺度神经网络。
+CNN with Attention  不少工作将CNN与不同形式的自注意机制相结合，尽管有很好的结果，但由于其复杂性，关注范围限制在局部区域。与将卷积和自注意机制相结合的方法相比，我们的工作是完全建立在自注意力网络之上的，如ViT。
+Vision Transformer  受transformer在机器翻译方面成功的启发，仅依赖于transformer层的无卷积模型已经在计算机视觉中传播。ViT是第一个基于transformer的方法来超过卷积网络进行图像分类的模型。与其他方法不同，我们提出了一种双路径架构来提取多尺度特征，以使用视觉transformer进行更好的视觉表示。
+Multi-Scale CNNs  多尺度特征表示在计算机视觉很常用，例如，图像金字塔，尺度空间表示，从粗粒度到细粒度的方法等。多尺度特征表示被用于多尺度的目标检测和识别。虽然多尺度特性已经证明有利于卷积网络，但它对视觉transformer的适用性仍然是一个新的未得到解决的问题。
+Method  我们的方法是建立在ViT的基础上的。
+Overview of Vision Transformer  ViT将图像分割成patch，线性投影成token，额外添加一个class token，将token序列加入位置embedding后输入网络，最后使用class token进行分类。transformer layer包括多头自注意力层MSA和前馈层FFN。
+Proposed Multi-Scale Vision Transformer  patch的会影响ViT的准确性和复杂度：使用细粒度的patch，ViT可以表现得更好，但会导致更高的FLOPs和内存消耗（patch大小为16的ViT比patch大小为32的ViT的结果高出6%，但FLOPs也高出4倍）因此，我们提出的方法试图利用细粒度patch的优势，同时平衡复杂性。即引入了一个双分支ViT，其中每个分支处理不同的patch大小，然后提出了一个简单而有效的模块来融合不同分支之间的信息。 如上图所示，该网络由K层多尺度Transformer Encoder组成，每个encoder包含两个分支：
+（1）L-Branch：大的（主要的）分支，处理粗粒度的patch（$P_{l}$），具有更多的Transformer Encoder和更大的embedding维度；
+（2）S-Branch：小的（互补的）分支，处理细粒度的patch（$P_{s}$），具有更少的Transformer Encoder和更小的embedding维度。
+两个分支被融合$L$次，并使用额外添加的class token进行预测。
+Multi-Scale Feature Fusion 有效的特征融合是学习多尺度特征表示的关键。我们提出了四种不同的融合策略，如上图所示。$x^{i}$是分支$i$的token序列，$i$可以是大（主要）分支的$l$，也可以是小（互补）分支的$s$，$x_{cls}^{i}$和$x_{patch}^{i}$分别代表分支$i$的class token和patch token。" />
+  <meta name="description" content="CrossViT: Cross-Attention Multi-Scale Vision Transformer for Image Classification
+Abstract  与卷积网络相比，Vision Transformer在图像分类方面取得了很好的效果。因此，本文研究了如何在transformer中学习多尺度的特征表示。提出了一种双分支transformer来融合不同大小的图像patch，以产生更强的图像特征，该方法利用两个不同分支分别处理小patch和大patch token，然后这些token通过注意力多次融合以相互补充。为了减少计算量，提出了一个简单而有效的基于交叉注意力的token融合模块，对每个分支使用一个token作为query，与其他分支交换信息。
+Introduction  在本文中，我们研究了如何让transformer模型学习多尺度的特征表示，以进行图像识别。基于多分支CNN网络的有效性，如Big-Little Net和 Octave convolutions，我们提出了一种双分支transformer来处理不同大小的图像patch，以产生更强的视觉特征用于图像分类。我们利用两个不同复杂度的网络分支，分别处理大patch和小patch，这些token被融合在一起以相互补充。
+该研究的主要重点是：适合于视觉transformer的特征融合方法，我们通过一个有效的交叉注意力模块来实现，其中每个transformer分支创建一个non-patch token作为agent，通过注意力机制与另一个分支交换信息。
+Contributions：
+（1）提出了一种新的双分支视觉transformer来提取多尺度特征表示用于图像分类；
+（2）提出了一种简单而有效的基于交叉注意力的token融合方法，并且复杂度是线性的；
+（3）性能优于或等于基于ViT的一些并行工作。
+Related Works  我们的工作涉及三个主要的研究方向：带有注意力机制的卷积神经网络、视觉transformer和多尺度神经网络。
+CNN with Attention  不少工作将CNN与不同形式的自注意机制相结合，尽管有很好的结果，但由于其复杂性，关注范围限制在局部区域。与将卷积和自注意机制相结合的方法相比，我们的工作是完全建立在自注意力网络之上的，如ViT。
+Vision Transformer  受transformer在机器翻译方面成功的启发，仅依赖于transformer层的无卷积模型已经在计算机视觉中传播。ViT是第一个基于transformer的方法来超过卷积网络进行图像分类的模型。与其他方法不同，我们提出了一种双路径架构来提取多尺度特征，以使用视觉transformer进行更好的视觉表示。
+Multi-Scale CNNs  多尺度特征表示在计算机视觉很常用，例如，图像金字塔，尺度空间表示，从粗粒度到细粒度的方法等。多尺度特征表示被用于多尺度的目标检测和识别。虽然多尺度特性已经证明有利于卷积网络，但它对视觉transformer的适用性仍然是一个新的未得到解决的问题。
+Method  我们的方法是建立在ViT的基础上的。
+Overview of Vision Transformer  ViT将图像分割成patch，线性投影成token，额外添加一个class token，将token序列加入位置embedding后输入网络，最后使用class token进行分类。transformer layer包括多头自注意力层MSA和前馈层FFN。
+Proposed Multi-Scale Vision Transformer  patch的会影响ViT的准确性和复杂度：使用细粒度的patch，ViT可以表现得更好，但会导致更高的FLOPs和内存消耗（patch大小为16的ViT比patch大小为32的ViT的结果高出6%，但FLOPs也高出4倍）因此，我们提出的方法试图利用细粒度patch的优势，同时平衡复杂性。即引入了一个双分支ViT，其中每个分支处理不同的patch大小，然后提出了一个简单而有效的模块来融合不同分支之间的信息。 如上图所示，该网络由K层多尺度Transformer Encoder组成，每个encoder包含两个分支：
+（1）L-Branch：大的（主要的）分支，处理粗粒度的patch（$P_{l}$），具有更多的Transformer Encoder和更大的embedding维度；
+（2）S-Branch：小的（互补的）分支，处理细粒度的patch（$P_{s}$），具有更少的Transformer Encoder和更小的embedding维度。
+两个分支被融合$L$次，并使用额外添加的class token进行预测。
+Multi-Scale Feature Fusion 有效的特征融合是学习多尺度特征表示的关键。我们提出了四种不同的融合策略，如上图所示。$x^{i}$是分支$i$的token序列，$i$可以是大（主要）分支的$l$，也可以是小（互补）分支的$s$，$x_{cls}^{i}$和$x_{patch}^{i}$分别代表分支$i$的class token和patch token。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">CrossViT</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-05-31 00:00:00 UTC">
+                31 May 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>CrossViT: Cross-Attention Multi-Scale Vision Transformer for Image Classification</p>
+<h2 id="abstract">Abstract</h2>
+<p>    与卷积网络相比，Vision Transformer在图像分类方面取得了很好的效果。因此，本文研究了如何在transformer中学习多尺度的特征表示。提出了一种双分支transformer来融合不同大小的图像patch，以产生更强的图像特征，该方法利用两个不同分支分别处理小patch和大patch token，然后这些token通过注意力多次融合以相互补充。为了减少计算量，提出了一个简单而有效的基于交叉注意力的token融合模块，对每个分支使用一个token作为query，与其他分支交换信息。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    在本文中，我们研究了如何让transformer模型学习多尺度的特征表示，以进行图像识别。基于多分支CNN网络的有效性，如Big-Little Net和 Octave convolutions，我们提出了一种双分支transformer来处理不同大小的图像patch，以产生更强的视觉特征用于图像分类。我们利用两个不同复杂度的网络分支，分别处理大patch和小patch，这些token被融合在一起以相互补充。<br>
+    该研究的主要重点是：适合于视觉transformer的特征融合方法，我们通过一个有效的交叉注意力模块来实现，其中每个transformer分支创建一个non-patch token作为agent，通过注意力机制与另一个分支交换信息。<br>
+    <em><strong>Contributions</strong></em>：<br>
+    （1）提出了一种新的双分支视觉transformer来提取多尺度特征表示用于图像分类；<br>
+    （2）提出了一种简单而有效的基于交叉注意力的token融合方法，并且复杂度是线性的；<br>
+    （3）性能优于或等于基于ViT的一些并行工作。</p>
+<h2 id="related-works">Related Works</h2>
+<p>    我们的工作涉及三个主要的研究方向：带有注意力机制的卷积神经网络、视觉transformer和多尺度神经网络。</p>
+<h3 id="cnn-with-attention">CNN with Attention</h3>
+<p>    不少工作将CNN与不同形式的自注意机制相结合，尽管有很好的结果，但由于其复杂性，关注范围限制在局部区域。与将卷积和自注意机制相结合的方法相比，我们的工作是完全建立在自注意力网络之上的，如ViT。</p>
+<h3 id="vision-transformer">Vision Transformer</h3>
+<p>    受transformer在机器翻译方面成功的启发，仅依赖于transformer层的无卷积模型已经在计算机视觉中传播。ViT是第一个基于transformer的方法来超过卷积网络进行图像分类的模型。与其他方法不同，我们提出了一种双路径架构来提取多尺度特征，以使用视觉transformer进行更好的视觉表示。</p>
+<h3 id="multi-scale-cnns">Multi-Scale CNNs</h3>
+<p>    多尺度特征表示在计算机视觉很常用，例如，图像金字塔，尺度空间表示，从粗粒度到细粒度的方法等。多尺度特征表示被用于多尺度的目标检测和识别。虽然多尺度特性已经证明有利于卷积网络，但它对视觉transformer的适用性仍然是一个新的未得到解决的问题。</p>
+<h2 id="method">Method</h2>
+<p>    我们的方法是建立在ViT的基础上的。</p>
+<h3 id="overview-of-vision-transformer">Overview of Vision Transformer</h3>
+<p>    ViT将图像分割成patch，线性投影成token，额外添加一个class token，将token序列加入位置embedding后输入网络，最后使用class token进行分类。transformer layer包括多头自注意力层MSA和前馈层FFN。</p>
+<h3 id="proposed-multi-scale-vision-transformer">Proposed Multi-Scale Vision Transformer</h3>
+<p>    patch的会影响ViT的准确性和复杂度：使用细粒度的patch，ViT可以表现得更好，但会导致更高的FLOPs和内存消耗（patch大小为16的ViT比patch大小为32的ViT的结果高出6%，但FLOPs也高出4倍）因此，我们提出的方法试图利用细粒度patch的优势，同时平衡复杂性。即引入了一个双分支ViT，其中每个分支处理不同的patch大小，然后提出了一个简单而有效的模块来融合不同分支之间的信息。
+<img src="/img/crossvit1.PNG" alt="">
+    如上图所示，该网络由K层多尺度Transformer Encoder组成，每个encoder包含两个分支：<br>
+    （1）L-Branch：大的（主要的）分支，处理粗粒度的patch（$P_{l}$），具有更多的Transformer Encoder和更大的embedding维度；<br>
+    （2）S-Branch：小的（互补的）分支，处理细粒度的patch（$P_{s}$），具有更少的Transformer Encoder和更小的embedding维度。<br>
+    两个分支被融合$L$次，并使用额外添加的class token进行预测。</p>
+<h3 id="multi-scale-feature-fusion">Multi-Scale Feature Fusion</h3>
+<p><img src="/img/crossvit2.PNG" alt="">
+    有效的特征融合是学习多尺度特征表示的关键。我们提出了四种不同的融合策略，如上图所示。$x^{i}$是分支$i$的token序列，$i$可以是大（主要）分支的$l$，也可以是小（互补）分支的$s$，$x_{cls}^{i}$和$x_{patch}^{i}$分别代表分支$i$的class token和patch token。</p>
+<h4 id="all-attention-fusion">All-Attention Fusion</h4>
+<p>    一种简单的方法是简单地concat两个分支的所有token，通过自注意机制融合信息，如上图的（a）所示，其复杂度是序列长度的二次方。该方法的输出$z^{i}$可以表示为：
+$$
+y=[f^{l}(x^{l})||f^{s}(x^{s})],o=y+MSA(LN(y))
+$$
+$$
+o=[o^{l}||o^{s}],z^{i}=g^{i}(o^{i})
+$$
+    其中，$f^{i}(\cdot )$和$g^{i}(\cdot )$是用于对齐尺寸的投影函数。</p>
+<h4 id="class-token-fusion">Class Token Fusion</h4>
+<p>    class token可以被认为是一个分支的全局抽象特征表示，因为它最终被用于预测。因此，一个简单的方法是对两个分支的class token进行相加，如上图的（b）所示。这种方法非常有效，因为只需要处理一个token，一旦class token被融合，信息将被传递给之后的transformer encoder中的patch token中。该方法的输出$z^{i}$可以表示为：
+$$
+z^{i}=[g^{i}(\sum_{j\in \lbrace l,s \rbrace }f^{j}(x_{cls}^{j}))||x_{patch}^{i}]
+$$</p>
+<h4 id="pairwise-fusion">Pairwise Fusion</h4>
+<p>    如上图中的（c）所示，由于patch token位于图像的空间位置，因此，一种简单的融合方式，就是基于他们的位置进行融合。然而，这两个分支处理的patch大小不同，因此有不同数量的patch token。首先利用插值来对齐空间大小，然后以成对的方式融合两个分支的patch token，同时，两个class token分别融合。该方法的输出$z^{i}$可以表示为：
+$$
+z^{i}=[g^{i}(\sum_{j\in \lbrace l,s \rbrace}f^{j}(x_{cls}^{j}))||g^{i}(\sum_{j\in \lbrace l,s \rbrace }f^{j}(x_{patch}^{j}))]
+$$</p>
+<h4 id="cross-attention-fusion">Cross-Attention Fusion</h4>
+<p>    如上图中的（d）所示，是我们提出的cross-attention，融合操作涉及到一个分支的class token和另一个分支的patch token。具体来说，为了更有效地融合多尺度特征，首先利用每个分支上的class token作为agent，与来自另一个分支的patch token进行信息交换，然后再将其返回到原来的分支中。由于class token已经在自身的分支中学习到了所有patch token中的信息，那么与另一个分支上的patch token交互有助于学习不同规模尺度的信息。与另一个分支的token融合后，class token在下一个encoder上再次与自身分支的patch token交互，它能够将来自另一分支的信息传递给自身分支的patch token，以丰富每个patch token的表示。<br>
+    下面仅描述大分支（L-branch）的交叉注意力模块，如下图所示，小分支与其操作大致相同，仅修改操作中的索引$l$和$s$即可。
+<img src="/img/crossvit3.PNG" alt="">
+    （1）首先，分支$l$从分支$s$中收集patch token，并将分支$l$的class token与其concat起来；
+$$
+x^{&lsquo;l}=[f^{l}(x_{cls}^{l})||x_{patch}^{s}]
+$$
+    （2）在$x_{cls}^{l}$与$x^{&lsquo;l}$之间进行交叉注意力（cross-attention，CA），其中class token作为唯一的query，使得patch token的信息可以融合到class token中。CA可以表示为：
+$$
+q=x_{cls}^{&lsquo;l}W_{q},k=x^{&lsquo;l}W_{k},v=x^{&lsquo;l}W_{v}
+$$
+$$
+A=attention(\frac{qk^{T}}{\sqrt{C/h}}),CA(x^{&lsquo;l})=Av
+$$
+    其中，$W_{q}$、$W_{k}$、$W_{v}$都是可学习的向量。由于在query中只使用了class token，因此该操作的复杂度是线性的，使得整个过程更加高效。但是我们并没有在交叉注意力层之后应用前馈层。<br>
+    该方法的输出$z^{i}$可以表示为：
+$$
+y_{cls}^{l}=f^{l}(x_{cls}^{l})+MCA(LN([f^{l}(x_{cls}^{l})||x_{patch}^{s}]))
+$$
+$$
+z^{l}=[g^{l}(y_{cls}^{l})||x_{patch}^{l}]
+$$
+    通过之后的实验结果表明，该方式效果更好更有效。</p>
+<h2 id="实验">实验</h2>
+<h3 id="comparisons">Comparisons</h3>
+<h4 id="with-deit">with DeiT</h4>
+<p><img src="/img/crossvit4.PNG" alt=""></p>
+<h4 id="with-sota-transformers">with SOTA Transformers</h4>
+<p><img src="/img/crossvit5.PNG" alt=""></p>
+<h4 id="with-cnn-based-models">with CNN-based Models</h4>
+<p><img src="/img/crossvit6.PNG" alt=""></p>
+<h3 id="ablation-studies">Ablation Studies</h3>
+<h4 id="comparison-of-different-fusion-schemes">Comparison of Different Fusion Schemes</h4>
+<p><img src="/img/crossvit7.PNG" alt="">
+    在所有的策略中，交叉注意融合的准确率最好，其参数和计算量略有增加。尽管使用了额外的自注意来融合两个分支之间的信息，但与简单的class token融合相比，All-Attention并没有获得更好的性能。</p>
+<h4 id="different-parameters">different parameters</h4>
+<p><img src="/img/crossvit8.PNG" alt="">
+    <strong>Effect of Patch Sizes</strong>：如上表的（A），对比了输入大小为（8，16）和（12，16），可以看到，（12,16）的patch在更少参数的情况下获得了更好的精度，虽然（8,16）本应该得到更好的结果，因为patch大小为8提供了更细粒度的特性；但是，实验结果却不如（12,16）好，是因为两个分支之间的粒度差异太大，这使得平滑学习特征很困难，而且（8,16）模型的patch token的数量差异也更大；<br>
+    <strong>Channel Width and Depth in S-branch</strong>：如上表的（B）和（C），这两种模型都增加了FLOPs和参数，但没有提高精度，我们认为这是由于$l$分支具有提取特征的主要作用，而$s$分支只提供额外的辅助信息，因此，一个轻量级的分支就足够了；<br>
+    <strong>Depth of Cross-Attention and Number of Multi-Scale Transformer Encoders</strong>：如上表的（D）和（E），增加层数没有带来更好的结果，只是使得参数更多了。</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>    本文提出了一种用于学习多尺度特征的双分支视觉transformer——CrossViT，以提高图像分类的识别精度。为了有效地结合不同尺度的图像patch token，进一步提出了一种基于交叉注意力的融合方法，在线性时间内有效地在两个分支之间进行信息交换。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/flash/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/flash/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "FLASH",
+      "headline" : "FLASH",
+      "description" : "Transformer Quality in Linear Time\nAbstract  针对transformer处理长序列文本的弱点，提出了一个简单的层：门控注意力单元（ gated attention unit），使用一个单头的注意力即可；提出了一种线性近似的方法来实现这一层；该模型称为FLASH（Fast Linear Attention with a Single Head）。\nIntroduction  由于transformer的二次复杂度，大多数模型限制在较短的上下文尺寸上，这种限制使得transformer无法处理长期信息。已经有许多工作提出更有效地加速transformer，我们从实践的角度来研究这个问题，并发现现有的有效的注意模型至少存在以下缺点之一：\n（1）Inferior Quality：当对transformer进行一些简单的修改之后，有效的注意力模型或多或少会导致效果的下降；\n（2）Overhead in Practice：由于有效的注意模型经常使transformer层复杂化，并需要大量的数据\/内存格式化操作，因此在GPU或TPU等加速器上，它们的理论复杂性和实验速度之间可能存在明显的差距；\n（3）Inefficient Auto-regressive Training：大多数注意力线性化模型在推理过程中都喜欢快速的decoder，但在语言建模等自回归任务上的训练速度可能非常慢，这主要是由于类似RNN的顺序状态更新，使得在训练期间无法充分利用现代加速器。\n我们提出了一个新的模型：在效果上和transformer相同，而且具有线性可扩展性。提出模型称为FLASH，分两个步骤提出：\n（1）提出了一个有效近似的新的层：引入门控机制来弱化自注意力机制，形成了门控自注意力单元（Gated Attention Unit，GAU），与transformer层相比，GAU的每一层都很简单，更重要的是，其效果对注意力的依赖性较小，GAU的单头、无softmax的模型与transformer效果相同；\n（2）提出了一种有效的方法来近似GAU中的二次复杂度，使得其复杂度变为线性的，关键思想就是将token分块，在块中使用二次注意力，块间使用线性注意力。\nGated Attention Unit 我们提出了门控注意力单元（Gated Attention Unit，GAU），比transformer更简单但更有效的层。\nVanilla MLP  transformer中的MLP层可以表示为： $$ O=\\phi (XW_{u})W_{o} $$ 其中，输入为$X\\in \\mathbb{R}^{T\\times d}$。\nGated Linear Unit (GLU)  GLU是一种MLP的变体，并已经被应用于transformer中，如上图中的左边所示。 $$ U=\\phi_{u} (XW_{u}),V=\\phi_{v} (XW_{v}) $$ $$ O=(U\\odot V)W_{o} $$ 其中，$\\odot$表示元素级乘法，在GLU中，每一个$u_{i}$都被另一个由相同token所关联的$v_{i}$所门控。\nGated Attention Unit (GAU)  关键思想是将注意力机制和GLU构建为一个统一的层，并尽可能多地共享它们的计算量，如上图中的右边所示。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-06-02 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-06-02 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/flash\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>FLASH</title>
+  <meta property="og:title" content="FLASH" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="Transformer Quality in Linear Time
+Abstract  针对transformer处理长序列文本的弱点，提出了一个简单的层：门控注意力单元（ gated attention unit），使用一个单头的注意力即可；提出了一种线性近似的方法来实现这一层；该模型称为FLASH（Fast Linear Attention with a Single Head）。
+Introduction  由于transformer的二次复杂度，大多数模型限制在较短的上下文尺寸上，这种限制使得transformer无法处理长期信息。已经有许多工作提出更有效地加速transformer，我们从实践的角度来研究这个问题，并发现现有的有效的注意模型至少存在以下缺点之一：
+（1）Inferior Quality：当对transformer进行一些简单的修改之后，有效的注意力模型或多或少会导致效果的下降；
+（2）Overhead in Practice：由于有效的注意模型经常使transformer层复杂化，并需要大量的数据/内存格式化操作，因此在GPU或TPU等加速器上，它们的理论复杂性和实验速度之间可能存在明显的差距；
+（3）Inefficient Auto-regressive Training：大多数注意力线性化模型在推理过程中都喜欢快速的decoder，但在语言建模等自回归任务上的训练速度可能非常慢，这主要是由于类似RNN的顺序状态更新，使得在训练期间无法充分利用现代加速器。
+我们提出了一个新的模型：在效果上和transformer相同，而且具有线性可扩展性。提出模型称为FLASH，分两个步骤提出：
+（1）提出了一个有效近似的新的层：引入门控机制来弱化自注意力机制，形成了门控自注意力单元（Gated Attention Unit，GAU），与transformer层相比，GAU的每一层都很简单，更重要的是，其效果对注意力的依赖性较小，GAU的单头、无softmax的模型与transformer效果相同；
+（2）提出了一种有效的方法来近似GAU中的二次复杂度，使得其复杂度变为线性的，关键思想就是将token分块，在块中使用二次注意力，块间使用线性注意力。
+Gated Attention Unit 我们提出了门控注意力单元（Gated Attention Unit，GAU），比transformer更简单但更有效的层。
+Vanilla MLP  transformer中的MLP层可以表示为： $$ O=\phi (XW_{u})W_{o} $$ 其中，输入为$X\in \mathbb{R}^{T\times d}$。
+Gated Linear Unit (GLU)  GLU是一种MLP的变体，并已经被应用于transformer中，如上图中的左边所示。 $$ U=\phi_{u} (XW_{u}),V=\phi_{v} (XW_{v}) $$ $$ O=(U\odot V)W_{o} $$ 其中，$\odot$表示元素级乘法，在GLU中，每一个$u_{i}$都被另一个由相同token所关联的$v_{i}$所门控。
+Gated Attention Unit (GAU)  关键思想是将注意力机制和GLU构建为一个统一的层，并尽可能多地共享它们的计算量，如上图中的右边所示。" />
+  <meta name="description" content="Transformer Quality in Linear Time
+Abstract  针对transformer处理长序列文本的弱点，提出了一个简单的层：门控注意力单元（ gated attention unit），使用一个单头的注意力即可；提出了一种线性近似的方法来实现这一层；该模型称为FLASH（Fast Linear Attention with a Single Head）。
+Introduction  由于transformer的二次复杂度，大多数模型限制在较短的上下文尺寸上，这种限制使得transformer无法处理长期信息。已经有许多工作提出更有效地加速transformer，我们从实践的角度来研究这个问题，并发现现有的有效的注意模型至少存在以下缺点之一：
+（1）Inferior Quality：当对transformer进行一些简单的修改之后，有效的注意力模型或多或少会导致效果的下降；
+（2）Overhead in Practice：由于有效的注意模型经常使transformer层复杂化，并需要大量的数据/内存格式化操作，因此在GPU或TPU等加速器上，它们的理论复杂性和实验速度之间可能存在明显的差距；
+（3）Inefficient Auto-regressive Training：大多数注意力线性化模型在推理过程中都喜欢快速的decoder，但在语言建模等自回归任务上的训练速度可能非常慢，这主要是由于类似RNN的顺序状态更新，使得在训练期间无法充分利用现代加速器。
+我们提出了一个新的模型：在效果上和transformer相同，而且具有线性可扩展性。提出模型称为FLASH，分两个步骤提出：
+（1）提出了一个有效近似的新的层：引入门控机制来弱化自注意力机制，形成了门控自注意力单元（Gated Attention Unit，GAU），与transformer层相比，GAU的每一层都很简单，更重要的是，其效果对注意力的依赖性较小，GAU的单头、无softmax的模型与transformer效果相同；
+（2）提出了一种有效的方法来近似GAU中的二次复杂度，使得其复杂度变为线性的，关键思想就是将token分块，在块中使用二次注意力，块间使用线性注意力。
+Gated Attention Unit 我们提出了门控注意力单元（Gated Attention Unit，GAU），比transformer更简单但更有效的层。
+Vanilla MLP  transformer中的MLP层可以表示为： $$ O=\phi (XW_{u})W_{o} $$ 其中，输入为$X\in \mathbb{R}^{T\times d}$。
+Gated Linear Unit (GLU)  GLU是一种MLP的变体，并已经被应用于transformer中，如上图中的左边所示。 $$ U=\phi_{u} (XW_{u}),V=\phi_{v} (XW_{v}) $$ $$ O=(U\odot V)W_{o} $$ 其中，$\odot$表示元素级乘法，在GLU中，每一个$u_{i}$都被另一个由相同token所关联的$v_{i}$所门控。
+Gated Attention Unit (GAU)  关键思想是将注意力机制和GLU构建为一个统一的层，并尽可能多地共享它们的计算量，如上图中的右边所示。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">FLASH</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-06-02 00:00:00 UTC">
+                02 Jun 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Transformer Quality in Linear Time</p>
+<h2 id="abstract">Abstract</h2>
+<p>    针对transformer处理长序列文本的弱点，提出了一个简单的层：门控注意力单元（ gated attention unit），使用一个单头的注意力即可；提出了一种线性近似的方法来实现这一层；该模型称为FLASH（Fast Linear Attention with a Single Head）。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    由于transformer的二次复杂度，大多数模型限制在较短的上下文尺寸上，这种限制使得transformer无法处理长期信息。已经有许多工作提出更有效地加速transformer，我们从实践的角度来研究这个问题，并发现现有的有效的注意模型至少存在以下缺点之一：<br>
+    （1）Inferior Quality：当对transformer进行一些简单的修改之后，有效的注意力模型或多或少会导致效果的下降；<br>
+    （2）Overhead in Practice：由于有效的注意模型经常使transformer层复杂化，并需要大量的数据/内存格式化操作，因此在GPU或TPU等加速器上，它们的理论复杂性和实验速度之间可能存在明显的差距；<br>
+    （3）Inefficient Auto-regressive Training：大多数注意力线性化模型在推理过程中都喜欢快速的decoder，但在语言建模等自回归任务上的训练速度可能非常慢，这主要是由于类似RNN的顺序状态更新，使得在训练期间无法充分利用现代加速器。<br>
+    我们提出了一个新的模型：在效果上和transformer相同，而且具有线性可扩展性。提出模型称为FLASH，分两个步骤提出：<br>
+    （1）提出了一个有效近似的新的层：引入门控机制来弱化自注意力机制，形成了门控自注意力单元（Gated Attention Unit，GAU），与transformer层相比，GAU的每一层都很简单，更重要的是，其效果对注意力的依赖性较小，GAU的单头、无softmax的模型与transformer效果相同；<br>
+    （2）提出了一种有效的方法来近似GAU中的二次复杂度，使得其复杂度变为线性的，关键思想就是将token分块，在块中使用二次注意力，块间使用线性注意力。</p>
+<h2 id="gated-attention-unit">Gated Attention Unit</h2>
+<p><img src="/img/flash1.PNG" alt="">
+    我们提出了门控注意力单元（Gated Attention Unit，GAU），比transformer更简单但更有效的层。</p>
+<h3 id="vanilla-mlp">Vanilla MLP</h3>
+<p>    transformer中的MLP层可以表示为：
+$$
+O=\phi (XW_{u})W_{o}
+$$
+    其中，输入为$X\in \mathbb{R}^{T\times d}$。</p>
+<h3 id="gated-linear-unit-glu">Gated Linear Unit (GLU)</h3>
+<p>    GLU是一种MLP的变体，并已经被应用于transformer中，如上图中的左边所示。
+$$
+U=\phi_{u} (XW_{u}),V=\phi_{v} (XW_{v})
+$$
+$$
+O=(U\odot V)W_{o}
+$$
+    其中，$\odot$表示元素级乘法，在GLU中，每一个$u_{i}$都被另一个由相同token所关联的$v_{i}$所门控。</p>
+<h3 id="gated-attention-unit-gau">Gated Attention Unit (GAU)</h3>
+<p>    关键思想是将注意力机制和GLU构建为一个统一的层，并尽可能多地共享它们的计算量，如上图中的右边所示。<br>
+    具体来说，其计算如下：
+$$
+O=(U\odot  \hat{V})W_{o},\hat{V}=AV
+$$
+    其中，$A\in \mathbb{R}^{T\times T}$代表token-token的注意力权重。与GLU中总是使用$v_{i}$来门控$u_{i}$不同，我们的GAU使用一个潜在的更相关的表示$\hat{v}_ {i}=\sum _ {j}a_{ij}v_{j}$来代替$v_{i}$。当A为单位矩阵时，上述公式简化为GLU。<br>
+    门控的表示可以使用一种比MHSA更简单/更弱的注意力机制，但没有精度的损失：
+$$
+Z=\phi _ {z}(XW_{z})
+$$
+$$
+A=relu^{2}(Q(Z)K(Z)^{T}+b)
+$$
+    其中，$Z$是一个共享的表示，$Q$和$K$是更简单的两个变换，相对于$Z$的每一维的标量和偏移量（类似于LayerNorm中的可学习变量），$b$是相对位置偏差。我们还发现，在GAU情况下，MHSA的softmax函数可以使用一个正则化的激活函数来简化。伪代码如下图所示：
+<img src="/img/flash2.PNG" alt=""></p>
+<h3 id="gau-vs-transformers">GAU vs. Transformers</h3>
+<p><img src="/img/flash3.PNG" alt="">
+<img src="/img/flash4.PNG" alt=""></p>
+<h2 id="fast-linear-attention-with-gau">Fast Linear Attention with GAU</h2>
+<p>    将GAU扩张到长序列建模，基于以下两个观察：<br>
+    （1）GAU中的门控机制允许使用较弱的注意力机制（即单头的，没有softmax的），而不影响精度，进一步将其应用到长序列建模中，GAU还可以提高近似（弱）注意机制的有效性，如局部化、稀疏化和线性化；<br>
+    （2）使用GAU后，其注意力模块的数量加倍，因为在参数上，MLP+MHSA是GAU的近似两倍，同时，因为近似注意力通常需要更多的层来捕获完全的依赖关系，这也使得GUA更加合适。<br>
+    基于以上考虑，我们首先回顾一些关于长序列建模的相关注意力工作，然后展示如何将GAU在长序列上实现线性变换。</p>
+<h3 id="existing-linear-complexity-variants">Existing Linear-Complexity Variants</h3>
+<h4 id="partial-attention">Partial Attention</h4>
+<p>    一些方法使用部分/稀疏注意力近似全注意矩阵，例如：局部窗口、局部+稀疏、聚类等。虽然没有完全注意力机制那么有效，但这些变体通常能够处理更长的序列。然而，这类方法的关键问题是，它们涉及大量的不规则或规则内存重新格式化操作，如收集、分散、切片和连接，这对大规模并行的现代加速器是不友好的，因此，它们的实际效益通常落后于理论分析。</p>
+<h4 id="linear-attention">Linear Attention</h4>
+<p>    一些方法通过分解注意力矩阵来线性化注意力计算，然后重新排列矩阵乘法的顺序。
+$$
+\hat{V}_ {lin}=Q(K^{T}V)\overset{approx}{\rightarrow}\hat{V}_ {lin}=Softmax(QK^{T})V
+$$
+    如下图的中间行所示，顺序依赖不仅限制了并行性的程度，更重要的是需要循环中的内存访问，因此，其理论的复杂性与实际运行时间之间存在着相当大的差距。</p>
+<h3 id="our-method-mixed-chunk-attention">Our Method: Mixed Chunk Attention</h3>
+<p><img src="/img/flash5.PNG" alt="">
+    （上图中：第一行为二次的注意力机制，即最原始的注意力方法；中间一行：Linear attention；最后一行：提出的mixed chunk注意力机制，$C=2$）<br>
+    我们提出了mixed chunk attention，融合了Partial Attention和Linear Attention的优势，如上图中的最后一行所示。</p>
+<h4 id="preparation">Preparation</h4>
+<p>    输入序列首先被分块成$G$个大小为$C$的不重叠的块，即$[T]\rightarrow [\frac{T}{C}\times C]$，每一块中经过GAU，生成$U_{g}\in \mathbb{R}^{C\times e}$、$V_{g}\in \mathbb{R}^{C\times e}$和$Z_{g}\in \mathbb{R}^{C\times s}$。然后由$Z_{g}$生成4种注意力头$Q_{g}^{quad}$、$K_{g}^{quad}$、$Q_{g}^{lin}$和$K_{g}^{lin}$。</p>
+<h4 id="local-attention-per-chunk">Local attention per chunk</h4>
+<p>    首先，对每个长度为$C$的块内分别应用局部二次注意力：
+$$
+\hat{V}_ {g}^{quad}=relu^{2}(Q_{g}^{quad}(K_{g}^{quad})^{T}+b)V_{g}
+$$
+    该步骤的复杂度是$Q(TCd)$，与$T$呈线性关系。</p>
+<h4 id="global-attention-across-chunks">Global attention across chunks</h4>
+<p>    采用全局线性注意力机制来捕获块间的信息随机交互：<br>
+    Non-Causal：
+$$
+\hat{V}_ {g}^{lin}=Q_{g}^{lin}(\sum_{h=1}^{G}(K_{h}^{lin})^{T}V_{h})
+$$
+    Causal：（即只能看到当前处理位置和之前的位置，之后的位置内容看不到）
+$$
+\hat{V}_ {g}^{lin}=Q_{g}^{lin}(\sum_{h=1}^{g-1}(K_{h}^{lin})^{T}V_{h})
+$$
+    上述两个公式都是在块间进行的。<br>
+    最后，$\hat{V}_ {g}^{quad}$和$\hat{V}_ {g}^{lin}$加在一起：
+$$
+Q_{g}=[U_{g}\odot (\hat{V}_ {g}^{quad}+\hat{V}_ {g}^{lin})]W_{o}
+$$</p>
+<h2 id="实验">实验</h2>
+<h3 id="bidirectional-language-modeling">Bidirectional Language Modeling</h3>
+<p><img src="/img/flash6.PNG" alt="">
+    （a）横坐标：文本长度，纵坐标：每步的时间；<br>
+    （b）-（f）：不同文本长度，横坐标：训练时间（越短越好），纵坐标：困惑度的负值（越大越好）。</p>
+<h3 id="auto-regressive-language-modeling">Auto-regressive Language Modeling</h3>
+<p><img src="/img/flash7.PNG" alt=""></p>
+<h3 id="ablation-studies">Ablation Studies</h3>
+<p><img src="/img/flash8.PNG" alt=""></p>
+<h2 id="conclusion">Conclusion</h2>
+<p>    本文提出了FLASH，以平衡精度与复杂度，通过设计一个门控注意力单元，将其与一个近似策略（混合块注意）相结合来实现的。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>
