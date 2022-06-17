@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/early-convolutions-help-transformers-see-better/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/early-convolutions-help-transformers-see-better/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "Early Convolutions Help Transformers See Better",
+      "headline" : "Early Convolutions Help Transformers See Better",
+      "description" : "Early Convolutions Help Transformers See Better Abstract  ViT对优化器的选择非常敏感，如Adam vs. SGD，并且对优化器的超参数和训练的时间长度也很敏感，相比之下，卷积网络更容易优化。在本文中，我们推测是由于ViT模型的patchify stem，对输入图像应用卷积核大小为p×p、步幅为p的卷积。这种大卷积核和大步幅，与卷积的设计思路是相违背的。为了测试这种设计是否会导致问题，我们用少量堆叠的3×3大小、步幅为2的卷积代替ViT中的方式。虽然提出的模型和ViT大多数部分计算相同，但是我们发现这种早期的细小的变化导致了模型在对优化器的敏感性和最终的准确性的不同。在ViT中使用卷积stem显著提高了优化器的稳定性和性能。\nIntroduction  ViT使用多头自注意力机制的全局处理代替了卷积中的局部处理，我们希望这种设计有潜力提高视觉表征。但是，ViT与卷积网络还是有很大差异，ViT对优化器的选择、针对特定数据集的超参数、训练的时间长度、网络的深度等等，都很敏感。\n相比之下，卷积网络就更好优化。在本文中，我们加深问题出现在ViT早期对图像的处理阶段，即ViT将图像分割为p×p大小的不重叠的patch，patchify stem通过卷积核大小为p×p、步幅为p的卷积来实现，但是这种大卷积核和大步幅，与卷积的设计思路是相违背的，卷积中，最佳的收敛方式是小卷积核的堆叠，如卷积核大小为3×3，步幅为2。\n为了验证这一假设，我们将ViT早期处理图像的方式进行改变，使用5层卷积来代替，如下图所示。为了对其计算量，删掉了一个transformer block。我们观察到，尽管两种ViT设计中的绝大多数计算量是相同的，但早期处理的微小变化导致了两个模型在对优化器的敏感性和最终的准确性方面有所不同。\n我们推测，将卷积添加在ViT的早期阶段可能是一个关键，与hybrid ViT相比，hybrid ViT使用了40个卷积层，与原始的ViT并没有改进，与ConViT（ConViT:Improving vision transformers with soft convolutional inductive biases.）的发现一致：早期的transformer块比后来的transformer块更喜欢学习局部信息。\n探索CNN与ViT的混合模型并不是我们的目标，相反，我们证明了简单的使用小卷积就足以显著改善模型的优化。\nRelated Work Convolutional neural networks (CNNs)  卷积网络通常使用SGD进行训练，并且是很容易优化的。\nSelf-attention in vision models  transformer使用多头自注意力机制，对全局信息进行处理，比卷积更加通用。\nVision transformer (ViT)  ViT将图像分割成不重叠的大小为16×16的patch，通过线性层的到patch embedding输入到模型中，在使用大规模数据集时获得了很好的效果，但其对一些训练细节很敏感，如相比于SGD，用Adam的效果更；与CNN相比，ViT通常时更难优化的。\nViT improvements  更多的正则化和更强的数据增强，可以提高ViT的精度，我们也探索了其他的一些细节。\nDiscussion  与引入局部先验不同，我们的研究重点是对ViT进行最小的修改来提高可优化性，并得到结果：只在stem上添加5层卷积，即可使ViT通过Adam和SGD进行优化，同时对学习速率和权重衰减等超参数不那么敏感。\nVision Transformer Architectures  我们将输入transformer块之前的网络部分称为stem。ViT的stem是一个步幅为p、大小为p×p的卷积，称之为patchify stem，我们保留卷积的stem，使用多层的重叠卷积来代替。\n我们使用最经典的堆叠的3×3卷积，并最后添加一个1×1卷积以匹配维度，将224×224的图像下采样到14×14，并且遵循3×3卷积，步幅为2。\n将CNN与ViT进行混合，将resnet-50作为ViT的stem，共有40层卷积层，但在我们的工作中，只有5-7层，并且我们的目标不是设计混合ViT模型，而是研究遵循卷积网络设计思想，用最小的卷积stem来代替patchify stem的效果。\n下表为ViT与本文提出的修改ViT的模型结构：$ViT_{p}$：原始的ViT模型；$ViT_{c}$：用卷积替换的ViT模型；为了匹配复杂度，$ViT_{c}$中减少了一个transformer block。 Stability Experiments  RegNetY是效果最好的CNN网络，并且很好优化。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-06-14 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-06-14 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/early-convolutions-help-transformers-see-better\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>Early Convolutions Help Transformers See Better</title>
+  <meta property="og:title" content="Early Convolutions Help Transformers See Better" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="Early Convolutions Help Transformers See Better Abstract  ViT对优化器的选择非常敏感，如Adam vs. SGD，并且对优化器的超参数和训练的时间长度也很敏感，相比之下，卷积网络更容易优化。在本文中，我们推测是由于ViT模型的patchify stem，对输入图像应用卷积核大小为p×p、步幅为p的卷积。这种大卷积核和大步幅，与卷积的设计思路是相违背的。为了测试这种设计是否会导致问题，我们用少量堆叠的3×3大小、步幅为2的卷积代替ViT中的方式。虽然提出的模型和ViT大多数部分计算相同，但是我们发现这种早期的细小的变化导致了模型在对优化器的敏感性和最终的准确性的不同。在ViT中使用卷积stem显著提高了优化器的稳定性和性能。
+Introduction  ViT使用多头自注意力机制的全局处理代替了卷积中的局部处理，我们希望这种设计有潜力提高视觉表征。但是，ViT与卷积网络还是有很大差异，ViT对优化器的选择、针对特定数据集的超参数、训练的时间长度、网络的深度等等，都很敏感。
+相比之下，卷积网络就更好优化。在本文中，我们加深问题出现在ViT早期对图像的处理阶段，即ViT将图像分割为p×p大小的不重叠的patch，patchify stem通过卷积核大小为p×p、步幅为p的卷积来实现，但是这种大卷积核和大步幅，与卷积的设计思路是相违背的，卷积中，最佳的收敛方式是小卷积核的堆叠，如卷积核大小为3×3，步幅为2。
+为了验证这一假设，我们将ViT早期处理图像的方式进行改变，使用5层卷积来代替，如下图所示。为了对其计算量，删掉了一个transformer block。我们观察到，尽管两种ViT设计中的绝大多数计算量是相同的，但早期处理的微小变化导致了两个模型在对优化器的敏感性和最终的准确性方面有所不同。
+我们推测，将卷积添加在ViT的早期阶段可能是一个关键，与hybrid ViT相比，hybrid ViT使用了40个卷积层，与原始的ViT并没有改进，与ConViT（ConViT:Improving vision transformers with soft convolutional inductive biases.）的发现一致：早期的transformer块比后来的transformer块更喜欢学习局部信息。
+探索CNN与ViT的混合模型并不是我们的目标，相反，我们证明了简单的使用小卷积就足以显著改善模型的优化。
+Related Work Convolutional neural networks (CNNs)  卷积网络通常使用SGD进行训练，并且是很容易优化的。
+Self-attention in vision models  transformer使用多头自注意力机制，对全局信息进行处理，比卷积更加通用。
+Vision transformer (ViT)  ViT将图像分割成不重叠的大小为16×16的patch，通过线性层的到patch embedding输入到模型中，在使用大规模数据集时获得了很好的效果，但其对一些训练细节很敏感，如相比于SGD，用Adam的效果更；与CNN相比，ViT通常时更难优化的。
+ViT improvements  更多的正则化和更强的数据增强，可以提高ViT的精度，我们也探索了其他的一些细节。
+Discussion  与引入局部先验不同，我们的研究重点是对ViT进行最小的修改来提高可优化性，并得到结果：只在stem上添加5层卷积，即可使ViT通过Adam和SGD进行优化，同时对学习速率和权重衰减等超参数不那么敏感。
+Vision Transformer Architectures  我们将输入transformer块之前的网络部分称为stem。ViT的stem是一个步幅为p、大小为p×p的卷积，称之为patchify stem，我们保留卷积的stem，使用多层的重叠卷积来代替。
+我们使用最经典的堆叠的3×3卷积，并最后添加一个1×1卷积以匹配维度，将224×224的图像下采样到14×14，并且遵循3×3卷积，步幅为2。
+将CNN与ViT进行混合，将resnet-50作为ViT的stem，共有40层卷积层，但在我们的工作中，只有5-7层，并且我们的目标不是设计混合ViT模型，而是研究遵循卷积网络设计思想，用最小的卷积stem来代替patchify stem的效果。
+下表为ViT与本文提出的修改ViT的模型结构：$ViT_{p}$：原始的ViT模型；$ViT_{c}$：用卷积替换的ViT模型；为了匹配复杂度，$ViT_{c}$中减少了一个transformer block。 Stability Experiments  RegNetY是效果最好的CNN网络，并且很好优化。" />
+  <meta name="description" content="Early Convolutions Help Transformers See Better Abstract  ViT对优化器的选择非常敏感，如Adam vs. SGD，并且对优化器的超参数和训练的时间长度也很敏感，相比之下，卷积网络更容易优化。在本文中，我们推测是由于ViT模型的patchify stem，对输入图像应用卷积核大小为p×p、步幅为p的卷积。这种大卷积核和大步幅，与卷积的设计思路是相违背的。为了测试这种设计是否会导致问题，我们用少量堆叠的3×3大小、步幅为2的卷积代替ViT中的方式。虽然提出的模型和ViT大多数部分计算相同，但是我们发现这种早期的细小的变化导致了模型在对优化器的敏感性和最终的准确性的不同。在ViT中使用卷积stem显著提高了优化器的稳定性和性能。
+Introduction  ViT使用多头自注意力机制的全局处理代替了卷积中的局部处理，我们希望这种设计有潜力提高视觉表征。但是，ViT与卷积网络还是有很大差异，ViT对优化器的选择、针对特定数据集的超参数、训练的时间长度、网络的深度等等，都很敏感。
+相比之下，卷积网络就更好优化。在本文中，我们加深问题出现在ViT早期对图像的处理阶段，即ViT将图像分割为p×p大小的不重叠的patch，patchify stem通过卷积核大小为p×p、步幅为p的卷积来实现，但是这种大卷积核和大步幅，与卷积的设计思路是相违背的，卷积中，最佳的收敛方式是小卷积核的堆叠，如卷积核大小为3×3，步幅为2。
+为了验证这一假设，我们将ViT早期处理图像的方式进行改变，使用5层卷积来代替，如下图所示。为了对其计算量，删掉了一个transformer block。我们观察到，尽管两种ViT设计中的绝大多数计算量是相同的，但早期处理的微小变化导致了两个模型在对优化器的敏感性和最终的准确性方面有所不同。
+我们推测，将卷积添加在ViT的早期阶段可能是一个关键，与hybrid ViT相比，hybrid ViT使用了40个卷积层，与原始的ViT并没有改进，与ConViT（ConViT:Improving vision transformers with soft convolutional inductive biases.）的发现一致：早期的transformer块比后来的transformer块更喜欢学习局部信息。
+探索CNN与ViT的混合模型并不是我们的目标，相反，我们证明了简单的使用小卷积就足以显著改善模型的优化。
+Related Work Convolutional neural networks (CNNs)  卷积网络通常使用SGD进行训练，并且是很容易优化的。
+Self-attention in vision models  transformer使用多头自注意力机制，对全局信息进行处理，比卷积更加通用。
+Vision transformer (ViT)  ViT将图像分割成不重叠的大小为16×16的patch，通过线性层的到patch embedding输入到模型中，在使用大规模数据集时获得了很好的效果，但其对一些训练细节很敏感，如相比于SGD，用Adam的效果更；与CNN相比，ViT通常时更难优化的。
+ViT improvements  更多的正则化和更强的数据增强，可以提高ViT的精度，我们也探索了其他的一些细节。
+Discussion  与引入局部先验不同，我们的研究重点是对ViT进行最小的修改来提高可优化性，并得到结果：只在stem上添加5层卷积，即可使ViT通过Adam和SGD进行优化，同时对学习速率和权重衰减等超参数不那么敏感。
+Vision Transformer Architectures  我们将输入transformer块之前的网络部分称为stem。ViT的stem是一个步幅为p、大小为p×p的卷积，称之为patchify stem，我们保留卷积的stem，使用多层的重叠卷积来代替。
+我们使用最经典的堆叠的3×3卷积，并最后添加一个1×1卷积以匹配维度，将224×224的图像下采样到14×14，并且遵循3×3卷积，步幅为2。
+将CNN与ViT进行混合，将resnet-50作为ViT的stem，共有40层卷积层，但在我们的工作中，只有5-7层，并且我们的目标不是设计混合ViT模型，而是研究遵循卷积网络设计思想，用最小的卷积stem来代替patchify stem的效果。
+下表为ViT与本文提出的修改ViT的模型结构：$ViT_{p}$：原始的ViT模型；$ViT_{c}$：用卷积替换的ViT模型；为了匹配复杂度，$ViT_{c}$中减少了一个transformer block。 Stability Experiments  RegNetY是效果最好的CNN网络，并且很好优化。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">Early Convolutions Help Transformers See Better</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-06-14 00:00:00 UTC">
+                14 Jun 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Early Convolutions Help Transformers See Better
+<img src="/img/vitc1.PNG" alt=""></p>
+<h2 id="abstract">Abstract</h2>
+<p>    ViT对优化器的选择非常敏感，如Adam vs. SGD，并且对优化器的超参数和训练的时间长度也很敏感，相比之下，卷积网络更容易优化。在本文中，我们推测是由于ViT模型的patchify stem，对输入图像应用卷积核大小为p×p、步幅为p的卷积。这种大卷积核和大步幅，与卷积的设计思路是相违背的。为了测试这种设计是否会导致问题，我们用少量堆叠的3×3大小、步幅为2的卷积代替ViT中的方式。虽然提出的模型和ViT大多数部分计算相同，但是我们发现这种早期的细小的变化导致了模型在对优化器的敏感性和最终的准确性的不同。在ViT中使用卷积stem显著提高了优化器的稳定性和性能。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    ViT使用多头自注意力机制的全局处理代替了卷积中的局部处理，我们希望这种设计有潜力提高视觉表征。但是，ViT与卷积网络还是有很大差异，ViT对优化器的选择、针对特定数据集的超参数、训练的时间长度、网络的深度等等，都很敏感。<br>
+    相比之下，卷积网络就更好优化。在本文中，我们加深问题出现在ViT早期对图像的处理阶段，即ViT将图像分割为p×p大小的不重叠的patch，patchify stem通过卷积核大小为p×p、步幅为p的卷积来实现，但是这种大卷积核和大步幅，与卷积的设计思路是相违背的，卷积中，最佳的收敛方式是小卷积核的堆叠，如卷积核大小为3×3，步幅为2。<br>
+    为了验证这一假设，我们将ViT早期处理图像的方式进行改变，使用5层卷积来代替，如下图所示。为了对其计算量，删掉了一个transformer block。我们观察到，尽管两种ViT设计中的绝大多数计算量是相同的，但早期处理的微小变化导致了两个模型在对优化器的敏感性和最终的准确性方面有所不同。<br>
+    我们推测，将卷积添加在ViT的早期阶段可能是一个关键，与hybrid ViT相比，hybrid ViT使用了40个卷积层，与原始的ViT并没有改进，与ConViT（ConViT:Improving vision transformers with soft convolutional inductive biases.）的发现一致：早期的transformer块比后来的transformer块更喜欢学习局部信息。<br>
+    探索CNN与ViT的混合模型并不是我们的目标，相反，我们证明了简单的使用小卷积就足以显著改善模型的优化。</p>
+<h2 id="related-work">Related Work</h2>
+<h3 id="convolutional-neural-networks-cnns">Convolutional neural networks (CNNs)</h3>
+<p>    卷积网络通常使用SGD进行训练，并且是很容易优化的。</p>
+<h3 id="self-attention-in-vision-models">Self-attention in vision models</h3>
+<p>    transformer使用多头自注意力机制，对全局信息进行处理，比卷积更加通用。</p>
+<h3 id="vision-transformer-vit">Vision transformer (ViT)</h3>
+<p>    ViT将图像分割成不重叠的大小为16×16的patch，通过线性层的到patch embedding输入到模型中，在使用大规模数据集时获得了很好的效果，但其对一些训练细节很敏感，如相比于SGD，用Adam的效果更；与CNN相比，ViT通常时更难优化的。</p>
+<h3 id="vit-improvements">ViT improvements</h3>
+<p>    更多的正则化和更强的数据增强，可以提高ViT的精度，我们也探索了其他的一些细节。</p>
+<h3 id="discussion">Discussion</h3>
+<p>    与引入局部先验不同，我们的研究重点是对ViT进行最小的修改来提高可优化性，并得到结果：只在stem上添加5层卷积，即可使ViT通过Adam和SGD进行优化，同时对学习速率和权重衰减等超参数不那么敏感。</p>
+<h2 id="vision-transformer-architectures">Vision Transformer Architectures</h2>
+<p>    我们将输入transformer块之前的网络部分称为stem。ViT的stem是一个步幅为p、大小为p×p的卷积，称之为patchify stem，我们保留卷积的stem，使用多层的重叠卷积来代替。<br>
+    我们使用最经典的堆叠的3×3卷积，并最后添加一个1×1卷积以匹配维度，将224×224的图像下采样到14×14，并且遵循3×3卷积，步幅为2。<br>
+    将CNN与ViT进行混合，将resnet-50作为ViT的stem，共有40层卷积层，但在我们的工作中，只有5-7层，并且我们的目标不是设计混合ViT模型，而是研究遵循卷积网络设计思想，用最小的卷积stem来代替patchify stem的效果。<br>
+    下表为ViT与本文提出的修改ViT的模型结构：$ViT_{p}$：原始的ViT模型；$ViT_{c}$：用卷积替换的ViT模型；为了匹配复杂度，$ViT_{c}$中减少了一个transformer block。
+<img src="/img/vitc2.PNG" alt=""></p>
+<h2 id="stability-experiments">Stability Experiments</h2>
+<p>    RegNetY是效果最好的CNN网络，并且很好优化。</p>
+<h3 id="training-length-stability">Training Length Stability</h3>
+<p>    训练时间的长短，用来收敛衡量速度，之前的ViT通常训练300-400epoch。结果如下图所示，可以看出，$ViT_{c}$比$ViT_{p}$拥有更快的收敛速度，并且缩小了与CNN的速度差距，在epoch为50时效果最为明显。
+<img src="/img/vitc3.PNG" alt=""></p>
+<h3 id="optimizer-stability">Optimizer Stability</h3>
+<p>    ViT使用Adam通常可以获得更好的结果，SGD却不行，相比之下，卷积网络都可以优化，SGD的好处是超参数少。下表为结果，其中上三角形表示Adam优化器，下三角形表示SGD优化器，对于$ViT_{p}$，Adam明显要比SGD好，而$ViT_{c}$和RegNetY模型差距很小，并且对于更长的训练时间，$ViT_{p}$中的SGD无法收敛，因此用虚线表示。
+<img src="/img/vitc4.PNG" alt=""></p>
+<h3 id="learning-rate-and-weight-decay-stability">Learning Rate and Weight Decay Stability</h3>
+<p>    比较了Adam和SGD优化器下，不同学习率和衰减权重的敏感性。我们对每个模型都只训练了50个epoch。使用EDF作为评价标准，EDF越陡峭，就表明鲁棒性越好，如果更平稳，则表示模型更敏感。<br>
+    Adam：
+<img src="/img/vitc5.PNG" alt="">
+    SGD：
+<img src="/img/vitc6.PNG" alt="">
+    从上图的结果中可以看出，$ViT_{c}$显著提高了稳定性，比$ViT_{p}$更容易优化。</p>
+<h2 id="peak-performance">Peak Performance</h2>
+<p><img src="/img/vitc7.PNG" alt="">
+    左边图展示了效果最好的几个卷积网络；中间图比较了卷积网络与ViT网络在ImageNet-1k上的训练结果，可以看出$ViT_{p}$表现逊于ResNets，而$ViT_{c}$更有竞争力，与卷积网络相当；右图比较了在ImageNet-21k上预训练的结果，这种情况下，ViT要比卷积网络效果更好，而$ViT_{c}$比$ViT_{p}$更好。<br>
+    下表可以看作是上图的数值精确结果：
+<img src="/img/vitc8.PNG" alt=""></p>
+<h2 id="conclusion">Conclusion</h2>
+<p>    在本文中，我们提出ViT的优化困难与大卷积核和大步幅的stem有关，因此使用一个简单的卷积stem代替ViT的stem，这种微小的变化，带来了优化性能和最终结果的变化。研究结果表明，在ViT的早期引入卷积引入归纳偏置是很有效的。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

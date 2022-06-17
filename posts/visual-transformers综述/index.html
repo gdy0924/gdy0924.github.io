@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/visual-transformers%E7%BB%BC%E8%BF%B0/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/visual-transformers%E7%BB%BC%E8%BF%B0/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "Visual Transformers综述",
+      "headline" : "Visual Transformers综述",
+      "description" : "A Survey of Visual Transformers\nAbstract  transformer是一种基于注意力机制的encoder-decoder模型，首次在NLP领域提出，后来被应用在CV领域中，并证实了transformer的有效性。在本文中，根据三种不同的任务分类，总结了100多个不同的transformer模型，并提出了未来三个有前景的研究方向。\nIntroduction  transformer利用注意力机制，已经成为许多NLP任务的主要模型，最近的主要模型是自监督，首先在大型数据集上进行预训练，然后针对小样本进行下游任务的微调，如GPT、BERT等。\n在CV领域，transformer出现之前，一直是卷积网络占据主导，后来通过向卷积网络中添加注意力模型或使用纯注意力模型，但在流行的基准上，纯注意力模型仍然低于最先进的CNN模型。 如上图所示，在过去一年多中，已经提出了数百个基于transformer的各种视觉模型，我们将基本任务分为三类：分类、检测和分割；同时根据数据流进行分类：图像、点云和多流数据；如下图所示：\n本文中，旨在对视觉transformer进行更全面的回顾和更系统的分类：\n（1）Comprehensiveness \u0026amp; Readability（全面性和可读性）：选择具有代表性的进行详细介绍，简单介绍其他工作，从单一角度对模型进行分析，并对他们的联系进行分析；\n（2）Intuitive Comparison（更直观的比较）：对不同的数据集和限制进行了多个横纵对比，并为每个任务总结了一系列的组件，包括：拥有层次backbone的浅层局部卷积，用于检测器的空间注意力加速，用于分割的通用掩码预测机制；\n（3）In-depth Analysis（深入分析）：从以下几个方面提供讲解：从传统的序列任务到视觉任务的转换过程，视觉transformer和其他神经网络模型之间的关系，在不同任务中采用的可学习embedding之间的相关性（class token、object query、mask embedding），最后，总结了一些未来的研究方向。\nOriginal Transformers  原始的transformer应用于sequence-to-sequence的自回归任务中，使用encoder-decoder架构，使用多头自注意力机制和前馈层完全代替了递归和卷积，如下图所示：\n(Multi-Head) Attention Mechanism  单头自注意力机制分为两部分：将输入序列映射成三个不同的向量：Q、K和V；利用Q和K进行查询，将注意力分数分配给V，并更新输出向量，其计算公式如下所示： $$ Q=XW^{Q},K=XW^{K},V=XW^{V} $$ $$ Attention(Q,K,V)=Softmax(\\frac{QK^{T}}{\\sqrt{d_{k}}})V $$ 多头自注意力机制就是并行多个单头自注意力机制，并对输出结果拼接起来得到最终输出。\nPosition-wise Feed-Forward Networks  将多头自注意力机制的输出经过两个前馈层FFN： $$ FFN(x)=RELU(W_{1}x\u002bb_{1})W_{2}\u002bb_{2} $$\nPositional Encoding  由于transformer对输入进行并行的处理，因此忽视了序列的顺序，为了引入顺序信息，提出添加一个位置embedding。\nTransformer Model 上图展示了encoder-decoder架构的整体transformer模型，由$N$个encoder块组成，每个encoder块包含两个子层：MHSA和FFN；还有$N$个decoder块，与encoder相比，decoder块中添加了多头交叉注意力层，以聚合decoder的embedding和encoder的输出。所有子层都采用残差连接和层归一化。\nTransformer For Classification 随着transformer在NLP领域的发展，许多研究试图将transformer用于图像分类，如上图所示。首先介绍全注意力网络和ViT，其证明了transformer的有效性；接着讨论了利用transformer增强卷积网络的方式提高卷积网络的性能；根据卷积网络的层次结构，分层transformer用金字塔结构取代了固定分辨率的柱状结构；最后对其进行了直观的比较和讨论。\nOriginal Visual Transformer  SANet用注意力完全取代卷积，提出了Stand-Alone self-attention network，给定resnet架构，将每层中的卷积替换为局部空间自注意力层；Fully-Attentional Network由一个transformer架构和二次位置编码组成，并证明了一个卷积层可以用一个带有相对位置编码的多头自注意力层来近似。\nViT进一步探索了大规模预训练transformer的有效性，ViT将输入图像分割为patch，并将其flatten成为序列，添加位置embedding作为输入，如下图所示。与BERT类似，引入class token进行最终的分类。然而，在有限的训练样本限制下，ViT泛化能力容易受到限制。 Transformer Enhanced CNNs  最近的一些方法试图将transformer集成到卷积网络中，以增强特征表示。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-06-12 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-06-12 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/visual-transformers%E7%BB%BC%E8%BF%B0\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>Visual Transformers综述</title>
+  <meta property="og:title" content="Visual Transformers综述" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="A Survey of Visual Transformers
+Abstract  transformer是一种基于注意力机制的encoder-decoder模型，首次在NLP领域提出，后来被应用在CV领域中，并证实了transformer的有效性。在本文中，根据三种不同的任务分类，总结了100多个不同的transformer模型，并提出了未来三个有前景的研究方向。
+Introduction  transformer利用注意力机制，已经成为许多NLP任务的主要模型，最近的主要模型是自监督，首先在大型数据集上进行预训练，然后针对小样本进行下游任务的微调，如GPT、BERT等。
+在CV领域，transformer出现之前，一直是卷积网络占据主导，后来通过向卷积网络中添加注意力模型或使用纯注意力模型，但在流行的基准上，纯注意力模型仍然低于最先进的CNN模型。 如上图所示，在过去一年多中，已经提出了数百个基于transformer的各种视觉模型，我们将基本任务分为三类：分类、检测和分割；同时根据数据流进行分类：图像、点云和多流数据；如下图所示：
+本文中，旨在对视觉transformer进行更全面的回顾和更系统的分类：
+（1）Comprehensiveness &amp;amp; Readability（全面性和可读性）：选择具有代表性的进行详细介绍，简单介绍其他工作，从单一角度对模型进行分析，并对他们的联系进行分析；
+（2）Intuitive Comparison（更直观的比较）：对不同的数据集和限制进行了多个横纵对比，并为每个任务总结了一系列的组件，包括：拥有层次backbone的浅层局部卷积，用于检测器的空间注意力加速，用于分割的通用掩码预测机制；
+（3）In-depth Analysis（深入分析）：从以下几个方面提供讲解：从传统的序列任务到视觉任务的转换过程，视觉transformer和其他神经网络模型之间的关系，在不同任务中采用的可学习embedding之间的相关性（class token、object query、mask embedding），最后，总结了一些未来的研究方向。
+Original Transformers  原始的transformer应用于sequence-to-sequence的自回归任务中，使用encoder-decoder架构，使用多头自注意力机制和前馈层完全代替了递归和卷积，如下图所示：
+(Multi-Head) Attention Mechanism  单头自注意力机制分为两部分：将输入序列映射成三个不同的向量：Q、K和V；利用Q和K进行查询，将注意力分数分配给V，并更新输出向量，其计算公式如下所示： $$ Q=XW^{Q},K=XW^{K},V=XW^{V} $$ $$ Attention(Q,K,V)=Softmax(\frac{QK^{T}}{\sqrt{d_{k}}})V $$ 多头自注意力机制就是并行多个单头自注意力机制，并对输出结果拼接起来得到最终输出。
+Position-wise Feed-Forward Networks  将多头自注意力机制的输出经过两个前馈层FFN： $$ FFN(x)=RELU(W_{1}x&#43;b_{1})W_{2}&#43;b_{2} $$
+Positional Encoding  由于transformer对输入进行并行的处理，因此忽视了序列的顺序，为了引入顺序信息，提出添加一个位置embedding。
+Transformer Model 上图展示了encoder-decoder架构的整体transformer模型，由$N$个encoder块组成，每个encoder块包含两个子层：MHSA和FFN；还有$N$个decoder块，与encoder相比，decoder块中添加了多头交叉注意力层，以聚合decoder的embedding和encoder的输出。所有子层都采用残差连接和层归一化。
+Transformer For Classification 随着transformer在NLP领域的发展，许多研究试图将transformer用于图像分类，如上图所示。首先介绍全注意力网络和ViT，其证明了transformer的有效性；接着讨论了利用transformer增强卷积网络的方式提高卷积网络的性能；根据卷积网络的层次结构，分层transformer用金字塔结构取代了固定分辨率的柱状结构；最后对其进行了直观的比较和讨论。
+Original Visual Transformer  SANet用注意力完全取代卷积，提出了Stand-Alone self-attention network，给定resnet架构，将每层中的卷积替换为局部空间自注意力层；Fully-Attentional Network由一个transformer架构和二次位置编码组成，并证明了一个卷积层可以用一个带有相对位置编码的多头自注意力层来近似。
+ViT进一步探索了大规模预训练transformer的有效性，ViT将输入图像分割为patch，并将其flatten成为序列，添加位置embedding作为输入，如下图所示。与BERT类似，引入class token进行最终的分类。然而，在有限的训练样本限制下，ViT泛化能力容易受到限制。 Transformer Enhanced CNNs  最近的一些方法试图将transformer集成到卷积网络中，以增强特征表示。" />
+  <meta name="description" content="A Survey of Visual Transformers
+Abstract  transformer是一种基于注意力机制的encoder-decoder模型，首次在NLP领域提出，后来被应用在CV领域中，并证实了transformer的有效性。在本文中，根据三种不同的任务分类，总结了100多个不同的transformer模型，并提出了未来三个有前景的研究方向。
+Introduction  transformer利用注意力机制，已经成为许多NLP任务的主要模型，最近的主要模型是自监督，首先在大型数据集上进行预训练，然后针对小样本进行下游任务的微调，如GPT、BERT等。
+在CV领域，transformer出现之前，一直是卷积网络占据主导，后来通过向卷积网络中添加注意力模型或使用纯注意力模型，但在流行的基准上，纯注意力模型仍然低于最先进的CNN模型。 如上图所示，在过去一年多中，已经提出了数百个基于transformer的各种视觉模型，我们将基本任务分为三类：分类、检测和分割；同时根据数据流进行分类：图像、点云和多流数据；如下图所示：
+本文中，旨在对视觉transformer进行更全面的回顾和更系统的分类：
+（1）Comprehensiveness &amp;amp; Readability（全面性和可读性）：选择具有代表性的进行详细介绍，简单介绍其他工作，从单一角度对模型进行分析，并对他们的联系进行分析；
+（2）Intuitive Comparison（更直观的比较）：对不同的数据集和限制进行了多个横纵对比，并为每个任务总结了一系列的组件，包括：拥有层次backbone的浅层局部卷积，用于检测器的空间注意力加速，用于分割的通用掩码预测机制；
+（3）In-depth Analysis（深入分析）：从以下几个方面提供讲解：从传统的序列任务到视觉任务的转换过程，视觉transformer和其他神经网络模型之间的关系，在不同任务中采用的可学习embedding之间的相关性（class token、object query、mask embedding），最后，总结了一些未来的研究方向。
+Original Transformers  原始的transformer应用于sequence-to-sequence的自回归任务中，使用encoder-decoder架构，使用多头自注意力机制和前馈层完全代替了递归和卷积，如下图所示：
+(Multi-Head) Attention Mechanism  单头自注意力机制分为两部分：将输入序列映射成三个不同的向量：Q、K和V；利用Q和K进行查询，将注意力分数分配给V，并更新输出向量，其计算公式如下所示： $$ Q=XW^{Q},K=XW^{K},V=XW^{V} $$ $$ Attention(Q,K,V)=Softmax(\frac{QK^{T}}{\sqrt{d_{k}}})V $$ 多头自注意力机制就是并行多个单头自注意力机制，并对输出结果拼接起来得到最终输出。
+Position-wise Feed-Forward Networks  将多头自注意力机制的输出经过两个前馈层FFN： $$ FFN(x)=RELU(W_{1}x&#43;b_{1})W_{2}&#43;b_{2} $$
+Positional Encoding  由于transformer对输入进行并行的处理，因此忽视了序列的顺序，为了引入顺序信息，提出添加一个位置embedding。
+Transformer Model 上图展示了encoder-decoder架构的整体transformer模型，由$N$个encoder块组成，每个encoder块包含两个子层：MHSA和FFN；还有$N$个decoder块，与encoder相比，decoder块中添加了多头交叉注意力层，以聚合decoder的embedding和encoder的输出。所有子层都采用残差连接和层归一化。
+Transformer For Classification 随着transformer在NLP领域的发展，许多研究试图将transformer用于图像分类，如上图所示。首先介绍全注意力网络和ViT，其证明了transformer的有效性；接着讨论了利用transformer增强卷积网络的方式提高卷积网络的性能；根据卷积网络的层次结构，分层transformer用金字塔结构取代了固定分辨率的柱状结构；最后对其进行了直观的比较和讨论。
+Original Visual Transformer  SANet用注意力完全取代卷积，提出了Stand-Alone self-attention network，给定resnet架构，将每层中的卷积替换为局部空间自注意力层；Fully-Attentional Network由一个transformer架构和二次位置编码组成，并证明了一个卷积层可以用一个带有相对位置编码的多头自注意力层来近似。
+ViT进一步探索了大规模预训练transformer的有效性，ViT将输入图像分割为patch，并将其flatten成为序列，添加位置embedding作为输入，如下图所示。与BERT类似，引入class token进行最终的分类。然而，在有限的训练样本限制下，ViT泛化能力容易受到限制。 Transformer Enhanced CNNs  最近的一些方法试图将transformer集成到卷积网络中，以增强特征表示。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">Visual Transformers综述</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-06-12 00:00:00 UTC">
+                12 Jun 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>A Survey of Visual Transformers</p>
+<h2 id="abstract">Abstract</h2>
+<p>    transformer是一种基于注意力机制的encoder-decoder模型，首次在NLP领域提出，后来被应用在CV领域中，并证实了transformer的有效性。在本文中，根据三种不同的任务分类，总结了100多个不同的transformer模型，并提出了未来三个有前景的研究方向。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    transformer利用注意力机制，已经成为许多NLP任务的主要模型，最近的主要模型是自监督，首先在大型数据集上进行预训练，然后针对小样本进行下游任务的微调，如GPT、BERT等。<br>
+    在CV领域，transformer出现之前，一直是卷积网络占据主导，后来通过向卷积网络中添加注意力模型或使用纯注意力模型，但在流行的基准上，纯注意力模型仍然低于最先进的CNN模型。
+<img src="/img/vt1-1.PNG" alt="">
+    如上图所示，在过去一年多中，已经提出了数百个基于transformer的各种视觉模型，我们将基本任务分为三类：分类、检测和分割；同时根据数据流进行分类：图像、点云和多流数据；如下图所示：</p>
+<p><img src="/img/vt1-2-1.PNG" alt="">
+<img src="/img/vt1-2-2.PNG" alt="">
+<img src="/img/vt1-2-3.PNG" alt="">
+<img src="/img/vt1-2-4.PNG" alt="">
+<img src="/img/vt1-2-5.PNG" alt="">
+    本文中，旨在对视觉transformer进行更全面的回顾和更系统的分类：<br>
+    （1）Comprehensiveness &amp; Readability（全面性和可读性）：选择具有代表性的进行详细介绍，简单介绍其他工作，从单一角度对模型进行分析，并对他们的联系进行分析；<br>
+    （2）Intuitive Comparison（更直观的比较）：对不同的数据集和限制进行了多个横纵对比，并为每个任务总结了一系列的组件，包括：拥有层次backbone的浅层局部卷积，用于检测器的空间注意力加速，用于分割的通用掩码预测机制；<br>
+    （3）In-depth Analysis（深入分析）：从以下几个方面提供讲解：从传统的序列任务到视觉任务的转换过程，视觉transformer和其他神经网络模型之间的关系，在不同任务中采用的可学习embedding之间的相关性（class token、object query、mask embedding），最后，总结了一些未来的研究方向。</p>
+<h2 id="original-transformers">Original Transformers</h2>
+<p>    原始的transformer应用于sequence-to-sequence的自回归任务中，使用encoder-decoder架构，使用多头自注意力机制和前馈层完全代替了递归和卷积，如下图所示：</p>
+<p><img src="/img/vt1-3.PNG" alt=""></p>
+<h3 id="multi-head-attention-mechanism">(Multi-Head) Attention Mechanism</h3>
+<p>    单头自注意力机制分为两部分：将输入序列映射成三个不同的向量：Q、K和V；利用Q和K进行查询，将注意力分数分配给V，并更新输出向量，其计算公式如下所示：
+$$
+Q=XW^{Q},K=XW^{K},V=XW^{V}
+$$
+$$
+Attention(Q,K,V)=Softmax(\frac{QK^{T}}{\sqrt{d_{k}}})V
+$$
+    多头自注意力机制就是并行多个单头自注意力机制，并对输出结果拼接起来得到最终输出。</p>
+<h3 id="position-wise-feed-forward-networks">Position-wise Feed-Forward Networks</h3>
+<p>    将多头自注意力机制的输出经过两个前馈层FFN：
+$$
+FFN(x)=RELU(W_{1}x+b_{1})W_{2}+b_{2}
+$$</p>
+<h3 id="positional-encoding">Positional Encoding</h3>
+<p>    由于transformer对输入进行并行的处理，因此忽视了序列的顺序，为了引入顺序信息，提出添加一个位置embedding。</p>
+<h3 id="transformer-model">Transformer Model</h3>
+<p><img src="/img/vt1-4.PNG" alt="">
+    上图展示了encoder-decoder架构的整体transformer模型，由$N$个encoder块组成，每个encoder块包含两个子层：MHSA和FFN；还有$N$个decoder块，与encoder相比，decoder块中添加了多头交叉注意力层，以聚合decoder的embedding和encoder的输出。所有子层都采用残差连接和层归一化。</p>
+<h2 id="transformer-for-classification">Transformer For Classification</h2>
+<p><img src="/img/vt1-5.PNG" alt="">
+    随着transformer在NLP领域的发展，许多研究试图将transformer用于图像分类，如上图所示。首先介绍全注意力网络和ViT，其证明了transformer的有效性；接着讨论了利用transformer增强卷积网络的方式提高卷积网络的性能；根据卷积网络的层次结构，分层transformer用金字塔结构取代了固定分辨率的柱状结构；最后对其进行了直观的比较和讨论。</p>
+<h3 id="original-visual-transformer">Original Visual Transformer</h3>
+<p>    <em><strong>SANet</strong></em>用注意力完全取代卷积，提出了Stand-Alone self-attention network，给定resnet架构，将每层中的卷积替换为局部空间自注意力层；<em><strong>Fully-Attentional Network</strong></em>由一个transformer架构和二次位置编码组成，并证明了一个卷积层可以用一个带有相对位置编码的多头自注意力层来近似。<br>
+    <em><strong>ViT</strong></em>进一步探索了大规模预训练transformer的有效性，ViT将输入图像分割为patch，并将其flatten成为序列，添加位置embedding作为输入，如下图所示。与BERT类似，引入class token进行最终的分类。然而，在有限的训练样本限制下，ViT泛化能力容易受到限制。
+<img src="/img/vt1-6.PNG" alt=""></p>
+<h3 id="transformer-enhanced-cnns">Transformer Enhanced CNNs</h3>
+<p>    最近的一些方法试图将transformer集成到卷积网络中，以增强特征表示。<br>
+    <em><strong>VTs</strong></em>将输入图像的语义概念输入到不同的通道中，通过VT-block将其联系起来；<em><strong>BoTNet</strong></em>由连续的MHSA组成的bottleneck块组成，并采用相对位置编码进一步模拟原始transformer。</p>
+<h3 id="cnn-enhanced-transformer">CNN Enhanced Transformer</h3>
+<p>    归纳偏置在卷积中表现为局部性和平移不变性，卷积网络可以在偏置的帮助下有效的处理图像，因此，最近的工作研究利用一个合适的卷积偏置来增强transformer。<br>
+    <em><strong>DeiT</strong></em>利用数据蒸馏的方式来辅助transformer，其中卷积网络作为teacher网络，ViT作为student网络，teacher网络通过soft蒸馏的方式将归纳偏置传递给student网络，并通过实验表明，卷积网络是一个比transformer更好的教师模型。<br>
+    <em><strong>ConViT</strong></em>通过添加一个平行的卷积分支，以引入归纳偏置；<em><strong>CeiT</strong></em>和<em><strong>LocalViT</strong></em>通过在FFN中直接添加深度卷积来提取局部信息；基于位置编码，<em><strong>ResT</strong></em>和<em><strong>CPVT</strong></em> 试图使卷积的固有位置信息适应于任意输入大小，而不是对位置embedding进行插值；<em><strong>CvT</strong></em>利用卷积代替线性投影层和位置embedding。</p>
+<h3 id="local-attention-enhanced-transformer">Local Attention Enhanced Transformer</h3>
+<p>    ViT中的粗粒度信息忽视了图像的布局细节信息，除了卷积的方式，研究者还提出局部注意力机制来增强局部信息的提取能力。
+<img src="/img/vt1-7.PNG" alt="">
+    一个代表性的模型是<em><strong>Swin Transformer</strong></em>，与TSM类似（上图中的a），Swin利用沿空间维度的移位窗口来建模局部和全局特征。具体来说，两个连续的窗口注意力层可以融合交叉窗口之间的信息（如上图中的b-c），类似于卷积中的感受野扩张。<br>
+    <em><strong>TNT</strong></em>利用inner transformer层和outer transformer层来聚合patch级和像素级表示，每一层中都由两个block组成，inner block对每个patch内部的像素进行建模，outer block提取patch间的全局信息。<br>
+    <em><strong>Twins</strong></em>采用一种空间可分离的自注意力机制，类似于深度可分离卷积或窗口级的TNT，以建模局部-全局表示。<br>
+    <em><strong>ViL</strong></em>利用一系列的局部embedding替换单个class token，这些局部embedding只进行内部注意计算和2维空间邻居之间的交互。<br>
+    <em><strong>VOLO</strong></em>提出了一个outlook注意力，类似于动态patch卷积，包括三个步骤：unfold、线性注意力和refold。</p>
+<h3 id="hierarchical-transformer">Hierarchical Transformer</h3>
+<p>    ViT为具有固定分辨率的柱状结构，因此忽视了细粒度的特征，并且计算量很大。<br>
+    <em><strong>Tokens-to-Token</strong></em>（T2T ViT）引入分层transformer，使用overlapping操作进行降采样，但是内存使用量和计算量很大。<br>
+    <em><strong>PVT</strong></em>利用不重叠的patch分区来减少特征图的大小，同时提出空间注意力减少层（SRA）来减少计算成本，PVT将transformer应用在许多密集预测任务中，通常需要大量的输入和细粒度特征。<br>
+    此外，<em><strong>PiT</strong></em>和<em><strong>CvT</strong></em>分别利用池化和卷积操作对token进行下采样，CvT通过卷积代替线性投影层，并改进了PVT的SRA模块，同时，CvT可以适应任意大小的输入，不需要进行位置embedding插值。</p>
+<h3 id="deep-transformer">Deep Transformer</h3>
+<p>    理论上，增加模型的深度可以提高其性能。在Deep Transformer中，更深层的特征往往不那么具有代表性（attention collapse），并且patch被映射到难以区分的潜在表示中（patch over-smoothing）。为了解决上述限制，目前的方法从两个方面来解决。<br>
+    从<strong>模型的结构</strong>来看，<em><strong>CaiT</strong></em>提出有效的类别注意力（Class-attention），包括两个阶段：（1）没有class token的多层自注意力阶段，在每一层，使用可学习的矩阵动态的更新通道权重；（2）使用冻结的class token的最后几个少数的类注意力阶段，后来的class token用来建模全局表征，类似encoder-decoder结构的DETR模型。这种方式是基于一个假设，即class token对正向传播中patch embedding的梯度无效。虽然该模型仍然存在上述两个问题，但仍然在很大程度上保留了不同头部之间的注意力图的多样性。<em><strong>Deep ViT</strong></em>利用线性层聚合跨头部的注意力图，以生成新的注意力图，来增加跨层的特征多样性。Refiner应用线性层来扩展注意力图的维度（间接增加头部数量），以促进多样性。<br>
+    从<strong>训练策略</strong>来看，Gong等人（Vision transformers with patch diversification）提出三个patch多样性损失函数，以促进patch的多样性；patch级别的混合交叉损失混合两个不同的图像，使每个patch只关注来自同一个图像的patch，而忽视不相关的patch。</p>
+<h3 id="transformers-with-self-supervised-learning">Transformers with Self-Supervised Learning</h3>
+<p>    最近的工作试图将视觉transformer引入自监督模型中。<br>
+    对于生成模型，<em><strong>iGPT</strong></em>是一个用于自监督视觉学习的图像生成预训练transformer，与ViT不同，iGPT直接调整图像的大小并flatten到一个更低分辨率的序列。将序列输入到模型中进行自回归像素预测。BeiT（BERT-style visual Transformer）在潜在特征空间中重建掩码图像。<br>
+    在<em><strong>DeiT</strong></em>之后，<em><strong>DINO</strong></em>将teacher-student方法扩展到自监督学习中，核心思想有三点： a momentum encoder（teacher），an online encoder（student），a standard cross-entropy loss。</p>
+<h3 id="discussion">Discussion</h3>
+<h4 id="algorithm-evaluation-and-comparative-analysis">Algorithm Evaluation and Comparative Analysis</h4>
+<p><img src="/img/vt1-8.PNG" alt="">
+    （a）输入大小为224×224时，模型的参数与精度的比较，圆的大小表示浮点运算次数；<br>
+    （b）更高分辨率的输入，448×448，比较模型的性能；<br>
+    （c）具有预训练模型的一些精度比较。<br>
+    <strong>总结</strong>：<br>
+    （1）与大多数结构改进的方法相比，DeiT和LV-ViT模型的基本训练策略对各种模型、任务和输入更为适用；<br>
+    （2）局部信息对transformer时不可或缺的，可以从VOLO和Swin看出；<br>
+    （3）Deep Transformer，如Refined-ViT和CaiT，有很大的潜力；<br>
+    （4）CeiT和CvT模型中小型数据集上具有显著优势，说明这类轻量级的混合注意力模块值得进一步探索。</p>
+<h2 id="overview-of-development-trend-on-visual-transformers">Overview of Development trend on Visual Transformers</h2>
+<p>    目前的视觉transformer模型主要是在传统的transformer架构（ViT，iGPT）或CV中基于注意力的模型（VTs，BoTNet）上进行重新设计。<br>
+    许多方法开始将CNN的层次结构扩展到transformer结构中，即利用一些方式对特征进行降采样；此外，还有一些方法修改内部组件，以进一步增强图像处理能力，如位置embedding、MHSA、MLP。<br>
+    Transformer的下一个浪潮是局部性，目前许多研究将局部注意力机制或卷积引入，将局部信息引入到transformer中。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

@@ -6,7 +6,139 @@
     <description>Recent content on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 02 Jun 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 15 Jun 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>CoAtNet</title>
+      <link>https://gdy0924.github.io/posts/coatnet/</link>
+      <pubDate>Wed, 15 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/coatnet/</guid>
+      <description>CoAtNet: Marrying Convolution and Attention for All Data Sizes
+Abstract  在本文中，我们证明了，虽然transformer有更大的潜力，但是由于缺乏正确的归纳偏置，其泛化性可能要比卷积网络更差。为了结合两种网络的优势，我们提出了CoAtNet（Convolution and self-Attention），是一种混合模型：（1）深度逐通道卷积和自注意力机制通过简单的相对注意力来进行统一；（2）有规则的叠加卷积层和注意力层在提高模型的泛化性和效率方面有惊人的效果。
+Introduction  虽然ViT的效果很好，但他在数据集量少的情况下，仍然不如卷积网络。这表明，transformer层可能缺少卷积网络所拥有的归纳偏置，因此需要大量的数据和计算量来弥补。最近很多工作，试图将归纳偏置来引入transformer，通过引入局部感受野、引入卷积层或带有卷积的FFN层。
+我们的研究表明，卷积网络具有更好的归纳偏置先验，并且收敛速度快，而注意力机制的模型能力/容量更高，更能从大型的数据集上获益；结合卷积和注意力，可以更好的提高模型的泛化性和能力。我们提出两个想法：（1）逐通道的卷积可以有效的合并到注意力层中；（2）简单的堆叠卷积层和注意力层，可以提高模型的泛化性和能力。基于以上两点，我们提出了CoAtNet，结合了卷积和transformer的优势。
+Model  我们将如何最有效的组合卷积和注意力这个问题分为两部分：
+（1）如何在一个block中结合；
+（2）如何将不同类型的block垂直叠加在一起，形成一个完整的网络。
+Merging Convolution and Self-Attention  对于卷积，我们关注MBConv（如下图所示），MBConv主要有两个特点：
+（1）采用了Depthwise卷积，因此相比于传统卷积，Depthwise Conv的参数能够大大减少；
+（2）采用了“inverted bottleneck”的结构，即先升维再降维，在原来的resnet结构中，输入维度是大的，先降维，然后为了能够相加，再升维，在transformer block的FFN层也是先升维再降维。
+除了inverted bottleneck的相似性，我们还注意到，深度卷积（逐通道卷积）与自注意力机制都可以表示为一个预先定义的感受野中的每维的加权和。
+具体来说，卷积依赖一个固定的卷积核从局部的感受野接收信息： $$ y_{i}=\sum_{j\in L(i)}w_{i-j}\odot x_{j} $$ 其中，$x_{i},y_{i}$分别表示位置$i$的输入和输出，$L(i)$表示$i$的局部邻域。
+相比之下，自注意力的感受野为整个空间位置，并归一化两两的相似性： $$ y_{i}=\sum_{j\in G}\frac{exp(x_{i}^{T}x_{j})}{\sum_{k\in G}exp(x_{i}^{T}x_{k})} x_{j} $$ 其中，$G$为全局的空间。
+我们先分析一下他们的优势和劣势：
+（1）逐通道卷积核$w_{i-j}$是一个独立于输入的静态的值，而注意力权重$A_{i,j}$是依赖于输入的动态的值，因此，自注意力更容易捕获到不同位置的复杂交互信息，但是这种灵活性，带来了过拟合的风险，特别是在数据有限的情况下；
+（2）对于给定的任何位置对$(i,j)$，卷积权重$w_{i-j}$只关注它们之间的相对位移，即$i-j$，这被称为平移不变性，而transformer缺乏这一特性，这也可以解释为什么在数据集不多的情况下，卷积网络通常比transformer更好；
+（3）感受野的大小是注意力机制核卷积之间最重要的区别，更大的感受野可以提供更多的上下文信息，可能会提升网络的性能，因此，在视觉中使用自注意力机制是为了全局的感受野，然而自注意力机制的计算复杂度为二次方，也是需要权衡的。 上表为卷积和自注意力的优势比较，那么一个理想的模型应该是结合以上三个优势，基于上述两个公式，一个简单的想法就是：将静态全局卷积核与自注意力权重矩阵相加，在softmax之前或者之后，即： $$ y_{i}^{post}=\sum_{j\in G}(\frac{exp(x_{i}^{T}x_{j})}{\sum_{k\in G}exp(x_{i}^{T}x_{k})}+w_{i-j}) x_{j} $$ $$ y_{i}^{pre}=\sum_{j\in G}\frac{exp(x_{i}^{T}x_{j}+w_{i-j})}{\sum_{k\in G}exp(x_{i}^{T}x_{k}+w_{i-k})} x_{j} $$ 为了在不增加参数数量的情况下引入全局卷积核，我们将$w_{i-j}$设置为一个标量，而不是公式1中的一个向量。我们使用pre-normalization作为CoAtNet模型的关键组成部分。
+Vertical Layout Design  将卷积和注意力结合起来之后，接下来要考虑如何堆叠整个网络，如果直接使用上述公式，其复杂度是二次方的，会影响速度，因此，我们考虑了三种方式：</description>
+    </item>
+    
+    <item>
+      <title>VOLO</title>
+      <link>https://gdy0924.github.io/posts/volo/</link>
+      <pubDate>Wed, 15 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/volo/</guid>
+      <description>VOLO: Vision Outlooker for Visual Recognition
+Abstract  限制ViT的性能的主要原因是：对细粒度的特征编码效率较低，为了解决这个问题，我们提出新的outlook attention，并提出了一个简单的架构Vision Outlooker (VOLO)。与粗粒度的全局注意力不同，outlook attention能够有效的提取细粒度特征和上下文信息。
+Introduction  限制ViT的一个主要因素是：分割得到的patch token，提取细粒度特征和引入上下文编码是低效率的。在本文中，我们提出了一种新的注意力机制：Outlooker，能够有效的提取细粒度特征和上下文信息；同时，利用线性投影，而摆脱了二次复杂度。
+基于Outlooker，我们提出了一个简单的模型架构：VOLO。VOLO通过一个两阶段的体系结构，实现了细粒度的token表示和全局信息的聚合；具体来说，给定一个224×224的图像，在使用自注意力机制在粗粒度上构建全局依赖以前，先在较小的patch上，使用多个Outlooker在细粒度特征上进行token表示。
+Method  可以分为两阶段：
+（1）堆叠的Outlooker，以生成细粒度级别的token表征；
+（2）一系列transformer block聚合全局信息。
+Outlooker  Outlooker由一个对空间信息编码的outlook attention层和一个用于通道之间信息交互的MLP层组成。
+对对于给定的C维输入$X\in \mathbb{R}^{H\times W\times C}$，Outlooker可以写作： $$ \tilde{X} = OutlookAtt(LN(X))+X $$ $$ Z=MLP(LN(\tilde{X}))+\tilde{X} $$
+Outlook Attention 如上图所示，主要思想有两点：
+（1）每个空间位置的局部特征足以生成注意力权重系数来聚合其临近的特征；
+（2）密集的局部空间特征聚集可以有效的编码细粒度信息。
+对于每个空间位置$(i,j)$，outlook注意力在以$(i,j)$为中心、大小为$K×K$的局部窗口内，计算相邻位置的相似性。与自注意力机制中使用Q-K矩阵相乘来得到权重系数不同，outlook通过reshape来简化这个过程。
+对于给定的输入$X$，每个C维的token首先经过线性投影，使用两个线性层，$W_{A}\in \mathbb{R}^{C\times K^{4}}$和$W_{V}\in \mathbb{R}^{C\times C}$，分别得到outlook权重$A\in \mathbb{R}^{H\times W\times K^{4}}$和value$V\in \mathbb{R}^{H\times W\times C}$，$V_{\Delta _ {i,j}}\in \mathbb{R}^{C\times K^{2}}$表示以$(i,j)$为中心的局部窗口内的值： $$ V_{\Delta _ {i,j}}=\lbrace V_{i+p-\left \lfloor \frac{K}{2} \right \rfloor,j+q-\left \lfloor \frac{K}{2} \right \rfloor} \rbrace $$ Outlook attention</description>
+    </item>
+    
+    <item>
+      <title>Early Convolutions Help Transformers See Better</title>
+      <link>https://gdy0924.github.io/posts/early-convolutions-help-transformers-see-better/</link>
+      <pubDate>Tue, 14 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/early-convolutions-help-transformers-see-better/</guid>
+      <description>Early Convolutions Help Transformers See Better Abstract  ViT对优化器的选择非常敏感，如Adam vs. SGD，并且对优化器的超参数和训练的时间长度也很敏感，相比之下，卷积网络更容易优化。在本文中，我们推测是由于ViT模型的patchify stem，对输入图像应用卷积核大小为p×p、步幅为p的卷积。这种大卷积核和大步幅，与卷积的设计思路是相违背的。为了测试这种设计是否会导致问题，我们用少量堆叠的3×3大小、步幅为2的卷积代替ViT中的方式。虽然提出的模型和ViT大多数部分计算相同，但是我们发现这种早期的细小的变化导致了模型在对优化器的敏感性和最终的准确性的不同。在ViT中使用卷积stem显著提高了优化器的稳定性和性能。
+Introduction  ViT使用多头自注意力机制的全局处理代替了卷积中的局部处理，我们希望这种设计有潜力提高视觉表征。但是，ViT与卷积网络还是有很大差异，ViT对优化器的选择、针对特定数据集的超参数、训练的时间长度、网络的深度等等，都很敏感。
+相比之下，卷积网络就更好优化。在本文中，我们加深问题出现在ViT早期对图像的处理阶段，即ViT将图像分割为p×p大小的不重叠的patch，patchify stem通过卷积核大小为p×p、步幅为p的卷积来实现，但是这种大卷积核和大步幅，与卷积的设计思路是相违背的，卷积中，最佳的收敛方式是小卷积核的堆叠，如卷积核大小为3×3，步幅为2。
+为了验证这一假设，我们将ViT早期处理图像的方式进行改变，使用5层卷积来代替，如下图所示。为了对其计算量，删掉了一个transformer block。我们观察到，尽管两种ViT设计中的绝大多数计算量是相同的，但早期处理的微小变化导致了两个模型在对优化器的敏感性和最终的准确性方面有所不同。
+我们推测，将卷积添加在ViT的早期阶段可能是一个关键，与hybrid ViT相比，hybrid ViT使用了40个卷积层，与原始的ViT并没有改进，与ConViT（ConViT:Improving vision transformers with soft convolutional inductive biases.）的发现一致：早期的transformer块比后来的transformer块更喜欢学习局部信息。
+探索CNN与ViT的混合模型并不是我们的目标，相反，我们证明了简单的使用小卷积就足以显著改善模型的优化。
+Related Work Convolutional neural networks (CNNs)  卷积网络通常使用SGD进行训练，并且是很容易优化的。
+Self-attention in vision models  transformer使用多头自注意力机制，对全局信息进行处理，比卷积更加通用。
+Vision transformer (ViT)  ViT将图像分割成不重叠的大小为16×16的patch，通过线性层的到patch embedding输入到模型中，在使用大规模数据集时获得了很好的效果，但其对一些训练细节很敏感，如相比于SGD，用Adam的效果更；与CNN相比，ViT通常时更难优化的。
+ViT improvements  更多的正则化和更强的数据增强，可以提高ViT的精度，我们也探索了其他的一些细节。
+Discussion  与引入局部先验不同，我们的研究重点是对ViT进行最小的修改来提高可优化性，并得到结果：只在stem上添加5层卷积，即可使ViT通过Adam和SGD进行优化，同时对学习速率和权重衰减等超参数不那么敏感。
+Vision Transformer Architectures  我们将输入transformer块之前的网络部分称为stem。ViT的stem是一个步幅为p、大小为p×p的卷积，称之为patchify stem，我们保留卷积的stem，使用多层的重叠卷积来代替。
+我们使用最经典的堆叠的3×3卷积，并最后添加一个1×1卷积以匹配维度，将224×224的图像下采样到14×14，并且遵循3×3卷积，步幅为2。
+将CNN与ViT进行混合，将resnet-50作为ViT的stem，共有40层卷积层，但在我们的工作中，只有5-7层，并且我们的目标不是设计混合ViT模型，而是研究遵循卷积网络设计思想，用最小的卷积stem来代替patchify stem的效果。
+下表为ViT与本文提出的修改ViT的模型结构：$ViT_{p}$：原始的ViT模型；$ViT_{c}$：用卷积替换的ViT模型；为了匹配复杂度，$ViT_{c}$中减少了一个transformer block。 Stability Experiments  RegNetY是效果最好的CNN网络，并且很好优化。</description>
+    </item>
+    
+    <item>
+      <title>Visual Transformers综述</title>
+      <link>https://gdy0924.github.io/posts/visual-transformers%E7%BB%BC%E8%BF%B0/</link>
+      <pubDate>Sun, 12 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/visual-transformers%E7%BB%BC%E8%BF%B0/</guid>
+      <description>A Survey of Visual Transformers
+Abstract  transformer是一种基于注意力机制的encoder-decoder模型，首次在NLP领域提出，后来被应用在CV领域中，并证实了transformer的有效性。在本文中，根据三种不同的任务分类，总结了100多个不同的transformer模型，并提出了未来三个有前景的研究方向。
+Introduction  transformer利用注意力机制，已经成为许多NLP任务的主要模型，最近的主要模型是自监督，首先在大型数据集上进行预训练，然后针对小样本进行下游任务的微调，如GPT、BERT等。
+在CV领域，transformer出现之前，一直是卷积网络占据主导，后来通过向卷积网络中添加注意力模型或使用纯注意力模型，但在流行的基准上，纯注意力模型仍然低于最先进的CNN模型。 如上图所示，在过去一年多中，已经提出了数百个基于transformer的各种视觉模型，我们将基本任务分为三类：分类、检测和分割；同时根据数据流进行分类：图像、点云和多流数据；如下图所示：
+本文中，旨在对视觉transformer进行更全面的回顾和更系统的分类：
+（1）Comprehensiveness &amp;amp; Readability（全面性和可读性）：选择具有代表性的进行详细介绍，简单介绍其他工作，从单一角度对模型进行分析，并对他们的联系进行分析；
+（2）Intuitive Comparison（更直观的比较）：对不同的数据集和限制进行了多个横纵对比，并为每个任务总结了一系列的组件，包括：拥有层次backbone的浅层局部卷积，用于检测器的空间注意力加速，用于分割的通用掩码预测机制；
+（3）In-depth Analysis（深入分析）：从以下几个方面提供讲解：从传统的序列任务到视觉任务的转换过程，视觉transformer和其他神经网络模型之间的关系，在不同任务中采用的可学习embedding之间的相关性（class token、object query、mask embedding），最后，总结了一些未来的研究方向。
+Original Transformers  原始的transformer应用于sequence-to-sequence的自回归任务中，使用encoder-decoder架构，使用多头自注意力机制和前馈层完全代替了递归和卷积，如下图所示：
+(Multi-Head) Attention Mechanism  单头自注意力机制分为两部分：将输入序列映射成三个不同的向量：Q、K和V；利用Q和K进行查询，将注意力分数分配给V，并更新输出向量，其计算公式如下所示： $$ Q=XW^{Q},K=XW^{K},V=XW^{V} $$ $$ Attention(Q,K,V)=Softmax(\frac{QK^{T}}{\sqrt{d_{k}}})V $$ 多头自注意力机制就是并行多个单头自注意力机制，并对输出结果拼接起来得到最终输出。
+Position-wise Feed-Forward Networks  将多头自注意力机制的输出经过两个前馈层FFN： $$ FFN(x)=RELU(W_{1}x+b_{1})W_{2}+b_{2} $$
+Positional Encoding  由于transformer对输入进行并行的处理，因此忽视了序列的顺序，为了引入顺序信息，提出添加一个位置embedding。
+Transformer Model 上图展示了encoder-decoder架构的整体transformer模型，由$N$个encoder块组成，每个encoder块包含两个子层：MHSA和FFN；还有$N$个decoder块，与encoder相比，decoder块中添加了多头交叉注意力层，以聚合decoder的embedding和encoder的输出。所有子层都采用残差连接和层归一化。
+Transformer For Classification 随着transformer在NLP领域的发展，许多研究试图将transformer用于图像分类，如上图所示。首先介绍全注意力网络和ViT，其证明了transformer的有效性；接着讨论了利用transformer增强卷积网络的方式提高卷积网络的性能；根据卷积网络的层次结构，分层transformer用金字塔结构取代了固定分辨率的柱状结构；最后对其进行了直观的比较和讨论。
+Original Visual Transformer  SANet用注意力完全取代卷积，提出了Stand-Alone self-attention network，给定resnet架构，将每层中的卷积替换为局部空间自注意力层；Fully-Attentional Network由一个transformer架构和二次位置编码组成，并证明了一个卷积层可以用一个带有相对位置编码的多头自注意力层来近似。
+ViT进一步探索了大规模预训练transformer的有效性，ViT将输入图像分割为patch，并将其flatten成为序列，添加位置embedding作为输入，如下图所示。与BERT类似，引入class token进行最终的分类。然而，在有限的训练样本限制下，ViT泛化能力容易受到限制。 Transformer Enhanced CNNs  最近的一些方法试图将transformer集成到卷积网络中，以增强特征表示。</description>
+    </item>
+    
+    <item>
+      <title>T2T</title>
+      <link>https://gdy0924.github.io/posts/t2t/</link>
+      <pubDate>Wed, 08 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/t2t/</guid>
+      <description>Tokens-to-Token ViT: Training Vision Transformers from Scratch on ImageNet
+Abstract  ViT将图像分割为patch，经过多个transformer层对特征进行提取，实现分类任务。但是，在中型数据集上从头开始训练时，ViT的性能不如CNN网络。可能有以下几个原因：（1）简单的将图像分割为patch作为token，无法建模重要的局部信息，如相邻像素之间的边和线等，导致训练样本效率低；（2）ViT的backbone中有冗余的注意力计算，导致计算量大，导致对于固定计算预算和有限训练样本不能提取更加丰富的特征。
+为了解决上述问题，我们提出了新的架构Tokens-To-Token Vision Transformer（T2T-ViT），包括：（1）一个层级的Tokens-To-Token的转换，通过递归将相邻的tokens聚合成一个token，即Tokens-To-Token，这样就可以对token周围的局部结构进行建模，并减少token长度；（2）基于CNN架构的deep-narrow视觉transformer架构。
+Introduction  虽然ViT证明了transformer结构在视觉任务中很有前景，但其在中小型数据集从头训练时，效果不如卷积网络。主要有两个限制：（1）输入图像直接生硬的分割为patch，无法建模局部结构，如边和线，因此需要更多的训练样本；（2）ViT的backbone过于冗余，没有与CNN设计相类似，因此导致特征提取丰富度有限并且模型训练困难。 为了验证假设，对ViT和ResNet的特征图进行了可视化，如上图所示：可以看出，ResNet捕捉的特征从局部（conv1）逐渐延伸到全局（conv25），然而，ViT的局部信息建模的很差，但全局信息被捕获到了。因此，可以说ViT直接分割图像为patch，忽视了局部结构；ViT中许多通道为0（红色框所示），表明ViT的backbone不如ResNets。
+我们提出了新的transformer架构，解决上述问题。（1）与ViT中的直接分割patch不同，我们提出了一个渐进的模块，逐步将相邻的tokens聚合为一个token，可以对周围token的局部信息进行建模，并迭代地减少token的长度，具体地说，在T2T模块中，transformer层的输出被reshape成图像，然后进行有重叠的分割，最后通过flatten将patch聚合在一起；（2）为了找到更高效的backbone，参考CNN架构设计，提出了更深更窄的transformer backbone。
+Contributions：
+（1）提出的transformer架构（T2T+高效backbone）在不使用预训练的情况下，效果好于卷积网络；
+（2）提出了一种新的渐进的token方法，可以建模token之间的局部结构；
+（3）证明CNN的更深更窄的架构同样适用于transformer架构，并提出更高效的transformer backbone。
+Related Work Transformers in Vision  ViT证明了纯transformer架构也可以在图像分类上有很好的效果，然而，ViT依赖于大规模数据集，需要进行模型预训练，并且需要大量的计算资源；我们提出的T2T-ViT不需要预训练，也不依赖于大规模数据集。
+Tokens-to-Token ViT  为了解决ViT中简单token和backbone低效的问题，提出了Tokens-to-Token Vision Transformer（T2T-ViT），可以逐步将图像转化为patch，并使用更加高效的backbone。
+T2T-ViT由两部分组成：（1）层级的Tokens-to-Token模块，对图像的局部信息进行建模，逐步减少token的长度；（2）更高效的T2T-ViT backbone。
+Tokens-to-Token: Progressive Tokenization  Tokens-to-Token模块是为了解决ViT中简单分割patch的问题，逐步将图像分割为patch，从而对局部信息进行建模，迭代的减少token的长度。每个T2T包含两个步骤：Re-structurization和Soft Split (SS)，如下图所示： Re-structurization  来自前一层的输出token序列，是通过MSA和MLP处理后得到的，即： $$ T^{&#39;}=MLP(MSA(T)) $$ 然后得到的$T^{&#39;}$将被reshape成空间维度中的图像： $$ I=Reshape(T^{&#39;}) $$ Reshape是将$T^{&#39;}\in \mathbb{R}^{l\times c}$转换为$I\in \mathbb{R}^{h\times w\times c}$，其中，$l$是$T^{&#39;}$的长度，$h,w,c$是图像的高、宽和通道数，并且$l=h×w$
+Soft Split  在reshape成图像$I$之后，对其图像进行Soft Split，以对局部信息进行建模，减少token的长度。
+将图像分割为重叠的patch，每个patch都可以与相邻的patch有关联，分割得到的tokens被连接为一个token，从而从周围的像素中聚合局部信息。</description>
+    </item>
+    
+    <item>
+      <title>TNT</title>
+      <link>https://gdy0924.github.io/posts/tnt/</link>
+      <pubDate>Mon, 06 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/tnt/</guid>
+      <description>Transformer in Transformer
+Abstract  transformer利用注意力机制学习数据的特征，在视觉transformer中，通常将图片划分为局部patch，然后计算patch之间的关系表示。由于图像具有丰富的细节信息，因此分割patch的粒度不足以提取不同尺度和位置的物体信息。在本文，我们提出局部patch的内部信息对构建高性能的transformer是很重要的，提出了一种新的架构Transformer iN Transformer（TNT）。我们将局部patch视为&amp;quot;visual sentences&amp;quot;，将更小的patch视为&amp;quot;visual words&amp;quot;，每个单词的注意力将用给定句子中的其他单词来计算，将单词和句子的特征进行聚合，以提高精度。
+Introduction  虽然transformer在视觉领域已经有了许多不错的模型，但是在目前的模型中，大多遵循ViT中的表示方法，即将输入图像分割为patch，这种方式可以有效的捕捉视觉序列信息，并计算不同patch之间的注意力。局部patch可以找到它们之间的关系和相似性，但是，一些子patch也有很高的相似性，因此，我们提出了一种更精细的图像分割方式，生成视觉序列，以提高精度。
+在本文中，我们提出了一种新的架构：Transformer iN Transformer（TNT），如下图所示。为了增强视觉表征能力，首先将输入图像划分为patch，即visual sentences，然后再将patch进行划分，形成visual words。除了之前的transformer架构提取visual sentences的特征和注意力计算，我们在架构中嵌入了一个子transformer，以提取较小的visual words的特征和细节。每个visual sentences中的visual words使用共享网络来计算注意力，然后，将visual words聚合成相应的visual sentences，该部分的class token也用于后续的分类。通过TNT模型，可以提取细粒度的视觉信息。我们对基准测试和下游任务都进行了一系列实验，证明了TNT的有效性。 Approach Preliminaries  在transformer中，包括多头自注意力机制MSA、MLP和层归一化LN，整个计算流程如下所示： $$ Attention(Q,K,V)=softmax(\frac{QK^{T}}{\sqrt{d_{k}}})V $$ $$ MLP(X)=FC(\sigma (FC(X))),FC(X)=XW+b $$
+Transformer in Transformer  给定一个2维的图像，将其均匀的分割成$n$个patch，$X=[X^{1},X^{2},&amp;hellip;,X^{n}]$，ViT使用transformer来处理patch序列，而没有考虑patch内部的结构。我们提出的TNT网络，学习图像的全局和局部信息。在TNT中，将patch看作图像的visual sentences，每个patch被进一步划分成$m$个子patch，即：一个visual sentences由一系列的visual words组成： $$ X^{i}[x^{i,1},x^{i,2},&amp;hellip;,x^{i,m},] $$ 其中，$x^{i,j}\in \mathbb{R}^{s\times s\times 3}$表示第i个visual sentences中的第j个visual words，$(s,s)$是子patch的尺寸大小。通过线性层，将visual words转换为一系列的word embedding： $$ Y^{i} \rightarrow [y^{i,1},y^{i,2},&amp;hellip;,y^{i,m},],y^{i,j}=FC(Vec(x^{i,j})) $$ 其中，$Vec()$是向量化操作。
+在TNT中，有两个数据流：一个数据流处理visual sentences，另一个数据流处理每个sentence中的visual words。对于word embedding，使用transformer层来处理： $$ Y_{l}^{&amp;lsquo;i}=Y_{l-1}^{i}+MSA(LN(Y_{l-1}^{i})) $$ $$ Y_{l}^{i}=Y_{l}^{&amp;lsquo;i}+MLP(LN(Y_{l}^{&amp;lsquo;i})) $$ 转换后的word embedding表示为$Y_{l}=[Y_{l}^{1},Y_{l}^{2},&amp;hellip;,Y_{l}^{n}]$，可以看作是inner transformer block，表示为$T_{in}$。这个过程计算两个visual words之间的注意力来捕捉关系，如在人脸的一个patch中，眼睛对应的word与眼睛的其他word更相关。</description>
+    </item>
+    
     <item>
       <title>FLASH</title>
       <link>https://gdy0924.github.io/posts/flash/</link>

@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/paper/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/paper/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/volo/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/volo/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Paper",
-      "headline" : "Paper",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "VOLO",
+      "headline" : "VOLO",
+      "description" : "VOLO: Vision Outlooker for Visual Recognition\nAbstract  限制ViT的性能的主要原因是：对细粒度的特征编码效率较低，为了解决这个问题，我们提出新的outlook attention，并提出了一个简单的架构Vision Outlooker (VOLO)。与粗粒度的全局注意力不同，outlook attention能够有效的提取细粒度特征和上下文信息。\nIntroduction  限制ViT的一个主要因素是：分割得到的patch token，提取细粒度特征和引入上下文编码是低效率的。在本文中，我们提出了一种新的注意力机制：Outlooker，能够有效的提取细粒度特征和上下文信息；同时，利用线性投影，而摆脱了二次复杂度。\n基于Outlooker，我们提出了一个简单的模型架构：VOLO。VOLO通过一个两阶段的体系结构，实现了细粒度的token表示和全局信息的聚合；具体来说，给定一个224×224的图像，在使用自注意力机制在粗粒度上构建全局依赖以前，先在较小的patch上，使用多个Outlooker在细粒度特征上进行token表示。\nMethod  可以分为两阶段：\n（1）堆叠的Outlooker，以生成细粒度级别的token表征；\n（2）一系列transformer block聚合全局信息。\nOutlooker  Outlooker由一个对空间信息编码的outlook attention层和一个用于通道之间信息交互的MLP层组成。\n对对于给定的C维输入$X\\in \\mathbb{R}^{H\\times W\\times C}$，Outlooker可以写作： $$ \\tilde{X} = OutlookAtt(LN(X))\u002bX $$ $$ Z=MLP(LN(\\tilde{X}))\u002b\\tilde{X} $$\nOutlook Attention 如上图所示，主要思想有两点：\n（1）每个空间位置的局部特征足以生成注意力权重系数来聚合其临近的特征；\n（2）密集的局部空间特征聚集可以有效的编码细粒度信息。\n对于每个空间位置$(i,j)$，outlook注意力在以$(i,j)$为中心、大小为$K×K$的局部窗口内，计算相邻位置的相似性。与自注意力机制中使用Q-K矩阵相乘来得到权重系数不同，outlook通过reshape来简化这个过程。\n对于给定的输入$X$，每个C维的token首先经过线性投影，使用两个线性层，$W_{A}\\in \\mathbb{R}^{C\\times K^{4}}$和$W_{V}\\in \\mathbb{R}^{C\\times C}$，分别得到outlook权重$A\\in \\mathbb{R}^{H\\times W\\times K^{4}}$和value$V\\in \\mathbb{R}^{H\\times W\\times C}$，$V_{\\Delta _ {i,j}}\\in \\mathbb{R}^{C\\times K^{2}}$表示以$(i,j)$为中心的局部窗口内的值： $$ V_{\\Delta _ {i,j}}=\\lbrace V_{i\u002bp-\\left \\lfloor \\frac{K}{2} \\right \\rfloor,j\u002bq-\\left \\lfloor \\frac{K}{2} \\right \\rfloor} \\rbrace $$ Outlook attention",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -69,15 +69,41 @@ code.has-jax {
       "copyrightYear" : "2022",
       "datePublished": "2022-06-15 00:00:00 \u002b0000 UTC",
       "dateModified" : "2022-06-15 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/paper\/",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/volo\/",
       "keywords" : [  ]
   }
 </script>
-<title>Paper</title>
-  <meta property="og:title" content="Paper" />
+<title>VOLO</title>
+  <meta property="og:title" content="VOLO" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="VOLO: Vision Outlooker for Visual Recognition
+Abstract  限制ViT的性能的主要原因是：对细粒度的特征编码效率较低，为了解决这个问题，我们提出新的outlook attention，并提出了一个简单的架构Vision Outlooker (VOLO)。与粗粒度的全局注意力不同，outlook attention能够有效的提取细粒度特征和上下文信息。
+Introduction  限制ViT的一个主要因素是：分割得到的patch token，提取细粒度特征和引入上下文编码是低效率的。在本文中，我们提出了一种新的注意力机制：Outlooker，能够有效的提取细粒度特征和上下文信息；同时，利用线性投影，而摆脱了二次复杂度。
+基于Outlooker，我们提出了一个简单的模型架构：VOLO。VOLO通过一个两阶段的体系结构，实现了细粒度的token表示和全局信息的聚合；具体来说，给定一个224×224的图像，在使用自注意力机制在粗粒度上构建全局依赖以前，先在较小的patch上，使用多个Outlooker在细粒度特征上进行token表示。
+Method  可以分为两阶段：
+（1）堆叠的Outlooker，以生成细粒度级别的token表征；
+（2）一系列transformer block聚合全局信息。
+Outlooker  Outlooker由一个对空间信息编码的outlook attention层和一个用于通道之间信息交互的MLP层组成。
+对对于给定的C维输入$X\in \mathbb{R}^{H\times W\times C}$，Outlooker可以写作： $$ \tilde{X} = OutlookAtt(LN(X))&#43;X $$ $$ Z=MLP(LN(\tilde{X}))&#43;\tilde{X} $$
+Outlook Attention 如上图所示，主要思想有两点：
+（1）每个空间位置的局部特征足以生成注意力权重系数来聚合其临近的特征；
+（2）密集的局部空间特征聚集可以有效的编码细粒度信息。
+对于每个空间位置$(i,j)$，outlook注意力在以$(i,j)$为中心、大小为$K×K$的局部窗口内，计算相邻位置的相似性。与自注意力机制中使用Q-K矩阵相乘来得到权重系数不同，outlook通过reshape来简化这个过程。
+对于给定的输入$X$，每个C维的token首先经过线性投影，使用两个线性层，$W_{A}\in \mathbb{R}^{C\times K^{4}}$和$W_{V}\in \mathbb{R}^{C\times C}$，分别得到outlook权重$A\in \mathbb{R}^{H\times W\times K^{4}}$和value$V\in \mathbb{R}^{H\times W\times C}$，$V_{\Delta _ {i,j}}\in \mathbb{R}^{C\times K^{2}}$表示以$(i,j)$为中心的局部窗口内的值： $$ V_{\Delta _ {i,j}}=\lbrace V_{i&#43;p-\left \lfloor \frac{K}{2} \right \rfloor,j&#43;q-\left \lfloor \frac{K}{2} \right \rfloor} \rbrace $$ Outlook attention" />
+  <meta name="description" content="VOLO: Vision Outlooker for Visual Recognition
+Abstract  限制ViT的性能的主要原因是：对细粒度的特征编码效率较低，为了解决这个问题，我们提出新的outlook attention，并提出了一个简单的架构Vision Outlooker (VOLO)。与粗粒度的全局注意力不同，outlook attention能够有效的提取细粒度特征和上下文信息。
+Introduction  限制ViT的一个主要因素是：分割得到的patch token，提取细粒度特征和引入上下文编码是低效率的。在本文中，我们提出了一种新的注意力机制：Outlooker，能够有效的提取细粒度特征和上下文信息；同时，利用线性投影，而摆脱了二次复杂度。
+基于Outlooker，我们提出了一个简单的模型架构：VOLO。VOLO通过一个两阶段的体系结构，实现了细粒度的token表示和全局信息的聚合；具体来说，给定一个224×224的图像，在使用自注意力机制在粗粒度上构建全局依赖以前，先在较小的patch上，使用多个Outlooker在细粒度特征上进行token表示。
+Method  可以分为两阶段：
+（1）堆叠的Outlooker，以生成细粒度级别的token表征；
+（2）一系列transformer block聚合全局信息。
+Outlooker  Outlooker由一个对空间信息编码的outlook attention层和一个用于通道之间信息交互的MLP层组成。
+对对于给定的C维输入$X\in \mathbb{R}^{H\times W\times C}$，Outlooker可以写作： $$ \tilde{X} = OutlookAtt(LN(X))&#43;X $$ $$ Z=MLP(LN(\tilde{X}))&#43;\tilde{X} $$
+Outlook Attention 如上图所示，主要思想有两点：
+（1）每个空间位置的局部特征足以生成注意力权重系数来聚合其临近的特征；
+（2）密集的局部空间特征聚集可以有效的编码细粒度信息。
+对于每个空间位置$(i,j)$，outlook注意力在以$(i,j)$为中心、大小为$K×K$的局部窗口内，计算相邻位置的相似性。与自注意力机制中使用Q-K矩阵相乘来得到权重系数不同，outlook通过reshape来简化这个过程。
+对于给定的输入$X$，每个C维的token首先经过线性投影，使用两个线性层，$W_{A}\in \mathbb{R}^{C\times K^{4}}$和$W_{V}\in \mathbb{R}^{C\times C}$，分别得到outlook权重$A\in \mathbb{R}^{H\times W\times K^{4}}$和value$V\in \mathbb{R}^{H\times W\times C}$，$V_{\Delta _ {i,j}}\in \mathbb{R}^{C\times K^{2}}$表示以$(i,j)$为中心的局部窗口内的值： $$ V_{\Delta _ {i,j}}=\lbrace V_{i&#43;p-\left \lfloor \frac{K}{2} \right \rfloor,j&#43;q-\left \lfloor \frac{K}{2} \right \rfloor} \rbrace $$ Outlook attention" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +129,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,476 +162,131 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term">Paper</h1>
-        <div id="posts-list">
-          <section>
-            <h1 class="site-date-catalog">2022</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-06-15 00:00:00 UTC">Jun 15</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/volo/">VOLO</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-06-15 00:00:00 UTC">Jun 15</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/coatnet/">CoAtNet</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-06-14 00:00:00 UTC">Jun 14</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/early-convolutions-help-transformers-see-better/">Early Convolutions Help Transformers See Better</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-06-12 00:00:00 UTC">Jun 12</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/visual-transformers%E7%BB%BC%E8%BF%B0/">Visual Transformers综述</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-06-08 00:00:00 UTC">Jun 08</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/t2t/">T2T</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-06-06 00:00:00 UTC">Jun 06</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/tnt/">TNT</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-06-02 00:00:00 UTC">Jun 02</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/flash/">FLASH</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-31 00:00:00 UTC">May 31</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/crossvit/">CrossViT</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-25 00:00:00 UTC">May 25</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/longformer/">LongFormer</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-24 00:00:00 UTC">May 24</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/pvt/">PVT</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-23 00:00:00 UTC">May 23</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/transformer-xl/">Transformer-XL</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-21 00:00:00 UTC">May 21</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/mae/">MAE</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-18 00:00:00 UTC">May 18</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/reformer/">Reformer</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-17 00:00:00 UTC">May 17</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/deit/">DeiT</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-07 00:00:00 UTC">May 07</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/setr/">SETR</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-07 00:00:00 UTC">May 07</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/segformer/">SegFormer</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-05 00:00:00 UTC">May 05</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/attention-u-net/">Attention U-Net</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-04 00:00:00 UTC">May 04</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/deeplab%E7%B3%BB%E5%88%97/">DeepLab系列</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-29 00:00:00 UTC">Apr 29</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/segnet/">SegNet</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-27 00:00:00 UTC">Apr 27</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/u-netu-net&#43;&#43;/">U-Net&amp;U-Net&#43;&#43;</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-25 00:00:00 UTC">Apr 25</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/fcn/">FCN</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-20 00:00:00 UTC">Apr 20</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/vit/">Vision Transformer</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-19 00:00:00 UTC">Apr 19</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/ssd/">SSD</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-16 00:00:00 UTC">Apr 16</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/bert/">BERT</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-13 00:00:00 UTC">Apr 13</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/yolo%E7%B3%BB%E5%88%97/">YOLO系列</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-12 00:00:00 UTC">Apr 12</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/r-cnn%E7%B3%BB%E5%88%97/">R-CNN系列</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-09 00:00:00 UTC">Apr 09</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/transformer/">Transformer</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-06 00:00:00 UTC">Apr 06</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/shufflenet/">ShuffleNet</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-05 00:00:00 UTC">Apr 05</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/resnet/">ResNet</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-03-30 00:00:00 UTC">Mar 30</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/googlenetpaper/">GoogleNet</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-03-29 00:00:00 UTC">Mar 29</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/vggpaper/">VGG</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-03-29 00:00:00 UTC">Mar 29</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/open-world-object-detector/">Open World Object Detector</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-03-27 00:00:00 UTC">Mar 27</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/relevance-campaper/">Relevance-CAM</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-01-12 00:00:00 UTC">Jan 12</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/alexnetpaper/">AlexNet</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          <section>
-            <h1 class="site-date-catalog">2021</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2021-12-26 00:00:00 UTC">Dec 26</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/lenetpapar/">LeNet</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">VOLO</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-06-15 00:00:00 UTC">
+                15 Jun 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>VOLO: Vision Outlooker for Visual Recognition</p>
+<h2 id="abstract">Abstract</h2>
+<p>    限制ViT的性能的主要原因是：对细粒度的特征编码效率较低，为了解决这个问题，我们提出新的outlook attention，并提出了一个简单的架构Vision Outlooker (VOLO)。与粗粒度的全局注意力不同，outlook attention能够有效的提取细粒度特征和上下文信息。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    限制ViT的一个主要因素是：分割得到的patch token，提取细粒度特征和引入上下文编码是低效率的。在本文中，我们提出了一种新的注意力机制：Outlooker，能够有效的提取细粒度特征和上下文信息；同时，利用线性投影，而摆脱了二次复杂度。<br>
+    基于Outlooker，我们提出了一个简单的模型架构：VOLO。VOLO通过一个两阶段的体系结构，实现了细粒度的token表示和全局信息的聚合；具体来说，给定一个224×224的图像，在使用自注意力机制在粗粒度上构建全局依赖以前，先在较小的patch上，使用多个Outlooker在细粒度特征上进行token表示。</p>
+<h2 id="method">Method</h2>
+<p>    可以分为两阶段：<br>
+    （1）堆叠的Outlooker，以生成细粒度级别的token表征；<br>
+    （2）一系列transformer block聚合全局信息。</p>
+<h3 id="outlooker">Outlooker</h3>
+<p>    Outlooker由一个对空间信息编码的outlook attention层和一个用于通道之间信息交互的MLP层组成。<br>
+    对对于给定的C维输入$X\in \mathbb{R}^{H\times W\times C}$，Outlooker可以写作：
+$$
+\tilde{X} = OutlookAtt(LN(X))+X
+$$
+$$
+Z=MLP(LN(\tilde{X}))+\tilde{X}
+$$</p>
+<h4 id="outlook-attention">Outlook Attention</h4>
+<p><img src="/img/volo1.PNG" alt="">
+    如上图所示，主要思想有两点：<br>
+    （1）每个空间位置的局部特征足以生成注意力权重系数来聚合其临近的特征；<br>
+    （2）密集的局部空间特征聚集可以有效的编码细粒度信息。<br>
+    对于每个空间位置$(i,j)$，outlook注意力在以$(i,j)$为中心、大小为$K×K$的局部窗口内，计算相邻位置的相似性。与自注意力机制中使用Q-K矩阵相乘来得到权重系数不同，outlook通过reshape来简化这个过程。<br>
+    对于给定的输入$X$，每个C维的token首先经过线性投影，使用两个线性层，$W_{A}\in \mathbb{R}^{C\times K^{4}}$和$W_{V}\in \mathbb{R}^{C\times C}$，分别得到outlook权重$A\in \mathbb{R}^{H\times W\times K^{4}}$和value$V\in \mathbb{R}^{H\times W\times C}$，$V_{\Delta _ {i,j}}\in \mathbb{R}^{C\times K^{2}}$表示以$(i,j)$为中心的局部窗口内的值：
+$$
+V_{\Delta _ {i,j}}=\lbrace V_{i+p-\left \lfloor \frac{K}{2} \right \rfloor,j+q-\left \lfloor \frac{K}{2} \right \rfloor} \rbrace
+$$
+    <strong>Outlook attention</strong><br>
+    位置$(i,j)$的outlook权重直接用作value聚合时的注意力权重，通过reshape操作将outlook权重$A\in \mathbb{R}^{H\times W\times K^{4}}$转换成$\tilde{A}_ {i,j}\in \mathbb{R}^{K^{2}\times K^{2}}$，然后跟着一个softmax，即：
+$$
+Y_{\Delta _ {i,j}}=MatMul(Softmax(\tilde{A}_ {i,j}),V_{\Delta _ {i,j}})
+$$
+    <strong>Dense aggregation</strong><br>
+    注意力密集的聚集了value的表示，将来自不同局部窗口的不同位置在同一位置的不同权值进行相加，得到输出：
+$$
+\tilde{Y}_ {\Delta _ {i,j}}=\sum_{0\leq m,n&lt; K}Y_{\Delta _ {i+m-\left \lfloor \frac{K}{2} \right \rfloor,j+n-\left \lfloor \frac{K}{2} \right \rfloor}}^{i,j}
+$$</p>
+<h4 id="multi-head-outlook-attention">Multi-Head Outlook Attention</h4>
+<p>    实现多头，假设头数维$N$，只需要修改权重$W_{A}$的形状即可，即$W_{A}\in \mathbb{R}^{C\times N\times K^{4}}$。outlook权重和value被分成$N$段，即$A_{n}\in \mathbb{R}^{H\times W\times K^{4}}$，$V_{n}\in \mathbb{R}^{H\times W\times C_{N}}$，其中$C_{N}$是每头的维度。</p>
+<h3 id="network-architecture-variants">Network Architecture Variants</h3>
+<p><img src="/img/volo2PNG" alt="">
+    我们观察到，在的Outlooker和Transformer比例在1：3时效果是最好的。</p>
+<h2 id="实验">实验</h2>
+<h3 id="main-results">Main Results</h3>
+<p><img src="/img/volo3.PNG" alt=""></p>
+<h3 id="performance-of-outlooker">Performance of Outlooker</h3>
+<p><img src="/img/volo4.PNG" alt="">
+    对LV-ViT-S进行逐步修改，逐渐形成我们的模型VOLO-D1</p>
+<h3 id="ablation-analysis">Ablation Analysis</h3>
+<h4 id="number-of-outlookers--head-number-in-outlookers">Number of Outlookers &amp; Head Number in Outlookers</h4>
+<p><img src="/img/volo5.PNG" alt=""></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -624,6 +306,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 
