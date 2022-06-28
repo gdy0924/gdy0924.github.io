@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/posts/volo/" />
-  <link rel="canonical" href="https://gdy0924.github.io/posts/volo/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/edgevit/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/edgevit/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -57,9 +57,9 @@ code.has-jax {
            "@id": "https:\/\/gdy0924.github.io\/"
       },
       "articleSection" : "posts",
-      "name" : "VOLO",
-      "headline" : "VOLO",
-      "description" : "VOLO: Vision Outlooker for Visual Recognition\nAbstract  限制ViT的性能的主要原因是：对细粒度的特征编码效率较低，为了解决这个问题，我们提出新的outlook attention，并提出了一个简单的架构Vision Outlooker (VOLO)。与粗粒度的全局注意力不同，outlook attention能够有效的提取细粒度特征和上下文信息。\nIntroduction  限制ViT的一个主要因素是：分割得到的patch token，提取细粒度特征和引入上下文编码是低效率的。在本文中，我们提出了一种新的注意力机制：Outlooker，能够有效的提取细粒度特征和上下文信息；同时，利用线性投影，而摆脱了二次复杂度。\n基于Outlooker，我们提出了一个简单的模型架构：VOLO。VOLO通过一个两阶段的体系结构，实现了细粒度的token表示和全局信息的聚合；具体来说，给定一个224×224的图像，在使用自注意力机制在粗粒度上构建全局依赖以前，先在较小的patch上，使用多个Outlooker在细粒度特征上进行token表示。\nMethod  可以分为两阶段：\n（1）堆叠的Outlooker，以生成细粒度级别的token表征；\n（2）一系列transformer block聚合全局信息。\nOutlooker  Outlooker由一个对空间信息编码的outlook attention层和一个用于通道之间信息交互的MLP层组成。\n对对于给定的C维输入$X\\in \\mathbb{R}^{H\\times W\\times C}$，Outlooker可以写作： $$ \\tilde{X} = OutlookAtt(LN(X))\u002bX $$ $$ Z=MLP(LN(\\tilde{X}))\u002b\\tilde{X} $$\nOutlook Attention 如上图所示，主要思想有两点：\n（1）每个空间位置的局部特征足以生成注意力权重系数来聚合其临近的特征；\n（2）密集的局部空间特征聚集可以有效的编码细粒度信息。\n对于每个空间位置$(i,j)$，outlook注意力在以$(i,j)$为中心、大小为$K×K$的局部窗口内，计算相邻位置的相似性。与自注意力机制中使用Q-K矩阵相乘来得到权重系数不同，outlook通过reshape来简化这个过程。\n对于给定的输入$X$，每个C维的token首先经过线性投影，使用两个线性层，$W_{A}\\in \\mathbb{R}^{C\\times K^{4}}$和$W_{V}\\in \\mathbb{R}^{C\\times C}$，分别得到outlook权重$A\\in \\mathbb{R}^{H\\times W\\times K^{4}}$和value$V\\in \\mathbb{R}^{H\\times W\\times C}$，$V_{\\Delta _ {i,j}}\\in \\mathbb{R}^{C\\times K^{2}}$表示以$(i,j)$为中心的局部窗口内的值： $$ V_{\\Delta _ {i,j}}=\\lbrace V_{i\u002bp-\\left \\lfloor \\frac{K}{2} \\right \\rfloor,j\u002bq-\\left \\lfloor \\frac{K}{2} \\right \\rfloor} \\rbrace $$ Outlook attention",
+      "name" : "EdgeViT",
+      "headline" : "EdgeViT",
+      "description" : "EdgeViTs: Competing Light-weight CNNs on Mobile Devices with Vision Transformers\nAbstract  ViTs已经成为计算机视觉中卷积神经网络的一种非常有竞争力的替代架构，但其二次复杂度，限制很大。最近有很多工作重新将卷积网络的设计引入ViT，如卷积、分层架构等。但它们仍然不足以满足移动设备有限的资源需求。在本文中，我们提出了EdgeViTs，一个新的轻量级ViTs，通过引入一个高效的local-global-local（LGL）bottleneck来实现的，实现了卷积和自注意力的最优集成。\nIntroduction  由于ViT的二次复杂度，目前一些工作通过三种方式来降低计算量：\n（1）使用层次结构逐步降低空间分辨率，减少token序列长度；\n（2）控制输入token序列长度和参数共享的局部自注意机制；\n（3）通过缩放因子对key和value进行降采样。\n我们考虑在真实平台上运行的ViT模型有以下几个特点：Inference efficiency需要高；Model size是可负担得起的，即参数数量；Implementational friendliness实现的友好性。\n提出了EdgeViTs网络，使ViTs能够在移动设备上与最好的轻量级CNN竞争，如MobileNetv2和EfficientNets。通过引入一个轻量级的local-global-local (LGL) information exchange bottleneck来实现，共包含三个操作：\n（1）利用有效的深度卷积，从相邻token中聚合局部信息；\n（2）形成一个稀疏的均匀分布的delegate token集，通过自注意机制实现远程信息交换；\n（3）通过转置卷积，将更新后的信息从delegate token扩散到局部的的非delegate token。\nRelated Work Efficient CNNs  深度可分离卷积，MobileNets，ShuffleNets\nVision transformers  ViT，对其改进之一是从卷积架构中引入层级结构，一些工作还改进位置embedding，所有这些方法主要都是为了提高模型的性能。\n一种有效的减少计算量的方式是减少MHSA内部的空间维度，发现key和value可以被降采样，从而更好平衡效率与精度。我们的工作通过对query进行降采样，扩展了这一想法，进一步提高了效率；一些其他的工作动态减少token数量，即在正向传递中，被认为不包含目标任务的一些token被修剪或合并在一起，从而降低了之后的整体复杂性。\nVision transformers for mobile devices  MobileViTs\nEdgeViTs Overview （a）4个阶段的EdgeViT架构，每个架构由堆叠的LGL block组成；\n（b）Local-Global-Local (LGL) blocks：local aggregation模块\u002b sparse-self-attention模块\u002blocal propagation模块。\n我们采用了最近ViT变体中使用的分层金字塔网络结构，金字塔变压器模型通常会逐步降低空间分辨率，同时增加通道数量。基于此，我们深入研究了transformer block，并提出了一个更高效的bottleneck：Local-Global-Local，LGL通过稀疏注意力模块进一步减少了自注意力的开销，实现了更好的精度-延迟平衡。\nLocal-Global-Local bottleneck  自注意力机制可以捕捉长期依赖，但是图像的空间冗余很高，因此关注所有空间中的token，即使是在下采样的特征图中，也是低效的。因此，需要同时保留建模全局和局部的底层信息流。\n我们将自注意分解为连续的模块，在不同的模块内处理token：（1）Local aggregation只聚合相邻token的信息；（2）Global sparse attention建模一组delegate token之间的信息，其中每个delegate token都被视为一个局部窗口的代表；（3）Local propagation将代表token学习到的全局上下文信息传播到具有相同窗口的非代表token中。 （a）Local aggregation：对于每个token，利用depth-wise卷积和point-wise卷积在大小为$k×k$的局部窗口中聚合信息；",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,43 +67,55 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-06-15 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-06-15 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/posts\/volo\/",
+      "datePublished": "2022-06-25 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-06-25 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/edgevit\/",
       "keywords" : [  ]
   }
 </script>
-<title>VOLO</title>
-  <meta property="og:title" content="VOLO" />
+<title>EdgeViT</title>
+  <meta property="og:title" content="EdgeViT" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="VOLO: Vision Outlooker for Visual Recognition
-Abstract  限制ViT的性能的主要原因是：对细粒度的特征编码效率较低，为了解决这个问题，我们提出新的outlook attention，并提出了一个简单的架构Vision Outlooker (VOLO)。与粗粒度的全局注意力不同，outlook attention能够有效的提取细粒度特征和上下文信息。
-Introduction  限制ViT的一个主要因素是：分割得到的patch token，提取细粒度特征和引入上下文编码是低效率的。在本文中，我们提出了一种新的注意力机制：Outlooker，能够有效的提取细粒度特征和上下文信息；同时，利用线性投影，而摆脱了二次复杂度。
-基于Outlooker，我们提出了一个简单的模型架构：VOLO。VOLO通过一个两阶段的体系结构，实现了细粒度的token表示和全局信息的聚合；具体来说，给定一个224×224的图像，在使用自注意力机制在粗粒度上构建全局依赖以前，先在较小的patch上，使用多个Outlooker在细粒度特征上进行token表示。
-Method  可以分为两阶段：
-（1）堆叠的Outlooker，以生成细粒度级别的token表征；
-（2）一系列transformer block聚合全局信息。
-Outlooker  Outlooker由一个对空间信息编码的outlook attention层和一个用于通道之间信息交互的MLP层组成。
-对对于给定的C维输入$X\in \mathbb{R}^{H\times W\times C}$，Outlooker可以写作： $$ \tilde{X} = OutlookAtt(LN(X))&#43;X $$ $$ Z=MLP(LN(\tilde{X}))&#43;\tilde{X} $$
-Outlook Attention 如上图所示，主要思想有两点：
-（1）每个空间位置的局部特征足以生成注意力权重系数来聚合其临近的特征；
-（2）密集的局部空间特征聚集可以有效的编码细粒度信息。
-对于每个空间位置$(i,j)$，outlook注意力在以$(i,j)$为中心、大小为$K×K$的局部窗口内，计算相邻位置的相似性。与自注意力机制中使用Q-K矩阵相乘来得到权重系数不同，outlook通过reshape来简化这个过程。
-对于给定的输入$X$，每个C维的token首先经过线性投影，使用两个线性层，$W_{A}\in \mathbb{R}^{C\times K^{4}}$和$W_{V}\in \mathbb{R}^{C\times C}$，分别得到outlook权重$A\in \mathbb{R}^{H\times W\times K^{4}}$和value$V\in \mathbb{R}^{H\times W\times C}$，$V_{\Delta _ {i,j}}\in \mathbb{R}^{C\times K^{2}}$表示以$(i,j)$为中心的局部窗口内的值： $$ V_{\Delta _ {i,j}}=\lbrace V_{i&#43;p-\left \lfloor \frac{K}{2} \right \rfloor,j&#43;q-\left \lfloor \frac{K}{2} \right \rfloor} \rbrace $$ Outlook attention" />
-  <meta name="description" content="VOLO: Vision Outlooker for Visual Recognition
-Abstract  限制ViT的性能的主要原因是：对细粒度的特征编码效率较低，为了解决这个问题，我们提出新的outlook attention，并提出了一个简单的架构Vision Outlooker (VOLO)。与粗粒度的全局注意力不同，outlook attention能够有效的提取细粒度特征和上下文信息。
-Introduction  限制ViT的一个主要因素是：分割得到的patch token，提取细粒度特征和引入上下文编码是低效率的。在本文中，我们提出了一种新的注意力机制：Outlooker，能够有效的提取细粒度特征和上下文信息；同时，利用线性投影，而摆脱了二次复杂度。
-基于Outlooker，我们提出了一个简单的模型架构：VOLO。VOLO通过一个两阶段的体系结构，实现了细粒度的token表示和全局信息的聚合；具体来说，给定一个224×224的图像，在使用自注意力机制在粗粒度上构建全局依赖以前，先在较小的patch上，使用多个Outlooker在细粒度特征上进行token表示。
-Method  可以分为两阶段：
-（1）堆叠的Outlooker，以生成细粒度级别的token表征；
-（2）一系列transformer block聚合全局信息。
-Outlooker  Outlooker由一个对空间信息编码的outlook attention层和一个用于通道之间信息交互的MLP层组成。
-对对于给定的C维输入$X\in \mathbb{R}^{H\times W\times C}$，Outlooker可以写作： $$ \tilde{X} = OutlookAtt(LN(X))&#43;X $$ $$ Z=MLP(LN(\tilde{X}))&#43;\tilde{X} $$
-Outlook Attention 如上图所示，主要思想有两点：
-（1）每个空间位置的局部特征足以生成注意力权重系数来聚合其临近的特征；
-（2）密集的局部空间特征聚集可以有效的编码细粒度信息。
-对于每个空间位置$(i,j)$，outlook注意力在以$(i,j)$为中心、大小为$K×K$的局部窗口内，计算相邻位置的相似性。与自注意力机制中使用Q-K矩阵相乘来得到权重系数不同，outlook通过reshape来简化这个过程。
-对于给定的输入$X$，每个C维的token首先经过线性投影，使用两个线性层，$W_{A}\in \mathbb{R}^{C\times K^{4}}$和$W_{V}\in \mathbb{R}^{C\times C}$，分别得到outlook权重$A\in \mathbb{R}^{H\times W\times K^{4}}$和value$V\in \mathbb{R}^{H\times W\times C}$，$V_{\Delta _ {i,j}}\in \mathbb{R}^{C\times K^{2}}$表示以$(i,j)$为中心的局部窗口内的值： $$ V_{\Delta _ {i,j}}=\lbrace V_{i&#43;p-\left \lfloor \frac{K}{2} \right \rfloor,j&#43;q-\left \lfloor \frac{K}{2} \right \rfloor} \rbrace $$ Outlook attention" />
+  <meta property="og:description" content="EdgeViTs: Competing Light-weight CNNs on Mobile Devices with Vision Transformers
+Abstract  ViTs已经成为计算机视觉中卷积神经网络的一种非常有竞争力的替代架构，但其二次复杂度，限制很大。最近有很多工作重新将卷积网络的设计引入ViT，如卷积、分层架构等。但它们仍然不足以满足移动设备有限的资源需求。在本文中，我们提出了EdgeViTs，一个新的轻量级ViTs，通过引入一个高效的local-global-local（LGL）bottleneck来实现的，实现了卷积和自注意力的最优集成。
+Introduction  由于ViT的二次复杂度，目前一些工作通过三种方式来降低计算量：
+（1）使用层次结构逐步降低空间分辨率，减少token序列长度；
+（2）控制输入token序列长度和参数共享的局部自注意机制；
+（3）通过缩放因子对key和value进行降采样。
+我们考虑在真实平台上运行的ViT模型有以下几个特点：Inference efficiency需要高；Model size是可负担得起的，即参数数量；Implementational friendliness实现的友好性。
+提出了EdgeViTs网络，使ViTs能够在移动设备上与最好的轻量级CNN竞争，如MobileNetv2和EfficientNets。通过引入一个轻量级的local-global-local (LGL) information exchange bottleneck来实现，共包含三个操作：
+（1）利用有效的深度卷积，从相邻token中聚合局部信息；
+（2）形成一个稀疏的均匀分布的delegate token集，通过自注意机制实现远程信息交换；
+（3）通过转置卷积，将更新后的信息从delegate token扩散到局部的的非delegate token。
+Related Work Efficient CNNs  深度可分离卷积，MobileNets，ShuffleNets
+Vision transformers  ViT，对其改进之一是从卷积架构中引入层级结构，一些工作还改进位置embedding，所有这些方法主要都是为了提高模型的性能。
+一种有效的减少计算量的方式是减少MHSA内部的空间维度，发现key和value可以被降采样，从而更好平衡效率与精度。我们的工作通过对query进行降采样，扩展了这一想法，进一步提高了效率；一些其他的工作动态减少token数量，即在正向传递中，被认为不包含目标任务的一些token被修剪或合并在一起，从而降低了之后的整体复杂性。
+Vision transformers for mobile devices  MobileViTs
+EdgeViTs Overview （a）4个阶段的EdgeViT架构，每个架构由堆叠的LGL block组成；
+（b）Local-Global-Local (LGL) blocks：local aggregation模块&#43; sparse-self-attention模块&#43;local propagation模块。
+我们采用了最近ViT变体中使用的分层金字塔网络结构，金字塔变压器模型通常会逐步降低空间分辨率，同时增加通道数量。基于此，我们深入研究了transformer block，并提出了一个更高效的bottleneck：Local-Global-Local，LGL通过稀疏注意力模块进一步减少了自注意力的开销，实现了更好的精度-延迟平衡。
+Local-Global-Local bottleneck  自注意力机制可以捕捉长期依赖，但是图像的空间冗余很高，因此关注所有空间中的token，即使是在下采样的特征图中，也是低效的。因此，需要同时保留建模全局和局部的底层信息流。
+我们将自注意分解为连续的模块，在不同的模块内处理token：（1）Local aggregation只聚合相邻token的信息；（2）Global sparse attention建模一组delegate token之间的信息，其中每个delegate token都被视为一个局部窗口的代表；（3）Local propagation将代表token学习到的全局上下文信息传播到具有相同窗口的非代表token中。 （a）Local aggregation：对于每个token，利用depth-wise卷积和point-wise卷积在大小为$k×k$的局部窗口中聚合信息；" />
+  <meta name="description" content="EdgeViTs: Competing Light-weight CNNs on Mobile Devices with Vision Transformers
+Abstract  ViTs已经成为计算机视觉中卷积神经网络的一种非常有竞争力的替代架构，但其二次复杂度，限制很大。最近有很多工作重新将卷积网络的设计引入ViT，如卷积、分层架构等。但它们仍然不足以满足移动设备有限的资源需求。在本文中，我们提出了EdgeViTs，一个新的轻量级ViTs，通过引入一个高效的local-global-local（LGL）bottleneck来实现的，实现了卷积和自注意力的最优集成。
+Introduction  由于ViT的二次复杂度，目前一些工作通过三种方式来降低计算量：
+（1）使用层次结构逐步降低空间分辨率，减少token序列长度；
+（2）控制输入token序列长度和参数共享的局部自注意机制；
+（3）通过缩放因子对key和value进行降采样。
+我们考虑在真实平台上运行的ViT模型有以下几个特点：Inference efficiency需要高；Model size是可负担得起的，即参数数量；Implementational friendliness实现的友好性。
+提出了EdgeViTs网络，使ViTs能够在移动设备上与最好的轻量级CNN竞争，如MobileNetv2和EfficientNets。通过引入一个轻量级的local-global-local (LGL) information exchange bottleneck来实现，共包含三个操作：
+（1）利用有效的深度卷积，从相邻token中聚合局部信息；
+（2）形成一个稀疏的均匀分布的delegate token集，通过自注意机制实现远程信息交换；
+（3）通过转置卷积，将更新后的信息从delegate token扩散到局部的的非delegate token。
+Related Work Efficient CNNs  深度可分离卷积，MobileNets，ShuffleNets
+Vision transformers  ViT，对其改进之一是从卷积架构中引入层级结构，一些工作还改进位置embedding，所有这些方法主要都是为了提高模型的性能。
+一种有效的减少计算量的方式是减少MHSA内部的空间维度，发现key和value可以被降采样，从而更好平衡效率与精度。我们的工作通过对query进行降采样，扩展了这一想法，进一步提高了效率；一些其他的工作动态减少token数量，即在正向传递中，被认为不包含目标任务的一些token被修剪或合并在一起，从而降低了之后的整体复杂性。
+Vision transformers for mobile devices  MobileViTs
+EdgeViTs Overview （a）4个阶段的EdgeViT架构，每个架构由堆叠的LGL block组成；
+（b）Local-Global-Local (LGL) blocks：local aggregation模块&#43; sparse-self-attention模块&#43;local propagation模块。
+我们采用了最近ViT变体中使用的分层金字塔网络结构，金字塔变压器模型通常会逐步降低空间分辨率，同时增加通道数量。基于此，我们深入研究了transformer block，并提出了一个更高效的bottleneck：Local-Global-Local，LGL通过稀疏注意力模块进一步减少了自注意力的开销，实现了更好的精度-延迟平衡。
+Local-Global-Local bottleneck  自注意力机制可以捕捉长期依赖，但是图像的空间冗余很高，因此关注所有空间中的token，即使是在下采样的特征图中，也是低效的。因此，需要同时保留建模全局和局部的底层信息流。
+我们将自注意分解为连续的模块，在不同的模块内处理token：（1）Local aggregation只聚合相邻token的信息；（2）Global sparse attention建模一组delegate token之间的信息，其中每个delegate token都被视为一个局部窗口的代表；（3）Local propagation将代表token学习到的全局上下文信息传播到具有相同窗口的非代表token中。 （a）Local aggregation：对于每个token，利用depth-wise卷积和point-wise卷积在大小为$k×k$的局部窗口中聚合信息；" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -164,13 +176,13 @@ Outlook Attention 如上图所示，主要思想有两点：
 
         </div>
         <header class="post-header">
-          <h1 class="post-title">VOLO</h1>
+          <h1 class="post-title">EdgeViT</h1>
           
           <div class="row post-desc">
             <div class="col-xs-6">
               
-              <time class="post-date" datetime="2022-06-15 00:00:00 UTC">
-                15 Jun 2022
+              <time class="post-date" datetime="2022-06-25 00:00:00 UTC">
+                25 Jun 2022
               </time>
               
             </div>
@@ -187,59 +199,50 @@ Outlook Attention 如上图所示，主要思想有两点：
 
         <div class="post-content markdown-body">
           
-          <p>VOLO: Vision Outlooker for Visual Recognition</p>
+          <p>EdgeViTs: Competing Light-weight CNNs on Mobile Devices with Vision Transformers</p>
 <h2 id="abstract">Abstract</h2>
-<p>    限制ViT的性能的主要原因是：对细粒度的特征编码效率较低，为了解决这个问题，我们提出新的outlook attention，并提出了一个简单的架构Vision Outlooker (VOLO)。与粗粒度的全局注意力不同，outlook attention能够有效的提取细粒度特征和上下文信息。</p>
+<p>    ViTs已经成为计算机视觉中卷积神经网络的一种非常有竞争力的替代架构，但其二次复杂度，限制很大。最近有很多工作重新将卷积网络的设计引入ViT，如卷积、分层架构等。但它们仍然不足以满足移动设备有限的资源需求。在本文中，我们提出了EdgeViTs，一个新的轻量级ViTs，通过引入一个高效的local-global-local（LGL）bottleneck来实现的，实现了卷积和自注意力的最优集成。</p>
 <h2 id="introduction">Introduction</h2>
-<p>    限制ViT的一个主要因素是：分割得到的patch token，提取细粒度特征和引入上下文编码是低效率的。在本文中，我们提出了一种新的注意力机制：Outlooker，能够有效的提取细粒度特征和上下文信息；同时，利用线性投影，而摆脱了二次复杂度。<br>
-    基于Outlooker，我们提出了一个简单的模型架构：VOLO。VOLO通过一个两阶段的体系结构，实现了细粒度的token表示和全局信息的聚合；具体来说，给定一个224×224的图像，在使用自注意力机制在粗粒度上构建全局依赖以前，先在较小的patch上，使用多个Outlooker在细粒度特征上进行token表示。</p>
-<h2 id="method">Method</h2>
-<p>    可以分为两阶段：<br>
-    （1）堆叠的Outlooker，以生成细粒度级别的token表征；<br>
-    （2）一系列transformer block聚合全局信息。</p>
-<h3 id="outlooker">Outlooker</h3>
-<p>    Outlooker由一个对空间信息编码的outlook attention层和一个用于通道之间信息交互的MLP层组成。<br>
-    对对于给定的C维输入$X\in \mathbb{R}^{H\times W\times C}$，Outlooker可以写作：
-$$
-\tilde{X} = OutlookAtt(LN(X))+X
-$$
-$$
-Z=MLP(LN(\tilde{X}))+\tilde{X}
-$$</p>
-<h4 id="outlook-attention">Outlook Attention</h4>
-<p><img src="/img/volo1.PNG" alt="">
-    如上图所示，主要思想有两点：<br>
-    （1）每个空间位置的局部特征足以生成注意力权重系数来聚合其临近的特征；<br>
-    （2）密集的局部空间特征聚集可以有效的编码细粒度信息。<br>
-    对于每个空间位置$(i,j)$，outlook注意力在以$(i,j)$为中心、大小为$K×K$的局部窗口内，计算相邻位置的相似性。与自注意力机制中使用Q-K矩阵相乘来得到权重系数不同，outlook通过reshape来简化这个过程。<br>
-    对于给定的输入$X$，每个C维的token首先经过线性投影，使用两个线性层，$W_{A}\in \mathbb{R}^{C\times K^{4}}$和$W_{V}\in \mathbb{R}^{C\times C}$，分别得到outlook权重$A\in \mathbb{R}^{H\times W\times K^{4}}$和value$V\in \mathbb{R}^{H\times W\times C}$，$V_{\Delta _ {i,j}}\in \mathbb{R}^{C\times K^{2}}$表示以$(i,j)$为中心的局部窗口内的值：
-$$
-V_{\Delta _ {i,j}}=\lbrace V_{i+p-\left \lfloor \frac{K}{2} \right \rfloor,j+q-\left \lfloor \frac{K}{2} \right \rfloor} \rbrace
-$$
-    <strong>Outlook attention</strong><br>
-    位置$(i,j)$的outlook权重直接用作value聚合时的注意力权重，通过reshape操作将outlook权重$A\in \mathbb{R}^{H\times W\times K^{4}}$转换成$\tilde{A}_ {i,j}\in \mathbb{R}^{K^{2}\times K^{2}}$，然后跟着一个softmax，即：
-$$
-Y_{\Delta _ {i,j}}=MatMul(Softmax(\tilde{A}_ {i,j}),V_{\Delta _ {i,j}})
-$$
-    <strong>Dense aggregation</strong><br>
-    注意力密集的聚集了value的表示，将来自不同局部窗口的不同位置在同一位置的不同权值进行相加，得到输出：
-$$
-\tilde{Y}_ {\Delta _ {i,j}}=\sum_{0\leq m,n&lt; K}Y_{\Delta _ {i+m-\left \lfloor \frac{K}{2} \right \rfloor,j+n-\left \lfloor \frac{K}{2} \right \rfloor}}^{i,j}
-$$</p>
-<h4 id="multi-head-outlook-attention">Multi-Head Outlook Attention</h4>
-<p>    实现多头，假设头数维$N$，只需要修改权重$W_{A}$的形状即可，即$W_{A}\in \mathbb{R}^{C\times N\times K^{4}}$。outlook权重和value被分成$N$段，即$A_{n}\in \mathbb{R}^{H\times W\times K^{4}}$，$V_{n}\in \mathbb{R}^{H\times W\times C_{N}}$，其中$C_{N}$是每头的维度。</p>
-<h3 id="network-architecture-variants">Network Architecture Variants</h3>
-<p><img src="/img/volo2.PNG" alt="">
-    我们观察到，在的Outlooker和Transformer比例在1：3时效果是最好的。</p>
+<p>    由于ViT的二次复杂度，目前一些工作通过三种方式来降低计算量：<br>
+    （1）使用层次结构逐步降低空间分辨率，减少token序列长度；<br>
+    （2）控制输入token序列长度和参数共享的局部自注意机制；<br>
+    （3）通过缩放因子对key和value进行降采样。<br>
+    我们考虑在真实平台上运行的ViT模型有以下几个特点：Inference efficiency需要高；Model size是可负担得起的，即参数数量；Implementational friendliness实现的友好性。<br>
+    提出了EdgeViTs网络，使ViTs能够在移动设备上与最好的轻量级CNN竞争，如MobileNetv2和EfficientNets。通过引入一个轻量级的local-global-local (LGL) information exchange bottleneck来实现，共包含三个操作：<br>
+    （1）利用有效的深度卷积，从相邻token中聚合局部信息；<br>
+    （2）形成一个稀疏的均匀分布的delegate token集，通过自注意机制实现远程信息交换；<br>
+    （3）通过转置卷积，将更新后的信息从delegate token扩散到局部的的非delegate token。</p>
+<h2 id="related-work">Related Work</h2>
+<h3 id="efficient-cnns">Efficient CNNs</h3>
+<p>    深度可分离卷积，MobileNets，ShuffleNets</p>
+<h3 id="vision-transformers">Vision transformers</h3>
+<p>    ViT，对其改进之一是从卷积架构中引入层级结构，一些工作还改进位置embedding，所有这些方法主要都是为了提高模型的性能。<br>
+    一种有效的减少计算量的方式是减少MHSA内部的空间维度，发现key和value可以被降采样，从而更好平衡效率与精度。我们的工作通过对query进行降采样，扩展了这一想法，进一步提高了效率；一些其他的工作动态减少token数量，即在正向传递中，被认为不包含目标任务的一些token被修剪或合并在一起，从而降低了之后的整体复杂性。</p>
+<h3 id="vision-transformers-for-mobile-devices">Vision transformers for mobile devices</h3>
+<p>    MobileViTs</p>
+<h2 id="edgevits">EdgeViTs</h2>
+<h3 id="overview">Overview</h3>
+<p><img src="/img/edgevit1.PNG" alt="">
+    （a）4个阶段的EdgeViT架构，每个架构由堆叠的LGL block组成；<br>
+    （b）Local-Global-Local (LGL) blocks：local aggregation模块+ sparse-self-attention模块+local propagation模块。<br>
+    我们采用了最近ViT变体中使用的分层金字塔网络结构，金字塔变压器模型通常会逐步降低空间分辨率，同时增加通道数量。基于此，我们深入研究了transformer block，并提出了一个更高效的bottleneck：Local-Global-Local，LGL通过稀疏注意力模块进一步减少了自注意力的开销，实现了更好的精度-延迟平衡。</p>
+<h3 id="local-global-local-bottleneck">Local-Global-Local bottleneck</h3>
+<p>    自注意力机制可以捕捉长期依赖，但是图像的空间冗余很高，因此关注所有空间中的token，即使是在下采样的特征图中，也是低效的。因此，需要同时保留建模全局和局部的底层信息流。<br>
+    我们将自注意分解为连续的模块，在不同的模块内处理token：（1）Local aggregation只聚合相邻token的信息；（2）Global sparse attention建模一组delegate token之间的信息，其中每个delegate token都被视为一个局部窗口的代表；（3）Local propagation将代表token学习到的全局上下文信息传播到具有相同窗口的非代表token中。
+<img src="/img/edgevit2.PNG" alt="">
+    （a）Local aggregation：对于每个token，利用depth-wise卷积和point-wise卷积在大小为$k×k$的局部窗口中聚合信息；<br>
+    （b）Global sparse attention：对均匀分布在空间中的稀疏delegate tokens进行采样，每个$r×r$窗口中有一个delegate tokens，$r$代表子样本率，对被选择的token进行自注意力机制；<br>
+    （c）Local propagation：通过转置卷积将delegate tokens中编码的全局上下文信息传播到相邻token中。</p>
+<h3 id="architectures">Architectures</h3>
+<p><img src="/img/edgevit3.PNG" alt="">
+    对于降采样层，使用卷积核大小为$2×2$、步幅为2的卷积实现，在第一阶段，下采样4倍，使用$4×4$大小、步幅为4的卷积。</p>
 <h2 id="实验">实验</h2>
-<h3 id="main-results">Main Results</h3>
-<p><img src="/img/volo3.PNG" alt=""></p>
-<h3 id="performance-of-outlooker">Performance of Outlooker</h3>
-<p><img src="/img/volo4.PNG" alt="">
-    对LV-ViT-S进行逐步修改，逐渐形成我们的模型VOLO-D1</p>
-<h3 id="ablation-analysis">Ablation Analysis</h3>
-<h4 id="number-of-outlookers--head-number-in-outlookers">Number of Outlookers &amp; Head Number in Outlookers</h4>
-<p><img src="/img/volo5.PNG" alt=""></p>
+<p><img src="/img/edgevit4.PNG" alt="">
+Results on ImageNet-1K validation set
+<img src="/img/edgevit5.PNG" alt="">
+On-device energy evaluation on ImageNet-1K
+<img src="/img/edgevit6.PNG" alt="">
+Ablation study on ImageNet-1K</p>
 
         </div>
 

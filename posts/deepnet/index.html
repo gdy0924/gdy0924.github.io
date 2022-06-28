@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/deepnet/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/deepnet/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "DeepNet",
+      "headline" : "DeepNet",
+      "description" : "DeepNet: Scaling Transformers to 1,000 Layers\nAbstract  本文提出了一种简单而有效的稳定更深层transformer的方法：引入了一个新的归一化函数DEEPNORM，该方法结合了两个优点：Post-LN的性能好和Pre-LN的稳定训练。\nIntroduction  近几年提出了许多大模型，尽管他们的参数量很大，但是它们的深度受到transformer训练不稳定性的限制。\n有研究发现：Pre-LN提高了模型的稳定性，但由于Pre-LN在底层的梯度往往大于在顶层的梯度，因此与Post-LN相比，性能下降。为了缓解上述问题，通常通过更好的初始化来改进深度他说former的优化。\n我们的目标是提高transformer的训练稳定性，并扩大模型深度的数量级。为此，我们研究了不稳定的原因，发现模型的爆炸性更新是导致不稳定的原因。基于上述观察，我们在残差连接处引入了一个新的归一化函数DEEPNORM。\nTL;DR for Practitioners 在归一化前，DEEPNORM向上扩展了残差连接；同时在初始化时，引入缩放因子gain。\nInstability of Deep Transformer  更好的初始化方法可以稳定transformer的训练，因此，我们研究了无论是否进行适当初始化情况下的Post-LN的训练过程。 上图中，Post-LN-init是对第l层的权值进行减小，Post-LN为标准的结果；可以看出，无论模型深度如何，最后一层Post-LN-init的梯度范数仍然远远大于Post-LN，这表明，深层的爆炸梯度不应该是Post-LN不稳定的根本原因。\n上图为可视化：\n（a）是训练的早期阶段的模型更新范数： $$ || \\Delta F ||=|| F(x,\\theta _ {i}) -F(x,\\theta _ {0})|| $$ 可以看出，Post-LN在训练一开始就有一个爆炸式的更新，然后几乎没有更新，这表明该模型陷入了一个虚假的局部最优状态。warm-up和更好的初始化都有助于缓解这个问题，使模型能够平稳地更新。当update爆发时，LN的输入就会变得很大。如上图中的（b）和（c）所示。\n总的来说，不稳定性始于训练开始时的大模型更新：它使模型陷入一个糟糕的局部最优，这反过来增加了LN的输入大小。随着训练的继续，通过LN的梯度变得越来越小，从而导致严重的梯度消失。梯度的消失使其难以脱离局部最优，并进一步使优化不稳定。相反，Post-LN-init的更新相对较小，并且对LN的输入是稳定的，这减轻了梯度消失的痛苦，使优化更加稳定。\nDEEPNET: Extremely Deep Transformers Architecture  DEEPNORM的公式表示为： $$ x_{l\u002b1}=LN(\\alpha x_{l}\u002bG_{l}(x_{l},\\theta _ {l})) $$ 其中，$\\alpha$是一个常数，$G_{l}(x_{l},\\theta _ {l})$是参数为$\\theta _ {l}$的第$l$层transformer层的子层，即注意力层或FFN层。此外，还通过$\\beta $来缩放残差分支内的权重$\\theta _ {l}$。 上图为在训练的早期阶段，vanilla Post-LN和DEEPNET的模型更新，可以看出，DEEPNET的更新更加稳定。\n实验 Neural Machine Translation BLEU scores on the WMT-17 En-De test set",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -69,15 +69,37 @@ code.has-jax {
       "copyrightYear" : "2022",
       "datePublished": "2022-06-25 00:00:00 \u002b0000 UTC",
       "dateModified" : "2022-06-25 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/deepnet\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>DeepNet</title>
+  <meta property="og:title" content="DeepNet" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="DeepNet: Scaling Transformers to 1,000 Layers
+Abstract  本文提出了一种简单而有效的稳定更深层transformer的方法：引入了一个新的归一化函数DEEPNORM，该方法结合了两个优点：Post-LN的性能好和Pre-LN的稳定训练。
+Introduction  近几年提出了许多大模型，尽管他们的参数量很大，但是它们的深度受到transformer训练不稳定性的限制。
+有研究发现：Pre-LN提高了模型的稳定性，但由于Pre-LN在底层的梯度往往大于在顶层的梯度，因此与Post-LN相比，性能下降。为了缓解上述问题，通常通过更好的初始化来改进深度他说former的优化。
+我们的目标是提高transformer的训练稳定性，并扩大模型深度的数量级。为此，我们研究了不稳定的原因，发现模型的爆炸性更新是导致不稳定的原因。基于上述观察，我们在残差连接处引入了一个新的归一化函数DEEPNORM。
+TL;DR for Practitioners 在归一化前，DEEPNORM向上扩展了残差连接；同时在初始化时，引入缩放因子gain。
+Instability of Deep Transformer  更好的初始化方法可以稳定transformer的训练，因此，我们研究了无论是否进行适当初始化情况下的Post-LN的训练过程。 上图中，Post-LN-init是对第l层的权值进行减小，Post-LN为标准的结果；可以看出，无论模型深度如何，最后一层Post-LN-init的梯度范数仍然远远大于Post-LN，这表明，深层的爆炸梯度不应该是Post-LN不稳定的根本原因。
+上图为可视化：
+（a）是训练的早期阶段的模型更新范数： $$ || \Delta F ||=|| F(x,\theta _ {i}) -F(x,\theta _ {0})|| $$ 可以看出，Post-LN在训练一开始就有一个爆炸式的更新，然后几乎没有更新，这表明该模型陷入了一个虚假的局部最优状态。warm-up和更好的初始化都有助于缓解这个问题，使模型能够平稳地更新。当update爆发时，LN的输入就会变得很大。如上图中的（b）和（c）所示。
+总的来说，不稳定性始于训练开始时的大模型更新：它使模型陷入一个糟糕的局部最优，这反过来增加了LN的输入大小。随着训练的继续，通过LN的梯度变得越来越小，从而导致严重的梯度消失。梯度的消失使其难以脱离局部最优，并进一步使优化不稳定。相反，Post-LN-init的更新相对较小，并且对LN的输入是稳定的，这减轻了梯度消失的痛苦，使优化更加稳定。
+DEEPNET: Extremely Deep Transformers Architecture  DEEPNORM的公式表示为： $$ x_{l&#43;1}=LN(\alpha x_{l}&#43;G_{l}(x_{l},\theta _ {l})) $$ 其中，$\alpha$是一个常数，$G_{l}(x_{l},\theta _ {l})$是参数为$\theta _ {l}$的第$l$层transformer层的子层，即注意力层或FFN层。此外，还通过$\beta $来缩放残差分支内的权重$\theta _ {l}$。 上图为在训练的早期阶段，vanilla Post-LN和DEEPNET的模型更新，可以看出，DEEPNET的更新更加稳定。
+实验 Neural Machine Translation BLEU scores on the WMT-17 En-De test set" />
+  <meta name="description" content="DeepNet: Scaling Transformers to 1,000 Layers
+Abstract  本文提出了一种简单而有效的稳定更深层transformer的方法：引入了一个新的归一化函数DEEPNORM，该方法结合了两个优点：Post-LN的性能好和Pre-LN的稳定训练。
+Introduction  近几年提出了许多大模型，尽管他们的参数量很大，但是它们的深度受到transformer训练不稳定性的限制。
+有研究发现：Pre-LN提高了模型的稳定性，但由于Pre-LN在底层的梯度往往大于在顶层的梯度，因此与Post-LN相比，性能下降。为了缓解上述问题，通常通过更好的初始化来改进深度他说former的优化。
+我们的目标是提高transformer的训练稳定性，并扩大模型深度的数量级。为此，我们研究了不稳定的原因，发现模型的爆炸性更新是导致不稳定的原因。基于上述观察，我们在残差连接处引入了一个新的归一化函数DEEPNORM。
+TL;DR for Practitioners 在归一化前，DEEPNORM向上扩展了残差连接；同时在初始化时，引入缩放因子gain。
+Instability of Deep Transformer  更好的初始化方法可以稳定transformer的训练，因此，我们研究了无论是否进行适当初始化情况下的Post-LN的训练过程。 上图中，Post-LN-init是对第l层的权值进行减小，Post-LN为标准的结果；可以看出，无论模型深度如何，最后一层Post-LN-init的梯度范数仍然远远大于Post-LN，这表明，深层的爆炸梯度不应该是Post-LN不稳定的根本原因。
+上图为可视化：
+（a）是训练的早期阶段的模型更新范数： $$ || \Delta F ||=|| F(x,\theta _ {i}) -F(x,\theta _ {0})|| $$ 可以看出，Post-LN在训练一开始就有一个爆炸式的更新，然后几乎没有更新，这表明该模型陷入了一个虚假的局部最优状态。warm-up和更好的初始化都有助于缓解这个问题，使模型能够平稳地更新。当update爆发时，LN的输入就会变得很大。如上图中的（b）和（c）所示。
+总的来说，不稳定性始于训练开始时的大模型更新：它使模型陷入一个糟糕的局部最优，这反过来增加了LN的输入大小。随着训练的继续，通过LN的梯度变得越来越小，从而导致严重的梯度消失。梯度的消失使其难以脱离局部最优，并进一步使优化不稳定。相反，Post-LN-init的更新相对较小，并且对LN的输入是稳定的，这减轻了梯度消失的痛苦，使优化更加稳定。
+DEEPNET: Extremely Deep Transformers Architecture  DEEPNORM的公式表示为： $$ x_{l&#43;1}=LN(\alpha x_{l}&#43;G_{l}(x_{l},\theta _ {l})) $$ 其中，$\alpha$是一个常数，$G_{l}(x_{l},\theta _ {l})$是参数为$\theta _ {l}$的第$l$层transformer层的子层，即注意力层或FFN层。此外，还通过$\beta $来缩放残差分支内的权重$\theta _ {l}$。 上图为在训练的早期阶段，vanilla Post-LN和DEEPNET的模型更新，可以看出，DEEPNET的更新更加稳定。
+实验 Neural Machine Translation BLEU scores on the WMT-17 En-De test set" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +125,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +158,118 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">DeepNet</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-06-25 00:00:00 UTC">
+                25 Jun 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>DeepNet: Scaling Transformers to 1,000 Layers</p>
+<h2 id="abstract">Abstract</h2>
+<p>    本文提出了一种简单而有效的稳定更深层transformer的方法：引入了一个新的归一化函数DEEPNORM，该方法结合了两个优点：Post-LN的性能好和Pre-LN的稳定训练。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    近几年提出了许多大模型，尽管他们的参数量很大，但是它们的深度受到transformer训练不稳定性的限制。<br>
+    有研究发现：Pre-LN提高了模型的稳定性，但由于Pre-LN在底层的梯度往往大于在顶层的梯度，因此与Post-LN相比，性能下降。为了缓解上述问题，通常通过更好的初始化来改进深度他说former的优化。<br>
+    我们的目标是提高transformer的训练稳定性，并扩大模型深度的数量级。为此，我们研究了不稳定的原因，发现模型的爆炸性更新是导致不稳定的原因。基于上述观察，我们在残差连接处引入了一个新的归一化函数DEEPNORM。</p>
+<h2 id="tldr-for-practitioners">TL;DR for Practitioners</h2>
+<p><img src="/img/deepnet1.PNG" alt="">
+    在归一化前，DEEPNORM向上扩展了残差连接；同时在初始化时，引入缩放因子gain。</p>
+<h2 id="instability-of-deep-transformer">Instability of Deep Transformer</h2>
+<p>    更好的初始化方法可以稳定transformer的训练，因此，我们研究了无论是否进行适当初始化情况下的Post-LN的训练过程。
+<img src="/img/deepnet2.PNG" alt="">
+    上图中，Post-LN-init是对第l层的权值进行减小，Post-LN为标准的结果；可以看出，无论模型深度如何，最后一层Post-LN-init的梯度范数仍然远远大于Post-LN，这表明，深层的爆炸梯度不应该是Post-LN不稳定的根本原因。</p>
+<p><img src="/img/deepnet3.PNG" alt="">
+    上图为可视化：<br>
+    （a）是训练的早期阶段的模型更新范数：
+$$
+|| \Delta F ||=|| F(x,\theta _ {i}) -F(x,\theta _ {0})||
+$$
+    可以看出，Post-LN在训练一开始就有一个爆炸式的更新，然后几乎没有更新，这表明该模型陷入了一个虚假的局部最优状态。warm-up和更好的初始化都有助于缓解这个问题，使模型能够平稳地更新。当update爆发时，LN的输入就会变得很大。如上图中的（b）和（c）所示。<br>
+    总的来说，不稳定性始于训练开始时的大模型更新：它使模型陷入一个糟糕的局部最优，这反过来增加了LN的输入大小。随着训练的继续，通过LN的梯度变得越来越小，从而导致严重的梯度消失。梯度的消失使其难以脱离局部最优，并进一步使优化不稳定。相反，Post-LN-init的更新相对较小，并且对LN的输入是稳定的，这减轻了梯度消失的痛苦，使优化更加稳定。</p>
+<h2 id="deepnet-extremely-deep-transformers">DEEPNET: Extremely Deep Transformers</h2>
+<h3 id="architecture">Architecture</h3>
+<p>    DEEPNORM的公式表示为：
+$$
+x_{l+1}=LN(\alpha x_{l}+G_{l}(x_{l},\theta _ {l}))
+$$
+    其中，$\alpha$是一个常数，$G_{l}(x_{l},\theta _ {l})$是参数为$\theta _ {l}$的第$l$层transformer层的子层，即注意力层或FFN层。此外，还通过$\beta $来缩放残差分支内的权重$\theta _ {l}$。
+<img src="/img/deepnet4.PNG" alt="">
+    上图为在训练的早期阶段，vanilla Post-LN和DEEPNET的模型更新，可以看出，DEEPNET的更新更加稳定。</p>
+<h2 id="实验">实验</h2>
+<h3 id="neural-machine-translation">Neural Machine Translation</h3>
+<p><img src="/img/deepnet5.PNG" alt="">
+    BLEU scores on the WMT-17 En-De test set</p>
+<h3 id="massively-multilingual-neural-machine-translation">Massively Multilingual Neural Machine Translation</h3>
+<p><img src="/img/deepnet6.PNG" alt="">
+    Average BLEU for DEEPNET and the baseline on the OPUS-100 test sets
+<img src="/img/deepnet7.PNG" alt="">
+    BLEU scores for DEEPNET and M2M-100 on various evaluation sets</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +289,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

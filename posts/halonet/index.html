@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/halonet/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/halonet/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "HaloNet",
+      "headline" : "HaloNet",
+      "description" : "Scaling Local Self-Attention for Parameter Efficient Visual Backbones\nAbstract  通过对注意力机制进行修改和扩展，提出了新的网络架构HaloNets，其结果优于更大的模型，并具有更好的推理性能。\nIntroduction  卷积体现了局部处理的原则，以学习图像中丰富的边缘和纹理等局部空间特征；Transformer表明，注意力机制是一种有效的、计算效率搞得机制，可以捕获全局的信息。\n自注意力机制有一下几个特点：（1）基于内容的交互，而不是与内容无关的卷积交互；（2）感受野大小与参数无关，而卷积中的感受野与参数有关；（3）在较大图像中能够捕获长期依赖关系；（4）灵活地处理多种类型的数据。\nModels and Methods  虽然我们的模型使用自注意力机制而不是卷积来捕捉像素之间的空间局部交互，但其采用了卷积神经网络的一些重要结构特征。\nSelf-attention can generate spatially varying convolutional filters  最近的研究表明，具有少量头数和几何偏置的自注意力机制可以模拟卷积，这表明自注意力和卷积之间存在更深层次的关系。\n我们将自注意机制和卷积写成一般的公式，对于给定的输入$x\\in \\mathbb{R}^{H\\times W\\times C_{in}}$，在$(i,j)$位置的输出为： $$ y_{ij}=\\sum_{a,b\\in N(i,j)}f(i,j,a,b)x_{ab} $$ 其中，$f(i,j,a,b)$是一个函数，在以$(i,j)$为中心、$k × k$为大小的局部窗口处，返回一个权重矩阵$W\\in \\mathbb{R}^{C_{in}\\times C_{out}}$。\n对于卷积和transformer，其函数分别为： $$ f(i,j,a,b)^{conv}=W_{a-i,b-j} $$ $$ f(i,j,a,b)^{self-att}=softmax_{ab}((W_{Q}x_{ij})^{T}W_{K}x_{ab}\u002b(W_{Q}x_{ij})^{T}r_{a-i,b-j})W_{V}=p_{a-i,b-j}^{i,j}W_{V} $$\nImproving the speed-memory tradeoff by relaxing translational equivariance  全局自注意，即所有的位置都相互关注，对于大多数图像尺度来说太昂贵了。但是如果用卷积中的滑动窗口思想，在每个窗口里做 local self-attention，由于每个窗口的结果都要一直存在显存里没法释放，容易造成显存溢出。\n因此提出了blocked local self-attention，即将输入的特征图分成了不重复的一些 block，然后在每个 block 里做 local self-attention。如果每次只考虑block内的信息，必然会导致信息的损失，因此在计算Local Self-Attention之前，先对每个block进行的haloing操作（在边界进行填充）。下图为将$[4,4,c]$的图像，分割成大小为2的block，并且halo=1：首先将图像分割成不重叠的$[2,2,c]$block，然后由block生成query，接着halo步骤在每个block周围提取$[4,4,c]$的图像，生成key和value。最终输出的维度与block维度（query）相同。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,35 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-06-25 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-06-25 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "datePublished": "2022-06-24 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-06-24 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/halonet\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>HaloNet</title>
+  <meta property="og:title" content="HaloNet" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Scaling Local Self-Attention for Parameter Efficient Visual Backbones
+Abstract  通过对注意力机制进行修改和扩展，提出了新的网络架构HaloNets，其结果优于更大的模型，并具有更好的推理性能。
+Introduction  卷积体现了局部处理的原则，以学习图像中丰富的边缘和纹理等局部空间特征；Transformer表明，注意力机制是一种有效的、计算效率搞得机制，可以捕获全局的信息。
+自注意力机制有一下几个特点：（1）基于内容的交互，而不是与内容无关的卷积交互；（2）感受野大小与参数无关，而卷积中的感受野与参数有关；（3）在较大图像中能够捕获长期依赖关系；（4）灵活地处理多种类型的数据。
+Models and Methods  虽然我们的模型使用自注意力机制而不是卷积来捕捉像素之间的空间局部交互，但其采用了卷积神经网络的一些重要结构特征。
+Self-attention can generate spatially varying convolutional filters  最近的研究表明，具有少量头数和几何偏置的自注意力机制可以模拟卷积，这表明自注意力和卷积之间存在更深层次的关系。
+我们将自注意机制和卷积写成一般的公式，对于给定的输入$x\in \mathbb{R}^{H\times W\times C_{in}}$，在$(i,j)$位置的输出为： $$ y_{ij}=\sum_{a,b\in N(i,j)}f(i,j,a,b)x_{ab} $$ 其中，$f(i,j,a,b)$是一个函数，在以$(i,j)$为中心、$k × k$为大小的局部窗口处，返回一个权重矩阵$W\in \mathbb{R}^{C_{in}\times C_{out}}$。
+对于卷积和transformer，其函数分别为： $$ f(i,j,a,b)^{conv}=W_{a-i,b-j} $$ $$ f(i,j,a,b)^{self-att}=softmax_{ab}((W_{Q}x_{ij})^{T}W_{K}x_{ab}&#43;(W_{Q}x_{ij})^{T}r_{a-i,b-j})W_{V}=p_{a-i,b-j}^{i,j}W_{V} $$
+Improving the speed-memory tradeoff by relaxing translational equivariance  全局自注意，即所有的位置都相互关注，对于大多数图像尺度来说太昂贵了。但是如果用卷积中的滑动窗口思想，在每个窗口里做 local self-attention，由于每个窗口的结果都要一直存在显存里没法释放，容易造成显存溢出。
+因此提出了blocked local self-attention，即将输入的特征图分成了不重复的一些 block，然后在每个 block 里做 local self-attention。如果每次只考虑block内的信息，必然会导致信息的损失，因此在计算Local Self-Attention之前，先对每个block进行的haloing操作（在边界进行填充）。下图为将$[4,4,c]$的图像，分割成大小为2的block，并且halo=1：首先将图像分割成不重叠的$[2,2,c]$block，然后由block生成query，接着halo步骤在每个block周围提取$[4,4,c]$的图像，生成key和value。最终输出的维度与block维度（query）相同。" />
+  <meta name="description" content="Scaling Local Self-Attention for Parameter Efficient Visual Backbones
+Abstract  通过对注意力机制进行修改和扩展，提出了新的网络架构HaloNets，其结果优于更大的模型，并具有更好的推理性能。
+Introduction  卷积体现了局部处理的原则，以学习图像中丰富的边缘和纹理等局部空间特征；Transformer表明，注意力机制是一种有效的、计算效率搞得机制，可以捕获全局的信息。
+自注意力机制有一下几个特点：（1）基于内容的交互，而不是与内容无关的卷积交互；（2）感受野大小与参数无关，而卷积中的感受野与参数有关；（3）在较大图像中能够捕获长期依赖关系；（4）灵活地处理多种类型的数据。
+Models and Methods  虽然我们的模型使用自注意力机制而不是卷积来捕捉像素之间的空间局部交互，但其采用了卷积神经网络的一些重要结构特征。
+Self-attention can generate spatially varying convolutional filters  最近的研究表明，具有少量头数和几何偏置的自注意力机制可以模拟卷积，这表明自注意力和卷积之间存在更深层次的关系。
+我们将自注意机制和卷积写成一般的公式，对于给定的输入$x\in \mathbb{R}^{H\times W\times C_{in}}$，在$(i,j)$位置的输出为： $$ y_{ij}=\sum_{a,b\in N(i,j)}f(i,j,a,b)x_{ab} $$ 其中，$f(i,j,a,b)$是一个函数，在以$(i,j)$为中心、$k × k$为大小的局部窗口处，返回一个权重矩阵$W\in \mathbb{R}^{C_{in}\times C_{out}}$。
+对于卷积和transformer，其函数分别为： $$ f(i,j,a,b)^{conv}=W_{a-i,b-j} $$ $$ f(i,j,a,b)^{self-att}=softmax_{ab}((W_{Q}x_{ij})^{T}W_{K}x_{ab}&#43;(W_{Q}x_{ij})^{T}r_{a-i,b-j})W_{V}=p_{a-i,b-j}^{i,j}W_{V} $$
+Improving the speed-memory tradeoff by relaxing translational equivariance  全局自注意，即所有的位置都相互关注，对于大多数图像尺度来说太昂贵了。但是如果用卷积中的滑动窗口思想，在每个窗口里做 local self-attention，由于每个窗口的结果都要一直存在显存里没法释放，容易造成显存溢出。
+因此提出了blocked local self-attention，即将输入的特征图分成了不重复的一些 block，然后在每个 block 里做 local self-attention。如果每次只考虑block内的信息，必然会导致信息的损失，因此在计算Local Self-Attention之前，先对每个block进行的haloing操作（在边界进行填充）。下图为将$[4,4,c]$的图像，分割成大小为2的block，并且halo=1：首先将图像分割成不重叠的$[2,2,c]$block，然后由block生成query，接着halo步骤在每个block周围提取$[4,4,c]$的图像，生成key和value。最终输出的维度与block维度（query）相同。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +121,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +154,108 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">HaloNet</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-06-24 00:00:00 UTC">
+                24 Jun 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Scaling Local Self-Attention for Parameter Efficient Visual Backbones</p>
+<h2 id="abstract">Abstract</h2>
+<p>    通过对注意力机制进行修改和扩展，提出了新的网络架构HaloNets，其结果优于更大的模型，并具有更好的推理性能。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    卷积体现了局部处理的原则，以学习图像中丰富的边缘和纹理等局部空间特征；Transformer表明，注意力机制是一种有效的、计算效率搞得机制，可以捕获全局的信息。<br>
+    自注意力机制有一下几个特点：（1）基于内容的交互，而不是与内容无关的卷积交互；（2）感受野大小与参数无关，而卷积中的感受野与参数有关；（3）在较大图像中能够捕获长期依赖关系；（4）灵活地处理多种类型的数据。</p>
+<h3 id="models-and-methods">Models and Methods</h3>
+<p>    虽然我们的模型使用自注意力机制而不是卷积来捕捉像素之间的空间局部交互，但其采用了卷积神经网络的一些重要结构特征。</p>
+<h3 id="self-attention-can-generate-spatially-varying-convolutional-filters">Self-attention can generate spatially varying convolutional filters</h3>
+<p>    最近的研究表明，具有少量头数和几何偏置的自注意力机制可以模拟卷积，这表明自注意力和卷积之间存在更深层次的关系。<br>
+    我们将自注意机制和卷积写成一般的公式，对于给定的输入$x\in \mathbb{R}^{H\times W\times C_{in}}$，在$(i,j)$位置的输出为：
+$$
+y_{ij}=\sum_{a,b\in N(i,j)}f(i,j,a,b)x_{ab}
+$$
+    其中，$f(i,j,a,b)$是一个函数，在以$(i,j)$为中心、$k × k$为大小的局部窗口处，返回一个权重矩阵$W\in \mathbb{R}^{C_{in}\times C_{out}}$。<br>
+    对于卷积和transformer，其函数分别为：
+$$
+f(i,j,a,b)^{conv}=W_{a-i,b-j}
+$$
+$$
+f(i,j,a,b)^{self-att}=softmax_{ab}((W_{Q}x_{ij})^{T}W_{K}x_{ab}+(W_{Q}x_{ij})^{T}r_{a-i,b-j})W_{V}=p_{a-i,b-j}^{i,j}W_{V}
+$$</p>
+<h3 id="improving-the-speed-memory-tradeoff-by-relaxing-translational-equivariance">Improving the speed-memory tradeoff by relaxing translational equivariance</h3>
+<p>    全局自注意，即所有的位置都相互关注，对于大多数图像尺度来说太昂贵了。但是如果用卷积中的滑动窗口思想，在每个窗口里做 local self-attention，由于每个窗口的结果都要一直存在显存里没法释放，容易造成显存溢出。<br>
+    因此提出了blocked local self-attention，即将输入的特征图分成了不重复的一些 block，然后在每个 block 里做 local self-attention。如果每次只考虑block内的信息，必然会导致信息的损失，因此在计算Local Self-Attention之前，先对每个block进行的haloing操作（在边界进行填充）。下图为将$[4,4,c]$的图像，分割成大小为2的block，并且halo=1：首先将图像分割成不重叠的$[2,2,c]$block，然后由block生成query，接着halo步骤在每个block周围提取$[4,4,c]$的图像，生成key和value。最终输出的维度与block维度（query）相同。</p>
+<p><img src="/img/halonet1.PNG" alt="">
+    针对下采样，如下图所示，使用一层attention层来实现，类似于子样本的query。
+<img src="/img/halonet2.PNG" alt=""></p>
+<h3 id="halonet">HaloNet</h3>
+<p><img src="/img/halonet3.PNG" alt=""></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +275,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

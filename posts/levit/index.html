@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/posts/volo/" />
-  <link rel="canonical" href="https://gdy0924.github.io/posts/volo/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/levit/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/levit/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -57,9 +57,9 @@ code.has-jax {
            "@id": "https:\/\/gdy0924.github.io\/"
       },
       "articleSection" : "posts",
-      "name" : "VOLO",
-      "headline" : "VOLO",
-      "description" : "VOLO: Vision Outlooker for Visual Recognition\nAbstract  限制ViT的性能的主要原因是：对细粒度的特征编码效率较低，为了解决这个问题，我们提出新的outlook attention，并提出了一个简单的架构Vision Outlooker (VOLO)。与粗粒度的全局注意力不同，outlook attention能够有效的提取细粒度特征和上下文信息。\nIntroduction  限制ViT的一个主要因素是：分割得到的patch token，提取细粒度特征和引入上下文编码是低效率的。在本文中，我们提出了一种新的注意力机制：Outlooker，能够有效的提取细粒度特征和上下文信息；同时，利用线性投影，而摆脱了二次复杂度。\n基于Outlooker，我们提出了一个简单的模型架构：VOLO。VOLO通过一个两阶段的体系结构，实现了细粒度的token表示和全局信息的聚合；具体来说，给定一个224×224的图像，在使用自注意力机制在粗粒度上构建全局依赖以前，先在较小的patch上，使用多个Outlooker在细粒度特征上进行token表示。\nMethod  可以分为两阶段：\n（1）堆叠的Outlooker，以生成细粒度级别的token表征；\n（2）一系列transformer block聚合全局信息。\nOutlooker  Outlooker由一个对空间信息编码的outlook attention层和一个用于通道之间信息交互的MLP层组成。\n对对于给定的C维输入$X\\in \\mathbb{R}^{H\\times W\\times C}$，Outlooker可以写作： $$ \\tilde{X} = OutlookAtt(LN(X))\u002bX $$ $$ Z=MLP(LN(\\tilde{X}))\u002b\\tilde{X} $$\nOutlook Attention 如上图所示，主要思想有两点：\n（1）每个空间位置的局部特征足以生成注意力权重系数来聚合其临近的特征；\n（2）密集的局部空间特征聚集可以有效的编码细粒度信息。\n对于每个空间位置$(i,j)$，outlook注意力在以$(i,j)$为中心、大小为$K×K$的局部窗口内，计算相邻位置的相似性。与自注意力机制中使用Q-K矩阵相乘来得到权重系数不同，outlook通过reshape来简化这个过程。\n对于给定的输入$X$，每个C维的token首先经过线性投影，使用两个线性层，$W_{A}\\in \\mathbb{R}^{C\\times K^{4}}$和$W_{V}\\in \\mathbb{R}^{C\\times C}$，分别得到outlook权重$A\\in \\mathbb{R}^{H\\times W\\times K^{4}}$和value$V\\in \\mathbb{R}^{H\\times W\\times C}$，$V_{\\Delta _ {i,j}}\\in \\mathbb{R}^{C\\times K^{2}}$表示以$(i,j)$为中心的局部窗口内的值： $$ V_{\\Delta _ {i,j}}=\\lbrace V_{i\u002bp-\\left \\lfloor \\frac{K}{2} \\right \\rfloor,j\u002bq-\\left \\lfloor \\frac{K}{2} \\right \\rfloor} \\rbrace $$ Outlook attention",
+      "name" : "LeViT",
+      "headline" : "LeViT",
+      "description" : "LeViT: a Vision Transformer in ConvNet’s Clothing for Faster Inference\nAbstract  设计了一系列图像分类架构，以权衡在高速状态下的精度和效率。利用注意力架构，并将卷积网络的原理应用于transformer，并且引入了注意力偏置，一种新的引入位置信息的方式。提出LeViT：一种用于快速推理的图像分类混合网络。\nIntroduction  在本文中，探索中小型架构中比ViT\/DeiT更好的权衡，目前许多工作旨在减少分类器和特征提取器的内存占用，但其推理速度也很重要。探索一个基于视觉transformer的模型架构，具有更好的推理速度。重新引入卷积，以代替类似卷积的transformer组件，同时利用池化金字塔结构替换transformer的柱状结构。\nContributions：\n（1）使用注意力机制作为降采样方式的多阶段transformer架构；\n（2）计算更高效的patch，减少了第一层中的特征数量；\n（3）一个可学习的注意力偏置代替ViT中的位置embedding；\n（4）一个重新设计的Attention-MLP block，在给定的计算时间中提高模型学习能力。\nRelated work Transformers The vision transformer (ViT) Positional encoding  在我们的工作中，用隐式编码空间信息的位置偏置来代替显式的位置编码。\nAttention along other mechanisms  在图像分类方面，最近与我们并行的工作是PVT，其设计很大程度上受到ResNet的启发，主要用于处理分割任务。同时还有T2T网络，与PVT类似。但是这些工作没有平衡精度与推理时间。\nMotivation  将patch的线性投影看作卷积操作，在一个卷积网络ResNet-50上嫁接一个transformer网络DeiT-S。\n我们裁剪了ResNet-50的上部阶段，并同样减少了DeiT层的数量，由于裁剪的ResNet产生的特征图比DeiT输入的14×14的特征图更大，因此在它们之间引入了池化层。\nResults\n嫁接的架构比单独使用DeiT和ResNet-50的精度更好，参数量最少并且效果最好的结构是使用ResNet-50的前两个阶段。 与DeiT模型相比，卷积层模型在早期阶段表现出更快的收敛速度；并且嫁接模型在早期的收敛类似于卷积网络，后期切换到transformer结构的收敛速度。\nDiscussion\n变压器架构需要与卷积阶段更紧密地合并，而不是仅仅是嫁接。\nModel Design principles of LeViT  LeViT建立在ViT和DeiT架构上，引入那些被证明对卷积网络有效的部件。第一步是得到一个兼容的表征，不考虑class token的话，ViT就是处理特征图的堆叠层，中间的token可以看作FCN架构中的特征图。因此，应用于特征图的操作（池化\/卷积）同样可以应用于DeiT的中间表征。\n在本文中，我们优化了体系结构，而不一定要最小化参数的数量。ResNet网络比VGG网络更有效率的原因之一是在其前两个阶段以相对较小的计算应用较强的分辨率降低，即当特征图到达ResNet的第三阶段时，它的分辨率已经缩小到足够小，从而降低了计算成本。\nLeViT components Patch embedding  在LeViT中，使用4层3×3的卷积（步幅为2）来对特征图的分辨率进行降低，通道数分别为3、32、64、128、256。\nNo classification token  为了使用BCHW张量格式，删除了class token。与卷积网络类似，通过在最后一个特征图上进行平均池化，来实现最终的分类。为了实现蒸馏，分别训练不同的头，在测试时，使用两个头的输出平均值。\nNormalization layers and activations  ViT中的FC层相当于1×1的卷积，同时在每个注意力层和MLP层之前使用层归一化。对于LeViT，每个卷积之后都进行批归一化。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,43 +67,57 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-06-15 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-06-15 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/posts\/volo\/",
+      "datePublished": "2022-06-21 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-06-21 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/levit\/",
       "keywords" : [  ]
   }
 </script>
-<title>VOLO</title>
-  <meta property="og:title" content="VOLO" />
+<title>LeViT</title>
+  <meta property="og:title" content="LeViT" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="VOLO: Vision Outlooker for Visual Recognition
-Abstract  限制ViT的性能的主要原因是：对细粒度的特征编码效率较低，为了解决这个问题，我们提出新的outlook attention，并提出了一个简单的架构Vision Outlooker (VOLO)。与粗粒度的全局注意力不同，outlook attention能够有效的提取细粒度特征和上下文信息。
-Introduction  限制ViT的一个主要因素是：分割得到的patch token，提取细粒度特征和引入上下文编码是低效率的。在本文中，我们提出了一种新的注意力机制：Outlooker，能够有效的提取细粒度特征和上下文信息；同时，利用线性投影，而摆脱了二次复杂度。
-基于Outlooker，我们提出了一个简单的模型架构：VOLO。VOLO通过一个两阶段的体系结构，实现了细粒度的token表示和全局信息的聚合；具体来说，给定一个224×224的图像，在使用自注意力机制在粗粒度上构建全局依赖以前，先在较小的patch上，使用多个Outlooker在细粒度特征上进行token表示。
-Method  可以分为两阶段：
-（1）堆叠的Outlooker，以生成细粒度级别的token表征；
-（2）一系列transformer block聚合全局信息。
-Outlooker  Outlooker由一个对空间信息编码的outlook attention层和一个用于通道之间信息交互的MLP层组成。
-对对于给定的C维输入$X\in \mathbb{R}^{H\times W\times C}$，Outlooker可以写作： $$ \tilde{X} = OutlookAtt(LN(X))&#43;X $$ $$ Z=MLP(LN(\tilde{X}))&#43;\tilde{X} $$
-Outlook Attention 如上图所示，主要思想有两点：
-（1）每个空间位置的局部特征足以生成注意力权重系数来聚合其临近的特征；
-（2）密集的局部空间特征聚集可以有效的编码细粒度信息。
-对于每个空间位置$(i,j)$，outlook注意力在以$(i,j)$为中心、大小为$K×K$的局部窗口内，计算相邻位置的相似性。与自注意力机制中使用Q-K矩阵相乘来得到权重系数不同，outlook通过reshape来简化这个过程。
-对于给定的输入$X$，每个C维的token首先经过线性投影，使用两个线性层，$W_{A}\in \mathbb{R}^{C\times K^{4}}$和$W_{V}\in \mathbb{R}^{C\times C}$，分别得到outlook权重$A\in \mathbb{R}^{H\times W\times K^{4}}$和value$V\in \mathbb{R}^{H\times W\times C}$，$V_{\Delta _ {i,j}}\in \mathbb{R}^{C\times K^{2}}$表示以$(i,j)$为中心的局部窗口内的值： $$ V_{\Delta _ {i,j}}=\lbrace V_{i&#43;p-\left \lfloor \frac{K}{2} \right \rfloor,j&#43;q-\left \lfloor \frac{K}{2} \right \rfloor} \rbrace $$ Outlook attention" />
-  <meta name="description" content="VOLO: Vision Outlooker for Visual Recognition
-Abstract  限制ViT的性能的主要原因是：对细粒度的特征编码效率较低，为了解决这个问题，我们提出新的outlook attention，并提出了一个简单的架构Vision Outlooker (VOLO)。与粗粒度的全局注意力不同，outlook attention能够有效的提取细粒度特征和上下文信息。
-Introduction  限制ViT的一个主要因素是：分割得到的patch token，提取细粒度特征和引入上下文编码是低效率的。在本文中，我们提出了一种新的注意力机制：Outlooker，能够有效的提取细粒度特征和上下文信息；同时，利用线性投影，而摆脱了二次复杂度。
-基于Outlooker，我们提出了一个简单的模型架构：VOLO。VOLO通过一个两阶段的体系结构，实现了细粒度的token表示和全局信息的聚合；具体来说，给定一个224×224的图像，在使用自注意力机制在粗粒度上构建全局依赖以前，先在较小的patch上，使用多个Outlooker在细粒度特征上进行token表示。
-Method  可以分为两阶段：
-（1）堆叠的Outlooker，以生成细粒度级别的token表征；
-（2）一系列transformer block聚合全局信息。
-Outlooker  Outlooker由一个对空间信息编码的outlook attention层和一个用于通道之间信息交互的MLP层组成。
-对对于给定的C维输入$X\in \mathbb{R}^{H\times W\times C}$，Outlooker可以写作： $$ \tilde{X} = OutlookAtt(LN(X))&#43;X $$ $$ Z=MLP(LN(\tilde{X}))&#43;\tilde{X} $$
-Outlook Attention 如上图所示，主要思想有两点：
-（1）每个空间位置的局部特征足以生成注意力权重系数来聚合其临近的特征；
-（2）密集的局部空间特征聚集可以有效的编码细粒度信息。
-对于每个空间位置$(i,j)$，outlook注意力在以$(i,j)$为中心、大小为$K×K$的局部窗口内，计算相邻位置的相似性。与自注意力机制中使用Q-K矩阵相乘来得到权重系数不同，outlook通过reshape来简化这个过程。
-对于给定的输入$X$，每个C维的token首先经过线性投影，使用两个线性层，$W_{A}\in \mathbb{R}^{C\times K^{4}}$和$W_{V}\in \mathbb{R}^{C\times C}$，分别得到outlook权重$A\in \mathbb{R}^{H\times W\times K^{4}}$和value$V\in \mathbb{R}^{H\times W\times C}$，$V_{\Delta _ {i,j}}\in \mathbb{R}^{C\times K^{2}}$表示以$(i,j)$为中心的局部窗口内的值： $$ V_{\Delta _ {i,j}}=\lbrace V_{i&#43;p-\left \lfloor \frac{K}{2} \right \rfloor,j&#43;q-\left \lfloor \frac{K}{2} \right \rfloor} \rbrace $$ Outlook attention" />
+  <meta property="og:description" content="LeViT: a Vision Transformer in ConvNet’s Clothing for Faster Inference
+Abstract  设计了一系列图像分类架构，以权衡在高速状态下的精度和效率。利用注意力架构，并将卷积网络的原理应用于transformer，并且引入了注意力偏置，一种新的引入位置信息的方式。提出LeViT：一种用于快速推理的图像分类混合网络。
+Introduction  在本文中，探索中小型架构中比ViT/DeiT更好的权衡，目前许多工作旨在减少分类器和特征提取器的内存占用，但其推理速度也很重要。探索一个基于视觉transformer的模型架构，具有更好的推理速度。重新引入卷积，以代替类似卷积的transformer组件，同时利用池化金字塔结构替换transformer的柱状结构。
+Contributions：
+（1）使用注意力机制作为降采样方式的多阶段transformer架构；
+（2）计算更高效的patch，减少了第一层中的特征数量；
+（3）一个可学习的注意力偏置代替ViT中的位置embedding；
+（4）一个重新设计的Attention-MLP block，在给定的计算时间中提高模型学习能力。
+Related work Transformers The vision transformer (ViT) Positional encoding  在我们的工作中，用隐式编码空间信息的位置偏置来代替显式的位置编码。
+Attention along other mechanisms  在图像分类方面，最近与我们并行的工作是PVT，其设计很大程度上受到ResNet的启发，主要用于处理分割任务。同时还有T2T网络，与PVT类似。但是这些工作没有平衡精度与推理时间。
+Motivation  将patch的线性投影看作卷积操作，在一个卷积网络ResNet-50上嫁接一个transformer网络DeiT-S。
+我们裁剪了ResNet-50的上部阶段，并同样减少了DeiT层的数量，由于裁剪的ResNet产生的特征图比DeiT输入的14×14的特征图更大，因此在它们之间引入了池化层。
+Results
+嫁接的架构比单独使用DeiT和ResNet-50的精度更好，参数量最少并且效果最好的结构是使用ResNet-50的前两个阶段。 与DeiT模型相比，卷积层模型在早期阶段表现出更快的收敛速度；并且嫁接模型在早期的收敛类似于卷积网络，后期切换到transformer结构的收敛速度。
+Discussion
+变压器架构需要与卷积阶段更紧密地合并，而不是仅仅是嫁接。
+Model Design principles of LeViT  LeViT建立在ViT和DeiT架构上，引入那些被证明对卷积网络有效的部件。第一步是得到一个兼容的表征，不考虑class token的话，ViT就是处理特征图的堆叠层，中间的token可以看作FCN架构中的特征图。因此，应用于特征图的操作（池化/卷积）同样可以应用于DeiT的中间表征。
+在本文中，我们优化了体系结构，而不一定要最小化参数的数量。ResNet网络比VGG网络更有效率的原因之一是在其前两个阶段以相对较小的计算应用较强的分辨率降低，即当特征图到达ResNet的第三阶段时，它的分辨率已经缩小到足够小，从而降低了计算成本。
+LeViT components Patch embedding  在LeViT中，使用4层3×3的卷积（步幅为2）来对特征图的分辨率进行降低，通道数分别为3、32、64、128、256。
+No classification token  为了使用BCHW张量格式，删除了class token。与卷积网络类似，通过在最后一个特征图上进行平均池化，来实现最终的分类。为了实现蒸馏，分别训练不同的头，在测试时，使用两个头的输出平均值。
+Normalization layers and activations  ViT中的FC层相当于1×1的卷积，同时在每个注意力层和MLP层之前使用层归一化。对于LeViT，每个卷积之后都进行批归一化。" />
+  <meta name="description" content="LeViT: a Vision Transformer in ConvNet’s Clothing for Faster Inference
+Abstract  设计了一系列图像分类架构，以权衡在高速状态下的精度和效率。利用注意力架构，并将卷积网络的原理应用于transformer，并且引入了注意力偏置，一种新的引入位置信息的方式。提出LeViT：一种用于快速推理的图像分类混合网络。
+Introduction  在本文中，探索中小型架构中比ViT/DeiT更好的权衡，目前许多工作旨在减少分类器和特征提取器的内存占用，但其推理速度也很重要。探索一个基于视觉transformer的模型架构，具有更好的推理速度。重新引入卷积，以代替类似卷积的transformer组件，同时利用池化金字塔结构替换transformer的柱状结构。
+Contributions：
+（1）使用注意力机制作为降采样方式的多阶段transformer架构；
+（2）计算更高效的patch，减少了第一层中的特征数量；
+（3）一个可学习的注意力偏置代替ViT中的位置embedding；
+（4）一个重新设计的Attention-MLP block，在给定的计算时间中提高模型学习能力。
+Related work Transformers The vision transformer (ViT) Positional encoding  在我们的工作中，用隐式编码空间信息的位置偏置来代替显式的位置编码。
+Attention along other mechanisms  在图像分类方面，最近与我们并行的工作是PVT，其设计很大程度上受到ResNet的启发，主要用于处理分割任务。同时还有T2T网络，与PVT类似。但是这些工作没有平衡精度与推理时间。
+Motivation  将patch的线性投影看作卷积操作，在一个卷积网络ResNet-50上嫁接一个transformer网络DeiT-S。
+我们裁剪了ResNet-50的上部阶段，并同样减少了DeiT层的数量，由于裁剪的ResNet产生的特征图比DeiT输入的14×14的特征图更大，因此在它们之间引入了池化层。
+Results
+嫁接的架构比单独使用DeiT和ResNet-50的精度更好，参数量最少并且效果最好的结构是使用ResNet-50的前两个阶段。 与DeiT模型相比，卷积层模型在早期阶段表现出更快的收敛速度；并且嫁接模型在早期的收敛类似于卷积网络，后期切换到transformer结构的收敛速度。
+Discussion
+变压器架构需要与卷积阶段更紧密地合并，而不是仅仅是嫁接。
+Model Design principles of LeViT  LeViT建立在ViT和DeiT架构上，引入那些被证明对卷积网络有效的部件。第一步是得到一个兼容的表征，不考虑class token的话，ViT就是处理特征图的堆叠层，中间的token可以看作FCN架构中的特征图。因此，应用于特征图的操作（池化/卷积）同样可以应用于DeiT的中间表征。
+在本文中，我们优化了体系结构，而不一定要最小化参数的数量。ResNet网络比VGG网络更有效率的原因之一是在其前两个阶段以相对较小的计算应用较强的分辨率降低，即当特征图到达ResNet的第三阶段时，它的分辨率已经缩小到足够小，从而降低了计算成本。
+LeViT components Patch embedding  在LeViT中，使用4层3×3的卷积（步幅为2）来对特征图的分辨率进行降低，通道数分别为3、32、64、128、256。
+No classification token  为了使用BCHW张量格式，删除了class token。与卷积网络类似，通过在最后一个特征图上进行平均池化，来实现最终的分类。为了实现蒸馏，分别训练不同的头，在测试时，使用两个头的输出平均值。
+Normalization layers and activations  ViT中的FC层相当于1×1的卷积，同时在每个注意力层和MLP层之前使用层归一化。对于LeViT，每个卷积之后都进行批归一化。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -164,13 +178,13 @@ Outlook Attention 如上图所示，主要思想有两点：
 
         </div>
         <header class="post-header">
-          <h1 class="post-title">VOLO</h1>
+          <h1 class="post-title">LeViT</h1>
           
           <div class="row post-desc">
             <div class="col-xs-6">
               
-              <time class="post-date" datetime="2022-06-15 00:00:00 UTC">
-                15 Jun 2022
+              <time class="post-date" datetime="2022-06-21 00:00:00 UTC">
+                21 Jun 2022
               </time>
               
             </div>
@@ -187,59 +201,68 @@ Outlook Attention 如上图所示，主要思想有两点：
 
         <div class="post-content markdown-body">
           
-          <p>VOLO: Vision Outlooker for Visual Recognition</p>
+          <p>LeViT: a Vision Transformer in ConvNet’s Clothing for Faster Inference</p>
 <h2 id="abstract">Abstract</h2>
-<p>    限制ViT的性能的主要原因是：对细粒度的特征编码效率较低，为了解决这个问题，我们提出新的outlook attention，并提出了一个简单的架构Vision Outlooker (VOLO)。与粗粒度的全局注意力不同，outlook attention能够有效的提取细粒度特征和上下文信息。</p>
+<p>    设计了一系列图像分类架构，以权衡在高速状态下的精度和效率。利用注意力架构，并将卷积网络的原理应用于transformer，并且引入了注意力偏置，一种新的引入位置信息的方式。提出LeViT：一种用于快速推理的图像分类混合网络。</p>
 <h2 id="introduction">Introduction</h2>
-<p>    限制ViT的一个主要因素是：分割得到的patch token，提取细粒度特征和引入上下文编码是低效率的。在本文中，我们提出了一种新的注意力机制：Outlooker，能够有效的提取细粒度特征和上下文信息；同时，利用线性投影，而摆脱了二次复杂度。<br>
-    基于Outlooker，我们提出了一个简单的模型架构：VOLO。VOLO通过一个两阶段的体系结构，实现了细粒度的token表示和全局信息的聚合；具体来说，给定一个224×224的图像，在使用自注意力机制在粗粒度上构建全局依赖以前，先在较小的patch上，使用多个Outlooker在细粒度特征上进行token表示。</p>
-<h2 id="method">Method</h2>
-<p>    可以分为两阶段：<br>
-    （1）堆叠的Outlooker，以生成细粒度级别的token表征；<br>
-    （2）一系列transformer block聚合全局信息。</p>
-<h3 id="outlooker">Outlooker</h3>
-<p>    Outlooker由一个对空间信息编码的outlook attention层和一个用于通道之间信息交互的MLP层组成。<br>
-    对对于给定的C维输入$X\in \mathbb{R}^{H\times W\times C}$，Outlooker可以写作：
+<p>    在本文中，探索中小型架构中比ViT/DeiT更好的权衡，目前许多工作旨在减少分类器和特征提取器的内存占用，但其推理速度也很重要。探索一个基于视觉transformer的模型架构，具有更好的推理速度。重新引入卷积，以代替类似卷积的transformer组件，同时利用池化金字塔结构替换transformer的柱状结构。<br>
+    <em><strong>Contributions</strong></em>：<br>
+    （1）使用注意力机制作为降采样方式的多阶段transformer架构；<br>
+    （2）计算更高效的patch，减少了第一层中的特征数量；<br>
+    （3）一个可学习的注意力偏置代替ViT中的位置embedding；<br>
+    （4）一个重新设计的Attention-MLP block，在给定的计算时间中提高模型学习能力。</p>
+<h2 id="related-work">Related work</h2>
+<h3 id="transformers">Transformers</h3>
+<h3 id="the-vision-transformer-vit">The vision transformer (ViT)</h3>
+<h3 id="positional-encoding">Positional encoding</h3>
+<p>    在我们的工作中，用隐式编码空间信息的位置偏置来代替显式的位置编码。</p>
+<h3 id="attention-along-other-mechanisms">Attention along other mechanisms</h3>
+<p>    在图像分类方面，最近与我们并行的工作是PVT，其设计很大程度上受到ResNet的启发，主要用于处理分割任务。同时还有T2T网络，与PVT类似。但是这些工作没有平衡精度与推理时间。</p>
+<h2 id="motivation">Motivation</h2>
+<p>    将patch的线性投影看作卷积操作，在一个卷积网络ResNet-50上嫁接一个transformer网络DeiT-S。<br>
+    我们裁剪了ResNet-50的上部阶段，并同样减少了DeiT层的数量，由于裁剪的ResNet产生的特征图比DeiT输入的14×14的特征图更大，因此在它们之间引入了池化层。<br>
+    <em><strong>Results</strong></em></p>
+<p><img src="/img/levit1.PNG" alt="">
+    嫁接的架构比单独使用DeiT和ResNet-50的精度更好，参数量最少并且效果最好的结构是使用ResNet-50的前两个阶段。
+<img src="/img/levit2.PNG" alt="">
+    与DeiT模型相比，卷积层模型在早期阶段表现出更快的收敛速度；并且嫁接模型在早期的收敛类似于卷积网络，后期切换到transformer结构的收敛速度。<br>
+    <em><strong>Discussion</strong></em><br>
+    变压器架构需要与卷积阶段更紧密地合并，而不是仅仅是嫁接。</p>
+<h2 id="model">Model</h2>
+<p><img src="/img/levit3.PNG" alt=""></p>
+<h3 id="design-principles-of-levit">Design principles of LeViT</h3>
+<p>    LeViT建立在ViT和DeiT架构上，引入那些被证明对卷积网络有效的部件。第一步是得到一个兼容的表征，不考虑class token的话，ViT就是处理特征图的堆叠层，中间的token可以看作FCN架构中的特征图。因此，应用于特征图的操作（池化/卷积）同样可以应用于DeiT的中间表征。<br>
+    在本文中，我们优化了体系结构，而不一定要最小化参数的数量。ResNet网络比VGG网络更有效率的原因之一是在其前两个阶段以相对较小的计算应用较强的分辨率降低，即当特征图到达ResNet的第三阶段时，它的分辨率已经缩小到足够小，从而降低了计算成本。</p>
+<h3 id="levit-components">LeViT components</h3>
+<h4 id="patch-embedding">Patch embedding</h4>
+<p>    在LeViT中，使用4层3×3的卷积（步幅为2）来对特征图的分辨率进行降低，通道数分别为3、32、64、128、256。</p>
+<h4 id="no-classification-token">No classification token</h4>
+<p>    为了使用BCHW张量格式，删除了class token。与卷积网络类似，通过在最后一个特征图上进行平均池化，来实现最终的分类。为了实现蒸馏，分别训练不同的头，在测试时，使用两个头的输出平均值。</p>
+<h4 id="normalization-layers-and-activations">Normalization layers and activations</h4>
+<p>    ViT中的FC层相当于1×1的卷积，同时在每个注意力层和MLP层之前使用层归一化。对于LeViT，每个卷积之后都进行批归一化。</p>
+<h4 id="multi-resolution-pyramid">Multi-resolution pyramid</h4>
+<p>    卷积网络中特征图的分辨率随着通道数量的增加而降低。LeViT在变压器架构中集成了ResNet阶段，阶段内部结构与原始的视觉transformer类似：MLP和MSA。如下图所示，左边为原始的结构，右边为将特征图减少一半的结构。
+<img src="/img/levit4.PNG" alt=""></p>
+<h4 id="downsampling">Downsampling</h4>
+<p>    在LeViT阶段之间，一个收缩的注意块（shrinking attention block）可以减少特征图的大小：在Q变换之前经过一个下采样模块，将输入大小$(C,H,W)$转换成大小为$(C',H/2,W/2)$，由于尺寸的变化，该模块没有残差连接。</p>
+<h4 id="attention-bias-instead-of-a-positional-embedding">Attention bias instead of a positional embedding.</h4>
+<p>    transformer中的位置embedding是一个与位置相关的可训练的向量，将其与patch embedding相加得到最终的输入。<br>
+    我们的目标是在每个attention block内提供位置信息：在特征图上添加注意力偏置（attention bias），一个头中两个像素$(x,y)$和$(x',y')$的注意力分数可以计算为：
 $$
-\tilde{X} = OutlookAtt(LN(X))+X
+A_{(x,y),(x',y')}^{h}=Q_{(x,y)}\cdot Q_{(x',y')}+B_{|x-x'|,|y-y'|}^{h}
 $$
-$$
-Z=MLP(LN(\tilde{X}))+\tilde{X}
-$$</p>
-<h4 id="outlook-attention">Outlook Attention</h4>
-<p><img src="/img/volo1.PNG" alt="">
-    如上图所示，主要思想有两点：<br>
-    （1）每个空间位置的局部特征足以生成注意力权重系数来聚合其临近的特征；<br>
-    （2）密集的局部空间特征聚集可以有效的编码细粒度信息。<br>
-    对于每个空间位置$(i,j)$，outlook注意力在以$(i,j)$为中心、大小为$K×K$的局部窗口内，计算相邻位置的相似性。与自注意力机制中使用Q-K矩阵相乘来得到权重系数不同，outlook通过reshape来简化这个过程。<br>
-    对于给定的输入$X$，每个C维的token首先经过线性投影，使用两个线性层，$W_{A}\in \mathbb{R}^{C\times K^{4}}$和$W_{V}\in \mathbb{R}^{C\times C}$，分别得到outlook权重$A\in \mathbb{R}^{H\times W\times K^{4}}$和value$V\in \mathbb{R}^{H\times W\times C}$，$V_{\Delta _ {i,j}}\in \mathbb{R}^{C\times K^{2}}$表示以$(i,j)$为中心的局部窗口内的值：
-$$
-V_{\Delta _ {i,j}}=\lbrace V_{i+p-\left \lfloor \frac{K}{2} \right \rfloor,j+q-\left \lfloor \frac{K}{2} \right \rfloor} \rbrace
-$$
-    <strong>Outlook attention</strong><br>
-    位置$(i,j)$的outlook权重直接用作value聚合时的注意力权重，通过reshape操作将outlook权重$A\in \mathbb{R}^{H\times W\times K^{4}}$转换成$\tilde{A}_ {i,j}\in \mathbb{R}^{K^{2}\times K^{2}}$，然后跟着一个softmax，即：
-$$
-Y_{\Delta _ {i,j}}=MatMul(Softmax(\tilde{A}_ {i,j}),V_{\Delta _ {i,j}})
-$$
-    <strong>Dense aggregation</strong><br>
-    注意力密集的聚集了value的表示，将来自不同局部窗口的不同位置在同一位置的不同权值进行相加，得到输出：
-$$
-\tilde{Y}_ {\Delta _ {i,j}}=\sum_{0\leq m,n&lt; K}Y_{\Delta _ {i+m-\left \lfloor \frac{K}{2} \right \rfloor,j+n-\left \lfloor \frac{K}{2} \right \rfloor}}^{i,j}
-$$</p>
-<h4 id="multi-head-outlook-attention">Multi-Head Outlook Attention</h4>
-<p>    实现多头，假设头数维$N$，只需要修改权重$W_{A}$的形状即可，即$W_{A}\in \mathbb{R}^{C\times N\times K^{4}}$。outlook权重和value被分成$N$段，即$A_{n}\in \mathbb{R}^{H\times W\times K^{4}}$，$V_{n}\in \mathbb{R}^{H\times W\times C_{N}}$，其中$C_{N}$是每头的维度。</p>
-<h3 id="network-architecture-variants">Network Architecture Variants</h3>
-<p><img src="/img/volo2.PNG" alt="">
-    我们观察到，在的Outlooker和Transformer比例在1：3时效果是最好的。</p>
+    上述公式中，第一项是经典的注意力计算，第二项是attention bias。每个头部都有$H×W$个参数，对应于不同像素的偏移量。</p>
+<h4 id="smaller-keys">Smaller keys</h4>
+<p>    attention bias减少了K对位置信息的编码压力，因此可以减少K的维度（相对于V的维度），即，K的维度为D，那么V的维度为2D；对于没有残差连接的层，V的维度为4D，以防止信息丢失。</p>
+<h4 id="attention-activation">Attention activation</h4>
+<p>    在使用正则线性投影来组合不同头的输出之前，我们对$A^{h}V$应用Hardswish激活。</p>
+<h4 id="reducing-the-mlp-blocks">Reducing the MLP blocks</h4>
+<p>    ViT中的MLP残差块是一个线性层，它将embedding维数增加4倍，后经过非线性层，并利用另一个线性层降低到原始维度。对于LeViT，MLP为一个1×1的卷积，然后经过BN。为了降低该阶段的计算量，我们将维度增加2倍而不是4倍。</p>
+<h3 id="the-levit-family-of-models">The LeViT family of models</h3>
+<p><img src="/img/levit5.PNG" alt=""></p>
 <h2 id="实验">实验</h2>
-<h3 id="main-results">Main Results</h3>
-<p><img src="/img/volo3.PNG" alt=""></p>
-<h3 id="performance-of-outlooker">Performance of Outlooker</h3>
-<p><img src="/img/volo4.PNG" alt="">
-    对LV-ViT-S进行逐步修改，逐渐形成我们的模型VOLO-D1</p>
-<h3 id="ablation-analysis">Ablation Analysis</h3>
-<h4 id="number-of-outlookers--head-number-in-outlookers">Number of Outlookers &amp; Head Number in Outlookers</h4>
-<p><img src="/img/volo5.PNG" alt=""></p>
+<p><img src="/img/levit6.PNG" alt="">
+<img src="/img/levit7.PNG" alt=""></p>
 
         </div>
 

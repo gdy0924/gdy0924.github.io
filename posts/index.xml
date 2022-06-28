@@ -6,7 +6,143 @@
     <description>Recent content in Posts on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 15 Jun 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 25 Jun 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>DeepNet</title>
+      <link>https://gdy0924.github.io/posts/deepnet/</link>
+      <pubDate>Sat, 25 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/deepnet/</guid>
+      <description>DeepNet: Scaling Transformers to 1,000 Layers
+Abstract  本文提出了一种简单而有效的稳定更深层transformer的方法：引入了一个新的归一化函数DEEPNORM，该方法结合了两个优点：Post-LN的性能好和Pre-LN的稳定训练。
+Introduction  近几年提出了许多大模型，尽管他们的参数量很大，但是它们的深度受到transformer训练不稳定性的限制。
+有研究发现：Pre-LN提高了模型的稳定性，但由于Pre-LN在底层的梯度往往大于在顶层的梯度，因此与Post-LN相比，性能下降。为了缓解上述问题，通常通过更好的初始化来改进深度他说former的优化。
+我们的目标是提高transformer的训练稳定性，并扩大模型深度的数量级。为此，我们研究了不稳定的原因，发现模型的爆炸性更新是导致不稳定的原因。基于上述观察，我们在残差连接处引入了一个新的归一化函数DEEPNORM。
+TL;DR for Practitioners 在归一化前，DEEPNORM向上扩展了残差连接；同时在初始化时，引入缩放因子gain。
+Instability of Deep Transformer  更好的初始化方法可以稳定transformer的训练，因此，我们研究了无论是否进行适当初始化情况下的Post-LN的训练过程。 上图中，Post-LN-init是对第l层的权值进行减小，Post-LN为标准的结果；可以看出，无论模型深度如何，最后一层Post-LN-init的梯度范数仍然远远大于Post-LN，这表明，深层的爆炸梯度不应该是Post-LN不稳定的根本原因。
+上图为可视化：
+（a）是训练的早期阶段的模型更新范数： $$ || \Delta F ||=|| F(x,\theta _ {i}) -F(x,\theta _ {0})|| $$ 可以看出，Post-LN在训练一开始就有一个爆炸式的更新，然后几乎没有更新，这表明该模型陷入了一个虚假的局部最优状态。warm-up和更好的初始化都有助于缓解这个问题，使模型能够平稳地更新。当update爆发时，LN的输入就会变得很大。如上图中的（b）和（c）所示。
+总的来说，不稳定性始于训练开始时的大模型更新：它使模型陷入一个糟糕的局部最优，这反过来增加了LN的输入大小。随着训练的继续，通过LN的梯度变得越来越小，从而导致严重的梯度消失。梯度的消失使其难以脱离局部最优，并进一步使优化不稳定。相反，Post-LN-init的更新相对较小，并且对LN的输入是稳定的，这减轻了梯度消失的痛苦，使优化更加稳定。
+DEEPNET: Extremely Deep Transformers Architecture  DEEPNORM的公式表示为： $$ x_{l+1}=LN(\alpha x_{l}+G_{l}(x_{l},\theta _ {l})) $$ 其中，$\alpha$是一个常数，$G_{l}(x_{l},\theta _ {l})$是参数为$\theta _ {l}$的第$l$层transformer层的子层，即注意力层或FFN层。此外，还通过$\beta $来缩放残差分支内的权重$\theta _ {l}$。 上图为在训练的早期阶段，vanilla Post-LN和DEEPNET的模型更新，可以看出，DEEPNET的更新更加稳定。
+实验 Neural Machine Translation BLEU scores on the WMT-17 En-De test set</description>
+    </item>
+    
+    <item>
+      <title>EdgeViT</title>
+      <link>https://gdy0924.github.io/posts/edgevit/</link>
+      <pubDate>Sat, 25 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/edgevit/</guid>
+      <description>EdgeViTs: Competing Light-weight CNNs on Mobile Devices with Vision Transformers
+Abstract  ViTs已经成为计算机视觉中卷积神经网络的一种非常有竞争力的替代架构，但其二次复杂度，限制很大。最近有很多工作重新将卷积网络的设计引入ViT，如卷积、分层架构等。但它们仍然不足以满足移动设备有限的资源需求。在本文中，我们提出了EdgeViTs，一个新的轻量级ViTs，通过引入一个高效的local-global-local（LGL）bottleneck来实现的，实现了卷积和自注意力的最优集成。
+Introduction  由于ViT的二次复杂度，目前一些工作通过三种方式来降低计算量：
+（1）使用层次结构逐步降低空间分辨率，减少token序列长度；
+（2）控制输入token序列长度和参数共享的局部自注意机制；
+（3）通过缩放因子对key和value进行降采样。
+我们考虑在真实平台上运行的ViT模型有以下几个特点：Inference efficiency需要高；Model size是可负担得起的，即参数数量；Implementational friendliness实现的友好性。
+提出了EdgeViTs网络，使ViTs能够在移动设备上与最好的轻量级CNN竞争，如MobileNetv2和EfficientNets。通过引入一个轻量级的local-global-local (LGL) information exchange bottleneck来实现，共包含三个操作：
+（1）利用有效的深度卷积，从相邻token中聚合局部信息；
+（2）形成一个稀疏的均匀分布的delegate token集，通过自注意机制实现远程信息交换；
+（3）通过转置卷积，将更新后的信息从delegate token扩散到局部的的非delegate token。
+Related Work Efficient CNNs  深度可分离卷积，MobileNets，ShuffleNets
+Vision transformers  ViT，对其改进之一是从卷积架构中引入层级结构，一些工作还改进位置embedding，所有这些方法主要都是为了提高模型的性能。
+一种有效的减少计算量的方式是减少MHSA内部的空间维度，发现key和value可以被降采样，从而更好平衡效率与精度。我们的工作通过对query进行降采样，扩展了这一想法，进一步提高了效率；一些其他的工作动态减少token数量，即在正向传递中，被认为不包含目标任务的一些token被修剪或合并在一起，从而降低了之后的整体复杂性。
+Vision transformers for mobile devices  MobileViTs
+EdgeViTs Overview （a）4个阶段的EdgeViT架构，每个架构由堆叠的LGL block组成；
+（b）Local-Global-Local (LGL) blocks：local aggregation模块+ sparse-self-attention模块+local propagation模块。
+我们采用了最近ViT变体中使用的分层金字塔网络结构，金字塔变压器模型通常会逐步降低空间分辨率，同时增加通道数量。基于此，我们深入研究了transformer block，并提出了一个更高效的bottleneck：Local-Global-Local，LGL通过稀疏注意力模块进一步减少了自注意力的开销，实现了更好的精度-延迟平衡。
+Local-Global-Local bottleneck  自注意力机制可以捕捉长期依赖，但是图像的空间冗余很高，因此关注所有空间中的token，即使是在下采样的特征图中，也是低效的。因此，需要同时保留建模全局和局部的底层信息流。
+我们将自注意分解为连续的模块，在不同的模块内处理token：（1）Local aggregation只聚合相邻token的信息；（2）Global sparse attention建模一组delegate token之间的信息，其中每个delegate token都被视为一个局部窗口的代表；（3）Local propagation将代表token学习到的全局上下文信息传播到具有相同窗口的非代表token中。 （a）Local aggregation：对于每个token，利用depth-wise卷积和point-wise卷积在大小为$k×k$的局部窗口中聚合信息；</description>
+    </item>
+    
+    <item>
+      <title>HaloNet</title>
+      <link>https://gdy0924.github.io/posts/halonet/</link>
+      <pubDate>Fri, 24 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/halonet/</guid>
+      <description>Scaling Local Self-Attention for Parameter Efficient Visual Backbones
+Abstract  通过对注意力机制进行修改和扩展，提出了新的网络架构HaloNets，其结果优于更大的模型，并具有更好的推理性能。
+Introduction  卷积体现了局部处理的原则，以学习图像中丰富的边缘和纹理等局部空间特征；Transformer表明，注意力机制是一种有效的、计算效率搞得机制，可以捕获全局的信息。
+自注意力机制有一下几个特点：（1）基于内容的交互，而不是与内容无关的卷积交互；（2）感受野大小与参数无关，而卷积中的感受野与参数有关；（3）在较大图像中能够捕获长期依赖关系；（4）灵活地处理多种类型的数据。
+Models and Methods  虽然我们的模型使用自注意力机制而不是卷积来捕捉像素之间的空间局部交互，但其采用了卷积神经网络的一些重要结构特征。
+Self-attention can generate spatially varying convolutional filters  最近的研究表明，具有少量头数和几何偏置的自注意力机制可以模拟卷积，这表明自注意力和卷积之间存在更深层次的关系。
+我们将自注意机制和卷积写成一般的公式，对于给定的输入$x\in \mathbb{R}^{H\times W\times C_{in}}$，在$(i,j)$位置的输出为： $$ y_{ij}=\sum_{a,b\in N(i,j)}f(i,j,a,b)x_{ab} $$ 其中，$f(i,j,a,b)$是一个函数，在以$(i,j)$为中心、$k × k$为大小的局部窗口处，返回一个权重矩阵$W\in \mathbb{R}^{C_{in}\times C_{out}}$。
+对于卷积和transformer，其函数分别为： $$ f(i,j,a,b)^{conv}=W_{a-i,b-j} $$ $$ f(i,j,a,b)^{self-att}=softmax_{ab}((W_{Q}x_{ij})^{T}W_{K}x_{ab}+(W_{Q}x_{ij})^{T}r_{a-i,b-j})W_{V}=p_{a-i,b-j}^{i,j}W_{V} $$
+Improving the speed-memory tradeoff by relaxing translational equivariance  全局自注意，即所有的位置都相互关注，对于大多数图像尺度来说太昂贵了。但是如果用卷积中的滑动窗口思想，在每个窗口里做 local self-attention，由于每个窗口的结果都要一直存在显存里没法释放，容易造成显存溢出。
+因此提出了blocked local self-attention，即将输入的特征图分成了不重复的一些 block，然后在每个 block 里做 local self-attention。如果每次只考虑block内的信息，必然会导致信息的损失，因此在计算Local Self-Attention之前，先对每个block进行的haloing操作（在边界进行填充）。下图为将$[4,4,c]$的图像，分割成大小为2的block，并且halo=1：首先将图像分割成不重叠的$[2,2,c]$block，然后由block生成query，接着halo步骤在每个block周围提取$[4,4,c]$的图像，生成key和value。最终输出的维度与block维度（query）相同。</description>
+    </item>
+    
+    <item>
+      <title>CeiT</title>
+      <link>https://gdy0924.github.io/posts/ceit/</link>
+      <pubDate>Thu, 23 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/ceit/</guid>
+      <description>Incorporating Convolution Designs into Visual Transformers
+Abstract  提出了一个新的网络CeiT（Convolution-enhanced image Transformer）：结合了卷积网络提取low-level特征、局部性和transformer建立长期依赖关系的优势。对原始的transformer进行了三方面的修改：（1）设计了一个I2T（Image-to-Tokens）模块，从low-level特征中提取patch，而不是ViT中直接分割得到token；（2）每个block中的FFN层替换为LeFF（Locally-enhanced Feed-Forward）层，以加强空间维度上相邻token之间的相关性；（3）提出LCA（Layer-wise Class token Attention）层用于融合多阶段的表征进行最终的预测。
+Introduction  ViT的论文中提到：transformer缺少CNN固有的归纳偏置，因此在数据量不足的情况下，模型不能很好的泛化。在DeiT中，CNN的teacher网络效果更好，这可能是由于“通过蒸馏transformer继承得到了归纳偏置”。
+针对卷积，主要特征是平移不不变性和局部性。然而transformer架构没有重新利用图像中存在的偏置。首先，ViT对大小为16×16或32×32的原始输入图像中的patch进行得到token，很难提取出图像中的一些低级特征（如角落和边缘）；其次，自注意力模块集中于建立token之间的长期依赖关系，而忽略了空间维度中的局部性。
+为了提取低级特征，设计了一个I2T（Image-to-Tokens）模块，从生成的low-level特征中提取patch，得到的patch尺寸更小；为了增强局部性，将FFN层替换为LeFF层（Locally-enhanced Feed-Forward）；为了更好的利用自注意力机制，在transformer顶部增加了LCA层（Layer-wise Class token Attention）。
+Methodology Revisiting Vision Transformer Tokenization
+ViT直接将图像分割为16×16或32×32大小的patch，这样会存在两个限制：（1）难以捕捉图像中的低级信息，如边和角；（2）大的卷积核通常过度参数化，导致难以优化。
+Encoder blocks
+由MSA和MLP组成： $$ x&#39;=LN(x+MSA(x)) $$ $$ y=LN(x&#39;+FFN(x&#39;)) $$
+Image-to-Tokens with Low-level Features 为了解决Tokenization的问题，提出了Image-to-Tokens模块，从特征图中提取patch，而不是原始图像。该模块由一个卷积层和一个最大池化层组成，公式表示为： $$ x&#39;=I2T(x)=MaxPool(BN(Conv(x))) $$ 其中，$x&#39;\in \mathbb{R}^{\frac{H}{S}\times \frac{W}{S}\times D}$，$S$是相对于原始图像的缩小倍数，将得到的特征图分割为patch，为了保证token数量相同，我们将patch的分辨率缩小为$(\frac{P}{S},\frac{P}{S})$。$S$通常为4。
+I2T模块充分利用了卷积在提取low-level特征方面的优势，通过缩小patch的大小来降低embedding的训练难度。
+Locally-Enhanced Feed-Forward Network  在每个block中，MSA模块不变，以捕获全局的相似性，使用LeFF层来代替原来的前馈层。 LeFF层的流程如下：
+（1）对于MSA的输出$x_{t}^{h}\in \mathbb{R}^{(N+1)\times C}$，先将其分为patch token$x_{p}^{h}\in \mathbb{R}^{N\times C}$和class token$x_{c}^{h}\in \mathbb{R}^{C}$，通过一个线性层将patch token的维度增加$x_{p}^{h}\in \mathbb{R}^{N\times (e\times C)}$，e为扩展比；</description>
+    </item>
+    
+    <item>
+      <title>CaiT</title>
+      <link>https://gdy0924.github.io/posts/cait/</link>
+      <pubDate>Wed, 22 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/cait/</guid>
+      <description>Going deeper with Image Transformers
+Abstract  目前对图像transformer的优化研究工作还很少，在本文中，我们搭建了更深层次的transformer用于图像分类，提出了两个架构变化，显著提高了transformer的深度和精度。这使得我们的模型性能不会随着更多的深度而早期饱和。
+Introduction  首先，残差结构可以定义为： $$ x_{l+1}=g_{l}(x_{l})+R_{l}(x_{l}) $$ 其中，$g_{l}$通常是恒等映射，$R_{l}$是block的主要操作。残差结构突出了体系结构设计和提高精度之间的强大相互作用。在ResNet论文中提到说，残差网络并不能提供更好的表示能力，但效果更好的原因是网络更容易训练。
+Transformer架构可以表示为： $$ x_{l}^{&#39;}=x_{l}+SA(\eta (x_{l})) $$ $$ x_{l+1}=x_{l}^{&#39;}+FFN(\eta (x_{l}^{&#39;})) $$ 其中，$\eta$是指LN。上述结构遵循残差连接。
+如何归一化、初始化权重或初始化残差块是值得思考的，我们共讨论了4个方法，分别是：Fixup、T-Fixup、ReZero和SkipInit。
+在分析了不同初始化、优化和架构设计之间的相互作用之后，我们提出了一种方法，与目前的图像变压器方法相比，它可以有效地改进更深层次的架构训练。具体的，在每个残差块的输出上添加一个可学习的对角矩阵，初始化接近为0，但不是0。我们称之为LayerScale。
+其次，我们将patch之间的注意力transformer层和将patch内容传递到单个向量中的层分离，以便单个向量进行分类。这种显式的分离避免了在处理class embedding时引导注意力过程的矛盾目标。我们称之为CaiT（Class-Attention in Image Transformers）。
+Deeper image transformers with LayerScale  在ViT和DeiT的工作中，没有证据表明深度更有效：更深的ViT架构性能较低，而DeiT只考虑12层的变压器。
+下图为我们比较的几个变体： （a）原始的结构：ViT和DeiT中使用的，即pre-norm结构，层归一化在残差分支的开始部分，但在原始的attention文章中（Attention is all you need）是post-norm，但在我们的实验中，post-norm并不能收敛。
+（b）ReZero/Skipinit/Fixup：在残差块的输出部分引入了可学习的标量权重$\alpha _ {l}$，同时出去了pre-norm，可以表示为： $$ x_{l}^{&#39;}=x_{l}+\alpha _ {l} SA(\eta (x_{l})) $$ $$ x_{l+1}=x_{l}^{&#39;}+\alpha _ {l}^{&#39;} FFN(\eta (x_{l}^{&#39;})) $$ ReZero是将该参数初始化为0；Fixup将其初始化为1，并进行了其他的修改；但在我们的实验中，这些都没有收敛。
+（c）我们的经验观察是，消除pre-norm是使在Fixup中的训练不稳定的原因，因此我们重新引入，从之后的实验中可以看到，是有效的。
+（d）Our proposal LayerScale：残差块的输出进行每个通道的相乘，而不是单个标量。即对Self-attention或者FFN的输出乘以一个对角矩阵，目的是给不同的channel乘以不同的$\lambda $值，同时保持Layer Normalization： $$ x_{l}^{&#39;}=x_{l}+diag(\lambda _ {l,1},&amp;hellip;,\lambda _ {l,d}) SA(\eta (x_{l})) $$ $$ x_{l+1}=x_{l}^{&#39;}+diag({\lambda }&#39;_ {l,1},&amp;hellip;,{\lambda }&#39;_ {l,d}) FFN(\eta (x_{l}^{&#39;})) $$ 其中，$\lambda _ {l,1}$和${\lambda }&#39;_ {l,1}$都是可学习的参数权重。</description>
+    </item>
+    
+    <item>
+      <title>LeViT</title>
+      <link>https://gdy0924.github.io/posts/levit/</link>
+      <pubDate>Tue, 21 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/levit/</guid>
+      <description>LeViT: a Vision Transformer in ConvNet’s Clothing for Faster Inference
+Abstract  设计了一系列图像分类架构，以权衡在高速状态下的精度和效率。利用注意力架构，并将卷积网络的原理应用于transformer，并且引入了注意力偏置，一种新的引入位置信息的方式。提出LeViT：一种用于快速推理的图像分类混合网络。
+Introduction  在本文中，探索中小型架构中比ViT/DeiT更好的权衡，目前许多工作旨在减少分类器和特征提取器的内存占用，但其推理速度也很重要。探索一个基于视觉transformer的模型架构，具有更好的推理速度。重新引入卷积，以代替类似卷积的transformer组件，同时利用池化金字塔结构替换transformer的柱状结构。
+Contributions：
+（1）使用注意力机制作为降采样方式的多阶段transformer架构；
+（2）计算更高效的patch，减少了第一层中的特征数量；
+（3）一个可学习的注意力偏置代替ViT中的位置embedding；
+（4）一个重新设计的Attention-MLP block，在给定的计算时间中提高模型学习能力。
+Related work Transformers The vision transformer (ViT) Positional encoding  在我们的工作中，用隐式编码空间信息的位置偏置来代替显式的位置编码。
+Attention along other mechanisms  在图像分类方面，最近与我们并行的工作是PVT，其设计很大程度上受到ResNet的启发，主要用于处理分割任务。同时还有T2T网络，与PVT类似。但是这些工作没有平衡精度与推理时间。
+Motivation  将patch的线性投影看作卷积操作，在一个卷积网络ResNet-50上嫁接一个transformer网络DeiT-S。
+我们裁剪了ResNet-50的上部阶段，并同样减少了DeiT层的数量，由于裁剪的ResNet产生的特征图比DeiT输入的14×14的特征图更大，因此在它们之间引入了池化层。
+Results
+嫁接的架构比单独使用DeiT和ResNet-50的精度更好，参数量最少并且效果最好的结构是使用ResNet-50的前两个阶段。 与DeiT模型相比，卷积层模型在早期阶段表现出更快的收敛速度；并且嫁接模型在早期的收敛类似于卷积网络，后期切换到transformer结构的收敛速度。
+Discussion
+变压器架构需要与卷积阶段更紧密地合并，而不是仅仅是嫁接。
+Model Design principles of LeViT  LeViT建立在ViT和DeiT架构上，引入那些被证明对卷积网络有效的部件。第一步是得到一个兼容的表征，不考虑class token的话，ViT就是处理特征图的堆叠层，中间的token可以看作FCN架构中的特征图。因此，应用于特征图的操作（池化/卷积）同样可以应用于DeiT的中间表征。
+在本文中，我们优化了体系结构，而不一定要最小化参数的数量。ResNet网络比VGG网络更有效率的原因之一是在其前两个阶段以相对较小的计算应用较强的分辨率降低，即当特征图到达ResNet的第三阶段时，它的分辨率已经缩小到足够小，从而降低了计算成本。
+LeViT components Patch embedding  在LeViT中，使用4层3×3的卷积（步幅为2）来对特征图的分辨率进行降低，通道数分别为3、32、64、128、256。
+No classification token  为了使用BCHW张量格式，删除了class token。与卷积网络类似，通过在最后一个特征图上进行平均池化，来实现最终的分类。为了实现蒸馏，分别训练不同的头，在测试时，使用两个头的输出平均值。
+Normalization layers and activations  ViT中的FC层相当于1×1的卷积，同时在每个注意力层和MLP层之前使用层归一化。对于LeViT，每个卷积之后都进行批归一化。</description>
+    </item>
+    
     <item>
       <title>CoAtNet</title>
       <link>https://gdy0924.github.io/posts/coatnet/</link>

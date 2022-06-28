@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/posts/volo/" />
-  <link rel="canonical" href="https://gdy0924.github.io/posts/volo/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/cait/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/cait/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -57,9 +57,9 @@ code.has-jax {
            "@id": "https:\/\/gdy0924.github.io\/"
       },
       "articleSection" : "posts",
-      "name" : "VOLO",
-      "headline" : "VOLO",
-      "description" : "VOLO: Vision Outlooker for Visual Recognition\nAbstract  限制ViT的性能的主要原因是：对细粒度的特征编码效率较低，为了解决这个问题，我们提出新的outlook attention，并提出了一个简单的架构Vision Outlooker (VOLO)。与粗粒度的全局注意力不同，outlook attention能够有效的提取细粒度特征和上下文信息。\nIntroduction  限制ViT的一个主要因素是：分割得到的patch token，提取细粒度特征和引入上下文编码是低效率的。在本文中，我们提出了一种新的注意力机制：Outlooker，能够有效的提取细粒度特征和上下文信息；同时，利用线性投影，而摆脱了二次复杂度。\n基于Outlooker，我们提出了一个简单的模型架构：VOLO。VOLO通过一个两阶段的体系结构，实现了细粒度的token表示和全局信息的聚合；具体来说，给定一个224×224的图像，在使用自注意力机制在粗粒度上构建全局依赖以前，先在较小的patch上，使用多个Outlooker在细粒度特征上进行token表示。\nMethod  可以分为两阶段：\n（1）堆叠的Outlooker，以生成细粒度级别的token表征；\n（2）一系列transformer block聚合全局信息。\nOutlooker  Outlooker由一个对空间信息编码的outlook attention层和一个用于通道之间信息交互的MLP层组成。\n对对于给定的C维输入$X\\in \\mathbb{R}^{H\\times W\\times C}$，Outlooker可以写作： $$ \\tilde{X} = OutlookAtt(LN(X))\u002bX $$ $$ Z=MLP(LN(\\tilde{X}))\u002b\\tilde{X} $$\nOutlook Attention 如上图所示，主要思想有两点：\n（1）每个空间位置的局部特征足以生成注意力权重系数来聚合其临近的特征；\n（2）密集的局部空间特征聚集可以有效的编码细粒度信息。\n对于每个空间位置$(i,j)$，outlook注意力在以$(i,j)$为中心、大小为$K×K$的局部窗口内，计算相邻位置的相似性。与自注意力机制中使用Q-K矩阵相乘来得到权重系数不同，outlook通过reshape来简化这个过程。\n对于给定的输入$X$，每个C维的token首先经过线性投影，使用两个线性层，$W_{A}\\in \\mathbb{R}^{C\\times K^{4}}$和$W_{V}\\in \\mathbb{R}^{C\\times C}$，分别得到outlook权重$A\\in \\mathbb{R}^{H\\times W\\times K^{4}}$和value$V\\in \\mathbb{R}^{H\\times W\\times C}$，$V_{\\Delta _ {i,j}}\\in \\mathbb{R}^{C\\times K^{2}}$表示以$(i,j)$为中心的局部窗口内的值： $$ V_{\\Delta _ {i,j}}=\\lbrace V_{i\u002bp-\\left \\lfloor \\frac{K}{2} \\right \\rfloor,j\u002bq-\\left \\lfloor \\frac{K}{2} \\right \\rfloor} \\rbrace $$ Outlook attention",
+      "name" : "CaiT",
+      "headline" : "CaiT",
+      "description" : "Going deeper with Image Transformers\nAbstract  目前对图像transformer的优化研究工作还很少，在本文中，我们搭建了更深层次的transformer用于图像分类，提出了两个架构变化，显著提高了transformer的深度和精度。这使得我们的模型性能不会随着更多的深度而早期饱和。\nIntroduction  首先，残差结构可以定义为： $$ x_{l\u002b1}=g_{l}(x_{l})\u002bR_{l}(x_{l}) $$ 其中，$g_{l}$通常是恒等映射，$R_{l}$是block的主要操作。残差结构突出了体系结构设计和提高精度之间的强大相互作用。在ResNet论文中提到说，残差网络并不能提供更好的表示能力，但效果更好的原因是网络更容易训练。\nTransformer架构可以表示为： $$ x_{l}^{\u0027}=x_{l}\u002bSA(\\eta (x_{l})) $$ $$ x_{l\u002b1}=x_{l}^{\u0027}\u002bFFN(\\eta (x_{l}^{\u0027})) $$ 其中，$\\eta$是指LN。上述结构遵循残差连接。\n如何归一化、初始化权重或初始化残差块是值得思考的，我们共讨论了4个方法，分别是：Fixup、T-Fixup、ReZero和SkipInit。\n在分析了不同初始化、优化和架构设计之间的相互作用之后，我们提出了一种方法，与目前的图像变压器方法相比，它可以有效地改进更深层次的架构训练。具体的，在每个残差块的输出上添加一个可学习的对角矩阵，初始化接近为0，但不是0。我们称之为LayerScale。\n其次，我们将patch之间的注意力transformer层和将patch内容传递到单个向量中的层分离，以便单个向量进行分类。这种显式的分离避免了在处理class embedding时引导注意力过程的矛盾目标。我们称之为CaiT（Class-Attention in Image Transformers）。\nDeeper image transformers with LayerScale  在ViT和DeiT的工作中，没有证据表明深度更有效：更深的ViT架构性能较低，而DeiT只考虑12层的变压器。\n下图为我们比较的几个变体： （a）原始的结构：ViT和DeiT中使用的，即pre-norm结构，层归一化在残差分支的开始部分，但在原始的attention文章中（Attention is all you need）是post-norm，但在我们的实验中，post-norm并不能收敛。\n（b）ReZero\/Skipinit\/Fixup：在残差块的输出部分引入了可学习的标量权重$\\alpha _ {l}$，同时出去了pre-norm，可以表示为： $$ x_{l}^{\u0027}=x_{l}\u002b\\alpha _ {l} SA(\\eta (x_{l})) $$ $$ x_{l\u002b1}=x_{l}^{\u0027}\u002b\\alpha _ {l}^{\u0027} FFN(\\eta (x_{l}^{\u0027})) $$ ReZero是将该参数初始化为0；Fixup将其初始化为1，并进行了其他的修改；但在我们的实验中，这些都没有收敛。\n（c）我们的经验观察是，消除pre-norm是使在Fixup中的训练不稳定的原因，因此我们重新引入，从之后的实验中可以看到，是有效的。\n（d）Our proposal LayerScale：残差块的输出进行每个通道的相乘，而不是单个标量。即对Self-attention或者FFN的输出乘以一个对角矩阵，目的是给不同的channel乘以不同的$\\lambda $值，同时保持Layer Normalization： $$ x_{l}^{\u0027}=x_{l}\u002bdiag(\\lambda _ {l,1},\u0026hellip;,\\lambda _ {l,d}) SA(\\eta (x_{l})) $$ $$ x_{l\u002b1}=x_{l}^{\u0027}\u002bdiag({\\lambda }\u0027_ {l,1},\u0026hellip;,{\\lambda }\u0027_ {l,d}) FFN(\\eta (x_{l}^{\u0027})) $$ 其中，$\\lambda _ {l,1}$和${\\lambda }\u0027_ {l,1}$都是可学习的参数权重。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,43 +67,39 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-06-15 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-06-15 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/posts\/volo\/",
+      "datePublished": "2022-06-22 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-06-22 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/cait\/",
       "keywords" : [  ]
   }
 </script>
-<title>VOLO</title>
-  <meta property="og:title" content="VOLO" />
+<title>CaiT</title>
+  <meta property="og:title" content="CaiT" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="VOLO: Vision Outlooker for Visual Recognition
-Abstract  限制ViT的性能的主要原因是：对细粒度的特征编码效率较低，为了解决这个问题，我们提出新的outlook attention，并提出了一个简单的架构Vision Outlooker (VOLO)。与粗粒度的全局注意力不同，outlook attention能够有效的提取细粒度特征和上下文信息。
-Introduction  限制ViT的一个主要因素是：分割得到的patch token，提取细粒度特征和引入上下文编码是低效率的。在本文中，我们提出了一种新的注意力机制：Outlooker，能够有效的提取细粒度特征和上下文信息；同时，利用线性投影，而摆脱了二次复杂度。
-基于Outlooker，我们提出了一个简单的模型架构：VOLO。VOLO通过一个两阶段的体系结构，实现了细粒度的token表示和全局信息的聚合；具体来说，给定一个224×224的图像，在使用自注意力机制在粗粒度上构建全局依赖以前，先在较小的patch上，使用多个Outlooker在细粒度特征上进行token表示。
-Method  可以分为两阶段：
-（1）堆叠的Outlooker，以生成细粒度级别的token表征；
-（2）一系列transformer block聚合全局信息。
-Outlooker  Outlooker由一个对空间信息编码的outlook attention层和一个用于通道之间信息交互的MLP层组成。
-对对于给定的C维输入$X\in \mathbb{R}^{H\times W\times C}$，Outlooker可以写作： $$ \tilde{X} = OutlookAtt(LN(X))&#43;X $$ $$ Z=MLP(LN(\tilde{X}))&#43;\tilde{X} $$
-Outlook Attention 如上图所示，主要思想有两点：
-（1）每个空间位置的局部特征足以生成注意力权重系数来聚合其临近的特征；
-（2）密集的局部空间特征聚集可以有效的编码细粒度信息。
-对于每个空间位置$(i,j)$，outlook注意力在以$(i,j)$为中心、大小为$K×K$的局部窗口内，计算相邻位置的相似性。与自注意力机制中使用Q-K矩阵相乘来得到权重系数不同，outlook通过reshape来简化这个过程。
-对于给定的输入$X$，每个C维的token首先经过线性投影，使用两个线性层，$W_{A}\in \mathbb{R}^{C\times K^{4}}$和$W_{V}\in \mathbb{R}^{C\times C}$，分别得到outlook权重$A\in \mathbb{R}^{H\times W\times K^{4}}$和value$V\in \mathbb{R}^{H\times W\times C}$，$V_{\Delta _ {i,j}}\in \mathbb{R}^{C\times K^{2}}$表示以$(i,j)$为中心的局部窗口内的值： $$ V_{\Delta _ {i,j}}=\lbrace V_{i&#43;p-\left \lfloor \frac{K}{2} \right \rfloor,j&#43;q-\left \lfloor \frac{K}{2} \right \rfloor} \rbrace $$ Outlook attention" />
-  <meta name="description" content="VOLO: Vision Outlooker for Visual Recognition
-Abstract  限制ViT的性能的主要原因是：对细粒度的特征编码效率较低，为了解决这个问题，我们提出新的outlook attention，并提出了一个简单的架构Vision Outlooker (VOLO)。与粗粒度的全局注意力不同，outlook attention能够有效的提取细粒度特征和上下文信息。
-Introduction  限制ViT的一个主要因素是：分割得到的patch token，提取细粒度特征和引入上下文编码是低效率的。在本文中，我们提出了一种新的注意力机制：Outlooker，能够有效的提取细粒度特征和上下文信息；同时，利用线性投影，而摆脱了二次复杂度。
-基于Outlooker，我们提出了一个简单的模型架构：VOLO。VOLO通过一个两阶段的体系结构，实现了细粒度的token表示和全局信息的聚合；具体来说，给定一个224×224的图像，在使用自注意力机制在粗粒度上构建全局依赖以前，先在较小的patch上，使用多个Outlooker在细粒度特征上进行token表示。
-Method  可以分为两阶段：
-（1）堆叠的Outlooker，以生成细粒度级别的token表征；
-（2）一系列transformer block聚合全局信息。
-Outlooker  Outlooker由一个对空间信息编码的outlook attention层和一个用于通道之间信息交互的MLP层组成。
-对对于给定的C维输入$X\in \mathbb{R}^{H\times W\times C}$，Outlooker可以写作： $$ \tilde{X} = OutlookAtt(LN(X))&#43;X $$ $$ Z=MLP(LN(\tilde{X}))&#43;\tilde{X} $$
-Outlook Attention 如上图所示，主要思想有两点：
-（1）每个空间位置的局部特征足以生成注意力权重系数来聚合其临近的特征；
-（2）密集的局部空间特征聚集可以有效的编码细粒度信息。
-对于每个空间位置$(i,j)$，outlook注意力在以$(i,j)$为中心、大小为$K×K$的局部窗口内，计算相邻位置的相似性。与自注意力机制中使用Q-K矩阵相乘来得到权重系数不同，outlook通过reshape来简化这个过程。
-对于给定的输入$X$，每个C维的token首先经过线性投影，使用两个线性层，$W_{A}\in \mathbb{R}^{C\times K^{4}}$和$W_{V}\in \mathbb{R}^{C\times C}$，分别得到outlook权重$A\in \mathbb{R}^{H\times W\times K^{4}}$和value$V\in \mathbb{R}^{H\times W\times C}$，$V_{\Delta _ {i,j}}\in \mathbb{R}^{C\times K^{2}}$表示以$(i,j)$为中心的局部窗口内的值： $$ V_{\Delta _ {i,j}}=\lbrace V_{i&#43;p-\left \lfloor \frac{K}{2} \right \rfloor,j&#43;q-\left \lfloor \frac{K}{2} \right \rfloor} \rbrace $$ Outlook attention" />
+  <meta property="og:description" content="Going deeper with Image Transformers
+Abstract  目前对图像transformer的优化研究工作还很少，在本文中，我们搭建了更深层次的transformer用于图像分类，提出了两个架构变化，显著提高了transformer的深度和精度。这使得我们的模型性能不会随着更多的深度而早期饱和。
+Introduction  首先，残差结构可以定义为： $$ x_{l&#43;1}=g_{l}(x_{l})&#43;R_{l}(x_{l}) $$ 其中，$g_{l}$通常是恒等映射，$R_{l}$是block的主要操作。残差结构突出了体系结构设计和提高精度之间的强大相互作用。在ResNet论文中提到说，残差网络并不能提供更好的表示能力，但效果更好的原因是网络更容易训练。
+Transformer架构可以表示为： $$ x_{l}^{&#39;}=x_{l}&#43;SA(\eta (x_{l})) $$ $$ x_{l&#43;1}=x_{l}^{&#39;}&#43;FFN(\eta (x_{l}^{&#39;})) $$ 其中，$\eta$是指LN。上述结构遵循残差连接。
+如何归一化、初始化权重或初始化残差块是值得思考的，我们共讨论了4个方法，分别是：Fixup、T-Fixup、ReZero和SkipInit。
+在分析了不同初始化、优化和架构设计之间的相互作用之后，我们提出了一种方法，与目前的图像变压器方法相比，它可以有效地改进更深层次的架构训练。具体的，在每个残差块的输出上添加一个可学习的对角矩阵，初始化接近为0，但不是0。我们称之为LayerScale。
+其次，我们将patch之间的注意力transformer层和将patch内容传递到单个向量中的层分离，以便单个向量进行分类。这种显式的分离避免了在处理class embedding时引导注意力过程的矛盾目标。我们称之为CaiT（Class-Attention in Image Transformers）。
+Deeper image transformers with LayerScale  在ViT和DeiT的工作中，没有证据表明深度更有效：更深的ViT架构性能较低，而DeiT只考虑12层的变压器。
+下图为我们比较的几个变体： （a）原始的结构：ViT和DeiT中使用的，即pre-norm结构，层归一化在残差分支的开始部分，但在原始的attention文章中（Attention is all you need）是post-norm，但在我们的实验中，post-norm并不能收敛。
+（b）ReZero/Skipinit/Fixup：在残差块的输出部分引入了可学习的标量权重$\alpha _ {l}$，同时出去了pre-norm，可以表示为： $$ x_{l}^{&#39;}=x_{l}&#43;\alpha _ {l} SA(\eta (x_{l})) $$ $$ x_{l&#43;1}=x_{l}^{&#39;}&#43;\alpha _ {l}^{&#39;} FFN(\eta (x_{l}^{&#39;})) $$ ReZero是将该参数初始化为0；Fixup将其初始化为1，并进行了其他的修改；但在我们的实验中，这些都没有收敛。
+（c）我们的经验观察是，消除pre-norm是使在Fixup中的训练不稳定的原因，因此我们重新引入，从之后的实验中可以看到，是有效的。
+（d）Our proposal LayerScale：残差块的输出进行每个通道的相乘，而不是单个标量。即对Self-attention或者FFN的输出乘以一个对角矩阵，目的是给不同的channel乘以不同的$\lambda $值，同时保持Layer Normalization： $$ x_{l}^{&#39;}=x_{l}&#43;diag(\lambda _ {l,1},&amp;hellip;,\lambda _ {l,d}) SA(\eta (x_{l})) $$ $$ x_{l&#43;1}=x_{l}^{&#39;}&#43;diag({\lambda }&#39;_ {l,1},&amp;hellip;,{\lambda }&#39;_ {l,d}) FFN(\eta (x_{l}^{&#39;})) $$ 其中，$\lambda _ {l,1}$和${\lambda }&#39;_ {l,1}$都是可学习的参数权重。" />
+  <meta name="description" content="Going deeper with Image Transformers
+Abstract  目前对图像transformer的优化研究工作还很少，在本文中，我们搭建了更深层次的transformer用于图像分类，提出了两个架构变化，显著提高了transformer的深度和精度。这使得我们的模型性能不会随着更多的深度而早期饱和。
+Introduction  首先，残差结构可以定义为： $$ x_{l&#43;1}=g_{l}(x_{l})&#43;R_{l}(x_{l}) $$ 其中，$g_{l}$通常是恒等映射，$R_{l}$是block的主要操作。残差结构突出了体系结构设计和提高精度之间的强大相互作用。在ResNet论文中提到说，残差网络并不能提供更好的表示能力，但效果更好的原因是网络更容易训练。
+Transformer架构可以表示为： $$ x_{l}^{&#39;}=x_{l}&#43;SA(\eta (x_{l})) $$ $$ x_{l&#43;1}=x_{l}^{&#39;}&#43;FFN(\eta (x_{l}^{&#39;})) $$ 其中，$\eta$是指LN。上述结构遵循残差连接。
+如何归一化、初始化权重或初始化残差块是值得思考的，我们共讨论了4个方法，分别是：Fixup、T-Fixup、ReZero和SkipInit。
+在分析了不同初始化、优化和架构设计之间的相互作用之后，我们提出了一种方法，与目前的图像变压器方法相比，它可以有效地改进更深层次的架构训练。具体的，在每个残差块的输出上添加一个可学习的对角矩阵，初始化接近为0，但不是0。我们称之为LayerScale。
+其次，我们将patch之间的注意力transformer层和将patch内容传递到单个向量中的层分离，以便单个向量进行分类。这种显式的分离避免了在处理class embedding时引导注意力过程的矛盾目标。我们称之为CaiT（Class-Attention in Image Transformers）。
+Deeper image transformers with LayerScale  在ViT和DeiT的工作中，没有证据表明深度更有效：更深的ViT架构性能较低，而DeiT只考虑12层的变压器。
+下图为我们比较的几个变体： （a）原始的结构：ViT和DeiT中使用的，即pre-norm结构，层归一化在残差分支的开始部分，但在原始的attention文章中（Attention is all you need）是post-norm，但在我们的实验中，post-norm并不能收敛。
+（b）ReZero/Skipinit/Fixup：在残差块的输出部分引入了可学习的标量权重$\alpha _ {l}$，同时出去了pre-norm，可以表示为： $$ x_{l}^{&#39;}=x_{l}&#43;\alpha _ {l} SA(\eta (x_{l})) $$ $$ x_{l&#43;1}=x_{l}^{&#39;}&#43;\alpha _ {l}^{&#39;} FFN(\eta (x_{l}^{&#39;})) $$ ReZero是将该参数初始化为0；Fixup将其初始化为1，并进行了其他的修改；但在我们的实验中，这些都没有收敛。
+（c）我们的经验观察是，消除pre-norm是使在Fixup中的训练不稳定的原因，因此我们重新引入，从之后的实验中可以看到，是有效的。
+（d）Our proposal LayerScale：残差块的输出进行每个通道的相乘，而不是单个标量。即对Self-attention或者FFN的输出乘以一个对角矩阵，目的是给不同的channel乘以不同的$\lambda $值，同时保持Layer Normalization： $$ x_{l}^{&#39;}=x_{l}&#43;diag(\lambda _ {l,1},&amp;hellip;,\lambda _ {l,d}) SA(\eta (x_{l})) $$ $$ x_{l&#43;1}=x_{l}^{&#39;}&#43;diag({\lambda }&#39;_ {l,1},&amp;hellip;,{\lambda }&#39;_ {l,d}) FFN(\eta (x_{l}^{&#39;})) $$ 其中，$\lambda _ {l,1}$和${\lambda }&#39;_ {l,1}$都是可学习的参数权重。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -164,13 +160,13 @@ Outlook Attention 如上图所示，主要思想有两点：
 
         </div>
         <header class="post-header">
-          <h1 class="post-title">VOLO</h1>
+          <h1 class="post-title">CaiT</h1>
           
           <div class="row post-desc">
             <div class="col-xs-6">
               
-              <time class="post-date" datetime="2022-06-15 00:00:00 UTC">
-                15 Jun 2022
+              <time class="post-date" datetime="2022-06-22 00:00:00 UTC">
+                22 Jun 2022
               </time>
               
             </div>
@@ -187,59 +183,82 @@ Outlook Attention 如上图所示，主要思想有两点：
 
         <div class="post-content markdown-body">
           
-          <p>VOLO: Vision Outlooker for Visual Recognition</p>
+          <p>Going deeper with Image Transformers</p>
 <h2 id="abstract">Abstract</h2>
-<p>    限制ViT的性能的主要原因是：对细粒度的特征编码效率较低，为了解决这个问题，我们提出新的outlook attention，并提出了一个简单的架构Vision Outlooker (VOLO)。与粗粒度的全局注意力不同，outlook attention能够有效的提取细粒度特征和上下文信息。</p>
+<p>    目前对图像transformer的优化研究工作还很少，在本文中，我们搭建了更深层次的transformer用于图像分类，提出了两个架构变化，显著提高了transformer的深度和精度。这使得我们的模型性能不会随着更多的深度而早期饱和。</p>
 <h2 id="introduction">Introduction</h2>
-<p>    限制ViT的一个主要因素是：分割得到的patch token，提取细粒度特征和引入上下文编码是低效率的。在本文中，我们提出了一种新的注意力机制：Outlooker，能够有效的提取细粒度特征和上下文信息；同时，利用线性投影，而摆脱了二次复杂度。<br>
-    基于Outlooker，我们提出了一个简单的模型架构：VOLO。VOLO通过一个两阶段的体系结构，实现了细粒度的token表示和全局信息的聚合；具体来说，给定一个224×224的图像，在使用自注意力机制在粗粒度上构建全局依赖以前，先在较小的patch上，使用多个Outlooker在细粒度特征上进行token表示。</p>
-<h2 id="method">Method</h2>
-<p>    可以分为两阶段：<br>
-    （1）堆叠的Outlooker，以生成细粒度级别的token表征；<br>
-    （2）一系列transformer block聚合全局信息。</p>
-<h3 id="outlooker">Outlooker</h3>
-<p>    Outlooker由一个对空间信息编码的outlook attention层和一个用于通道之间信息交互的MLP层组成。<br>
-    对对于给定的C维输入$X\in \mathbb{R}^{H\times W\times C}$，Outlooker可以写作：
+<p>    首先，残差结构可以定义为：
 $$
-\tilde{X} = OutlookAtt(LN(X))+X
+x_{l+1}=g_{l}(x_{l})+R_{l}(x_{l})
+$$
+    其中，$g_{l}$通常是恒等映射，$R_{l}$是block的主要操作。残差结构突出了体系结构设计和提高精度之间的强大相互作用。在ResNet论文中提到说，残差网络并不能提供更好的表示能力，但效果更好的原因是网络更容易训练。<br>
+    Transformer架构可以表示为：
+$$
+x_{l}^{'}=x_{l}+SA(\eta (x_{l}))
 $$
 $$
-Z=MLP(LN(\tilde{X}))+\tilde{X}
-$$</p>
-<h4 id="outlook-attention">Outlook Attention</h4>
-<p><img src="/img/volo1.PNG" alt="">
-    如上图所示，主要思想有两点：<br>
-    （1）每个空间位置的局部特征足以生成注意力权重系数来聚合其临近的特征；<br>
-    （2）密集的局部空间特征聚集可以有效的编码细粒度信息。<br>
-    对于每个空间位置$(i,j)$，outlook注意力在以$(i,j)$为中心、大小为$K×K$的局部窗口内，计算相邻位置的相似性。与自注意力机制中使用Q-K矩阵相乘来得到权重系数不同，outlook通过reshape来简化这个过程。<br>
-    对于给定的输入$X$，每个C维的token首先经过线性投影，使用两个线性层，$W_{A}\in \mathbb{R}^{C\times K^{4}}$和$W_{V}\in \mathbb{R}^{C\times C}$，分别得到outlook权重$A\in \mathbb{R}^{H\times W\times K^{4}}$和value$V\in \mathbb{R}^{H\times W\times C}$，$V_{\Delta _ {i,j}}\in \mathbb{R}^{C\times K^{2}}$表示以$(i,j)$为中心的局部窗口内的值：
+x_{l+1}=x_{l}^{'}+FFN(\eta (x_{l}^{'}))
 $$
-V_{\Delta _ {i,j}}=\lbrace V_{i+p-\left \lfloor \frac{K}{2} \right \rfloor,j+q-\left \lfloor \frac{K}{2} \right \rfloor} \rbrace
+    其中，$\eta$是指LN。上述结构遵循残差连接。<br>
+    如何归一化、初始化权重或初始化残差块是值得思考的，我们共讨论了4个方法，分别是：Fixup、T-Fixup、ReZero和SkipInit。<br>
+    在分析了不同初始化、优化和架构设计之间的相互作用之后，我们提出了一种方法，与目前的图像变压器方法相比，它可以有效地改进更深层次的架构训练。具体的，在每个残差块的输出上添加一个可学习的对角矩阵，初始化接近为0，但不是0。我们称之为LayerScale。<br>
+    其次，我们将patch之间的注意力transformer层和将patch内容传递到单个向量中的层分离，以便单个向量进行分类。这种显式的分离避免了在处理class embedding时引导注意力过程的矛盾目标。我们称之为CaiT（Class-Attention in Image Transformers）。</p>
+<h2 id="deeper-image-transformers-with-layerscale">Deeper image transformers with LayerScale</h2>
+<p>    在ViT和DeiT的工作中，没有证据表明深度更有效：更深的ViT架构性能较低，而DeiT只考虑12层的变压器。<br>
+    下图为我们比较的几个变体：
+<img src="/img/cait1.PNG" alt="">
+    （a）原始的结构：ViT和DeiT中使用的，即pre-norm结构，层归一化在残差分支的开始部分，但在原始的attention文章中（Attention is all you need）是post-norm，但在我们的实验中，post-norm并不能收敛。<br>
+    （b）ReZero/Skipinit/Fixup：在残差块的输出部分引入了可学习的标量权重$\alpha _ {l}$，同时出去了pre-norm，可以表示为：
 $$
-    <strong>Outlook attention</strong><br>
-    位置$(i,j)$的outlook权重直接用作value聚合时的注意力权重，通过reshape操作将outlook权重$A\in \mathbb{R}^{H\times W\times K^{4}}$转换成$\tilde{A}_ {i,j}\in \mathbb{R}^{K^{2}\times K^{2}}$，然后跟着一个softmax，即：
+x_{l}^{'}=x_{l}+\alpha _ {l} SA(\eta (x_{l}))
 $$
-Y_{\Delta _ {i,j}}=MatMul(Softmax(\tilde{A}_ {i,j}),V_{\Delta _ {i,j}})
 $$
-    <strong>Dense aggregation</strong><br>
-    注意力密集的聚集了value的表示，将来自不同局部窗口的不同位置在同一位置的不同权值进行相加，得到输出：
+x_{l+1}=x_{l}^{'}+\alpha _ {l}^{'} FFN(\eta (x_{l}^{'}))
 $$
-\tilde{Y}_ {\Delta _ {i,j}}=\sum_{0\leq m,n&lt; K}Y_{\Delta _ {i+m-\left \lfloor \frac{K}{2} \right \rfloor,j+n-\left \lfloor \frac{K}{2} \right \rfloor}}^{i,j}
-$$</p>
-<h4 id="multi-head-outlook-attention">Multi-Head Outlook Attention</h4>
-<p>    实现多头，假设头数维$N$，只需要修改权重$W_{A}$的形状即可，即$W_{A}\in \mathbb{R}^{C\times N\times K^{4}}$。outlook权重和value被分成$N$段，即$A_{n}\in \mathbb{R}^{H\times W\times K^{4}}$，$V_{n}\in \mathbb{R}^{H\times W\times C_{N}}$，其中$C_{N}$是每头的维度。</p>
-<h3 id="network-architecture-variants">Network Architecture Variants</h3>
-<p><img src="/img/volo2.PNG" alt="">
-    我们观察到，在的Outlooker和Transformer比例在1：3时效果是最好的。</p>
+    ReZero是将该参数初始化为0；Fixup将其初始化为1，并进行了其他的修改；但在我们的实验中，这些都没有收敛。<br>
+    （c）我们的经验观察是，消除pre-norm是使在Fixup中的训练不稳定的原因，因此我们重新引入，从之后的实验中可以看到，是有效的。<br>
+    （d）Our proposal LayerScale：残差块的输出进行每个通道的相乘，而不是单个标量。即对Self-attention或者FFN的输出乘以一个对角矩阵，目的是给不同的channel乘以不同的$\lambda $值，同时保持Layer Normalization：
+$$
+x_{l}^{'}=x_{l}+diag(\lambda _ {l,1},&hellip;,\lambda _ {l,d}) SA(\eta (x_{l}))
+$$
+$$
+x_{l+1}=x_{l}^{'}+diag({\lambda }'_ {l,1},&hellip;,{\lambda }'_ {l,d}) FFN(\eta (x_{l}^{'}))
+$$
+    其中，$\lambda _ {l,1}$和${\lambda }'_ {l,1}$都是可学习的参数权重。<br>
+    在形式上，添加这些权重并不会改变架构的表达能力，因为它们可以集成到SA和FFN层的矩阵中，而不改变网络实现的功能。</p>
+<h2 id="specializing-layers-for-class-attention">Specializing layers for class attention</h2>
+<p><img src="/img/cait2.PNG" alt="">
+    在本节中，我们将介绍CaiT体系结构，如上图的右边所示。该设计旨在规避ViT体系结构的一个问题：学习到的权重被要求优化两个相互矛盾的目标：（1）指导patch之间的自注意力；（2）总结对分类有用的信息。因此，我们提出分离上述两个阶段。<br>
+    Later class token：在网络的后半部分插入所谓的class token。</p>
+<h3 id="architecture">Architecture</h3>
+<p>    CaiT网络由两个不同的处理阶段组成：<br>
+    （1）self-attention阶段：和ViT相同，只是没有class token；<br>
+    （2）class-attention阶段：一组堆叠的层将patch embedding的信息编译成class token，作为最终的分类。<br>
+    class-attention包含一个multi-head class-attention（CA）层和FFN层。在该阶段，只更新class token，即，在正向传递过程中，不将class embedding的信息复制到patch embedding中。class embedding只通过CA和FFN中的残差连接来更新。</p>
+<h4 id="multi-heads-class-attention">Multi-heads class attention</h4>
+<p>    CA层的作用是从处理过的patch集合中提取信息，与SA层类似，计算class embedding和patch embedding之间的注意力。<br>
+    CA的计算过程如下：
+$$
+Q=W_{q}x_{class}+b_{q}
+$$
+$$
+K=W_{k}z+b_{k}
+$$
+$$
+V=W_{v}z+b_{v}
+$$
+    其中，$z=[x_{class},x_{patches}]$。<br>
+    class-attention weights计算如下：
+$$
+A=Softmax(QK^{T}/\sqrt{d/h})
+$$
+    最终的输出通过计算：
+$$
+out_{CA}=W_{o}AV+b_{o}
+$$
+    该输出被添加到$x_{class}$中进行后续的处理。<br>
+    CA层从patch embedding提取有用的信息到class embedding。在初步实验中，我们通过经验观察到，第一个CA和FFN提供了主要的性能提升，并且2个block块层(2个CA和2个FFN)足以提升性能。在实验部分中，用12+2a表示12块SA+FFN层和2块CA+FFN层。</p>
 <h2 id="实验">实验</h2>
-<h3 id="main-results">Main Results</h3>
-<p><img src="/img/volo3.PNG" alt=""></p>
-<h3 id="performance-of-outlooker">Performance of Outlooker</h3>
-<p><img src="/img/volo4.PNG" alt="">
-    对LV-ViT-S进行逐步修改，逐渐形成我们的模型VOLO-D1</p>
-<h3 id="ablation-analysis">Ablation Analysis</h3>
-<h4 id="number-of-outlookers--head-number-in-outlookers">Number of Outlookers &amp; Head Number in Outlookers</h4>
-<p><img src="/img/volo5.PNG" alt=""></p>
 
         </div>
 

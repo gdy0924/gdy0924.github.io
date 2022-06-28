@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/ceit/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/ceit/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "CeiT",
+      "headline" : "CeiT",
+      "description" : "Incorporating Convolution Designs into Visual Transformers\nAbstract  提出了一个新的网络CeiT（Convolution-enhanced image Transformer）：结合了卷积网络提取low-level特征、局部性和transformer建立长期依赖关系的优势。对原始的transformer进行了三方面的修改：（1）设计了一个I2T（Image-to-Tokens）模块，从low-level特征中提取patch，而不是ViT中直接分割得到token；（2）每个block中的FFN层替换为LeFF（Locally-enhanced Feed-Forward）层，以加强空间维度上相邻token之间的相关性；（3）提出LCA（Layer-wise Class token Attention）层用于融合多阶段的表征进行最终的预测。\nIntroduction  ViT的论文中提到：transformer缺少CNN固有的归纳偏置，因此在数据量不足的情况下，模型不能很好的泛化。在DeiT中，CNN的teacher网络效果更好，这可能是由于“通过蒸馏transformer继承得到了归纳偏置”。\n针对卷积，主要特征是平移不不变性和局部性。然而transformer架构没有重新利用图像中存在的偏置。首先，ViT对大小为16×16或32×32的原始输入图像中的patch进行得到token，很难提取出图像中的一些低级特征（如角落和边缘）；其次，自注意力模块集中于建立token之间的长期依赖关系，而忽略了空间维度中的局部性。\n为了提取低级特征，设计了一个I2T（Image-to-Tokens）模块，从生成的low-level特征中提取patch，得到的patch尺寸更小；为了增强局部性，将FFN层替换为LeFF层（Locally-enhanced Feed-Forward）；为了更好的利用自注意力机制，在transformer顶部增加了LCA层（Layer-wise Class token Attention）。\nMethodology Revisiting Vision Transformer Tokenization\nViT直接将图像分割为16×16或32×32大小的patch，这样会存在两个限制：（1）难以捕捉图像中的低级信息，如边和角；（2）大的卷积核通常过度参数化，导致难以优化。\nEncoder blocks\n由MSA和MLP组成： $$ x\u0027=LN(x\u002bMSA(x)) $$ $$ y=LN(x\u0027\u002bFFN(x\u0027)) $$\nImage-to-Tokens with Low-level Features 为了解决Tokenization的问题，提出了Image-to-Tokens模块，从特征图中提取patch，而不是原始图像。该模块由一个卷积层和一个最大池化层组成，公式表示为： $$ x\u0027=I2T(x)=MaxPool(BN(Conv(x))) $$ 其中，$x\u0027\\in \\mathbb{R}^{\\frac{H}{S}\\times \\frac{W}{S}\\times D}$，$S$是相对于原始图像的缩小倍数，将得到的特征图分割为patch，为了保证token数量相同，我们将patch的分辨率缩小为$(\\frac{P}{S},\\frac{P}{S})$。$S$通常为4。\nI2T模块充分利用了卷积在提取low-level特征方面的优势，通过缩小patch的大小来降低embedding的训练难度。\nLocally-Enhanced Feed-Forward Network  在每个block中，MSA模块不变，以捕获全局的相似性，使用LeFF层来代替原来的前馈层。 LeFF层的流程如下：\n（1）对于MSA的输出$x_{t}^{h}\\in \\mathbb{R}^{(N\u002b1)\\times C}$，先将其分为patch token$x_{p}^{h}\\in \\mathbb{R}^{N\\times C}$和class token$x_{c}^{h}\\in \\mathbb{R}^{C}$，通过一个线性层将patch token的维度增加$x_{p}^{h}\\in \\mathbb{R}^{N\\times (e\\times C)}$，e为扩展比；",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,41 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-06-25 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-06-25 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "datePublished": "2022-06-23 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-06-23 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/ceit\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>CeiT</title>
+  <meta property="og:title" content="CeiT" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Incorporating Convolution Designs into Visual Transformers
+Abstract  提出了一个新的网络CeiT（Convolution-enhanced image Transformer）：结合了卷积网络提取low-level特征、局部性和transformer建立长期依赖关系的优势。对原始的transformer进行了三方面的修改：（1）设计了一个I2T（Image-to-Tokens）模块，从low-level特征中提取patch，而不是ViT中直接分割得到token；（2）每个block中的FFN层替换为LeFF（Locally-enhanced Feed-Forward）层，以加强空间维度上相邻token之间的相关性；（3）提出LCA（Layer-wise Class token Attention）层用于融合多阶段的表征进行最终的预测。
+Introduction  ViT的论文中提到：transformer缺少CNN固有的归纳偏置，因此在数据量不足的情况下，模型不能很好的泛化。在DeiT中，CNN的teacher网络效果更好，这可能是由于“通过蒸馏transformer继承得到了归纳偏置”。
+针对卷积，主要特征是平移不不变性和局部性。然而transformer架构没有重新利用图像中存在的偏置。首先，ViT对大小为16×16或32×32的原始输入图像中的patch进行得到token，很难提取出图像中的一些低级特征（如角落和边缘）；其次，自注意力模块集中于建立token之间的长期依赖关系，而忽略了空间维度中的局部性。
+为了提取低级特征，设计了一个I2T（Image-to-Tokens）模块，从生成的low-level特征中提取patch，得到的patch尺寸更小；为了增强局部性，将FFN层替换为LeFF层（Locally-enhanced Feed-Forward）；为了更好的利用自注意力机制，在transformer顶部增加了LCA层（Layer-wise Class token Attention）。
+Methodology Revisiting Vision Transformer Tokenization
+ViT直接将图像分割为16×16或32×32大小的patch，这样会存在两个限制：（1）难以捕捉图像中的低级信息，如边和角；（2）大的卷积核通常过度参数化，导致难以优化。
+Encoder blocks
+由MSA和MLP组成： $$ x&#39;=LN(x&#43;MSA(x)) $$ $$ y=LN(x&#39;&#43;FFN(x&#39;)) $$
+Image-to-Tokens with Low-level Features 为了解决Tokenization的问题，提出了Image-to-Tokens模块，从特征图中提取patch，而不是原始图像。该模块由一个卷积层和一个最大池化层组成，公式表示为： $$ x&#39;=I2T(x)=MaxPool(BN(Conv(x))) $$ 其中，$x&#39;\in \mathbb{R}^{\frac{H}{S}\times \frac{W}{S}\times D}$，$S$是相对于原始图像的缩小倍数，将得到的特征图分割为patch，为了保证token数量相同，我们将patch的分辨率缩小为$(\frac{P}{S},\frac{P}{S})$。$S$通常为4。
+I2T模块充分利用了卷积在提取low-level特征方面的优势，通过缩小patch的大小来降低embedding的训练难度。
+Locally-Enhanced Feed-Forward Network  在每个block中，MSA模块不变，以捕获全局的相似性，使用LeFF层来代替原来的前馈层。 LeFF层的流程如下：
+（1）对于MSA的输出$x_{t}^{h}\in \mathbb{R}^{(N&#43;1)\times C}$，先将其分为patch token$x_{p}^{h}\in \mathbb{R}^{N\times C}$和class token$x_{c}^{h}\in \mathbb{R}^{C}$，通过一个线性层将patch token的维度增加$x_{p}^{h}\in \mathbb{R}^{N\times (e\times C)}$，e为扩展比；" />
+  <meta name="description" content="Incorporating Convolution Designs into Visual Transformers
+Abstract  提出了一个新的网络CeiT（Convolution-enhanced image Transformer）：结合了卷积网络提取low-level特征、局部性和transformer建立长期依赖关系的优势。对原始的transformer进行了三方面的修改：（1）设计了一个I2T（Image-to-Tokens）模块，从low-level特征中提取patch，而不是ViT中直接分割得到token；（2）每个block中的FFN层替换为LeFF（Locally-enhanced Feed-Forward）层，以加强空间维度上相邻token之间的相关性；（3）提出LCA（Layer-wise Class token Attention）层用于融合多阶段的表征进行最终的预测。
+Introduction  ViT的论文中提到：transformer缺少CNN固有的归纳偏置，因此在数据量不足的情况下，模型不能很好的泛化。在DeiT中，CNN的teacher网络效果更好，这可能是由于“通过蒸馏transformer继承得到了归纳偏置”。
+针对卷积，主要特征是平移不不变性和局部性。然而transformer架构没有重新利用图像中存在的偏置。首先，ViT对大小为16×16或32×32的原始输入图像中的patch进行得到token，很难提取出图像中的一些低级特征（如角落和边缘）；其次，自注意力模块集中于建立token之间的长期依赖关系，而忽略了空间维度中的局部性。
+为了提取低级特征，设计了一个I2T（Image-to-Tokens）模块，从生成的low-level特征中提取patch，得到的patch尺寸更小；为了增强局部性，将FFN层替换为LeFF层（Locally-enhanced Feed-Forward）；为了更好的利用自注意力机制，在transformer顶部增加了LCA层（Layer-wise Class token Attention）。
+Methodology Revisiting Vision Transformer Tokenization
+ViT直接将图像分割为16×16或32×32大小的patch，这样会存在两个限制：（1）难以捕捉图像中的低级信息，如边和角；（2）大的卷积核通常过度参数化，导致难以优化。
+Encoder blocks
+由MSA和MLP组成： $$ x&#39;=LN(x&#43;MSA(x)) $$ $$ y=LN(x&#39;&#43;FFN(x&#39;)) $$
+Image-to-Tokens with Low-level Features 为了解决Tokenization的问题，提出了Image-to-Tokens模块，从特征图中提取patch，而不是原始图像。该模块由一个卷积层和一个最大池化层组成，公式表示为： $$ x&#39;=I2T(x)=MaxPool(BN(Conv(x))) $$ 其中，$x&#39;\in \mathbb{R}^{\frac{H}{S}\times \frac{W}{S}\times D}$，$S$是相对于原始图像的缩小倍数，将得到的特征图分割为patch，为了保证token数量相同，我们将patch的分辨率缩小为$(\frac{P}{S},\frac{P}{S})$。$S$通常为4。
+I2T模块充分利用了卷积在提取low-level特征方面的优势，通过缩小patch的大小来降低embedding的训练难度。
+Locally-Enhanced Feed-Forward Network  在每个block中，MSA模块不变，以捕获全局的相似性，使用LeFF层来代替原来的前馈层。 LeFF层的流程如下：
+（1）对于MSA的输出$x_{t}^{h}\in \mathbb{R}^{(N&#43;1)\times C}$，先将其分为patch token$x_{p}^{h}\in \mathbb{R}^{N\times C}$和class token$x_{c}^{h}\in \mathbb{R}^{C}$，通过一个线性层将patch token的维度增加$x_{p}^{h}\in \mathbb{R}^{N\times (e\times C)}$，e为扩展比；" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +127,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +160,124 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">CeiT</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-06-23 00:00:00 UTC">
+                23 Jun 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Incorporating Convolution Designs into Visual Transformers</p>
+<h2 id="abstract">Abstract</h2>
+<p>    提出了一个新的网络CeiT（Convolution-enhanced image Transformer）：结合了卷积网络提取low-level特征、局部性和transformer建立长期依赖关系的优势。对原始的transformer进行了三方面的修改：（1）设计了一个I2T（Image-to-Tokens）模块，从low-level特征中提取patch，而不是ViT中直接分割得到token；（2）每个block中的FFN层替换为LeFF（Locally-enhanced Feed-Forward）层，以加强空间维度上相邻token之间的相关性；（3）提出LCA（Layer-wise Class token Attention）层用于融合多阶段的表征进行最终的预测。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    ViT的论文中提到：transformer缺少CNN固有的归纳偏置，因此在数据量不足的情况下，模型不能很好的泛化。在DeiT中，CNN的teacher网络效果更好，这可能是由于“通过蒸馏transformer继承得到了归纳偏置”。<br>
+    针对卷积，主要特征是平移不不变性和局部性。然而transformer架构没有重新利用图像中存在的偏置。首先，ViT对大小为16×16或32×32的原始输入图像中的patch进行得到token，很难提取出图像中的一些低级特征（如角落和边缘）；其次，自注意力模块集中于建立token之间的长期依赖关系，而忽略了空间维度中的局部性。<br>
+    为了提取低级特征，设计了一个I2T（Image-to-Tokens）模块，从生成的low-level特征中提取patch，得到的patch尺寸更小；为了增强局部性，将FFN层替换为LeFF层（Locally-enhanced Feed-Forward）；为了更好的利用自注意力机制，在transformer顶部增加了LCA层（Layer-wise Class token Attention）。</p>
+<h2 id="methodology">Methodology</h2>
+<h3 id="revisiting-vision-transformer">Revisiting Vision Transformer</h3>
+<p><em><strong>Tokenization</strong></em><br>
+    ViT直接将图像分割为16×16或32×32大小的patch，这样会存在两个限制：（1）难以捕捉图像中的低级信息，如边和角；（2）大的卷积核通常过度参数化，导致难以优化。<br>
+<em><strong>Encoder blocks</strong></em><br>
+    由MSA和MLP组成：
+$$
+x'=LN(x+MSA(x))
+$$
+$$
+y=LN(x'+FFN(x'))
+$$</p>
+<h3 id="image-to-tokens-with-low-level-features">Image-to-Tokens with Low-level Features</h3>
+<p><img src="/img/ceit1.PNG" alt="">
+    为了解决Tokenization的问题，提出了Image-to-Tokens模块，从特征图中提取patch，而不是原始图像。该模块由一个卷积层和一个最大池化层组成，公式表示为：
+$$
+x'=I2T(x)=MaxPool(BN(Conv(x)))
+$$
+    其中，$x'\in \mathbb{R}^{\frac{H}{S}\times \frac{W}{S}\times D}$，$S$是相对于原始图像的缩小倍数，将得到的特征图分割为patch，为了保证token数量相同，我们将patch的分辨率缩小为$(\frac{P}{S},\frac{P}{S})$。$S$通常为4。<br>
+    I2T模块充分利用了卷积在提取low-level特征方面的优势，通过缩小patch的大小来降低embedding的训练难度。</p>
+<h3 id="locally-enhanced-feed-forward-network">Locally-Enhanced Feed-Forward Network</h3>
+<p>    在每个block中，MSA模块不变，以捕获全局的相似性，使用LeFF层来代替原来的前馈层。
+<img src="/img/ceit2.PNG" alt="">
+    LeFF层的流程如下：<br>
+    （1）对于MSA的输出$x_{t}^{h}\in \mathbb{R}^{(N+1)\times C}$，先将其分为patch token$x_{p}^{h}\in \mathbb{R}^{N\times C}$和class token$x_{c}^{h}\in \mathbb{R}^{C}$，通过一个线性层将patch token的维度增加$x_{p}^{h}\in \mathbb{R}^{N\times (e\times C)}$，e为扩展比；<br>
+    （2）将patch token恢复成“图像”，$x_{p}^{s}\in \mathbb{R}^{\sqrt{N}\times \sqrt{N} \times (e\times C)}$；<br>
+    （3）对恢复的patch token进行卷积核大小为$k$的depth-wise卷积，加强局部的相关性，得到$x_{p}^{d}\in \mathbb{R}^{\sqrt{N}\times \sqrt{N} \times (e\times C)}$；<br>
+    （4）将patch展平得到序列$x_{p}^{f}\in \mathbb{R}^{N \times (e\times C)}$；<br>
+    （5）经过一个线性投影将维度降低为原始维度，与class token进行连接，$x_{t}^{h+1}\in \mathbb{R}^{(N+1) \times C}$。</p>
+<h3 id="layer-wise-class-token-attention">Layer-wise Class-Token Attention</h3>
+<p>    在CNN中，随着网络的加深，特征图的感受野逐步扩大，在ViT中也发现了类似的观察结果，因此，特征表示在不同的层上是不同的。为了融合不同层的信息，我们设计了一个Layer-wise Class-token Attention模块。
+<img src="/img/ceit3.PNG" alt="">
+    LCA将一个class token序列作为输入，即$X_{c}=[x_{c}^{(1)},&hellip;,x_{c}^{(l)},&hellip;,x_{c}^{(L)}]$，遵循标准的transformer结构，包含一个MSA和一个FFN层。但是，该模块只计算第L层的class token$x_{c}^{(L)}$与其他class token的单向相似性，对应的value$x_{c}^{(L)}$通过注意力与其他的值进行聚合，聚合后的value经过FFN层得到最终的表示。</p>
+<h2 id="实验">实验</h2>
+<h3 id="imagenet">ImageNet</h3>
+<p><img src="/img/ceit4.PNG" alt=""></p>
+<h3 id="ablation-studies">Ablation Studies</h3>
+<p><img src="/img/ceit5.PNG" alt="">
+<img src="/img/ceit6.PNG" alt=""></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +297,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

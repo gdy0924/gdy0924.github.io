@@ -3,7 +3,7 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://gdy0924.github.io/categories/</loc>
-    <lastmod>2022-06-15T00:00:00+00:00</lastmod>
+    <lastmod>2022-06-25T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -15,14 +15,17 @@
                 href="https://gdy0924.github.io/categories/"
                 />
   </url><url>
-    <loc>https://gdy0924.github.io/posts/coatnet/</loc>
-    <lastmod>2022-06-15T00:00:00+00:00</lastmod>
+    <loc>https://gdy0924.github.io/posts/deepnet/</loc>
+    <lastmod>2022-06-25T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/edgevit/</loc>
+    <lastmod>2022-06-25T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/categories/paper/</loc>
-    <lastmod>2022-06-15T00:00:00+00:00</lastmod>
+    <lastmod>2022-06-25T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/</loc>
-    <lastmod>2022-06-15T00:00:00+00:00</lastmod>
+    <lastmod>2022-06-25T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -34,11 +37,8 @@
                 href="https://gdy0924.github.io/posts/"
                 />
   </url><url>
-    <loc>https://gdy0924.github.io/posts/volo/</loc>
-    <lastmod>2022-06-15T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://gdy0924.github.io/</loc>
-    <lastmod>2022-06-15T00:00:00+00:00</lastmod>
+    <lastmod>2022-06-25T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -49,6 +49,24 @@
                 hreflang="cn"
                 href="https://gdy0924.github.io/"
                 />
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/halonet/</loc>
+    <lastmod>2022-06-24T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/ceit/</loc>
+    <lastmod>2022-06-23T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/cait/</loc>
+    <lastmod>2022-06-22T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/levit/</loc>
+    <lastmod>2022-06-21T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/coatnet/</loc>
+    <lastmod>2022-06-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/volo/</loc>
+    <lastmod>2022-06-15T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/early-convolutions-help-transformers-see-better/</loc>
     <lastmod>2022-06-14T00:00:00+00:00</lastmod>
