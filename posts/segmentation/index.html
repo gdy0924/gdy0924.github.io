@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/segmentation/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/segmentation/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "Segmentation",
+      "headline" : "Segmentation",
+      "description" : "FCN：全卷积网络，语义分割。\nDeepMask：实例分割，讲图像分割为patch，输入网络，两个分支，一个生成像素级掩码，一个生成分数，其中分割掩码分支，只识别图像最中心的一个物体，分数分支判断一个patch是否满足两个要求：目标位于图块的正中心附近，目标完整存在于图块中，以16为步长，选择不同的尺度大小，进行分割。\nSharpMask：DeepMask的进一步改进，将网络浅层的特征图，引入，以生成高分辨率的掩码结果。\nR-CNN家族：R-CNN、Fast R-CNN和Faster R-CNN用于目标识别，输出bounding box的类别和坐标，Mask R-CNN增加一个掩码分支，用于图像分割，并且提出了RoIAlign代替RoI Pooling，同时mask分支输出$K×m×m$的特征图，K为分类数目，计算损失只计算第k个类别的损失，第k个类别是bounding box的分类分支输出的分类结果，即将掩码和分类解耦。\nDeepLab：引入空洞卷积，在增大感受野的同时，不增加参数量，并引入ASPP模块（Atrous Spatial Pooling Pyramid），即分成不同分支，利用不同扩展率的空洞卷积进行处理，再融合。\nPSPNet：利用金字塔池化模块，在四个不同的粗细尺度上进行特征融合，四个分支利用不同的池化大小，得到不同大小的特征图，再进行双线性插值进行上采样得到特征尺寸大小的特征图，然后融合。 RefineNet：提出了多路径网络，利用多级别的抽象用于高分辨率语义分割；由三部分组成：残差卷积模块（Residual Conv Unit，RCU），包含自适应卷积和残差连接；多分辨率融合模块（Multi-Resolution fuse，MRF），卷积\u002b上采样得到相同尺度大小的特征图，然后进行融合（元素相加）；链式残差池化模块（Chained Residual Pooling，CRP），使用多层池化\u002b卷积从大的背景区域中捕获上下文信息。 U-Net：引入encoder和decoder，encoder提取特征，decoder利用转置卷积对特征图进行上采样，并将encoder中的特征图横着连接过来，即skip连接。\nV-Net：3D conv\u002bresidual Block版的U-Net，池化用卷积代替，转置卷积上采样，提出了一个新的目标函数：Dice coefficient，使模型能够处理前景和背景中体素数量之间存在强烈不平衡的情况。\nSegNet：encoder\u002bdecoder架构，encoder中为卷积池化提取特征图，在最大池化层中将最大元素的位置记录下来，在decoder中，根据位置进行反池化，从而对特征图进行上采样，该方式不增加参数量但增加了存储空间的使用。\nENet：一个小的浅层分割网络，用于实时的语义分割，更深的encoder和更浅的decoder，将卷积和池化并行执行。\nParseNet：通过使用全局平均池化来增强每个位置的特征，即将特征图进行全局平均池化后再进行归一化，接着进行unpool对特征向量转换为特征图的尺寸大小，并于特征图进行拼接融合，向FCNs中添加全局上下文信息。\nHRNet：通过并行连接高分辨率到低分辨率的卷积流，并跨分辨率交换信息，通过decoder过程维护高分辨率特征表示。\nFPN：Feature Pyramid Network\nPANet：Path Aggregation Network，（a）是一个FPN，（b）是PAN增加的自底向上的特征融合层，（c）是自适应特征池化层，（d）是PANet的bounding box预测头，（e）是用于预测掩码的全连接融合层。 PAN：Pyramid Attention Network，提出Feature Pyramid Attention module（FPA）和Global Attention Upsample module（GAU），引入注意力机制用于语义分割；FPA：用于在特征上执行空间金字塔注意力，并结合全局池以学习更好的特征表示。 DANet：在一个扩展的FCN上附加了两种类型的注意力模块，分别模拟了空间维度和通道维度上的语义相互依赖关系；Position Attention模块，B、C、D表示的都是特征图A，然后对他们都进行reshape操作，得到了三个大小为$C×N$的矩阵，对应Q、K和V，（1）B和C相乘，得到$N×N$的矩阵，对应$Q^{T}\\times K$，（2）经过softmax，（3）与D相乘，并reshape，得到权重分数；Channel Attention模块，与上边类似，只是B和C相乘，得到$C×C$的矩阵。\n全景分割：对于图像中的每个像素打上两个标签，一个是分类标签，一个是实例ID，并将像素分为两类，stuff（填充物）和things（目标），stuff的实例ID会被忽略，具有相同标签和id的像素都属于同一个对象，对于无法确定的像素，比如不在分类范围内模糊的像素则会给一个void标签。\nPanoptic FPN：赋予Mask R-CNN一个结合了实例分割和语义分割的FPN主干网络。\nPanoptic-DeepLab：通过通过将预测的前景像素分组到它们最近的预测实例中心，从而得到与类无关的实例分割，再与语义分割进行融合，生成最终的全景分割；采用双上下文和双解码器模块进行语义分割和实例分割预测；Semantic segmentation，分割结果（H×W×Num_classes）；Instance segmentation head，实例中心预测（预测每个点是不是实例中心的概率）\u002b实例中心回归（预测每个点到实例中心的偏移量是多少，x和y） Applications Medical imaging：如对血管、组织、神经等进行分割；定位异常，如肿瘤、动脉瘤等；显微图像中的分割，如细胞或细胞核检测、计数细胞数、细胞结构分析以进行癌症检测等。\nContent-based image retrieval（CBIR）：高效的信息检索系统，如视觉问题回答，基于交互式查询的图像处理，描述生成；分割可以提供对象的位置关系、数目等。\nObject Detection：自动驾驶、智能运动检测、跟踪系统等；图像匹配、合成等。\nForensics：生物识别验证系统，如虹膜、指纹等，涉及对各种信息区域的分割，以进行有效分析。\nDiscussion and Future Scope  目前仍然存在大量的有监督方法，然而无监督和弱监督算法仍远未达到饱和水平。这在图像分割领域是一个合理的问题，因为数据收集可以通过许多自动化过程进行，但对它们进行注释完全需要手工劳动。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-07-18 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-07-18 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/segmentation\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>Segmentation</title>
+  <meta property="og:title" content="Segmentation" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="FCN：全卷积网络，语义分割。
+DeepMask：实例分割，讲图像分割为patch，输入网络，两个分支，一个生成像素级掩码，一个生成分数，其中分割掩码分支，只识别图像最中心的一个物体，分数分支判断一个patch是否满足两个要求：目标位于图块的正中心附近，目标完整存在于图块中，以16为步长，选择不同的尺度大小，进行分割。
+SharpMask：DeepMask的进一步改进，将网络浅层的特征图，引入，以生成高分辨率的掩码结果。
+R-CNN家族：R-CNN、Fast R-CNN和Faster R-CNN用于目标识别，输出bounding box的类别和坐标，Mask R-CNN增加一个掩码分支，用于图像分割，并且提出了RoIAlign代替RoI Pooling，同时mask分支输出$K×m×m$的特征图，K为分类数目，计算损失只计算第k个类别的损失，第k个类别是bounding box的分类分支输出的分类结果，即将掩码和分类解耦。
+DeepLab：引入空洞卷积，在增大感受野的同时，不增加参数量，并引入ASPP模块（Atrous Spatial Pooling Pyramid），即分成不同分支，利用不同扩展率的空洞卷积进行处理，再融合。
+PSPNet：利用金字塔池化模块，在四个不同的粗细尺度上进行特征融合，四个分支利用不同的池化大小，得到不同大小的特征图，再进行双线性插值进行上采样得到特征尺寸大小的特征图，然后融合。 RefineNet：提出了多路径网络，利用多级别的抽象用于高分辨率语义分割；由三部分组成：残差卷积模块（Residual Conv Unit，RCU），包含自适应卷积和残差连接；多分辨率融合模块（Multi-Resolution fuse，MRF），卷积&#43;上采样得到相同尺度大小的特征图，然后进行融合（元素相加）；链式残差池化模块（Chained Residual Pooling，CRP），使用多层池化&#43;卷积从大的背景区域中捕获上下文信息。 U-Net：引入encoder和decoder，encoder提取特征，decoder利用转置卷积对特征图进行上采样，并将encoder中的特征图横着连接过来，即skip连接。
+V-Net：3D conv&#43;residual Block版的U-Net，池化用卷积代替，转置卷积上采样，提出了一个新的目标函数：Dice coefficient，使模型能够处理前景和背景中体素数量之间存在强烈不平衡的情况。
+SegNet：encoder&#43;decoder架构，encoder中为卷积池化提取特征图，在最大池化层中将最大元素的位置记录下来，在decoder中，根据位置进行反池化，从而对特征图进行上采样，该方式不增加参数量但增加了存储空间的使用。
+ENet：一个小的浅层分割网络，用于实时的语义分割，更深的encoder和更浅的decoder，将卷积和池化并行执行。
+ParseNet：通过使用全局平均池化来增强每个位置的特征，即将特征图进行全局平均池化后再进行归一化，接着进行unpool对特征向量转换为特征图的尺寸大小，并于特征图进行拼接融合，向FCNs中添加全局上下文信息。
+HRNet：通过并行连接高分辨率到低分辨率的卷积流，并跨分辨率交换信息，通过decoder过程维护高分辨率特征表示。
+FPN：Feature Pyramid Network
+PANet：Path Aggregation Network，（a）是一个FPN，（b）是PAN增加的自底向上的特征融合层，（c）是自适应特征池化层，（d）是PANet的bounding box预测头，（e）是用于预测掩码的全连接融合层。 PAN：Pyramid Attention Network，提出Feature Pyramid Attention module（FPA）和Global Attention Upsample module（GAU），引入注意力机制用于语义分割；FPA：用于在特征上执行空间金字塔注意力，并结合全局池以学习更好的特征表示。 DANet：在一个扩展的FCN上附加了两种类型的注意力模块，分别模拟了空间维度和通道维度上的语义相互依赖关系；Position Attention模块，B、C、D表示的都是特征图A，然后对他们都进行reshape操作，得到了三个大小为$C×N$的矩阵，对应Q、K和V，（1）B和C相乘，得到$N×N$的矩阵，对应$Q^{T}\times K$，（2）经过softmax，（3）与D相乘，并reshape，得到权重分数；Channel Attention模块，与上边类似，只是B和C相乘，得到$C×C$的矩阵。
+全景分割：对于图像中的每个像素打上两个标签，一个是分类标签，一个是实例ID，并将像素分为两类，stuff（填充物）和things（目标），stuff的实例ID会被忽略，具有相同标签和id的像素都属于同一个对象，对于无法确定的像素，比如不在分类范围内模糊的像素则会给一个void标签。
+Panoptic FPN：赋予Mask R-CNN一个结合了实例分割和语义分割的FPN主干网络。
+Panoptic-DeepLab：通过通过将预测的前景像素分组到它们最近的预测实例中心，从而得到与类无关的实例分割，再与语义分割进行融合，生成最终的全景分割；采用双上下文和双解码器模块进行语义分割和实例分割预测；Semantic segmentation，分割结果（H×W×Num_classes）；Instance segmentation head，实例中心预测（预测每个点是不是实例中心的概率）&#43;实例中心回归（预测每个点到实例中心的偏移量是多少，x和y） Applications Medical imaging：如对血管、组织、神经等进行分割；定位异常，如肿瘤、动脉瘤等；显微图像中的分割，如细胞或细胞核检测、计数细胞数、细胞结构分析以进行癌症检测等。
+Content-based image retrieval（CBIR）：高效的信息检索系统，如视觉问题回答，基于交互式查询的图像处理，描述生成；分割可以提供对象的位置关系、数目等。
+Object Detection：自动驾驶、智能运动检测、跟踪系统等；图像匹配、合成等。
+Forensics：生物识别验证系统，如虹膜、指纹等，涉及对各种信息区域的分割，以进行有效分析。
+Discussion and Future Scope  目前仍然存在大量的有监督方法，然而无监督和弱监督算法仍远未达到饱和水平。这在图像分割领域是一个合理的问题，因为数据收集可以通过许多自动化过程进行，但对它们进行注释完全需要手工劳动。" />
+  <meta name="description" content="FCN：全卷积网络，语义分割。
+DeepMask：实例分割，讲图像分割为patch，输入网络，两个分支，一个生成像素级掩码，一个生成分数，其中分割掩码分支，只识别图像最中心的一个物体，分数分支判断一个patch是否满足两个要求：目标位于图块的正中心附近，目标完整存在于图块中，以16为步长，选择不同的尺度大小，进行分割。
+SharpMask：DeepMask的进一步改进，将网络浅层的特征图，引入，以生成高分辨率的掩码结果。
+R-CNN家族：R-CNN、Fast R-CNN和Faster R-CNN用于目标识别，输出bounding box的类别和坐标，Mask R-CNN增加一个掩码分支，用于图像分割，并且提出了RoIAlign代替RoI Pooling，同时mask分支输出$K×m×m$的特征图，K为分类数目，计算损失只计算第k个类别的损失，第k个类别是bounding box的分类分支输出的分类结果，即将掩码和分类解耦。
+DeepLab：引入空洞卷积，在增大感受野的同时，不增加参数量，并引入ASPP模块（Atrous Spatial Pooling Pyramid），即分成不同分支，利用不同扩展率的空洞卷积进行处理，再融合。
+PSPNet：利用金字塔池化模块，在四个不同的粗细尺度上进行特征融合，四个分支利用不同的池化大小，得到不同大小的特征图，再进行双线性插值进行上采样得到特征尺寸大小的特征图，然后融合。 RefineNet：提出了多路径网络，利用多级别的抽象用于高分辨率语义分割；由三部分组成：残差卷积模块（Residual Conv Unit，RCU），包含自适应卷积和残差连接；多分辨率融合模块（Multi-Resolution fuse，MRF），卷积&#43;上采样得到相同尺度大小的特征图，然后进行融合（元素相加）；链式残差池化模块（Chained Residual Pooling，CRP），使用多层池化&#43;卷积从大的背景区域中捕获上下文信息。 U-Net：引入encoder和decoder，encoder提取特征，decoder利用转置卷积对特征图进行上采样，并将encoder中的特征图横着连接过来，即skip连接。
+V-Net：3D conv&#43;residual Block版的U-Net，池化用卷积代替，转置卷积上采样，提出了一个新的目标函数：Dice coefficient，使模型能够处理前景和背景中体素数量之间存在强烈不平衡的情况。
+SegNet：encoder&#43;decoder架构，encoder中为卷积池化提取特征图，在最大池化层中将最大元素的位置记录下来，在decoder中，根据位置进行反池化，从而对特征图进行上采样，该方式不增加参数量但增加了存储空间的使用。
+ENet：一个小的浅层分割网络，用于实时的语义分割，更深的encoder和更浅的decoder，将卷积和池化并行执行。
+ParseNet：通过使用全局平均池化来增强每个位置的特征，即将特征图进行全局平均池化后再进行归一化，接着进行unpool对特征向量转换为特征图的尺寸大小，并于特征图进行拼接融合，向FCNs中添加全局上下文信息。
+HRNet：通过并行连接高分辨率到低分辨率的卷积流，并跨分辨率交换信息，通过decoder过程维护高分辨率特征表示。
+FPN：Feature Pyramid Network
+PANet：Path Aggregation Network，（a）是一个FPN，（b）是PAN增加的自底向上的特征融合层，（c）是自适应特征池化层，（d）是PANet的bounding box预测头，（e）是用于预测掩码的全连接融合层。 PAN：Pyramid Attention Network，提出Feature Pyramid Attention module（FPA）和Global Attention Upsample module（GAU），引入注意力机制用于语义分割；FPA：用于在特征上执行空间金字塔注意力，并结合全局池以学习更好的特征表示。 DANet：在一个扩展的FCN上附加了两种类型的注意力模块，分别模拟了空间维度和通道维度上的语义相互依赖关系；Position Attention模块，B、C、D表示的都是特征图A，然后对他们都进行reshape操作，得到了三个大小为$C×N$的矩阵，对应Q、K和V，（1）B和C相乘，得到$N×N$的矩阵，对应$Q^{T}\times K$，（2）经过softmax，（3）与D相乘，并reshape，得到权重分数；Channel Attention模块，与上边类似，只是B和C相乘，得到$C×C$的矩阵。
+全景分割：对于图像中的每个像素打上两个标签，一个是分类标签，一个是实例ID，并将像素分为两类，stuff（填充物）和things（目标），stuff的实例ID会被忽略，具有相同标签和id的像素都属于同一个对象，对于无法确定的像素，比如不在分类范围内模糊的像素则会给一个void标签。
+Panoptic FPN：赋予Mask R-CNN一个结合了实例分割和语义分割的FPN主干网络。
+Panoptic-DeepLab：通过通过将预测的前景像素分组到它们最近的预测实例中心，从而得到与类无关的实例分割，再与语义分割进行融合，生成最终的全景分割；采用双上下文和双解码器模块进行语义分割和实例分割预测；Semantic segmentation，分割结果（H×W×Num_classes）；Instance segmentation head，实例中心预测（预测每个点是不是实例中心的概率）&#43;实例中心回归（预测每个点到实例中心的偏移量是多少，x和y） Applications Medical imaging：如对血管、组织、神经等进行分割；定位异常，如肿瘤、动脉瘤等；显微图像中的分割，如细胞或细胞核检测、计数细胞数、细胞结构分析以进行癌症检测等。
+Content-based image retrieval（CBIR）：高效的信息检索系统，如视觉问题回答，基于交互式查询的图像处理，描述生成；分割可以提供对象的位置关系、数目等。
+Object Detection：自动驾驶、智能运动检测、跟踪系统等；图像匹配、合成等。
+Forensics：生物识别验证系统，如虹膜、指纹等，涉及对各种信息区域的分割，以进行有效分析。
+Discussion and Future Scope  目前仍然存在大量的有监督方法，然而无监督和弱监督算法仍远未达到饱和水平。这在图像分割领域是一个合理的问题，因为数据收集可以通过许多自动化过程进行，但对它们进行注释完全需要手工劳动。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">Segmentation</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-07-18 00:00:00 UTC">
+                18 Jul 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p><strong>FCN</strong>：全卷积网络，语义分割。<br>
+<strong>DeepMask</strong>：实例分割，讲图像分割为patch，输入网络，两个分支，一个生成像素级掩码，一个生成分数，其中分割掩码分支，只识别图像最中心的一个物体，分数分支判断一个patch是否满足两个要求：目标位于图块的正中心附近，目标完整存在于图块中，以16为步长，选择不同的尺度大小，进行分割。<br>
+<strong>SharpMask</strong>：DeepMask的进一步改进，将网络浅层的特征图，引入，以生成高分辨率的掩码结果。<br>
+<strong>R-CNN家族</strong>：R-CNN、Fast R-CNN和Faster R-CNN用于目标识别，输出bounding box的类别和坐标，Mask R-CNN增加一个掩码分支，用于图像分割，并且提出了RoIAlign代替RoI Pooling，同时mask分支输出$K×m×m$的特征图，K为分类数目，计算损失只计算第k个类别的损失，第k个类别是bounding box的分类分支输出的分类结果，即将掩码和分类解耦。<br>
+<strong>DeepLab</strong>：引入空洞卷积，在增大感受野的同时，不增加参数量，并引入ASPP模块（Atrous Spatial Pooling Pyramid），即分成不同分支，利用不同扩展率的空洞卷积进行处理，再融合。<br>
+<strong>PSPNet</strong>：利用金字塔池化模块，在四个不同的粗细尺度上进行特征融合，四个分支利用不同的池化大小，得到不同大小的特征图，再进行双线性插值进行上采样得到特征尺寸大小的特征图，然后融合。
+<img src="/img/pspnet.PNG" alt="">
+<strong>RefineNet</strong>：提出了多路径网络，利用多级别的抽象用于高分辨率语义分割；由三部分组成：残差卷积模块（Residual Conv Unit，RCU），包含自适应卷积和残差连接；多分辨率融合模块（Multi-Resolution fuse，MRF），卷积+上采样得到相同尺度大小的特征图，然后进行融合（元素相加）；链式残差池化模块（Chained Residual Pooling，CRP），使用多层池化+卷积从大的背景区域中捕获上下文信息。
+<img src="/img/refinenet.PNG" alt="">
+<strong>U-Net</strong>：引入encoder和decoder，encoder提取特征，decoder利用转置卷积对特征图进行上采样，并将encoder中的特征图横着连接过来，即skip连接。<br>
+<strong>V-Net</strong>：3D conv+residual Block版的U-Net，池化用卷积代替，转置卷积上采样，提出了一个新的目标函数：Dice coefficient，使模型能够处理前景和背景中体素数量之间存在强烈不平衡的情况。<br>
+<strong>SegNet</strong>：encoder+decoder架构，encoder中为卷积池化提取特征图，在最大池化层中将最大元素的位置记录下来，在decoder中，根据位置进行反池化，从而对特征图进行上采样，该方式不增加参数量但增加了存储空间的使用。<br>
+<strong>ENet</strong>：一个小的浅层分割网络，用于实时的语义分割，更深的encoder和更浅的decoder，将卷积和池化并行执行。<br>
+<strong>ParseNet</strong>：通过使用全局平均池化来增强每个位置的特征，即将特征图进行全局平均池化后再进行归一化，接着进行unpool对特征向量转换为特征图的尺寸大小，并于特征图进行拼接融合，向FCNs中添加全局上下文信息。<br>
+<strong>HRNet</strong>：通过并行连接高分辨率到低分辨率的卷积流，并跨分辨率交换信息，通过decoder过程维护高分辨率特征表示。<br>
+<img src="/img/hrnet.PNG" alt="">
+<strong>FPN</strong>：Feature Pyramid Network<br>
+<strong>PANet</strong>：Path Aggregation Network，（a）是一个FPN，（b）是PAN增加的自底向上的特征融合层，（c）是自适应特征池化层，（d）是PANet的bounding box预测头，（e）是用于预测掩码的全连接融合层。
+<img src="/img/panet.PNG" alt="">
+<strong>PAN</strong>：Pyramid Attention Network，提出Feature Pyramid Attention module（FPA）和Global Attention Upsample module（GAU），引入注意力机制用于语义分割；FPA：用于在特征上执行空间金字塔注意力，并结合全局池以学习更好的特征表示。
+<img src="/img/pan1.PNG" alt="">
+<img src="/img/pan2.PNG" alt="">
+<img src="/img/pan3.PNG" alt="">
+<strong>DANet</strong>：在一个扩展的FCN上附加了两种类型的注意力模块，分别模拟了空间维度和通道维度上的语义相互依赖关系；Position Attention模块，B、C、D表示的都是特征图A，然后对他们都进行reshape操作，得到了三个大小为$C×N$的矩阵，对应Q、K和V，（1）B和C相乘，得到$N×N$的矩阵，对应$Q^{T}\times K$，（2）经过softmax，（3）与D相乘，并reshape，得到权重分数；Channel Attention模块，与上边类似，只是B和C相乘，得到$C×C$的矩阵。</p>
+<p><img src="/img/danet1.jpg" alt="">
+<img src="/img/danet2.png" alt="">
+<img src="/img/danet3.jpg" alt=""></p>
+<p><strong>全景分割</strong>：对于图像中的每个像素打上两个标签，一个是分类标签，一个是实例ID，并将像素分为两类，stuff（填充物）和things（目标），stuff的实例ID会被忽略，具有相同标签和id的像素都属于同一个对象，对于无法确定的像素，比如不在分类范围内模糊的像素则会给一个void标签。<br>
+<strong>Panoptic FPN</strong>：赋予Mask R-CNN一个结合了实例分割和语义分割的FPN主干网络。<br>
+<strong>Panoptic-DeepLab</strong>：通过通过将预测的前景像素分组到它们最近的预测实例中心，从而得到与类无关的实例分割，再与语义分割进行融合，生成最终的全景分割；采用双上下文和双解码器模块进行语义分割和实例分割预测；Semantic segmentation，分割结果（H×W×Num_classes）；Instance segmentation head，实例中心预测（预测每个点是不是实例中心的概率）+实例中心回归（预测每个点到实例中心的偏移量是多少，x和y）
+<img src="/img/pandeeplab1.PNG" alt="">
+<img src="/img/pandeeplab2.PNG" alt=""></p>
+<h2 id="applications">Applications</h2>
+<p><strong>Medical imaging</strong>：如对血管、组织、神经等进行分割；定位异常，如肿瘤、动脉瘤等；显微图像中的分割，如细胞或细胞核检测、计数细胞数、细胞结构分析以进行癌症检测等。<br>
+<strong>Content-based image retrieval（CBIR）</strong>：高效的信息检索系统，如视觉问题回答，基于交互式查询的图像处理，描述生成；分割可以提供对象的位置关系、数目等。<br>
+<strong>Object Detection</strong>：自动驾驶、智能运动检测、跟踪系统等；图像匹配、合成等。<br>
+<strong>Forensics</strong>：生物识别验证系统，如虹膜、指纹等，涉及对各种信息区域的分割，以进行有效分析。</p>
+<h2 id="discussion-and-future-scope">Discussion and Future Scope</h2>
+<p>    目前仍然存在大量的有监督方法，然而无监督和弱监督算法仍远未达到饱和水平。这在图像分割领域是一个合理的问题，因为数据收集可以通过许多自动化过程进行，但对它们进行注释完全需要手工劳动。<br>
+    利用高性能的分类网络作为backbone是比较常用的做法，encoder-decoder架构也是很常见的架构；然而，如果需要更精细的实例分割，通常需要与目标检测算法相结合。<br>
+    速度和精度是两个度量模型的方面；图像分割的未来在很大程度上取决于可用数据的质量和数量。<br>
+    需要更具挑战性的数据集，以及不同类型图像的数据集；随着三维图像分割技术的日益普及，特别是在医学图像分析中，对大规模的三维图像数据集的需求也越来越大。<br>
+    模型的可解释性；实时和内存使用量少的分割模型，这对于例如部署在自动驾驶汽车上的计算机视觉系统非常有用。</p>
+<h2 id="image-segmenation-before-deep-learning">Image Segmenation before deep learning</h2>
+<p><strong>Thresholding</strong>：基于阈值分割，将输入图像$f$到输出图像$g$，即：
+$$
+g(i,j)=1,f(i,j)\geq T
+$$
+$$
+g(i,j)=0,f(i,j)&lt;  T
+$$
+    其中，$T$为阈值，物体为1，背景为0；阈值分割算法的关键是确定阈值，如果能确定一个合适的阈值就可准确地将图像分割开来；可分为全局阈值（整个图像使用一个阈值进行分割）、自适应阈值（将图像分成若干子区域分别选择阈值）、最佳阈值（通过分析直方图的方法确定最佳的阈值）。优点是计算简单、运算效率较高、速度快。
+<strong>Clustering methods</strong>：如K-means可以将图像像素聚类为多个类。<br>
+<strong>Histogram-based methods</strong>：通过分析直方图的波峰和波谷，用于确定图像中的簇数，与K-means不同的是，K-means中簇的数量事先是不知道的。<br>
+<strong>Edge detection</strong>：考虑对象之间的语义边界，比如单个物体在图像中往往被一条强度梯度急剧变化的边缘分开，利用此特征可以分割图像，这种不连续性可通过求导数来检测到。<br>
+<strong>Region-growing methods</strong>：基于强度的方法在聚类图像中相当有效，但它们没有考虑局部性因素；基本思想是将具有相似性质的像素集合起来构成区域；具体先对每个需要分割的区域找一个种子像素作为生长的起点，然后将种子像素周围邻域中与种子像素有相同或相似性质的像素（如灰度级、彩色、纹理、梯度等）合并到种子像素所在的区域中，将这些新像素当作新的种子像素继续进行上面的过程，直到再没有满足条件的像素可被包括进来，这样一个区域就长成了。<br>
+<strong>Watershed transformations</strong>：假设一个图像的梯度是一个地形表面，类似于在这样一个表面上的水流线，梯度最高的像素作为分割的轮廓。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

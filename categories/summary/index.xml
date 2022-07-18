@@ -6,7 +6,35 @@
     <description>Recent content in Summary on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 15 May 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/summary/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 18 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/summary/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Segmentation</title>
+      <link>https://gdy0924.github.io/posts/segmentation/</link>
+      <pubDate>Mon, 18 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/segmentation/</guid>
+      <description>FCN：全卷积网络，语义分割。
+DeepMask：实例分割，讲图像分割为patch，输入网络，两个分支，一个生成像素级掩码，一个生成分数，其中分割掩码分支，只识别图像最中心的一个物体，分数分支判断一个patch是否满足两个要求：目标位于图块的正中心附近，目标完整存在于图块中，以16为步长，选择不同的尺度大小，进行分割。
+SharpMask：DeepMask的进一步改进，将网络浅层的特征图，引入，以生成高分辨率的掩码结果。
+R-CNN家族：R-CNN、Fast R-CNN和Faster R-CNN用于目标识别，输出bounding box的类别和坐标，Mask R-CNN增加一个掩码分支，用于图像分割，并且提出了RoIAlign代替RoI Pooling，同时mask分支输出$K×m×m$的特征图，K为分类数目，计算损失只计算第k个类别的损失，第k个类别是bounding box的分类分支输出的分类结果，即将掩码和分类解耦。
+DeepLab：引入空洞卷积，在增大感受野的同时，不增加参数量，并引入ASPP模块（Atrous Spatial Pooling Pyramid），即分成不同分支，利用不同扩展率的空洞卷积进行处理，再融合。
+PSPNet：利用金字塔池化模块，在四个不同的粗细尺度上进行特征融合，四个分支利用不同的池化大小，得到不同大小的特征图，再进行双线性插值进行上采样得到特征尺寸大小的特征图，然后融合。 RefineNet：提出了多路径网络，利用多级别的抽象用于高分辨率语义分割；由三部分组成：残差卷积模块（Residual Conv Unit，RCU），包含自适应卷积和残差连接；多分辨率融合模块（Multi-Resolution fuse，MRF），卷积+上采样得到相同尺度大小的特征图，然后进行融合（元素相加）；链式残差池化模块（Chained Residual Pooling，CRP），使用多层池化+卷积从大的背景区域中捕获上下文信息。 U-Net：引入encoder和decoder，encoder提取特征，decoder利用转置卷积对特征图进行上采样，并将encoder中的特征图横着连接过来，即skip连接。
+V-Net：3D conv+residual Block版的U-Net，池化用卷积代替，转置卷积上采样，提出了一个新的目标函数：Dice coefficient，使模型能够处理前景和背景中体素数量之间存在强烈不平衡的情况。
+SegNet：encoder+decoder架构，encoder中为卷积池化提取特征图，在最大池化层中将最大元素的位置记录下来，在decoder中，根据位置进行反池化，从而对特征图进行上采样，该方式不增加参数量但增加了存储空间的使用。
+ENet：一个小的浅层分割网络，用于实时的语义分割，更深的encoder和更浅的decoder，将卷积和池化并行执行。
+ParseNet：通过使用全局平均池化来增强每个位置的特征，即将特征图进行全局平均池化后再进行归一化，接着进行unpool对特征向量转换为特征图的尺寸大小，并于特征图进行拼接融合，向FCNs中添加全局上下文信息。
+HRNet：通过并行连接高分辨率到低分辨率的卷积流，并跨分辨率交换信息，通过decoder过程维护高分辨率特征表示。
+FPN：Feature Pyramid Network
+PANet：Path Aggregation Network，（a）是一个FPN，（b）是PAN增加的自底向上的特征融合层，（c）是自适应特征池化层，（d）是PANet的bounding box预测头，（e）是用于预测掩码的全连接融合层。 PAN：Pyramid Attention Network，提出Feature Pyramid Attention module（FPA）和Global Attention Upsample module（GAU），引入注意力机制用于语义分割；FPA：用于在特征上执行空间金字塔注意力，并结合全局池以学习更好的特征表示。 DANet：在一个扩展的FCN上附加了两种类型的注意力模块，分别模拟了空间维度和通道维度上的语义相互依赖关系；Position Attention模块，B、C、D表示的都是特征图A，然后对他们都进行reshape操作，得到了三个大小为$C×N$的矩阵，对应Q、K和V，（1）B和C相乘，得到$N×N$的矩阵，对应$Q^{T}\times K$，（2）经过softmax，（3）与D相乘，并reshape，得到权重分数；Channel Attention模块，与上边类似，只是B和C相乘，得到$C×C$的矩阵。
+全景分割：对于图像中的每个像素打上两个标签，一个是分类标签，一个是实例ID，并将像素分为两类，stuff（填充物）和things（目标），stuff的实例ID会被忽略，具有相同标签和id的像素都属于同一个对象，对于无法确定的像素，比如不在分类范围内模糊的像素则会给一个void标签。
+Panoptic FPN：赋予Mask R-CNN一个结合了实例分割和语义分割的FPN主干网络。
+Panoptic-DeepLab：通过通过将预测的前景像素分组到它们最近的预测实例中心，从而得到与类无关的实例分割，再与语义分割进行融合，生成最终的全景分割；采用双上下文和双解码器模块进行语义分割和实例分割预测；Semantic segmentation，分割结果（H×W×Num_classes）；Instance segmentation head，实例中心预测（预测每个点是不是实例中心的概率）+实例中心回归（预测每个点到实例中心的偏移量是多少，x和y） Applications Medical imaging：如对血管、组织、神经等进行分割；定位异常，如肿瘤、动脉瘤等；显微图像中的分割，如细胞或细胞核检测、计数细胞数、细胞结构分析以进行癌症检测等。
+Content-based image retrieval（CBIR）：高效的信息检索系统，如视觉问题回答，基于交互式查询的图像处理，描述生成；分割可以提供对象的位置关系、数目等。
+Object Detection：自动驾驶、智能运动检测、跟踪系统等；图像匹配、合成等。
+Forensics：生物识别验证系统，如虹膜、指纹等，涉及对各种信息区域的分割，以进行有效分析。
+Discussion and Future Scope  目前仍然存在大量的有监督方法，然而无监督和弱监督算法仍远未达到饱和水平。这在图像分割领域是一个合理的问题，因为数据收集可以通过许多自动化过程进行，但对它们进行注释完全需要手工劳动。</description>
+    </item>
+    
     <item>
       <title>总结（一）</title>
       <link>https://gdy0924.github.io/posts/%E6%80%BB%E7%BB%93%E4%B8%80/</link>

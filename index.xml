@@ -6,7 +6,101 @@
     <description>Recent content on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 25 Jun 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 18 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Segmentation</title>
+      <link>https://gdy0924.github.io/posts/segmentation/</link>
+      <pubDate>Mon, 18 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/segmentation/</guid>
+      <description>FCN：全卷积网络，语义分割。
+DeepMask：实例分割，讲图像分割为patch，输入网络，两个分支，一个生成像素级掩码，一个生成分数，其中分割掩码分支，只识别图像最中心的一个物体，分数分支判断一个patch是否满足两个要求：目标位于图块的正中心附近，目标完整存在于图块中，以16为步长，选择不同的尺度大小，进行分割。
+SharpMask：DeepMask的进一步改进，将网络浅层的特征图，引入，以生成高分辨率的掩码结果。
+R-CNN家族：R-CNN、Fast R-CNN和Faster R-CNN用于目标识别，输出bounding box的类别和坐标，Mask R-CNN增加一个掩码分支，用于图像分割，并且提出了RoIAlign代替RoI Pooling，同时mask分支输出$K×m×m$的特征图，K为分类数目，计算损失只计算第k个类别的损失，第k个类别是bounding box的分类分支输出的分类结果，即将掩码和分类解耦。
+DeepLab：引入空洞卷积，在增大感受野的同时，不增加参数量，并引入ASPP模块（Atrous Spatial Pooling Pyramid），即分成不同分支，利用不同扩展率的空洞卷积进行处理，再融合。
+PSPNet：利用金字塔池化模块，在四个不同的粗细尺度上进行特征融合，四个分支利用不同的池化大小，得到不同大小的特征图，再进行双线性插值进行上采样得到特征尺寸大小的特征图，然后融合。 RefineNet：提出了多路径网络，利用多级别的抽象用于高分辨率语义分割；由三部分组成：残差卷积模块（Residual Conv Unit，RCU），包含自适应卷积和残差连接；多分辨率融合模块（Multi-Resolution fuse，MRF），卷积+上采样得到相同尺度大小的特征图，然后进行融合（元素相加）；链式残差池化模块（Chained Residual Pooling，CRP），使用多层池化+卷积从大的背景区域中捕获上下文信息。 U-Net：引入encoder和decoder，encoder提取特征，decoder利用转置卷积对特征图进行上采样，并将encoder中的特征图横着连接过来，即skip连接。
+V-Net：3D conv+residual Block版的U-Net，池化用卷积代替，转置卷积上采样，提出了一个新的目标函数：Dice coefficient，使模型能够处理前景和背景中体素数量之间存在强烈不平衡的情况。
+SegNet：encoder+decoder架构，encoder中为卷积池化提取特征图，在最大池化层中将最大元素的位置记录下来，在decoder中，根据位置进行反池化，从而对特征图进行上采样，该方式不增加参数量但增加了存储空间的使用。
+ENet：一个小的浅层分割网络，用于实时的语义分割，更深的encoder和更浅的decoder，将卷积和池化并行执行。
+ParseNet：通过使用全局平均池化来增强每个位置的特征，即将特征图进行全局平均池化后再进行归一化，接着进行unpool对特征向量转换为特征图的尺寸大小，并于特征图进行拼接融合，向FCNs中添加全局上下文信息。
+HRNet：通过并行连接高分辨率到低分辨率的卷积流，并跨分辨率交换信息，通过decoder过程维护高分辨率特征表示。
+FPN：Feature Pyramid Network
+PANet：Path Aggregation Network，（a）是一个FPN，（b）是PAN增加的自底向上的特征融合层，（c）是自适应特征池化层，（d）是PANet的bounding box预测头，（e）是用于预测掩码的全连接融合层。 PAN：Pyramid Attention Network，提出Feature Pyramid Attention module（FPA）和Global Attention Upsample module（GAU），引入注意力机制用于语义分割；FPA：用于在特征上执行空间金字塔注意力，并结合全局池以学习更好的特征表示。 DANet：在一个扩展的FCN上附加了两种类型的注意力模块，分别模拟了空间维度和通道维度上的语义相互依赖关系；Position Attention模块，B、C、D表示的都是特征图A，然后对他们都进行reshape操作，得到了三个大小为$C×N$的矩阵，对应Q、K和V，（1）B和C相乘，得到$N×N$的矩阵，对应$Q^{T}\times K$，（2）经过softmax，（3）与D相乘，并reshape，得到权重分数；Channel Attention模块，与上边类似，只是B和C相乘，得到$C×C$的矩阵。
+全景分割：对于图像中的每个像素打上两个标签，一个是分类标签，一个是实例ID，并将像素分为两类，stuff（填充物）和things（目标），stuff的实例ID会被忽略，具有相同标签和id的像素都属于同一个对象，对于无法确定的像素，比如不在分类范围内模糊的像素则会给一个void标签。
+Panoptic FPN：赋予Mask R-CNN一个结合了实例分割和语义分割的FPN主干网络。
+Panoptic-DeepLab：通过通过将预测的前景像素分组到它们最近的预测实例中心，从而得到与类无关的实例分割，再与语义分割进行融合，生成最终的全景分割；采用双上下文和双解码器模块进行语义分割和实例分割预测；Semantic segmentation，分割结果（H×W×Num_classes）；Instance segmentation head，实例中心预测（预测每个点是不是实例中心的概率）+实例中心回归（预测每个点到实例中心的偏移量是多少，x和y） Applications Medical imaging：如对血管、组织、神经等进行分割；定位异常，如肿瘤、动脉瘤等；显微图像中的分割，如细胞或细胞核检测、计数细胞数、细胞结构分析以进行癌症检测等。
+Content-based image retrieval（CBIR）：高效的信息检索系统，如视觉问题回答，基于交互式查询的图像处理，描述生成；分割可以提供对象的位置关系、数目等。
+Object Detection：自动驾驶、智能运动检测、跟踪系统等；图像匹配、合成等。
+Forensics：生物识别验证系统，如虹膜、指纹等，涉及对各种信息区域的分割，以进行有效分析。
+Discussion and Future Scope  目前仍然存在大量的有监督方法，然而无监督和弱监督算法仍远未达到饱和水平。这在图像分割领域是一个合理的问题，因为数据收集可以通过许多自动化过程进行，但对它们进行注释完全需要手工劳动。</description>
+    </item>
+    
+    <item>
+      <title>MixFormer</title>
+      <link>https://gdy0924.github.io/posts/mixformer/</link>
+      <pubDate>Thu, 07 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/mixformer/</guid>
+      <description>MixFormer: Mixing Features across Windows and Dimensions
+Abstract  虽然局部窗口自注意力在视觉任务中表现显著，但其有限感受野和建模能力薄弱，主要是因为在非重叠的窗口中执行自注意力，并在通道维度上共享权重。因此提出MixFormer，将局部窗口自注意力与depth-wise卷积并行设计，建模跨窗口连接以扩大感受野；提出了跨分支的双向交互作用，以提供在通道和空间维度上的互补信息交互。上述两种改进以实现窗口和尺寸之间的有效特征混合。
+Introduction  局部窗口自注意力可以解决ViT中无法建模局部信息的问题， 但是其在非重叠的窗口内计算自注意力，并在通道维度上共享权重，从而导致感受野有限并且建模能力较弱。扩大感受野的一种常见方法是创建跨窗口连接：如移动窗口；扩展窗口；改组等。 提出MixFormer Block：将局部窗口自注意力与depth-wise卷积结合起来，以一种并行的方式，同时建模窗口内部关系和跨窗口关系，扩大了感受野；引入了跨分支的双向交互作用，通过局部窗口自注意力和depth-wise卷积进行信息互补，提高了通道和空间维度的建模能力。
+Related Works Vision Transformers Window-based Vision Transformers Receptive Fields  基于窗口的视觉transformer在不重叠的局部窗口内计算自注意力，限制了局部窗口中的感受野，可以通过移动、扩展或打乱等操作来解决。
+Dynamic Mechanism Method The Mixing Block  Mixing Block有两个关键点：（1）并行设计，结合局部窗口自注意力和depth-wise卷积；（2）引入了跨分支的双向信息交互。
+The Parallel Design  虽然在非重叠窗口内计算自注意力能够提高效率，但会导致感受野有限，可以通过移动、扩展、打乱或卷积来建模跨窗口的连接。因此，考虑使用depth-wise卷积来实现。之前的工作通过连续叠加自注意力和depth-wise卷积来实现，但这样会使其信息交互不足。
+在本文，提出并行设计，通过同时建模窗口内和跨窗口信息来扩大感受野。具体的，使用不同的窗口大小：局部窗口自注意力采用7×7大小，depth-wise卷积使用3×3大小。两个分支的输出进行拼接，一起经过FFN层，得到最终的输出。
+并行设计有两个方面的好处：（1）将局部窗口自注意力和depth-wise卷积结合起来，建立跨窗口的模型连接，解决了有限感受野的问题；（2）并行设计同时建模窗口内和跨窗口信息交互，为特征跨分支交互提供了机会，实现了更好的特征表示学习。
+Bi-directional Interactions  局部窗口自注意力在空间维度上动态计算权值，同时通道之间共享权值，导致了在通道维度上建模能力薄弱的问题。
+depth-wise卷积在空间维度上共享权重，可以为局部窗口自注意力提供互补的信息。因此，提出了双向交互，以提高通道和空间维度的建模能力。 双向交互包括平行分支之间的通道和空间交互：depth-wise卷积分支中的信息通过通道交互流到另一个分支，增强了通道维度的建模能力；空间交互使空间关系信息从局部窗口自注意力分支流动到另一个分支。
+channel interaction：遵循SE设计思路；首先经过一个全局平均池化层，然后是两个连续的1×1卷积层，最后利用sigmoid函数生成权重系数；SE层中将其应用于模块的输出，当在该交互中只作用于自注意力中的value。
+spatial interaction：利用两个1×1的卷积层，将通道数量降为1，在经过sigmoid函数生成空间注意图。
+The Mixing Block  Mixing Block可以表示为： $$ \widehat{X}^{l+1}=MIX(LN(X^{l}),W-MSA,CONV)+X^{l} $$ $$ X^{l+1}=FFN(LN(\widehat{X}^{l+1}))+\widehat{X}^{l+1} $$ 其中，MIX表示函数，实现了W-MSA（基于窗口的多头自注意）分支和CONV（depth-wise卷积）分支之间的特征融合。MIX首先通过两个线性投影层将输入特征投影到并行分支上，然后对不同分支的信息进行融合。
+MixFormer 提取patch和下采样使用卷积实现 实验 Image Classification Object Detection and Instance Segmentation Semantic Segmentation Ablation Study  Parallel or Not &amp;amp; Bi-directional Interactions Window Sizes in DwConv </description>
+    </item>
+    
+    <item>
+      <title>Segmenter</title>
+      <link>https://gdy0924.github.io/posts/segmenter/</link>
+      <pubDate>Wed, 06 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/segmenter/</guid>
+      <description>Segmenter: Transformer for Semantic Segmentation
+Abstract  图像分割在单个patch上往往是模糊的，需要上下文信息来达到标签的共识。提出模型用于语义分割，依赖于与图像patch对应的输出embedding，使用一个point-wise线性解码器或掩码transformer解码器来从这些embedding中获得类别标签信息。线性解码器已经能够获得不错的结果，但可以通过掩码transformer生成类别掩码进一步提高效果。
+Related work Semantic segmentation  基于全卷积网络(FCN)的编码器-解码器方法已经成为语义分割的主要方法。在解码过程中将其与低级特征图相结合，以捕获全局信息和恢复清晰的目标边界；利用扩张卷积增大感受野；使用空间金字塔池来捕获多尺度的上下文信息。
+Transformers for vision  SETR使用了一个ViT主干网和一个标准的CNN解码器；我们的方法依赖于一个ViT主干，并引入了受DETR启发的掩码解码器。
+Our approach: Segmenter Segmenter是一个完全基于transformer架构的编码器-解码器模型，将一系列的patch embedding映射到像素级的类别分类。
+Encoder  由L层transformer block组成encoder：MSA+MLP。
+encoder将具有位置embedding的输入序列$z_{0}=[z_{0,1},&amp;hellip;,z_{0,N}]$，映射为$z_{L}=[z_{L,1},&amp;hellip;,z_{L,N}]$，为包含丰富语义信息的上下文编码序列
+Decoder  decoder将patch embedding$z_{L}\in \mathbb{R}^{N\times D}$解码为特征图$s\in \mathbb{R}^{H\times W\times K}$，其中$K$为类别数。解码器将来自编码器的patch embedding映射到patch级的类别分类，然后对其进行线性插值以上采样带像素级别的类别分数。
+Linear
+对patch embedding应用线性层，以生成patch级别的类别分数$z_{lin} \in \mathbb{R}^{N\times K}$；然后将其reshape成二维特征图$s_{lin} \in \mathbb{R}^{\frac{H}{P}\times \frac{W}{P}\times K}$；利用线性插值对特征图进行上采样，得到$s \in \mathbb{R}^{H\times W\times K}$。
+Mask Transformer
+引入一组$K$个可学习的class embedding$cls=[cls_{1},&amp;hellip;,cls_{K}]\in \mathbb{R}^{K\times D}$，每个class embedding都被随机初始化，并分配给一个语义类别，用于生成类别掩码。
+decoder由M层transformer block组成。经过transformer block得到的patch embedding ${z}&#39;_ {M}\in \mathbb{R}^{N\times D}$和class embedding$c\in \mathbb{R}^{K\times D}$ 先进行点乘： $$ Masks({z}&#39;_ {M},c)={z}&#39;_ {M}c^{T} $$ 掩码序列被reshape成二维掩码特征图$s_{mask}\in \mathbb{R}^{\frac{H}{P}\times \frac{W}{P}\times K}$，并进行线性上采样，到原始图像大小。</description>
+    </item>
+    
+    <item>
+      <title>Shunted Transformer</title>
+      <link>https://gdy0924.github.io/posts/shunted-transformer/</link>
+      <pubDate>Tue, 05 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/shunted-transformer/</guid>
+      <description>Shunted Self-Attention via Multi-Scale Token Aggregation
+Abstract  ViT通过自注意力机制建模图像或patch之间的长期依赖关系，这些模型通常指定每一层中每个token的相似感受野，这种约束限制了每个自注意层捕获多尺度特征的能力，从而导致处理多个不同尺度对象的性能下降。
+为了解决这个问题，我们提出了一种新的策略，称为shunted self-attention(SSA)，它允许ViT在每层中的不同尺度上建模自注意力。SSA的关键思想是将不同大小的感受野引入token中：在计算自注意力矩阵之前，有选择地合并token以表示更大的对象特征，同时保留某些token以保留细粒度的特征。这种合并方案使自注意力能够学习到不同大小的对象之间的关系，同时降低了token数量和计算成本。
+Introduction  ViT中self-attention是针对一个固定patch大小的token的，然而这种single-scale的self-attention在捕捉多尺度特征时会导致性能上的下降，尤其是针对一张图片里存在多种不同尺度的图片时。
+目前self-attention机制由于token的数量会带来很多空间上计算的开销。某些模型采取下采样等方式减少特征图的大小，以此来减少开销：如在第一层就采取16倍下采样，然后在粗粒度的单尺度的特征图上进行self-attention，但是这种做法会导致图片信息的丢失，从而导致模型的性能下降；另一种方式是在高分辨率特征下计算自注意，并通过合并token来降低计算成本，但是这种方式将许多tokens融入在一个self-attention layer中，从而导致来自小物体的token和背景噪声的混合，这会使得模型更难以捕捉小物体了。
+现有的方法只依赖于token的静态感受野和一个自注意层内的统一图片信息粒度，因此不能同时捕获不同尺度的特征。为了解决这一限制，提出了shunted self-attention(SSA)，允许在同一层内的不同自注意力头分别提取粗粒度和细粒度特征。下图比较了原始的ViT、下采样自注意力和SSA： （a）ViT捕捉到的是细粒度的小物体，但是又极其庞大的计算开销；
+（b）PVT减小了计算开销，但是它仅仅能捕捉到粗粒度大物体；
+（c）SSA既维持了轻量计算的开销，同时也能捕捉到多尺度的物体。
+SSA的多尺度注意机制是通过将多个自注意力头分成多个组来实现的：对于细粒度的组，SSA聚合少量的token以保存更多的局部细节；对于粗粒度的组，SSA聚合大量的token，从而降低了计算成本，同时保留了捕获大型对象的能力。
+Related Work Self-Attention in CNNs Vision Transformer Efficient ViT Variants  （1）将特征图划分为局部窗口，并在窗口内执行局部自注意力计算；
+（2）合并token，以减少token的数量。
+Swin Transformer、PVT。
+Method 整体架构如上图所示，有两个改进：（1）每层中引入shunted attention来捕获多粒度信息；（2）通过增强交叉token之间的交互作用，增强了在point-wise前馈层中提取局部信息的能力。
+Shunted Transformer Block Shunted Self-Attention  由输入序列，得到Q、K和V，然后利用多头自注意力机制并行计算；为了降低计算成本，减少K和V的长度。 在SSA中，在同一自注意力层的不同自注意力头中，K、V的长度不相同： $$ Q_{i}=XW_{i}^{Q} $$ $$ K_{i},V_{i}=MTA(X,r_{i})W_{i}^{K},MTA(X,r_{i})W_{i}^{V} $$ $$ V_{i}=V_{i}+LE(V_{i}) $$ 其中，$MTA(\cdot ;r_{i})$是第$i$个头的多尺度token聚合层(MTA)，$r_{i}$为降采样率，具体通过卷积层来实现降采样；$LE(\cdot )$是MTA通过depth-wise卷积的局部增强分量。
+Detail-specific Feedforward Layers 通过在前馈层中的两个全连接层之间添加特定的数据处理层来增强前馈层中的局部细节： $$ {x}&#39;=FC(x;\theta _ {1}) $$ $$ {x}&#39;&#39;=FC(\sigma ({x}&#39;+DS({x}&#39;;\theta ));\theta _ {2}) $$ 其中，$DS(\cdot ;\theta )$是参数为$\theta$的细节特定层，具体通过depth-wise卷积实现。</description>
+    </item>
+    
     <item>
       <title>DeepNet</title>
       <link>https://gdy0924.github.io/posts/deepnet/</link>
