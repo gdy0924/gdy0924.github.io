@@ -6,7 +6,25 @@
     <description>Recent content in Paper on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 07 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/paper/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 09 Aug 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/paper/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>MaskFormer</title>
+      <link>https://gdy0924.github.io/posts/maskformer/</link>
+      <pubDate>Tue, 09 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/maskformer/</guid>
+      <description>Abstract  通常，语义分割是像素级的分类任务，而实例分割利用mask classification；但是mask classification可以统一语义分割和实例分割。因此，我们提出了MaskFormer，预测一组二进制mask，每个mask与单个全局类标签预测相关联。
+Introduction 上图为语义分割和实例分割的比较；语义分割为每个像素应用损失函数进行计算；实例分割将分割与分类分离开来，预测一个二进制掩码，每个掩码与预测的类别相关联。
+提出的MaskFormer，是利用DETR中提出的集合预测机制，利用Transformer计算一组对，每组对由一个类预测和一个掩码embedding向量组成。利用掩码embedding，通过点积和像素embedding的点积得到二进制掩码预测。
+Related Works Per-pixel classification  FCN以来，每像素分类称为语义分割的主流方式；SETR和Segmenter虽然使用transformer作为提取特征的框架，仍使用每个像素分类的方式。
+Mask classification  Mask classification用于语义分割，生成与每个类别对应的二进制掩码。
+From Per-Pixel to Mask Classification Per-pixel classification formulation  对于per-pixel classification，分割模型为每个像素预测其在K个类别上的概率分布；为每个像素给定ground-truth类别标，利用像素的交叉熵损失函数进行计算。
+Mask classification formulation  将分割任务分为两步骤：（1）将图像分割/分组到N个区域，用二进制掩码表示$\lbrace m_{i}|m_{i}\in \left [ 0,1 \right ]^{H\times W} \rbrace ^{N}_ {i=1}$，N不一定等于K；（2）将每个区域作为一个整体与K个类别上的分布联系起来。将输出z定义为N个概率掩码对的集合，即$z=\lbrace (p_{i},m_{i}) \rbrace ^{N}_ {i=1}$。
+训练时，需要匹配预测结果$z$和ground-truth $N^{gt}$，$z^{gt}=\lbrace (c_{i}^{gt},m_{i}^{gt})|c_{i}^{gt}\in \lbrace 1,&amp;hellip;,K\rbrace,m_{i}^{gt}\in \lbrace 0,1\rbrace^{H\times W} \rbrace _ {i=1}^{N^{gt}}$，其中，$c_{i}^{gt}$是第i个类别的ground-truth。通常，预测结果集合$|z|=N$和ground-truth集合$|z|^{gt}=N^{gt}$大小不同，令$N \geq N^{gt}$，并令其真实标签为&amp;quot;no object&amp;quot;，表示为$\varnothing $。
+与DETR计算边界框不同，我们直接计算类别和掩码的损失，即$-p_{i}(c_{j}^{gt})+L_{mask}(m_{i},m_{j}^{gt})$，其中$L_{mask}$是二进制掩码损失。
+总损失函数$L_{mask-cls}$由交叉熵的分类损失和针对每个预测区域的二进制掩码损失组成： $$ L_{mask-cls}(z,z^{gt})=\sum_{j=1}^{N}[-log p_{\sigma (j)}(c_{j}^{gt})+1_{c_{j}^{gt}\neq \varnothing }L_{mask}(m_{\sigma (j)},m_{j}^{gt})] $$ 目前的实例分割通常会使用辅助损失，如边界框损失。</description>
+    </item>
+    
     <item>
       <title>MixFormer</title>
       <link>https://gdy0924.github.io/posts/mixformer/</link>
