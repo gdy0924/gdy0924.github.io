@@ -6,7 +6,30 @@
     <description>Recent content in Posts on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 09 Aug 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 11 Aug 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Mask2Former</title>
+      <link>https://gdy0924.github.io/posts/mask2former/</link>
+      <pubDate>Thu, 11 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/mask2former/</guid>
+      <description>Masked-attention Mask Transformer for Universal Image Segmentation
+Abstract  目前针对不同的分割任务，即语义分割、实例分割和全景分割，致力于为每个任务设计专门的体系结构。提出的Mask2Former可以处理任何图像分割任务。关键部分是masked attention，通过约束在预测的掩码区域内的交叉注意来提取局部特征。
+Introduction  基于FCN的网络用于语义分割任务，即对每个像素进行分类；而掩码结构预测一组二进制掩码，每个掩码与某个单一类别相关，在实例分割中占主导地位。而这两种架构不能很好的泛化到其他任务上，即FCNs不能很好的解决实例分割任务，因此导致语义分割与实例分割之间的不同架构。
+因此，希望提出一个通用的架构整合不同的任务，目前通用的架构要比专门的网络性能差，同时也更难进行训练。
+提出了Mask2Former（Masked-attention Mask Transformer），a backbone feature extractor+a pixel decoder+a Transformer decoder
+Related Work Specialized semantic segmentation architectures  将任务看作每个像素的分类问题，FCNs
+Specialized instance segmentation architectures  基于掩码分类，Mask R-CNN从检测到的边界框中生成掩模；提升性能可以从更精确的检测框或者生成更好的mask两方面来实现。
+Panoptic segmentation  将语义分割和实例分割架构结合到一个单一的框架中
+Universal architectures  DETR，MaskFormer，它们在特定任务或数据集上的性能仍然不如最好的专门的分割架构
+Masked-attention Mask Transformer Mask classification preliminaries  掩码分类架构预测N个二进制掩码和N个对应的类别标签。难点是为每个部分区域（segment）找到好的表征，如Mask R-CNN使用边界框作为表示。受到DETR的启发，可以将segment表示为c维的向量，作为query。
+该架构包含三个模块：
+（1）backbone：从图像中提取低分辨率的特征；
+（2）pixel decoder：逐渐对特征图进行上采样，以生成高分辨率的像素级embedding；
+（3）Transformer decoder：对特征图和query进行处理。
+Transformer decoder with masked attention 在Transformer decoder中使用我们提出的masked attention，通过交叉注意约束，在每个query预测掩码的前景区域中提取局部特征，而不是关注整个特征图；为了处理小对象，提出了一种多尺度策略来利用高分辨率特征，循环的将pixel decoder中的不同尺度的特征图输入到Transformer decoder中。</description>
+    </item>
+    
     <item>
       <title>MaskFormer</title>
       <link>https://gdy0924.github.io/posts/maskformer/</link>

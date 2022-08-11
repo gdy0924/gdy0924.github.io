@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/mask2former/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/mask2former/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "Mask2Former",
+      "headline" : "Mask2Former",
+      "description" : "Masked-attention Mask Transformer for Universal Image Segmentation\nAbstract  目前针对不同的分割任务，即语义分割、实例分割和全景分割，致力于为每个任务设计专门的体系结构。提出的Mask2Former可以处理任何图像分割任务。关键部分是masked attention，通过约束在预测的掩码区域内的交叉注意来提取局部特征。\nIntroduction  基于FCN的网络用于语义分割任务，即对每个像素进行分类；而掩码结构预测一组二进制掩码，每个掩码与某个单一类别相关，在实例分割中占主导地位。而这两种架构不能很好的泛化到其他任务上，即FCNs不能很好的解决实例分割任务，因此导致语义分割与实例分割之间的不同架构。\n因此，希望提出一个通用的架构整合不同的任务，目前通用的架构要比专门的网络性能差，同时也更难进行训练。\n提出了Mask2Former（Masked-attention Mask Transformer），a backbone feature extractor\u002ba pixel decoder\u002ba Transformer decoder\nRelated Work Specialized semantic segmentation architectures  将任务看作每个像素的分类问题，FCNs\nSpecialized instance segmentation architectures  基于掩码分类，Mask R-CNN从检测到的边界框中生成掩模；提升性能可以从更精确的检测框或者生成更好的mask两方面来实现。\nPanoptic segmentation  将语义分割和实例分割架构结合到一个单一的框架中\nUniversal architectures  DETR，MaskFormer，它们在特定任务或数据集上的性能仍然不如最好的专门的分割架构\nMasked-attention Mask Transformer Mask classification preliminaries  掩码分类架构预测N个二进制掩码和N个对应的类别标签。难点是为每个部分区域（segment）找到好的表征，如Mask R-CNN使用边界框作为表示。受到DETR的启发，可以将segment表示为c维的向量，作为query。\n该架构包含三个模块：\n（1）backbone：从图像中提取低分辨率的特征；\n（2）pixel decoder：逐渐对特征图进行上采样，以生成高分辨率的像素级embedding；\n（3）Transformer decoder：对特征图和query进行处理。\nTransformer decoder with masked attention 在Transformer decoder中使用我们提出的masked attention，通过交叉注意约束，在每个query预测掩码的前景区域中提取局部特征，而不是关注整个特征图；为了处理小对象，提出了一种多尺度策略来利用高分辨率特征，循环的将pixel decoder中的不同尺度的特征图输入到Transformer decoder中。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -69,15 +69,43 @@ code.has-jax {
       "copyrightYear" : "2022",
       "datePublished": "2022-08-11 00:00:00 \u002b0000 UTC",
       "dateModified" : "2022-08-11 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/mask2former\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>Mask2Former</title>
+  <meta property="og:title" content="Mask2Former" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Masked-attention Mask Transformer for Universal Image Segmentation
+Abstract  目前针对不同的分割任务，即语义分割、实例分割和全景分割，致力于为每个任务设计专门的体系结构。提出的Mask2Former可以处理任何图像分割任务。关键部分是masked attention，通过约束在预测的掩码区域内的交叉注意来提取局部特征。
+Introduction  基于FCN的网络用于语义分割任务，即对每个像素进行分类；而掩码结构预测一组二进制掩码，每个掩码与某个单一类别相关，在实例分割中占主导地位。而这两种架构不能很好的泛化到其他任务上，即FCNs不能很好的解决实例分割任务，因此导致语义分割与实例分割之间的不同架构。
+因此，希望提出一个通用的架构整合不同的任务，目前通用的架构要比专门的网络性能差，同时也更难进行训练。
+提出了Mask2Former（Masked-attention Mask Transformer），a backbone feature extractor&#43;a pixel decoder&#43;a Transformer decoder
+Related Work Specialized semantic segmentation architectures  将任务看作每个像素的分类问题，FCNs
+Specialized instance segmentation architectures  基于掩码分类，Mask R-CNN从检测到的边界框中生成掩模；提升性能可以从更精确的检测框或者生成更好的mask两方面来实现。
+Panoptic segmentation  将语义分割和实例分割架构结合到一个单一的框架中
+Universal architectures  DETR，MaskFormer，它们在特定任务或数据集上的性能仍然不如最好的专门的分割架构
+Masked-attention Mask Transformer Mask classification preliminaries  掩码分类架构预测N个二进制掩码和N个对应的类别标签。难点是为每个部分区域（segment）找到好的表征，如Mask R-CNN使用边界框作为表示。受到DETR的启发，可以将segment表示为c维的向量，作为query。
+该架构包含三个模块：
+（1）backbone：从图像中提取低分辨率的特征；
+（2）pixel decoder：逐渐对特征图进行上采样，以生成高分辨率的像素级embedding；
+（3）Transformer decoder：对特征图和query进行处理。
+Transformer decoder with masked attention 在Transformer decoder中使用我们提出的masked attention，通过交叉注意约束，在每个query预测掩码的前景区域中提取局部特征，而不是关注整个特征图；为了处理小对象，提出了一种多尺度策略来利用高分辨率特征，循环的将pixel decoder中的不同尺度的特征图输入到Transformer decoder中。" />
+  <meta name="description" content="Masked-attention Mask Transformer for Universal Image Segmentation
+Abstract  目前针对不同的分割任务，即语义分割、实例分割和全景分割，致力于为每个任务设计专门的体系结构。提出的Mask2Former可以处理任何图像分割任务。关键部分是masked attention，通过约束在预测的掩码区域内的交叉注意来提取局部特征。
+Introduction  基于FCN的网络用于语义分割任务，即对每个像素进行分类；而掩码结构预测一组二进制掩码，每个掩码与某个单一类别相关，在实例分割中占主导地位。而这两种架构不能很好的泛化到其他任务上，即FCNs不能很好的解决实例分割任务，因此导致语义分割与实例分割之间的不同架构。
+因此，希望提出一个通用的架构整合不同的任务，目前通用的架构要比专门的网络性能差，同时也更难进行训练。
+提出了Mask2Former（Masked-attention Mask Transformer），a backbone feature extractor&#43;a pixel decoder&#43;a Transformer decoder
+Related Work Specialized semantic segmentation architectures  将任务看作每个像素的分类问题，FCNs
+Specialized instance segmentation architectures  基于掩码分类，Mask R-CNN从检测到的边界框中生成掩模；提升性能可以从更精确的检测框或者生成更好的mask两方面来实现。
+Panoptic segmentation  将语义分割和实例分割架构结合到一个单一的框架中
+Universal architectures  DETR，MaskFormer，它们在特定任务或数据集上的性能仍然不如最好的专门的分割架构
+Masked-attention Mask Transformer Mask classification preliminaries  掩码分类架构预测N个二进制掩码和N个对应的类别标签。难点是为每个部分区域（segment）找到好的表征，如Mask R-CNN使用边界框作为表示。受到DETR的启发，可以将segment表示为c维的向量，作为query。
+该架构包含三个模块：
+（1）backbone：从图像中提取低分辨率的特征；
+（2）pixel decoder：逐渐对特征图进行上采样，以生成高分辨率的像素级embedding；
+（3）Transformer decoder：对特征图和query进行处理。
+Transformer decoder with masked attention 在Transformer decoder中使用我们提出的masked attention，通过交叉注意约束，在每个query预测掩码的前景区域中提取局部特征，而不是关注整个特征图；为了处理小对象，提出了一种多尺度策略来利用高分辨率特征，循环的将pixel decoder中的不同尺度的特征图输入到Transformer decoder中。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +131,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +164,159 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">Mask2Former</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-08-11 00:00:00 UTC">
+                11 Aug 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Masked-attention Mask Transformer for Universal Image Segmentation</p>
+<h2 id="abstract">Abstract</h2>
+<p>    目前针对不同的分割任务，即语义分割、实例分割和全景分割，致力于为每个任务设计专门的体系结构。提出的Mask2Former可以处理任何图像分割任务。关键部分是masked attention，通过约束在预测的掩码区域内的交叉注意来提取局部特征。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    基于FCN的网络用于语义分割任务，即对每个像素进行分类；而掩码结构预测一组二进制掩码，每个掩码与某个单一类别相关，在实例分割中占主导地位。而这两种架构不能很好的泛化到其他任务上，即FCNs不能很好的解决实例分割任务，因此导致语义分割与实例分割之间的不同架构。<br>
+    因此，希望提出一个通用的架构整合不同的任务，目前通用的架构要比专门的网络性能差，同时也更难进行训练。<br>
+    提出了Mask2Former（Masked-attention Mask Transformer），a backbone feature extractor+a pixel decoder+a Transformer decoder</p>
+<h2 id="related-work">Related Work</h2>
+<h3 id="specialized-semantic-segmentation-architectures">Specialized semantic segmentation architectures</h3>
+<p>    将任务看作每个像素的分类问题，FCNs</p>
+<h3 id="specialized-instance-segmentation-architectures">Specialized instance segmentation architectures</h3>
+<p>    基于掩码分类，Mask R-CNN从检测到的边界框中生成掩模；提升性能可以从更精确的检测框或者生成更好的mask两方面来实现。</p>
+<h3 id="panoptic-segmentation">Panoptic segmentation</h3>
+<p>    将语义分割和实例分割架构结合到一个单一的框架中</p>
+<h3 id="universal-architectures">Universal architectures</h3>
+<p>    DETR，MaskFormer，它们在特定任务或数据集上的性能仍然不如最好的专门的分割架构</p>
+<h2 id="masked-attention-mask-transformer">Masked-attention Mask Transformer</h2>
+<h3 id="mask-classification-preliminaries">Mask classification preliminaries</h3>
+<p>    掩码分类架构预测N个二进制掩码和N个对应的类别标签。难点是为每个部分区域（segment）找到好的表征，如Mask R-CNN使用边界框作为表示。受到DETR的启发，可以将segment表示为c维的向量，作为query。<br>
+    该架构包含三个模块：<br>
+    （1）backbone：从图像中提取低分辨率的特征；<br>
+    （2）pixel decoder：逐渐对特征图进行上采样，以生成高分辨率的像素级embedding；<br>
+    （3）Transformer decoder：对特征图和query进行处理。</p>
+<h3 id="transformer-decoder-with-masked-attention">Transformer decoder with masked attention</h3>
+<p><img src="/img/mask2former1.PNG" alt="">
+    在Transformer decoder中使用我们提出的masked attention，通过交叉注意约束，在每个query预测掩码的前景区域中提取局部特征，而不是关注整个特征图；为了处理小对象，提出了一种多尺度策略来利用高分辨率特征，循环的将pixel decoder中的不同尺度的特征图输入到Transformer decoder中。</p>
+<h4 id="masked-attention">Masked attention</h4>
+<p>    标准的注意力计算为：
+$$
+X_{l}=softmax(Q_{l}K_{l}^{T})V_{l}+X_{l-1}
+$$
+    masked attention为：
+$$
+X_{l}=softmax(M_{l-1}+Q_{l}K_{l}^{T})V_{l}+X_{l-1}
+$$
+    其中，在$(x,y)$位置的注意力掩码为：
+$$
+M_{l-1}(x,y)=0,if;  m_{l-1}(x,y)=1
+$$
+$$
+M_{l-1}(x,y)=-\infty ,otherwise
+$$
+    其中，$m_{l-1} \in \lbrace 0,1 \rbrace^{N\times H_{l}W_{l}}$，是一个二进制输出（阈值设为0.5），由前一层的transformer decoder layer经过resize得到的。<br>
+    （感觉就是将重要的像素保留，即数值大的，而不重要的，变为很小很小的数，相当于丢弃）</p>
+<h4 id="high-resolution-features">High-resolution features</h4>
+<p>    循环将不同多尺度的特征分别输入到transformer decoder中。<br>
+    pixel decoder输出的分辨率分别为原始图像的$\frac{1}{32}$、$\frac{1}{16}$和$\frac{1}{8}$，对于每一个分辨率，都添加位置embedding $e_{pos}\in \mathbb{R}^{H_{l}W_{l}\times C}$和可学习的scale-level embedding $e_{lvl}\in \mathbb{R}^{1\times C}$；重复这三层L次，即共有3L层。</p>
+<h4 id="optimization-improvements">Optimization improvements</h4>
+<p>    标准的Transformer decoder layer包含顺序如下：a self-attention module, a cross-attention and a feed-forward network (FFN)。<br>
+    进行改进如下：<br>
+    （1）交换self-attention和cross-attention的顺序；<br>
+    （2）使query为可学习的，即$X_{0}$；<br>
+    （3）删掉dropout。</p>
+<h3 id="improving-training-efficiency">Improving training efficiency</h3>
+<p>    计算Mask损失时使用采样点而不是整张图像，减小计算量（受到PointRend和Implicit PointRend的启发）</p>
+<h2 id="实验">实验</h2>
+<h3 id="panoptic-segmentation-1">Panoptic segmentation</h3>
+<p><img src="/img/mask2former2.PNG" alt=""></p>
+<h3 id="instance-segmentation">Instance segmentation</h3>
+<p><img src="/img/mask2former3.PNG" alt="">
+    总体上最高的收益来自大物体，在小物体（$AP^{s}$）上的性能仍然落后于其他最先进的模型，因此，在小物体上仍有改进的空间。</p>
+<h3 id="semantic-segmentation">Semantic segmentation</h3>
+<p><img src="/img/mask2former4.PNG" alt=""></p>
+<h3 id="ablation-studies">Ablation studies</h3>
+<h4 id="transformer-decoder">Transformer decoder</h4>
+<p><img src="/img/mask2former5.PNG" alt="">
+<img src="/img/mask2former6.PNG" alt="">
+    masked attention在所有任务中都带来了最大的改善。</p>
+<h4 id="masked-attention--feature-resolution">Masked attention &amp; Feature resolution</h4>
+<p><img src="/img/mask2former7.PNG" alt="">
+<img src="/img/mask2former8.PNG" alt=""></p>
+<h4 id="calculating-loss-with-points-vs-masks">Calculating loss with points vs. masks</h4>
+<p><img src="/img/mask2former9.PNG" alt="">
+    用采样点计算最终的训练损失，在不影响性能的情况下减少了3倍的内存使用量。</p>
+<h4 id="learnable-queries-as-region-proposals">Learnable queries as region proposals</h4>
+<p><img src="/img/mask2former10.PNG" alt="">
+    top：选定的可学习query输入掩码预测，然后将其可视化（过程如右下所示）</p>
+<h2 id="limitations">Limitations</h2>
+<p><img src="/img/mask2former11.PNG" alt="">
+    虽然一个单一的Mask2Former可以处理任何分割任务，但仍然需要在不同的任务上训练它。在三个数据集中，我们发现使用全景注释数据训练的Mask2Former比专门训练的相同模型和使用相应数据的语义分割任务稍差。<br>
+     Mask2Former仍然难以分割小对象，并且无法充分利用多尺度特性。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +336,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 
