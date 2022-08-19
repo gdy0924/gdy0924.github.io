@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/panoptic-fpn/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/panoptic-fpn/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "Panoptic FPN",
+      "headline" : "Panoptic FPN",
+      "description" : "Abstract  为语义分割和实例分割设计一个单一的网络，即将Mask R-CNN中添加一个FPN分支。\nIntroduction  语义分割通常由FCNs架构，而实例分割通常以Mask R-CNN为基础。我们提出使用一个同时生成基于区域的输出（实例分割）和密集像素输出（语义分割）的单一网络来匹配两个任务的精度。\nRelated Work Panoptic segmentation Instance segmentation  基于区域的目标检测方法：Slow\/Fast\/Faster\/Mask R-CNN，Mask R-CNN用于实例分割。\nSemantic segmentation  FCNs是语义分割方法的基础。编码器-解码器架构逐步上采样，并将来自前馈网络的高级特征与来自较低层次的特征结合起来，最终产生具有语义意义的高分辨率特征。\nMulti-task learning Panoptic Feature Pyramid Network 设计原则是从基于FPN的Mask R-CNN开始，进行最小的更改，同时生成语义分割密集像素输出。\nModel Architecture  Feature Pyramid Network：如上图中的（a）\nInstance segmentation branch：如上图中的（b），Mask R-CNN增加一个FCN分支，从而预测每个候选区域的二进制分割掩码\nPanoptic FPN：在FPN上附加一个简单而快速的语义分割分支\nSemantic segmentation branch：将来自FPN金字塔的所有层次的特征图进行上采样，得到1\/4尺度的特征图，然后进行融合（元素相加）；除了stuff类别，这个分支还为属于对象的所有像素输出一个特殊的“other”类。 Inference and Training  Panoptic inference：为每个输出像素分配一个类标签（或void标签）和实例id（对于stuff，将忽略实例id）。由于Panoptic FPN中的实例和语义分割输出可能重叠，通过以下原则进行处理：根据置信度分数来解决不同实例之间的重叠问题；实例分割和语义分割的重叠部分按照实例分割为主；stuff区域中，去掉“other”类别和阈值下的像素。\nJoint training：instance segmentation分支有三个loss，$L_{c}$、$L_{b}$和$L_{mask}$分别表示分类损失、bounding-box损失和mask损失，semantic segmentation分支有$L_{s}$损失，为像素级的交叉熵损失，最终的损失为: $$ L=\\lambda _ {i}(L_{c}\u002bL_{b}\u002bL_{mask})\u002b\\lambda _ {s}L_{s} $$\n实验 FPN for Semantic Segmentation 我们的基线在准确性和效率上可与最先进的方法相媲美 Multi-Task Training  （a，b）：添加一个语义分割分支可以使实例分割结果在单任务基线上略微改进实例分割结果；",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -69,15 +69,35 @@ code.has-jax {
       "copyrightYear" : "2022",
       "datePublished": "2022-08-18 00:00:00 \u002b0000 UTC",
       "dateModified" : "2022-08-18 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/panoptic-fpn\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>Panoptic FPN</title>
+  <meta property="og:title" content="Panoptic FPN" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Abstract  为语义分割和实例分割设计一个单一的网络，即将Mask R-CNN中添加一个FPN分支。
+Introduction  语义分割通常由FCNs架构，而实例分割通常以Mask R-CNN为基础。我们提出使用一个同时生成基于区域的输出（实例分割）和密集像素输出（语义分割）的单一网络来匹配两个任务的精度。
+Related Work Panoptic segmentation Instance segmentation  基于区域的目标检测方法：Slow/Fast/Faster/Mask R-CNN，Mask R-CNN用于实例分割。
+Semantic segmentation  FCNs是语义分割方法的基础。编码器-解码器架构逐步上采样，并将来自前馈网络的高级特征与来自较低层次的特征结合起来，最终产生具有语义意义的高分辨率特征。
+Multi-task learning Panoptic Feature Pyramid Network 设计原则是从基于FPN的Mask R-CNN开始，进行最小的更改，同时生成语义分割密集像素输出。
+Model Architecture  Feature Pyramid Network：如上图中的（a）
+Instance segmentation branch：如上图中的（b），Mask R-CNN增加一个FCN分支，从而预测每个候选区域的二进制分割掩码
+Panoptic FPN：在FPN上附加一个简单而快速的语义分割分支
+Semantic segmentation branch：将来自FPN金字塔的所有层次的特征图进行上采样，得到1/4尺度的特征图，然后进行融合（元素相加）；除了stuff类别，这个分支还为属于对象的所有像素输出一个特殊的“other”类。 Inference and Training  Panoptic inference：为每个输出像素分配一个类标签（或void标签）和实例id（对于stuff，将忽略实例id）。由于Panoptic FPN中的实例和语义分割输出可能重叠，通过以下原则进行处理：根据置信度分数来解决不同实例之间的重叠问题；实例分割和语义分割的重叠部分按照实例分割为主；stuff区域中，去掉“other”类别和阈值下的像素。
+Joint training：instance segmentation分支有三个loss，$L_{c}$、$L_{b}$和$L_{mask}$分别表示分类损失、bounding-box损失和mask损失，semantic segmentation分支有$L_{s}$损失，为像素级的交叉熵损失，最终的损失为: $$ L=\lambda _ {i}(L_{c}&#43;L_{b}&#43;L_{mask})&#43;\lambda _ {s}L_{s} $$
+实验 FPN for Semantic Segmentation 我们的基线在准确性和效率上可与最先进的方法相媲美 Multi-Task Training  （a，b）：添加一个语义分割分支可以使实例分割结果在单任务基线上略微改进实例分割结果；" />
+  <meta name="description" content="Abstract  为语义分割和实例分割设计一个单一的网络，即将Mask R-CNN中添加一个FPN分支。
+Introduction  语义分割通常由FCNs架构，而实例分割通常以Mask R-CNN为基础。我们提出使用一个同时生成基于区域的输出（实例分割）和密集像素输出（语义分割）的单一网络来匹配两个任务的精度。
+Related Work Panoptic segmentation Instance segmentation  基于区域的目标检测方法：Slow/Fast/Faster/Mask R-CNN，Mask R-CNN用于实例分割。
+Semantic segmentation  FCNs是语义分割方法的基础。编码器-解码器架构逐步上采样，并将来自前馈网络的高级特征与来自较低层次的特征结合起来，最终产生具有语义意义的高分辨率特征。
+Multi-task learning Panoptic Feature Pyramid Network 设计原则是从基于FPN的Mask R-CNN开始，进行最小的更改，同时生成语义分割密集像素输出。
+Model Architecture  Feature Pyramid Network：如上图中的（a）
+Instance segmentation branch：如上图中的（b），Mask R-CNN增加一个FCN分支，从而预测每个候选区域的二进制分割掩码
+Panoptic FPN：在FPN上附加一个简单而快速的语义分割分支
+Semantic segmentation branch：将来自FPN金字塔的所有层次的特征图进行上采样，得到1/4尺度的特征图，然后进行融合（元素相加）；除了stuff类别，这个分支还为属于对象的所有像素输出一个特殊的“other”类。 Inference and Training  Panoptic inference：为每个输出像素分配一个类标签（或void标签）和实例id（对于stuff，将忽略实例id）。由于Panoptic FPN中的实例和语义分割输出可能重叠，通过以下原则进行处理：根据置信度分数来解决不同实例之间的重叠问题；实例分割和语义分割的重叠部分按照实例分割为主；stuff区域中，去掉“other”类别和阈值下的像素。
+Joint training：instance segmentation分支有三个loss，$L_{c}$、$L_{b}$和$L_{mask}$分别表示分类损失、bounding-box损失和mask损失，semantic segmentation分支有$L_{s}$损失，为像素级的交叉熵损失，最终的损失为: $$ L=\lambda _ {i}(L_{c}&#43;L_{b}&#43;L_{mask})&#43;\lambda _ {s}L_{s} $$
+实验 FPN for Semantic Segmentation 我们的基线在准确性和效率上可与最先进的方法相媲美 Multi-Task Training  （a，b）：添加一个语义分割分支可以使实例分割结果在单任务基线上略微改进实例分割结果；" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +123,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +156,116 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">Panoptic FPN</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-08-18 00:00:00 UTC">
+                18 Aug 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <h2 id="abstract">Abstract</h2>
+<p>    为语义分割和实例分割设计一个单一的网络，即将Mask R-CNN中添加一个FPN分支。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    语义分割通常由FCNs架构，而实例分割通常以Mask R-CNN为基础。我们提出使用一个同时生成基于区域的输出（实例分割）和密集像素输出（语义分割）的单一网络来匹配两个任务的精度。</p>
+<h2 id="related-work">Related Work</h2>
+<h3 id="panoptic-segmentation">Panoptic segmentation</h3>
+<h3 id="instance-segmentation">Instance segmentation</h3>
+<p>    基于区域的目标检测方法：Slow/Fast/Faster/Mask R-CNN，Mask R-CNN用于实例分割。</p>
+<h3 id="semantic-segmentation">Semantic segmentation</h3>
+<p>    FCNs是语义分割方法的基础。编码器-解码器架构逐步上采样，并将来自前馈网络的高级特征与来自较低层次的特征结合起来，最终产生具有语义意义的高分辨率特征。</p>
+<h3 id="multi-task-learning">Multi-task learning</h3>
+<h2 id="panoptic-feature-pyramid-network">Panoptic Feature Pyramid Network</h2>
+<p><img src="/img/panopticfpn1.PNG" alt="">
+    设计原则是从基于FPN的Mask R-CNN开始，进行最小的更改，同时生成语义分割密集像素输出。</p>
+<h3 id="model-architecture">Model Architecture</h3>
+<p>    <strong>Feature Pyramid Network</strong>：如上图中的（a）<br>
+    <strong>Instance segmentation branch</strong>：如上图中的（b），Mask R-CNN增加一个FCN分支，从而预测每个候选区域的二进制分割掩码<br>
+    <strong>Panoptic FPN</strong>：在FPN上附加一个简单而快速的语义分割分支<br>
+    <strong>Semantic segmentation branch</strong>：将来自FPN金字塔的所有层次的特征图进行上采样，得到1/4尺度的特征图，然后进行融合（元素相加）；除了stuff类别，这个分支还为属于对象的所有像素输出一个特殊的“other”类。
+<img src="/img/panopticfpn2.PNG" alt=""></p>
+<h3 id="inference-and-training">Inference and Training</h3>
+<p>    <strong>Panoptic inference</strong>：为每个输出像素分配一个类标签（或void标签）和实例id（对于stuff，将忽略实例id）。由于Panoptic FPN中的实例和语义分割输出可能重叠，通过以下原则进行处理：根据置信度分数来解决不同实例之间的重叠问题；实例分割和语义分割的重叠部分按照实例分割为主；stuff区域中，去掉“other”类别和阈值下的像素。<br>
+    <strong>Joint training</strong>：instance segmentation分支有三个loss，$L_{c}$、$L_{b}$和$L_{mask}$分别表示分类损失、bounding-box损失和mask损失，semantic segmentation分支有$L_{s}$损失，为像素级的交叉熵损失，最终的损失为:
+$$
+L=\lambda _ {i}(L_{c}+L_{b}+L_{mask})+\lambda _ {s}L_{s}
+$$</p>
+<h2 id="实验">实验</h2>
+<h3 id="fpn-for-semantic-segmentation">FPN for Semantic Segmentation</h3>
+<p><img src="/img/panopticfpn3.PNG" alt="">
+<img src="/img/panopticfpn4.PNG" alt="">
+    我们的基线在准确性和效率上可与最先进的方法相媲美
+<img src="/img/panopticfpn5.PNG" alt=""></p>
+<h3 id="multi-task-training">Multi-Task Training</h3>
+<p><img src="/img/panopticfpn6.PNG" alt=""></p>
+<p>    （a，b）：添加一个语义分割分支可以使实例分割结果在单任务基线上略微改进实例分割结果；<br>
+    （c，d）：添加一个实例分割分支可以为语义分割提供更大的好处，使语义分割比单任务基线提供更大的好处。</p>
+<h3 id="panoptic-fpn">Panoptic FPN</h3>
+<p><img src="/img/panopticfpn7.PNG" alt=""></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +285,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

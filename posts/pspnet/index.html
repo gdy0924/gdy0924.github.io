@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/pspnet/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/pspnet/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "PSPNet",
+      "headline" : "PSPNet",
+      "description" : "Pyramid Scene Parsing Network\nAbstract  通过金字塔池化模块和提出的金字塔场景解析网络(PSPNet)，利用基于不同区域的上下文聚合的全局上下文信息的能力。\nIntroduction  语义分割为图像中的每个像素分配一个类别标签。基于卷积网络的方法提高了动态对象的理解，但对于考虑不同场景和无限制词汇仍是困难的。\n如下图中的第一行，其中一艘船被误认为是汽车，该错误是由于物体的外观相似而造成的。但是，当查看之前的场景被描述为河流附近的船库时，应该得到正确的预测。目前基于FCN的网络模型的主要问题是缺乏合适的策略来利用全局场景信息。\n为例结合全局特征，我们提出了Pyramid Scene Parsing Network（PSPNet），还提出了一种具有深监督损失的优化策略。 Related Work  基于FCN的语义分割发展分为两个分支，一个是多尺度集成，另一个是基于结构预测，如添加CRF等。\n其他网络通过全局池化来引入全局信息，我们通过PSPNet，通过基于不同区域的上下文聚合来利用全局上下文信息。\nPyramid Scene Parsing Network Important Observations  我们总结了复杂场景解析的几个常见问题：\nMismatched Relationship：语境关系是重要的，如一架飞机很可能是在跑道上或在空中飞行，而不是在道路上；\nConfusion Categories：在ADE20K数据集中有许多类标签对在分类中令人混淆，如field和earth，mountain和hill，wall、house、building和skyscraper；这个问题可以通过利用类别之间的关系来解决。\nInconspicuous Classes：小物体的对象通常很难找到，而大物体可能会超过感受野，从而导致不连续的预测。\nPyramid Pooling Module  感受野的大小可以大致表明我们使用上下文信息的数量，虽然理论上ResNet的感受野已经大于输入图像，但实验证明，CNN的实际感受野比理论感受野要小得多，特别是在高层。使得网络没有全局的信息，我们通过有效的全局先验表示来解决这个问题。\n全局平均池化虽然可以引入全局信息，但是像素级标注任务中，如果将特征图直接融合形成一个单一的向量，可能会失去空间关系和细节信息，造成歧义。\n金字塔池化模块（下图中的（c））在四个不同的金字塔尺度下融合特征，不同尺度层的输出包含不同大小的特征映射，接着经过一个1×1卷积改变通道数，然后利用双线性插值上采样，得到与原始图像相同大小的特征，最后进行拼接。\nNetwork Architecture Deep Supervision for ResNet-Based FCN 除了使用softmax损失训练最终分类器的主分支外，在第四阶段后还应用另一个分类器，辅助损失有助于优化学习过程，而主分支损失承担的责任最大，通过权重来平衡辅助损失。\n实验 ImageNet Scene Parsing Challenge 2016 Ablation Study Auxiliary Loss\nMain ‘DA’ refers to data augmentation we performed, ‘AL’ denotes the auxiliary loss we added and ‘PSP’ represents the proposed PSPNet.",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,47 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-08-18 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-08-18 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "datePublished": "2022-08-17 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-08-17 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/pspnet\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>PSPNet</title>
+  <meta property="og:title" content="PSPNet" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Pyramid Scene Parsing Network
+Abstract  通过金字塔池化模块和提出的金字塔场景解析网络(PSPNet)，利用基于不同区域的上下文聚合的全局上下文信息的能力。
+Introduction  语义分割为图像中的每个像素分配一个类别标签。基于卷积网络的方法提高了动态对象的理解，但对于考虑不同场景和无限制词汇仍是困难的。
+如下图中的第一行，其中一艘船被误认为是汽车，该错误是由于物体的外观相似而造成的。但是，当查看之前的场景被描述为河流附近的船库时，应该得到正确的预测。目前基于FCN的网络模型的主要问题是缺乏合适的策略来利用全局场景信息。
+为例结合全局特征，我们提出了Pyramid Scene Parsing Network（PSPNet），还提出了一种具有深监督损失的优化策略。 Related Work  基于FCN的语义分割发展分为两个分支，一个是多尺度集成，另一个是基于结构预测，如添加CRF等。
+其他网络通过全局池化来引入全局信息，我们通过PSPNet，通过基于不同区域的上下文聚合来利用全局上下文信息。
+Pyramid Scene Parsing Network Important Observations  我们总结了复杂场景解析的几个常见问题：
+Mismatched Relationship：语境关系是重要的，如一架飞机很可能是在跑道上或在空中飞行，而不是在道路上；
+Confusion Categories：在ADE20K数据集中有许多类标签对在分类中令人混淆，如field和earth，mountain和hill，wall、house、building和skyscraper；这个问题可以通过利用类别之间的关系来解决。
+Inconspicuous Classes：小物体的对象通常很难找到，而大物体可能会超过感受野，从而导致不连续的预测。
+Pyramid Pooling Module  感受野的大小可以大致表明我们使用上下文信息的数量，虽然理论上ResNet的感受野已经大于输入图像，但实验证明，CNN的实际感受野比理论感受野要小得多，特别是在高层。使得网络没有全局的信息，我们通过有效的全局先验表示来解决这个问题。
+全局平均池化虽然可以引入全局信息，但是像素级标注任务中，如果将特征图直接融合形成一个单一的向量，可能会失去空间关系和细节信息，造成歧义。
+金字塔池化模块（下图中的（c））在四个不同的金字塔尺度下融合特征，不同尺度层的输出包含不同大小的特征映射，接着经过一个1×1卷积改变通道数，然后利用双线性插值上采样，得到与原始图像相同大小的特征，最后进行拼接。
+Network Architecture Deep Supervision for ResNet-Based FCN 除了使用softmax损失训练最终分类器的主分支外，在第四阶段后还应用另一个分类器，辅助损失有助于优化学习过程，而主分支损失承担的责任最大，通过权重来平衡辅助损失。
+实验 ImageNet Scene Parsing Challenge 2016 Ablation Study Auxiliary Loss
+Main ‘DA’ refers to data augmentation we performed, ‘AL’ denotes the auxiliary loss we added and ‘PSP’ represents the proposed PSPNet." />
+  <meta name="description" content="Pyramid Scene Parsing Network
+Abstract  通过金字塔池化模块和提出的金字塔场景解析网络(PSPNet)，利用基于不同区域的上下文聚合的全局上下文信息的能力。
+Introduction  语义分割为图像中的每个像素分配一个类别标签。基于卷积网络的方法提高了动态对象的理解，但对于考虑不同场景和无限制词汇仍是困难的。
+如下图中的第一行，其中一艘船被误认为是汽车，该错误是由于物体的外观相似而造成的。但是，当查看之前的场景被描述为河流附近的船库时，应该得到正确的预测。目前基于FCN的网络模型的主要问题是缺乏合适的策略来利用全局场景信息。
+为例结合全局特征，我们提出了Pyramid Scene Parsing Network（PSPNet），还提出了一种具有深监督损失的优化策略。 Related Work  基于FCN的语义分割发展分为两个分支，一个是多尺度集成，另一个是基于结构预测，如添加CRF等。
+其他网络通过全局池化来引入全局信息，我们通过PSPNet，通过基于不同区域的上下文聚合来利用全局上下文信息。
+Pyramid Scene Parsing Network Important Observations  我们总结了复杂场景解析的几个常见问题：
+Mismatched Relationship：语境关系是重要的，如一架飞机很可能是在跑道上或在空中飞行，而不是在道路上；
+Confusion Categories：在ADE20K数据集中有许多类标签对在分类中令人混淆，如field和earth，mountain和hill，wall、house、building和skyscraper；这个问题可以通过利用类别之间的关系来解决。
+Inconspicuous Classes：小物体的对象通常很难找到，而大物体可能会超过感受野，从而导致不连续的预测。
+Pyramid Pooling Module  感受野的大小可以大致表明我们使用上下文信息的数量，虽然理论上ResNet的感受野已经大于输入图像，但实验证明，CNN的实际感受野比理论感受野要小得多，特别是在高层。使得网络没有全局的信息，我们通过有效的全局先验表示来解决这个问题。
+全局平均池化虽然可以引入全局信息，但是像素级标注任务中，如果将特征图直接融合形成一个单一的向量，可能会失去空间关系和细节信息，造成歧义。
+金字塔池化模块（下图中的（c））在四个不同的金字塔尺度下融合特征，不同尺度层的输出包含不同大小的特征映射，接着经过一个1×1卷积改变通道数，然后利用双线性插值上采样，得到与原始图像相同大小的特征，最后进行拼接。
+Network Architecture Deep Supervision for ResNet-Based FCN 除了使用softmax损失训练最终分类器的主分支外，在第四阶段后还应用另一个分类器，辅助损失有助于优化学习过程，而主分支损失承担的责任最大，通过权重来平衡辅助损失。
+实验 ImageNet Scene Parsing Challenge 2016 Ablation Study Auxiliary Loss
+Main ‘DA’ refers to data augmentation we performed, ‘AL’ denotes the auxiliary loss we added and ‘PSP’ represents the proposed PSPNet." />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +133,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +166,117 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">PSPNet</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-08-17 00:00:00 UTC">
+                17 Aug 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Pyramid Scene Parsing Network</p>
+<h2 id="abstract">Abstract</h2>
+<p>    通过金字塔池化模块和提出的金字塔场景解析网络(PSPNet)，利用基于不同区域的上下文聚合的全局上下文信息的能力。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    语义分割为图像中的每个像素分配一个类别标签。基于卷积网络的方法提高了动态对象的理解，但对于考虑不同场景和无限制词汇仍是困难的。<br>
+    如下图中的第一行，其中一艘船被误认为是汽车，该错误是由于物体的外观相似而造成的。但是，当查看之前的场景被描述为河流附近的船库时，应该得到正确的预测。目前基于FCN的网络模型的主要问题是缺乏合适的策略来利用全局场景信息。<br>
+    为例结合全局特征，我们提出了Pyramid Scene Parsing Network（PSPNet），还提出了一种具有深监督损失的优化策略。
+<img src="/img/pspnet8.PNG" alt=""></p>
+<h2 id="related-work">Related Work</h2>
+<p>    基于FCN的语义分割发展分为两个分支，一个是多尺度集成，另一个是基于结构预测，如添加CRF等。<br>
+    其他网络通过全局池化来引入全局信息，我们通过PSPNet，通过基于不同区域的上下文聚合来利用全局上下文信息。</p>
+<h2 id="pyramid-scene-parsing-network">Pyramid Scene Parsing Network</h2>
+<h3 id="important-observations">Important Observations</h3>
+<p>    我们总结了复杂场景解析的几个常见问题：<br>
+    <em><strong>Mismatched Relationship</strong></em>：语境关系是重要的，如一架飞机很可能是在跑道上或在空中飞行，而不是在道路上；<br>
+    <em><strong>Confusion Categories</strong></em>：在ADE20K数据集中有许多类标签对在分类中令人混淆，如field和earth，mountain和hill，wall、house、building和skyscraper；这个问题可以通过利用类别之间的关系来解决。<br>
+    <em><strong>Inconspicuous Classes</strong></em>：小物体的对象通常很难找到，而大物体可能会超过感受野，从而导致不连续的预测。</p>
+<h3 id="pyramid-pooling-module">Pyramid Pooling Module</h3>
+<p>    感受野的大小可以大致表明我们使用上下文信息的数量，虽然理论上ResNet的感受野已经大于输入图像，但实验证明，CNN的实际感受野比理论感受野要小得多，特别是在高层。使得网络没有全局的信息，我们通过有效的全局先验表示来解决这个问题。<br>
+    全局平均池化虽然可以引入全局信息，但是像素级标注任务中，如果将特征图直接融合形成一个单一的向量，可能会失去空间关系和细节信息，造成歧义。<br>
+    金字塔池化模块（下图中的（c））在四个不同的金字塔尺度下融合特征，不同尺度层的输出包含不同大小的特征映射，接着经过一个1×1卷积改变通道数，然后利用双线性插值上采样，得到与原始图像相同大小的特征，最后进行拼接。</p>
+<h3 id="network-architecture">Network Architecture</h3>
+<p><img src="/img/pspnet1.PNG" alt=""></p>
+<h2 id="deep-supervision-for-resnet-based-fcn">Deep Supervision for ResNet-Based FCN</h2>
+<p><img src="/img/pspnet2.PNG" alt="">
+    除了使用softmax损失训练最终分类器的主分支外，在第四阶段后还应用另一个分类器，辅助损失有助于优化学习过程，而主分支损失承担的责任最大，通过权重来平衡辅助损失。</p>
+<h2 id="实验">实验</h2>
+<h3 id="imagenet-scene-parsing-challenge-2016">ImageNet Scene Parsing Challenge 2016</h3>
+<h4 id="ablation-study">Ablation Study</h4>
+<p><img src="/img/pspnet3.PNG" alt="">
+<img src="/img/pspnet4.PNG" alt="">
+    Auxiliary Loss</p>
+<h4 id="main">Main</h4>
+<p><img src="/img/pspnet5.PNG" alt="">
+    ‘DA’ refers to data augmentation we performed, ‘AL’ denotes the auxiliary loss we added and ‘PSP’ represents the proposed PSPNet. ‘MS’ means that multi-scale testing is used.</p>
+<h3 id="pascal-voc-2012">PASCAL VOC 2012</h3>
+<p><img src="/img/pspnet6.PNG" alt=""></p>
+<h3 id="cityscapes">Cityscapes</h3>
+<p><img src="/img/pspnet7.PNG" alt=""></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +296,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

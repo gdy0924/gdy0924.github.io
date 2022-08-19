@@ -6,7 +6,69 @@
     <description>Recent content in Paper on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 16 Aug 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/paper/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 18 Aug 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/paper/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Panoptic FPN</title>
+      <link>https://gdy0924.github.io/posts/panoptic-fpn/</link>
+      <pubDate>Thu, 18 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/panoptic-fpn/</guid>
+      <description>Abstract  为语义分割和实例分割设计一个单一的网络，即将Mask R-CNN中添加一个FPN分支。
+Introduction  语义分割通常由FCNs架构，而实例分割通常以Mask R-CNN为基础。我们提出使用一个同时生成基于区域的输出（实例分割）和密集像素输出（语义分割）的单一网络来匹配两个任务的精度。
+Related Work Panoptic segmentation Instance segmentation  基于区域的目标检测方法：Slow/Fast/Faster/Mask R-CNN，Mask R-CNN用于实例分割。
+Semantic segmentation  FCNs是语义分割方法的基础。编码器-解码器架构逐步上采样，并将来自前馈网络的高级特征与来自较低层次的特征结合起来，最终产生具有语义意义的高分辨率特征。
+Multi-task learning Panoptic Feature Pyramid Network 设计原则是从基于FPN的Mask R-CNN开始，进行最小的更改，同时生成语义分割密集像素输出。
+Model Architecture  Feature Pyramid Network：如上图中的（a）
+Instance segmentation branch：如上图中的（b），Mask R-CNN增加一个FCN分支，从而预测每个候选区域的二进制分割掩码
+Panoptic FPN：在FPN上附加一个简单而快速的语义分割分支
+Semantic segmentation branch：将来自FPN金字塔的所有层次的特征图进行上采样，得到1/4尺度的特征图，然后进行融合（元素相加）；除了stuff类别，这个分支还为属于对象的所有像素输出一个特殊的“other”类。 Inference and Training  Panoptic inference：为每个输出像素分配一个类标签（或void标签）和实例id（对于stuff，将忽略实例id）。由于Panoptic FPN中的实例和语义分割输出可能重叠，通过以下原则进行处理：根据置信度分数来解决不同实例之间的重叠问题；实例分割和语义分割的重叠部分按照实例分割为主；stuff区域中，去掉“other”类别和阈值下的像素。
+Joint training：instance segmentation分支有三个loss，$L_{c}$、$L_{b}$和$L_{mask}$分别表示分类损失、bounding-box损失和mask损失，semantic segmentation分支有$L_{s}$损失，为像素级的交叉熵损失，最终的损失为: $$ L=\lambda _ {i}(L_{c}+L_{b}+L_{mask})+\lambda _ {s}L_{s} $$
+实验 FPN for Semantic Segmentation 我们的基线在准确性和效率上可与最先进的方法相媲美 Multi-Task Training  （a，b）：添加一个语义分割分支可以使实例分割结果在单任务基线上略微改进实例分割结果；</description>
+    </item>
+    
+    <item>
+      <title>Panoptic Segmentation</title>
+      <link>https://gdy0924.github.io/posts/panoptic-segmentation/</link>
+      <pubDate>Thu, 18 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/panoptic-segmentation/</guid>
+      <description>Abstract  全景分割统一了语义分割（为每个像素分配一个类标签）和实例分割（检测和分割每个对象实例）的任务；提出了新的度量指标PQ（panoptic quality）。
+Introduction  things：可数的物体，如人、动物、工具。
+stuff：具有类似纹理或材料的无定形区域，如草、天空、道路。
+semantic segmentation：studying stuff，被定义为简单地为图像中的每个像素分配一个类标签（将thing视为stuff），常用FCN网络。
+instance segmentation/object detection：studying things，检测每个对象，并分别用一个边界框或分割掩码来描述，基于object proposals或region-based。
+提出一个新任务： (1) encompasses both stuff and thing classes, (2) uses a simple but general output format, and (3) introduces a uniform evaluation metric.
+全景分割：图像的每个像素必须分配一个语义标签和一个实例id；具有相同标签和id的像素属于同一对象；对于stuff标签，实例id将被忽略。
+Related Work Object detection tasks Semantic segmentation tasks  FCNs
+Multitask learning Joint segmentation tasks Panoptic Segmentation Format  给定一组预先定义的L类语义编码：$L:= \lbrace0,&amp;hellip;,L-1\rbrace$，为每个像素预测一对$(l_{i},z_{i})\in L\times N$，其中$l_{i}$表示像素$i$的语义类别，$z_{i}$表示它的实例id；$z_{i}$将同一类的像素分组。
+语义标签由子集$L^{St}$和$L^{Th}$组成，即$L=L^{St}\cup L^{Th}$，且$L^{St}\cap L^{Th}=\phi $。当一个像素被标记为$L^{St}$时，其$z_{i}$是忽略的。
+Panoptic Segmentation Metric  panoptic quality包括两个步骤：segment matching和PQ computation given the matches</description>
+    </item>
+    
+    <item>
+      <title>PSPNet</title>
+      <link>https://gdy0924.github.io/posts/pspnet/</link>
+      <pubDate>Wed, 17 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/pspnet/</guid>
+      <description>Pyramid Scene Parsing Network
+Abstract  通过金字塔池化模块和提出的金字塔场景解析网络(PSPNet)，利用基于不同区域的上下文聚合的全局上下文信息的能力。
+Introduction  语义分割为图像中的每个像素分配一个类别标签。基于卷积网络的方法提高了动态对象的理解，但对于考虑不同场景和无限制词汇仍是困难的。
+如下图中的第一行，其中一艘船被误认为是汽车，该错误是由于物体的外观相似而造成的。但是，当查看之前的场景被描述为河流附近的船库时，应该得到正确的预测。目前基于FCN的网络模型的主要问题是缺乏合适的策略来利用全局场景信息。
+为例结合全局特征，我们提出了Pyramid Scene Parsing Network（PSPNet），还提出了一种具有深监督损失的优化策略。 Related Work  基于FCN的语义分割发展分为两个分支，一个是多尺度集成，另一个是基于结构预测，如添加CRF等。
+其他网络通过全局池化来引入全局信息，我们通过PSPNet，通过基于不同区域的上下文聚合来利用全局上下文信息。
+Pyramid Scene Parsing Network Important Observations  我们总结了复杂场景解析的几个常见问题：
+Mismatched Relationship：语境关系是重要的，如一架飞机很可能是在跑道上或在空中飞行，而不是在道路上；
+Confusion Categories：在ADE20K数据集中有许多类标签对在分类中令人混淆，如field和earth，mountain和hill，wall、house、building和skyscraper；这个问题可以通过利用类别之间的关系来解决。
+Inconspicuous Classes：小物体的对象通常很难找到，而大物体可能会超过感受野，从而导致不连续的预测。
+Pyramid Pooling Module  感受野的大小可以大致表明我们使用上下文信息的数量，虽然理论上ResNet的感受野已经大于输入图像，但实验证明，CNN的实际感受野比理论感受野要小得多，特别是在高层。使得网络没有全局的信息，我们通过有效的全局先验表示来解决这个问题。
+全局平均池化虽然可以引入全局信息，但是像素级标注任务中，如果将特征图直接融合形成一个单一的向量，可能会失去空间关系和细节信息，造成歧义。
+金字塔池化模块（下图中的（c））在四个不同的金字塔尺度下融合特征，不同尺度层的输出包含不同大小的特征映射，接着经过一个1×1卷积改变通道数，然后利用双线性插值上采样，得到与原始图像相同大小的特征，最后进行拼接。
+Network Architecture Deep Supervision for ResNet-Based FCN 除了使用softmax损失训练最终分类器的主分支外，在第四阶段后还应用另一个分类器，辅助损失有助于优化学习过程，而主分支损失承担的责任最大，通过权重来平衡辅助损失。
+实验 ImageNet Scene Parsing Challenge 2016 Ablation Study Auxiliary Loss
+Main ‘DA’ refers to data augmentation we performed, ‘AL’ denotes the auxiliary loss we added and ‘PSP’ represents the proposed PSPNet.</description>
+    </item>
+    
     <item>
       <title>YOLACT</title>
       <link>https://gdy0924.github.io/posts/yolact/</link>

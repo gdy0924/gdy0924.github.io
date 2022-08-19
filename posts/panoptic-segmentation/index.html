@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/panoptic-segmentation/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/panoptic-segmentation/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "Panoptic Segmentation",
+      "headline" : "Panoptic Segmentation",
+      "description" : "Abstract  全景分割统一了语义分割（为每个像素分配一个类标签）和实例分割（检测和分割每个对象实例）的任务；提出了新的度量指标PQ（panoptic quality）。\nIntroduction  things：可数的物体，如人、动物、工具。\nstuff：具有类似纹理或材料的无定形区域，如草、天空、道路。\nsemantic segmentation：studying stuff，被定义为简单地为图像中的每个像素分配一个类标签（将thing视为stuff），常用FCN网络。\ninstance segmentation\/object detection：studying things，检测每个对象，并分别用一个边界框或分割掩码来描述，基于object proposals或region-based。\n提出一个新任务： (1) encompasses both stuff and thing classes, (2) uses a simple but general output format, and (3) introduces a uniform evaluation metric.\n全景分割：图像的每个像素必须分配一个语义标签和一个实例id；具有相同标签和id的像素属于同一对象；对于stuff标签，实例id将被忽略。\nRelated Work Object detection tasks Semantic segmentation tasks  FCNs\nMultitask learning Joint segmentation tasks Panoptic Segmentation Format  给定一组预先定义的L类语义编码：$L:= \\lbrace0,\u0026hellip;,L-1\\rbrace$，为每个像素预测一对$(l_{i},z_{i})\\in L\\times N$，其中$l_{i}$表示像素$i$的语义类别，$z_{i}$表示它的实例id；$z_{i}$将同一类的像素分组。\n语义标签由子集$L^{St}$和$L^{Th}$组成，即$L=L^{St}\\cup L^{Th}$，且$L^{St}\\cap L^{Th}=\\phi $。当一个像素被标记为$L^{St}$时，其$z_{i}$是忽略的。\nPanoptic Segmentation Metric  panoptic quality包括两个步骤：segment matching和PQ computation given the matches",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -69,15 +69,35 @@ code.has-jax {
       "copyrightYear" : "2022",
       "datePublished": "2022-08-18 00:00:00 \u002b0000 UTC",
       "dateModified" : "2022-08-18 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/panoptic-segmentation\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>Panoptic Segmentation</title>
+  <meta property="og:title" content="Panoptic Segmentation" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Abstract  全景分割统一了语义分割（为每个像素分配一个类标签）和实例分割（检测和分割每个对象实例）的任务；提出了新的度量指标PQ（panoptic quality）。
+Introduction  things：可数的物体，如人、动物、工具。
+stuff：具有类似纹理或材料的无定形区域，如草、天空、道路。
+semantic segmentation：studying stuff，被定义为简单地为图像中的每个像素分配一个类标签（将thing视为stuff），常用FCN网络。
+instance segmentation/object detection：studying things，检测每个对象，并分别用一个边界框或分割掩码来描述，基于object proposals或region-based。
+提出一个新任务： (1) encompasses both stuff and thing classes, (2) uses a simple but general output format, and (3) introduces a uniform evaluation metric.
+全景分割：图像的每个像素必须分配一个语义标签和一个实例id；具有相同标签和id的像素属于同一对象；对于stuff标签，实例id将被忽略。
+Related Work Object detection tasks Semantic segmentation tasks  FCNs
+Multitask learning Joint segmentation tasks Panoptic Segmentation Format  给定一组预先定义的L类语义编码：$L:= \lbrace0,&amp;hellip;,L-1\rbrace$，为每个像素预测一对$(l_{i},z_{i})\in L\times N$，其中$l_{i}$表示像素$i$的语义类别，$z_{i}$表示它的实例id；$z_{i}$将同一类的像素分组。
+语义标签由子集$L^{St}$和$L^{Th}$组成，即$L=L^{St}\cup L^{Th}$，且$L^{St}\cap L^{Th}=\phi $。当一个像素被标记为$L^{St}$时，其$z_{i}$是忽略的。
+Panoptic Segmentation Metric  panoptic quality包括两个步骤：segment matching和PQ computation given the matches" />
+  <meta name="description" content="Abstract  全景分割统一了语义分割（为每个像素分配一个类标签）和实例分割（检测和分割每个对象实例）的任务；提出了新的度量指标PQ（panoptic quality）。
+Introduction  things：可数的物体，如人、动物、工具。
+stuff：具有类似纹理或材料的无定形区域，如草、天空、道路。
+semantic segmentation：studying stuff，被定义为简单地为图像中的每个像素分配一个类标签（将thing视为stuff），常用FCN网络。
+instance segmentation/object detection：studying things，检测每个对象，并分别用一个边界框或分割掩码来描述，基于object proposals或region-based。
+提出一个新任务： (1) encompasses both stuff and thing classes, (2) uses a simple but general output format, and (3) introduces a uniform evaluation metric.
+全景分割：图像的每个像素必须分配一个语义标签和一个实例id；具有相同标签和id的像素属于同一对象；对于stuff标签，实例id将被忽略。
+Related Work Object detection tasks Semantic segmentation tasks  FCNs
+Multitask learning Joint segmentation tasks Panoptic Segmentation Format  给定一组预先定义的L类语义编码：$L:= \lbrace0,&amp;hellip;,L-1\rbrace$，为每个像素预测一对$(l_{i},z_{i})\in L\times N$，其中$l_{i}$表示像素$i$的语义类别，$z_{i}$表示它的实例id；$z_{i}$将同一类的像素分组。
+语义标签由子集$L^{St}$和$L^{Th}$组成，即$L=L^{St}\cup L^{Th}$，且$L^{St}\cap L^{Th}=\phi $。当一个像素被标记为$L^{St}$时，其$z_{i}$是忽略的。
+Panoptic Segmentation Metric  panoptic quality包括两个步骤：segment matching和PQ computation given the matches" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +123,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +156,115 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">Panoptic Segmentation</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-08-18 00:00:00 UTC">
+                18 Aug 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p><img src="/img/panopticseg1.PNG" alt=""></p>
+<h2 id="abstract">Abstract</h2>
+<p>    全景分割统一了语义分割（为每个像素分配一个类标签）和实例分割（检测和分割每个对象实例）的任务；提出了新的度量指标PQ（panoptic quality）。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    things：可数的物体，如人、动物、工具。<br>
+    stuff：具有类似纹理或材料的无定形区域，如草、天空、道路。<br>
+    semantic segmentation：studying stuff，被定义为简单地为图像中的每个像素分配一个类标签（将thing视为stuff），常用FCN网络。<br>
+    instance segmentation/object detection：studying things，检测每个对象，并分别用一个边界框或分割掩码来描述，基于object proposals或region-based。<br>
+    提出一个新任务： (1) encompasses both stuff and thing classes, (2) uses a simple but general output format, and (3) introduces a uniform evaluation metric.<br>
+    全景分割：图像的每个像素必须分配一个语义标签和一个实例id；具有相同标签和id的像素属于同一对象；对于stuff标签，实例id将被忽略。</p>
+<h2 id="related-work">Related Work</h2>
+<h3 id="object-detection-tasks">Object detection tasks</h3>
+<h3 id="semantic-segmentation-tasks">Semantic segmentation tasks</h3>
+<p>    FCNs</p>
+<h3 id="multitask-learning">Multitask learning</h3>
+<h3 id="joint-segmentation-tasks">Joint segmentation tasks</h3>
+<h2 id="panoptic-segmentation-format">Panoptic Segmentation Format</h2>
+<p>    给定一组预先定义的L类语义编码：$L:= \lbrace0,&hellip;,L-1\rbrace$，为每个像素预测一对$(l_{i},z_{i})\in L\times N$，其中$l_{i}$表示像素$i$的语义类别，$z_{i}$表示它的实例id；$z_{i}$将同一类的像素分组。<br>
+    语义标签由子集$L^{St}$和$L^{Th}$组成，即$L=L^{St}\cup L^{Th}$，且$L^{St}\cap  L^{Th}=\phi $。当一个像素被标记为$L^{St}$时，其$z_{i}$是忽略的。</p>
+<h2 id="panoptic-segmentation-metric">Panoptic Segmentation Metric</h2>
+<p>    panoptic quality包括两个步骤：segment matching和PQ computation given the matches</p>
+<h3 id="segment-matching">Segment Matching</h3>
+<p>    规定当某一predicted segment与某一ground truth segment的交并比大于0.5时，才能匹配，保证了最多可以有一个predicted segment与ground truth segment相匹配。</p>
+<h3 id="pq-computation">PQ Computation</h3>
+<p><img src="/img/panopticseg2.PNG" alt="">
+     独立地计算每个类别的PQ，并对类进行平均。对于每一类，分为真阳性(TP)、假阳性(FP)和假阴性(FN)：
+$$
+PQ=\frac{\sum _ {(p,g)\in TP}IoU(p,g)}{\left | TP \right |+\frac{1}{2}\left | FP \right |+\frac{1}{2}\left | FN \right |}
+$$
+     其中，$\frac{\sum _ {(p,g)\in TP}IoU(p,g)}{\left | TP \right |}$是 matched segments的平均IoU，$\frac{1}{2}\left | FP \right |+\frac{1}{2}\left | FN \right |$被添加到分母中，以惩罚没有匹配的segment。<br>
+     PQ可以看作segmentation quality（SQ）和recognition quality（RQ）的乘积：
+$$
+\frac{\sum _ {(p,g)\in TP}IoU(p,g)}{\left | TP \right |}\times \frac{\left | TP \right |}{\left | TP \right |+\frac{1}{2}\left | FP \right |+\frac{1}{2}\left | FN \right |}
+$$
+    其中，前一项为SQ，后一项为RQ；RQ为常见的$F_{1}$分数，SQ是matched segments的平均IoU。<br>
+     Void labels：在ground truth中有两类void labels，不属于定义类别的像素，模糊或未知的像素。具体来说：匹配期间，将预测segments中在ground truth中标记为Void 的所有像素都从预测中移除，并且不影响IoU计算；匹配后，包含匹配像素阈值以上的Void 像素的未匹配预测segments将被删除，并且不算作FP；最后，输出也可能包含Void 像素；这些不会影响评估。</p>
+<h2 id="machine-performance-baselines">Machine Performance Baselines</h2>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +284,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 
