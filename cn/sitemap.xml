@@ -3,7 +3,7 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://gdy0924.github.io/categories/</loc>
-    <lastmod>2022-08-18T00:00:00+00:00</lastmod>
+    <lastmod>2022-09-16T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -15,17 +15,14 @@
                 href="https://gdy0924.github.io/categories/"
                 />
   </url><url>
-    <loc>https://gdy0924.github.io/posts/panoptic-fpn/</loc>
-    <lastmod>2022-08-18T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://gdy0924.github.io/posts/panoptic-segmentation/</loc>
-    <lastmod>2022-08-18T00:00:00+00:00</lastmod>
+    <loc>https://gdy0924.github.io/posts/fcos/</loc>
+    <lastmod>2022-09-16T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/categories/paper/</loc>
-    <lastmod>2022-08-18T00:00:00+00:00</lastmod>
+    <lastmod>2022-09-16T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/</loc>
-    <lastmod>2022-08-18T00:00:00+00:00</lastmod>
+    <lastmod>2022-09-16T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -38,7 +35,7 @@
                 />
   </url><url>
     <loc>https://gdy0924.github.io/</loc>
-    <lastmod>2022-08-18T00:00:00+00:00</lastmod>
+    <lastmod>2022-09-16T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -49,6 +46,15 @@
                 hreflang="cn"
                 href="https://gdy0924.github.io/"
                 />
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/retinanet/</loc>
+    <lastmod>2022-09-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/panoptic-fpn/</loc>
+    <lastmod>2022-08-18T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/panoptic-segmentation/</loc>
+    <lastmod>2022-08-18T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/pspnet/</loc>
     <lastmod>2022-08-17T00:00:00+00:00</lastmod>

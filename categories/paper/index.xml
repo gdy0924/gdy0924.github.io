@@ -6,7 +6,57 @@
     <description>Recent content in Paper on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 18 Aug 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/paper/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 16 Sep 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/paper/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>FCOS</title>
+      <link>https://gdy0924.github.io/posts/fcos/</link>
+      <pubDate>Fri, 16 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/fcos/</guid>
+      <description>A Simple and Strong Anchor-free Object Detector
+Abstract  之前的one-stage目标检测算法，都是anchor-based的，依赖于预定义的锚框，我们提出的FCOS是anchor-free的，减少了许多计算量，如IoU计算等。
+Introduction  Anchor-Based方法的缺点是：
+（1）Faster R-CNN和RetinaNet等，性能对锚框的大小、长宽比等都很敏感；
+（2）由于锚盒的尺寸和长宽比是固定的，算法在处理形状变化较大的候选目标时会遇到困难，特别是小物体，从而影响泛化性能；
+（3）在算法中产生大量的候选锚框，而这些锚框会存在正负样本不均衡的问题；
+（4）这种方法涉及复杂的计算，如筛选锚框时需要计算IoU。
+DenseBox试图利用FCN网络架构实现目标检测，即在特征图中的每个位置直接预测四维向量和类别，如上图中的左边所示；但为了处理不同大小的bounding-box，DenseBox需要使用到图像金字塔结构，与FCN提出的一次计算所有卷积相矛盾。
+本文提出了anchor-free的FCOS，仅可能会在远离目标物体中心的位置产生一些低质量的预测bounding-box；但其实目标中心附近区域能够得到更可靠的预测；因此，我们引入center-ness分数，来描述一个位置到中心的偏差，用于降低低质量检测bounding-box，该分支与回归分支并行预测。
+Related Work Anchor-based Detectors  R-CNN系列、SSD、YOLOv2等算法都使用锚框，作为预定义的滑动窗口或候选区域。需要调整超参数才能得到好的效果，并且引入IoU计算量。
+Anchor-free Detectors  最流行的anchor-free算法是YOLOv1，其使用中心点预测bounding-box，然而YOLOv1的召回率很低，因此，在v2中也使用了锚框。
+与YOLOv1相比，FCOS可以利用box中的所有点来预测bounding-box，而检测到的低质量的bounding-box可以被所提出的“center-ness”分支所抑制。
+OUR APPROACH Fully Convolutional One-Stage Object Detector  第i层的特征图为$F_{i}\in \mathbb{R}^{H\times W\times C}$，ground-truth bounding boxes表示为$\lbrace B_{i}\rbrace$，其中$B_{i}=(x_{0}^{(i)},y_{0}^{(i)},x_{1}^{(i)},y_{1}^{(i)},c^{(i)})\in \mathbb{R}^{4}\times \lbrace1,2,&amp;hellip;,C\rbrace$，前两个为box的左上角坐标，接着是右下角坐标，最后是所属类别。
+将特征图上的每个位置$(x,y)$，映射到原图中$(\left \lfloor \frac{2}{s} \right \rfloor+xs,\left \lfloor \frac{2}{s} \right \rfloor+ys)$。anchor-based的算法，将输入图像上的位置作为（多个）锚框的中心，我们只在该位置预测一个bounding-box，作为一个锚框的中心。
+如果$(x,y)$坐标落入某一bounding-box的中心区域，那么就把它视为正样本；$(c_{x},c_{y})$中心区域定义为$(c_{x}-rs,c_{y}-rs,c_{y}+rs,c_{y}+rs)$，$r$为定义的超参数。输出类别和回归目标$t^{\ast }=(l^{\ast },t^{\ast },r^{\ast },b^{\ast })$，为从该位置到bounding-box的四个边的距离。
+如果一个位置落在多个bounding-box的中心区域内，则将其分到面积最小的bounding-box中。
+与每个位置有一个锚框的anchor-based算法不相同，关键的区别是定义正样本和负样本的方式。anchor-based算法中使用锚框和ground-truth之间的iou来确定这些锚盒的标签；FCOS通过位置是否包含在ground-truth的中心区域中来标记。
+Network Outputs
+类别分支预测C个类别，回归分支预测4个坐标信息。（与anchor-based算法相比，少了anchor的数量） Loss Function</description>
+    </item>
+    
+    <item>
+      <title>RetinaNet</title>
+      <link>https://gdy0924.github.io/posts/retinanet/</link>
+      <pubDate>Thu, 15 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/retinanet/</guid>
+      <description>Focal Loss for Dense Object Detection
+Abstract  两阶段的目标检测算法R-CNN系列，精度高，但是一阶段的检测算法，速度更快，更有潜力，但精度落后于两阶段的算法。
+在本文中，研究了出现这种现象的原因，主要是由于在训练过程中遇到的极端类别不平衡问题。因此，我们提出Focal Loss来解决该问题，并训练了一个简单的算法，RetinaNet。
+Introduction  R-CNN系列的两阶段目标检测算法，在第一阶段产生候选框，第二阶段对候选框进行位置和类别预测，达到了最好的效果；一阶段的算法，如YOLO、SSD，其速度更快，但与两阶段算法的精度还有差别。
+本文提出了一阶段算法，其精度与两阶段的相匹配；将类别不平衡作为阻碍一阶段算法的主要问题，通过提出Focal Loss来解决。
+在两阶段的算法中，第一阶段生成候选框，迅速将候选对象位置的数量减少（1-2k），过滤掉了大量的负样本，在第二阶段，按照一定比例进行训练，如正负样本1：3，以平衡正负样本的数量。
+而一阶段的算法，通常生成巨大数量、密集的框（~100k），导致效率底下，主要是由于背景框太多。
+本文提出了Focal Loss，在训练过程中，动态的降低易分样本的权重，使模型将注意力放在难分样本上。
+Related Work  Classic Object Detectors：滑动窗口检测
+Two-stage Detectors：第一阶段生成候选框，过滤掉大部分负样本，第二阶段分类回归预测。
+One-stage Detectors：RetinaNet的精度提升，不是基于网络的创新，而是提出的新损失函数。
+Class Imbalance：一阶段的算法，通常产生10k-100k个候选框，其中大部分为背景框，这种不平衡会导致两个问题：训练效率低，大多数框是对训练没有用处的；负样本会占据训练的主导，可能导致模型退化。
+Robust Estimation：Focal Loss不是通过解决异常值，而是通过降低权重（易分样本）来解决类别不平衡，这样即使它们的数量很大，它们对总损失的贡献也很小。
+Focal Loss  该损失函数是为了解决一阶段检测算法中，训练过程中类别极端不平衡的问题。先在二分类交叉熵损失中引入Focal Loss： $$ CE(p,y)=-log(p),if:y=1 $$ $$ CE(p,y)=-log(1-p),otherwise $$ 上述公式中，$y\in \lbrace\pm 1 \rbrace$为 ground-truth class，$p\in [0,1]$为预测$y=1$的概率，我们定义： $$ p_{t}=p,if: y=1 $$ $$ p_{t}=1-p,otherwise $$ 那么，$CE(p,y)=CE(p_{t})=-log(p_{t})$，可以看图1中的蓝色曲线，概率越大表明越容易分类；即使是易分样本，当其数量大时，也会导致不平衡。
+Balanced Cross Entropy  解决类别不平衡的常见方式之一是引入权重因子$\alpha \in [0,1]$（正例），负例为$1-\alpha$： $$ CE(p_{t})=-\alpha _ {t}log(p_{t}) $$</description>
+    </item>
+    
     <item>
       <title>Panoptic FPN</title>
       <link>https://gdy0924.github.io/posts/panoptic-fpn/</link>
