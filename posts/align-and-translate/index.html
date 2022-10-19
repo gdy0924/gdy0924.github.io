@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/summary/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/summary/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/align-and-translate/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/align-and-translate/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Summary",
-      "headline" : "Summary",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "Align and Translate",
+      "headline" : "Align and Translate",
+      "description" : "Dzmitry Bahdanau, Kyunghyun Cho, and Yoshua Bengio. 2015. Neural Machine Translation by Jointly Learning to Align and Translate. In Proceedings of ICLR 2015. (Citation: 20,776)\n 这篇论文算是在自然语言处理(NLP)中或是encoder-decoder中第一个使用attention机制的工作，将attention机制用到了神经网络机器翻译(NMT)\nAbstract  最近提出的神经机器翻译模型通常属于encoder-decoder架构，即将输入编码成一个固定长度的向量，decoder利用向量生成输出翻译。\n本文中，我们推测使用一个固定长度的向量（hard）是提高这种基本结构性能的一个瓶颈。因此，扩展这一向量，而不是显式地将所有部分形成hard segment，通过让模型自动（soft）搜索输入句子中与预测目标词相关的部分，用该部分来扩展向量。\nIntroduction  encoder-decoder架构：encoder将源句子编码为一个固定长度的向量，decoder从所编码的向量中输出翻译结构。一个潜在问题是，神经网络需要能够将源句子的所有必要信息压缩成一个固定长度的向量。这可能会使神经网络难以处理长句子，特别是那些比训练语料库中的句子更长的句子。\n为了解决这个问题，我们引入了扩展架构，共同学习对齐和翻译。每当生成的模型在翻译中生成一个单词的时候，它会（soft）搜索源句中最相关信息集中的位置。然后，该模型根据与源句位置相关的上下文向量和之前产生的所有目标词来预测当前目标词。\n这种方法的特点是，它不尝试将整个输入句子编码成一个固定长度的向量。而是将输入的句子编码为一系列向量序列，并在decoder时自适应地选择这些向量的一个子集。这使得翻译模型不必将输入中的所有信息，无论其长度如何，都压缩成一个固定长度的向量。\nRNN ENCODER–DECODER $$ h_{t}=f(x_{t},h_{t-1}) $$ $$ c=q(h_{1},\u0026hellip;,h_{T_{x}}) $$ $$ p(y)=\\prod_{t=1}^{T}p(y_{t}|c,y_{1},\u0026hellip;,y_{t-1}) $$ $$ p(y_{t}|c,y_{1},\u0026hellip;,y_{t-1})=g(y_{t-1},s_{t},c) $$\nLearning to Align and Translate Decoder  在新的架构中，计算： $$ p(y_{i}|x,y_{1},\u0026hellip;,y_{i-1})=g(y_{i-1},s_{i},c_{i}) $$ 其中，$s_{i}$是RNN在时间i的隐含状态： $$ s_{i}=f(s_{i-1},y_{i-1},c_{i}) $$ 在该公式中，引入了上下文向量$c_{i}$，基于每个目标词都有一个不同的上下文向量： $$ c_{i}=\\sum_{j=1}^{T_{x}}\\alpha _ {ij}h_{j} $$ 上下文向量$c_{i}$是$h_{i}$的加权和计算得到，$h_{i}$是输入序列映射得到的表征，每个$h_{i}$都包含整个输入序列的信息，重点关注输入序列的第$i$个字周围的部分。 $$ \\alpha _ {ij}=\\frac{exp(e_{ij})}{\\sum_{k=1}^{T_{x}}exp(e_{ik})} $$ $$ e_{ij}=a(s_{i-1},h_{j})=v_{a}^{T}tanh(W_{a}s_{i-1}\u002bU_{a}h_{j}) $$ $a$是一个对齐模型，对$j$周围的输入和$i$的输出匹配程度进行评分，该分数是基于RNN隐藏状态$s_{i-1}$和输入句子中的$h_{j}$。$a$为一个简单的前馈神经网络，$v_{a}^{T}$、$W_{a}$和$U_{a}$都是权重矩阵，可以与该模型的其他组成部分共同训练。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,33 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-10-17 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-10-17 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/summary\/",
+      "datePublished": "2022-10-18 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-10-18 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/align-and-translate\/",
       "keywords" : [  ]
   }
 </script>
-<title>Summary</title>
-  <meta property="og:title" content="Summary" />
+<title>Align and Translate</title>
+  <meta property="og:title" content="Align and Translate" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Dzmitry Bahdanau, Kyunghyun Cho, and Yoshua Bengio. 2015. Neural Machine Translation by Jointly Learning to Align and Translate. In Proceedings of ICLR 2015. (Citation: 20,776)
+ 这篇论文算是在自然语言处理(NLP)中或是encoder-decoder中第一个使用attention机制的工作，将attention机制用到了神经网络机器翻译(NMT)
+Abstract  最近提出的神经机器翻译模型通常属于encoder-decoder架构，即将输入编码成一个固定长度的向量，decoder利用向量生成输出翻译。
+本文中，我们推测使用一个固定长度的向量（hard）是提高这种基本结构性能的一个瓶颈。因此，扩展这一向量，而不是显式地将所有部分形成hard segment，通过让模型自动（soft）搜索输入句子中与预测目标词相关的部分，用该部分来扩展向量。
+Introduction  encoder-decoder架构：encoder将源句子编码为一个固定长度的向量，decoder从所编码的向量中输出翻译结构。一个潜在问题是，神经网络需要能够将源句子的所有必要信息压缩成一个固定长度的向量。这可能会使神经网络难以处理长句子，特别是那些比训练语料库中的句子更长的句子。
+为了解决这个问题，我们引入了扩展架构，共同学习对齐和翻译。每当生成的模型在翻译中生成一个单词的时候，它会（soft）搜索源句中最相关信息集中的位置。然后，该模型根据与源句位置相关的上下文向量和之前产生的所有目标词来预测当前目标词。
+这种方法的特点是，它不尝试将整个输入句子编码成一个固定长度的向量。而是将输入的句子编码为一系列向量序列，并在decoder时自适应地选择这些向量的一个子集。这使得翻译模型不必将输入中的所有信息，无论其长度如何，都压缩成一个固定长度的向量。
+RNN ENCODER–DECODER $$ h_{t}=f(x_{t},h_{t-1}) $$ $$ c=q(h_{1},&amp;hellip;,h_{T_{x}}) $$ $$ p(y)=\prod_{t=1}^{T}p(y_{t}|c,y_{1},&amp;hellip;,y_{t-1}) $$ $$ p(y_{t}|c,y_{1},&amp;hellip;,y_{t-1})=g(y_{t-1},s_{t},c) $$
+Learning to Align and Translate Decoder  在新的架构中，计算： $$ p(y_{i}|x,y_{1},&amp;hellip;,y_{i-1})=g(y_{i-1},s_{i},c_{i}) $$ 其中，$s_{i}$是RNN在时间i的隐含状态： $$ s_{i}=f(s_{i-1},y_{i-1},c_{i}) $$ 在该公式中，引入了上下文向量$c_{i}$，基于每个目标词都有一个不同的上下文向量： $$ c_{i}=\sum_{j=1}^{T_{x}}\alpha _ {ij}h_{j} $$ 上下文向量$c_{i}$是$h_{i}$的加权和计算得到，$h_{i}$是输入序列映射得到的表征，每个$h_{i}$都包含整个输入序列的信息，重点关注输入序列的第$i$个字周围的部分。 $$ \alpha _ {ij}=\frac{exp(e_{ij})}{\sum_{k=1}^{T_{x}}exp(e_{ik})} $$ $$ e_{ij}=a(s_{i-1},h_{j})=v_{a}^{T}tanh(W_{a}s_{i-1}&#43;U_{a}h_{j}) $$ $a$是一个对齐模型，对$j$周围的输入和$i$的输出匹配程度进行评分，该分数是基于RNN隐藏状态$s_{i-1}$和输入句子中的$h_{j}$。$a$为一个简单的前馈神经网络，$v_{a}^{T}$、$W_{a}$和$U_{a}$都是权重矩阵，可以与该模型的其他组成部分共同训练。" />
+  <meta name="description" content="Dzmitry Bahdanau, Kyunghyun Cho, and Yoshua Bengio. 2015. Neural Machine Translation by Jointly Learning to Align and Translate. In Proceedings of ICLR 2015. (Citation: 20,776)
+ 这篇论文算是在自然语言处理(NLP)中或是encoder-decoder中第一个使用attention机制的工作，将attention机制用到了神经网络机器翻译(NMT)
+Abstract  最近提出的神经机器翻译模型通常属于encoder-decoder架构，即将输入编码成一个固定长度的向量，decoder利用向量生成输出翻译。
+本文中，我们推测使用一个固定长度的向量（hard）是提高这种基本结构性能的一个瓶颈。因此，扩展这一向量，而不是显式地将所有部分形成hard segment，通过让模型自动（soft）搜索输入句子中与预测目标词相关的部分，用该部分来扩展向量。
+Introduction  encoder-decoder架构：encoder将源句子编码为一个固定长度的向量，decoder从所编码的向量中输出翻译结构。一个潜在问题是，神经网络需要能够将源句子的所有必要信息压缩成一个固定长度的向量。这可能会使神经网络难以处理长句子，特别是那些比训练语料库中的句子更长的句子。
+为了解决这个问题，我们引入了扩展架构，共同学习对齐和翻译。每当生成的模型在翻译中生成一个单词的时候，它会（soft）搜索源句中最相关信息集中的位置。然后，该模型根据与源句位置相关的上下文向量和之前产生的所有目标词来预测当前目标词。
+这种方法的特点是，它不尝试将整个输入句子编码成一个固定长度的向量。而是将输入的句子编码为一系列向量序列，并在decoder时自适应地选择这些向量的一个子集。这使得翻译模型不必将输入中的所有信息，无论其长度如何，都压缩成一个固定长度的向量。
+RNN ENCODER–DECODER $$ h_{t}=f(x_{t},h_{t-1}) $$ $$ c=q(h_{1},&amp;hellip;,h_{T_{x}}) $$ $$ p(y)=\prod_{t=1}^{T}p(y_{t}|c,y_{1},&amp;hellip;,y_{t-1}) $$ $$ p(y_{t}|c,y_{1},&amp;hellip;,y_{t-1})=g(y_{t-1},s_{t},c) $$
+Learning to Align and Translate Decoder  在新的架构中，计算： $$ p(y_{i}|x,y_{1},&amp;hellip;,y_{i-1})=g(y_{i-1},s_{i},c_{i}) $$ 其中，$s_{i}$是RNN在时间i的隐含状态： $$ s_{i}=f(s_{i-1},y_{i-1},c_{i}) $$ 在该公式中，引入了上下文向量$c_{i}$，基于每个目标词都有一个不同的上下文向量： $$ c_{i}=\sum_{j=1}^{T_{x}}\alpha _ {ij}h_{j} $$ 上下文向量$c_{i}$是$h_{i}$的加权和计算得到，$h_{i}$是输入序列映射得到的表征，每个$h_{i}$都包含整个输入序列的信息，重点关注输入序列的第$i$个字周围的部分。 $$ \alpha _ {ij}=\frac{exp(e_{ij})}{\sum_{k=1}^{T_{x}}exp(e_{ik})} $$ $$ e_{ij}=a(s_{i-1},h_{j})=v_{a}^{T}tanh(W_{a}s_{i-1}&#43;U_{a}h_{j}) $$ $a$是一个对齐模型，对$j$周围的输入和$i$的输出匹配程度进行评分，该分数是基于RNN隐藏状态$s_{i-1}$和输入句子中的$h_{j}$。$a$为一个简单的前馈神经网络，$v_{a}^{T}$、$W_{a}$和$U_{a}$都是权重矩阵，可以与该模型的其他组成部分共同训练。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +119,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,190 +152,146 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term">Summary</h1>
-        <div id="posts-list">
-          <section>
-            <h1 class="site-date-catalog">2022</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-10-17 00:00:00 UTC">Oct 17</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E6%9C%BA%E5%99%A8%E7%BF%BB%E8%AF%91/">机器翻译</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-07-18 00:00:00 UTC">Jul 18</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/segmentation/">Segmentation</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-15 00:00:00 UTC">May 15</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E6%80%BB%E7%BB%93%E4%B8%80/">总结（一）</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-04 00:00:00 UTC">May 04</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E7%A9%BA%E6%B4%9E%E5%8D%B7%E7%A7%AF/">空洞卷积</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-26 00:00:00 UTC">Apr 26</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/upsampling/">Upsampling</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-25 00:00:00 UTC">Apr 25</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%BB%8F%E5%85%B8%E8%AE%BA%E6%96%87%E6%80%BB%E7%BB%93/">图像分割经典论文总结</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-25 00:00:00 UTC">Apr 25</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/transformer%E4%B8%AD%E7%9A%84%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81/">Transformer中的位置编码</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-12 00:00:00 UTC">Apr 12</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/r-cnn%E7%B3%BB%E5%88%97%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93/">R-CNN系列简单总结</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-11 00:00:00 UTC">Apr 11</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/iounms/">IoU&amp;NMS</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-08 00:00:00 UTC">Apr 08</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/attentionself-attention/">Attention&amp;Self-Attention</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-06 00:00:00 UTC">Apr 06</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E5%88%86%E7%BB%84%E5%8D%B7%E7%A7%AF%E5%8F%AF%E5%88%86%E7%A6%BB%E5%8D%B7%E7%A7%AF/">分组卷积&amp;可分离卷积</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-01-24 00:00:00 UTC">Jan 24</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/batchnormalization/">BatchNormalization</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          <section>
-            <h1 class="site-date-catalog">2021</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2021-12-11 15:52:51 CST">Dec 11</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87/">模型评价指标</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">Align and Translate</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-10-18 00:00:00 UTC">
+                18 Oct 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Dzmitry Bahdanau, Kyunghyun Cho, and Yoshua Bengio. 2015. Neural Machine Translation by Jointly Learning to Align and Translate. In Proceedings of ICLR 2015. (Citation: 20,776)</p>
+<p>    这篇论文算是在自然语言处理(NLP)中或是encoder-decoder中第一个使用attention机制的工作，将attention机制用到了神经网络机器翻译(NMT)</p>
+<h2 id="abstract">Abstract</h2>
+<p>    最近提出的神经机器翻译模型通常属于encoder-decoder架构，即将输入编码成一个固定长度的向量，decoder利用向量生成输出翻译。<br>
+    本文中，我们推测使用一个固定长度的向量（hard）是提高这种基本结构性能的一个瓶颈。因此，扩展这一向量，而不是显式地将所有部分形成hard segment，通过让模型自动（soft）搜索输入句子中与预测目标词相关的部分，用该部分来扩展向量。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    encoder-decoder架构：encoder将源句子编码为一个固定长度的向量，decoder从所编码的向量中输出翻译结构。一个潜在问题是，神经网络需要能够将源句子的所有必要信息压缩成一个固定长度的向量。这可能会使神经网络难以处理长句子，特别是那些比训练语料库中的句子更长的句子。<br>
+    为了解决这个问题，我们引入了扩展架构，共同学习对齐和翻译。每当生成的模型在翻译中生成一个单词的时候，它会（soft）搜索源句中最相关信息集中的位置。然后，该模型根据与源句位置相关的上下文向量和之前产生的所有目标词来预测当前目标词。<br>
+    这种方法的特点是，它不尝试将整个输入句子编码成一个固定长度的向量。而是将输入的句子编码为一系列向量序列，并在decoder时自适应地选择这些向量的一个子集。这使得翻译模型不必将输入中的所有信息，无论其长度如何，都压缩成一个固定长度的向量。</p>
+<h2 id="rnn-encoderdecoder">RNN ENCODER–DECODER</h2>
+<p>$$
+h_{t}=f(x_{t},h_{t-1})
+$$
+$$
+c=q(h_{1},&hellip;,h_{T_{x}})
+$$
+$$
+p(y)=\prod_{t=1}^{T}p(y_{t}|c,y_{1},&hellip;,y_{t-1})
+$$
+$$
+p(y_{t}|c,y_{1},&hellip;,y_{t-1})=g(y_{t-1},s_{t},c)
+$$</p>
+<h2 id="learning-to-align-and-translate">Learning to Align and Translate</h2>
+<h3 id="decoder">Decoder</h3>
+<p>    在新的架构中，计算：
+$$
+p(y_{i}|x,y_{1},&hellip;,y_{i-1})=g(y_{i-1},s_{i},c_{i})
+$$
+    其中，$s_{i}$是RNN在时间i的隐含状态：
+$$
+s_{i}=f(s_{i-1},y_{i-1},c_{i})
+$$
+    在该公式中，引入了上下文向量$c_{i}$，基于每个目标词都有一个不同的上下文向量：
+$$
+c_{i}=\sum_{j=1}^{T_{x}}\alpha _ {ij}h_{j}
+$$
+    上下文向量$c_{i}$是$h_{i}$的加权和计算得到，$h_{i}$是输入序列映射得到的表征，每个$h_{i}$都包含整个输入序列的信息，重点关注输入序列的第$i$个字周围的部分。
+$$
+\alpha _ {ij}=\frac{exp(e_{ij})}{\sum_{k=1}^{T_{x}}exp(e_{ik})}
+$$
+$$
+e_{ij}=a(s_{i-1},h_{j})=v_{a}^{T}tanh(W_{a}s_{i-1}+U_{a}h_{j})
+$$
+    $a$是一个对齐模型，对$j$周围的输入和$i$的输出匹配程度进行评分，该分数是基于RNN隐藏状态$s_{i-1}$和输入句子中的$h_{j}$。$a$为一个简单的前馈神经网络，$v_{a}^{T}$、$W_{a}$和$U_{a}$都是权重矩阵，可以与该模型的其他组成部分共同训练。<br>
+    直观地说，在decoder中实现了一种注意机制。通过让decoder注意重要的地方，减轻了encoder必须将源句中的所有信息编码为固定长度向量的负担。
+<img src="/img/softsearch1.webp" alt="">
+    上图为一个例子：红色的部分就是对齐模型，其输入是encoder中的隐含状态$h_{j}$和decoder中的隐含状态$s_{i-1}$，计算他俩的匹配分数，作为输出，即权重。</p>
+<h3 id="encoderbi-rnn">Encoder：Bi-RNN</h3>
+<p><img src="/img/softsearch2.PNG" alt="">
+    Bi-RNN由正向和反向的RNN组成，正向RNN得到正向隐藏状态序列$(\overrightarrow{h_{1}},&hellip;,\overrightarrow{h_{T_{x}}})$，反向RNN得到反向隐藏状态序列$(\overleftarrow{h_{1}},&hellip;,\overleftarrow{h_{T_{x}}})$。
+    通过将正向隐藏状态和反向隐藏状态拼接得到$h_{j}$：
+$$
+h_{j}=\left [ \overrightarrow{h_{j}}^{T};\overleftarrow{h_{j}}^{T} \right ]^{T}
+$$</p>
+<h2 id="实验">实验</h2>
+<p>    RNNencdec：RNN Encoder–Decoder<br>
+    RNNsearch：使用该论文提出的方法RNNencdec-30, RNNsearch-30：句子长度30个单词<br>
+    RNNencdec-50, RNNsearch-50：句子长度50个单词<br>
+    Moses：基于短语的翻译系统</p>
+<h3 id="结果">结果</h3>
+<p><img src="/img/softsearch3.PNG" alt="">
+    带星号：训练的时间更长，直到性能不再提高<br>
+    No UNK：只对没有未知单词的句子进行了评估<br>
+    在所有情况下，RNNsearch都优于传统的RNNencdec。当只考虑包含RNNsearch的句子时，RNNsearch的性能与传统的基于短语的翻译系统（Moses）一样高。
+<img src="/img/softsearch4.PNG" alt="">
+    RNNencdec的性能随着句子长度的增加而显著下降；RNNsearch-30和RNNsearch-50对句子的长度都更具鲁棒性。特别是RNNsearch- 50，即使是长度为50或以上的句子，性能也没有下降。RNNsearch-30甚至优于RNNencdec-50，进一步证实了该模型相对于基本编解码器的优势。</p>
+<p><img src="/img/softsearch5.PNG" alt="">
+    权重可视化，每个图的x轴和y轴分别对应于源句（英语）和生成的翻译本（法语）中的单词。在每个矩阵的对角线上看到强权值。（a）中的“Area”和“zone”对应。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -338,6 +311,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

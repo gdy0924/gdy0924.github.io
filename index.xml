@@ -6,7 +6,94 @@
     <description>Recent content on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 16 Sep 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 19 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>BPE</title>
+      <link>https://gdy0924.github.io/posts/bpe/</link>
+      <pubDate>Wed, 19 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/bpe/</guid>
+      <description>Rico Sennrich, Barry Haddow, and Alexandra Birch. 2016. Neural Machine Translation of Rare Words with Subword Units. In Proceedings of ACL 2016. (Citation: 5,172)
+ 对于机器翻译，会维持一个固定大小的词表，每次通过softmax从词表选取一个词输出，直到遇到EOS字符。如果一个词语不在词表中，那么是无法生成的对应的词语，这样的问题是Out-Of-Vocabulary（OOV）。如果词表是character，虽然可以表示所有的单词，但是效果不好，而且由于粒度太小，难以训练。基于此，提出了一个折中方案，选取粒度小于单词，大于character的词表，BPE因此而产生。
+两个问题：生成不在词表中的词；模型遇到没有见过的词。之前的解决办法是back-off dictionary，即退回到字典。比如将source和target两两对应起来，使用OOV来表示，这样在翻译结果中出现OOV时，就用source所对应的target来代替，如下图所示；针对模型没有见过的词，直接从copy到target words中，但是这种处理策略也仅仅限于一些实体名称类的词汇，如人名，但也需要一些转换、音译等。上述的前提是source和target中的词总是能一一对应。 上图中，如果我们知道了第二个unk标记对应的是源句子中的ecotax，那么我们就可以查找词典得到翻译结果。
+因此，我们提出让模型从 subword表示中学习复合和音译。采用byte pair encoding（BPE），一种压缩算法，以适应分词的任务。BPE通过可变长度字符序列的固定大小的词汇表，来表示开放词汇表，这使其成为一种非常适合神经网络模型的分词策略。
+Subword Translation  在翻译中，会遇到名称类的词（通过subword复制或音译，如名字）、复合词（形态上类似的词，前缀后缀相同，如run、runer、running等）、同源词和外来词（通过subword语音和形态转换），称为透明翻译。这种通过subword来翻译则显得更有效率和意义。为了权衡词汇表大小和字词大小，简单的方法是只对罕见的词进行分割，使用子词翻译。但我们提出一种文本压缩的方法，byte pair encoding (BPE)。
+Byte Pair Encoding (BPE) （1）使用字母表初始化词汇表，并将每个单词后加上一个特殊的字符“·”，标记单词边界，以后用于字符恢复成单词；
+（2）统计上面的得到的字符集合，统计每个单词内 2-gram字符出现频次，得到频次最高的2-gram字符，例如（‘A’，‘B’）连续出现的频率最高，则以“AB”替换所有单词内出现的（‘A‘，‘B’），然后将该新词添加到词表中。这里注意：该新词以后可以作为一个整体与单词内其他字符合并；替换或合并不跨单词边界。
+（3）对步骤2循环进行多次，直到达到就得到我们预设的词表大小。
+假设词典中包含： {‘low’, ‘lowest’, ‘newer’, ‘wider’}，可得： 这样就将得到了er这样的字词，“lower”就被划分成了“ low er·”
+实验 different word segmentation techniques 德语语料库，tokens指sequence length，types指vocabulary size，UNK指未知token的数量，BPE合并59 50次，joint BPE合并89 500次
+translation performance English→German English→Russian</description>
+    </item>
+    
+    <item>
+      <title>Google NMTS</title>
+      <link>https://gdy0924.github.io/posts/google-nmts/</link>
+      <pubDate>Wed, 19 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/google-nmts/</guid>
+      <description>Yonghui Wu, Mike Schuster, Zhifeng Chen, Quoc V. Le, Mohammad Norouzi, Wolfgang Macherey, Maxim Krikun, Yuan Cao, Qin Gao, Klaus Macherey, Jeff Klingner, Apurva Shah, Melvin Johnson, Xiaobing Liu, Łukasz Kaiser, Stephan Gouws, Yoshikiyo Kato, Taku Kudo, Hideto Kazawa, Keith Stevens, George Kurian, Nishant Patil, Wei Wang, Cliff Young, Jason Smith, Jason Riesa, Alex Rudnick, Oriol Vinyals, Greg Corrado, Macduff Hughes, and Jeffrey Dean. 2016. Google&amp;rsquo;s Neural Machine Translation System: Bridging the Gap between Human and Machine Translation.</description>
+    </item>
+    
+    <item>
+      <title>Align and Translate</title>
+      <link>https://gdy0924.github.io/posts/align-and-translate/</link>
+      <pubDate>Tue, 18 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/align-and-translate/</guid>
+      <description>Dzmitry Bahdanau, Kyunghyun Cho, and Yoshua Bengio. 2015. Neural Machine Translation by Jointly Learning to Align and Translate. In Proceedings of ICLR 2015. (Citation: 20,776)
+ 这篇论文算是在自然语言处理(NLP)中或是encoder-decoder中第一个使用attention机制的工作，将attention机制用到了神经网络机器翻译(NMT)
+Abstract  最近提出的神经机器翻译模型通常属于encoder-decoder架构，即将输入编码成一个固定长度的向量，decoder利用向量生成输出翻译。
+本文中，我们推测使用一个固定长度的向量（hard）是提高这种基本结构性能的一个瓶颈。因此，扩展这一向量，而不是显式地将所有部分形成hard segment，通过让模型自动（soft）搜索输入句子中与预测目标词相关的部分，用该部分来扩展向量。
+Introduction  encoder-decoder架构：encoder将源句子编码为一个固定长度的向量，decoder从所编码的向量中输出翻译结构。一个潜在问题是，神经网络需要能够将源句子的所有必要信息压缩成一个固定长度的向量。这可能会使神经网络难以处理长句子，特别是那些比训练语料库中的句子更长的句子。
+为了解决这个问题，我们引入了扩展架构，共同学习对齐和翻译。每当生成的模型在翻译中生成一个单词的时候，它会（soft）搜索源句中最相关信息集中的位置。然后，该模型根据与源句位置相关的上下文向量和之前产生的所有目标词来预测当前目标词。
+这种方法的特点是，它不尝试将整个输入句子编码成一个固定长度的向量。而是将输入的句子编码为一系列向量序列，并在decoder时自适应地选择这些向量的一个子集。这使得翻译模型不必将输入中的所有信息，无论其长度如何，都压缩成一个固定长度的向量。
+RNN ENCODER–DECODER $$ h_{t}=f(x_{t},h_{t-1}) $$ $$ c=q(h_{1},&amp;hellip;,h_{T_{x}}) $$ $$ p(y)=\prod_{t=1}^{T}p(y_{t}|c,y_{1},&amp;hellip;,y_{t-1}) $$ $$ p(y_{t}|c,y_{1},&amp;hellip;,y_{t-1})=g(y_{t-1},s_{t},c) $$
+Learning to Align and Translate Decoder  在新的架构中，计算： $$ p(y_{i}|x,y_{1},&amp;hellip;,y_{i-1})=g(y_{i-1},s_{i},c_{i}) $$ 其中，$s_{i}$是RNN在时间i的隐含状态： $$ s_{i}=f(s_{i-1},y_{i-1},c_{i}) $$ 在该公式中，引入了上下文向量$c_{i}$，基于每个目标词都有一个不同的上下文向量： $$ c_{i}=\sum_{j=1}^{T_{x}}\alpha _ {ij}h_{j} $$ 上下文向量$c_{i}$是$h_{i}$的加权和计算得到，$h_{i}$是输入序列映射得到的表征，每个$h_{i}$都包含整个输入序列的信息，重点关注输入序列的第$i$个字周围的部分。 $$ \alpha _ {ij}=\frac{exp(e_{ij})}{\sum_{k=1}^{T_{x}}exp(e_{ik})} $$ $$ e_{ij}=a(s_{i-1},h_{j})=v_{a}^{T}tanh(W_{a}s_{i-1}+U_{a}h_{j}) $$ $a$是一个对齐模型，对$j$周围的输入和$i$的输出匹配程度进行评分，该分数是基于RNN隐藏状态$s_{i-1}$和输入句子中的$h_{j}$。$a$为一个简单的前馈神经网络，$v_{a}^{T}$、$W_{a}$和$U_{a}$都是权重矩阵，可以与该模型的其他组成部分共同训练。</description>
+    </item>
+    
+    <item>
+      <title>Seq2Seq</title>
+      <link>https://gdy0924.github.io/posts/seq2seq/</link>
+      <pubDate>Mon, 17 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/seq2seq/</guid>
+      <description>Ilya Sutskever, Oriol Vinyals, and Quoc V. Le. 2014. Sequence to Sequence Learning with Neural Networks. In Proceedings of NIPS 2014. (Citation: 5,452)
+ 原始RNN可以处理多种情况，如下： 最经典的RNN结构，输入、输出都是等长的序列数据，即n to n。
+但是针对一些任务，如机器翻译、智能对话等，其输入与输出不是等长的，那么最原始的RNN结构就不适用，因此提出了Seq2Seq结构（也叫Encoder-Decoder模型）
+Abstract  在本文中，我们提出了一种通用的端到端序列学习方法，它对序列结构做出最小的假设。我们的方法使用LSTM将输入序列映射到一个固定维数的向量，然后使用另一个深层LSTM从该向量解码得到目标序列。
+Introduction 使用一个LSTM来读取输入序列，一次一个时间步长，以获得大的固定维向量表示，然后使用另一个LSTM来从该向量中提取输出序列，上图所示。LSTM能够学习具有长期时间依赖性的数据，这使得它很适合该模型，因为其输入和相应的输出之间有相当大的时间延迟。
+The model  递归神经网络： $$ h_{t}=sigm(W^{hx}x_{t}+W^{hh}h_{t-1}) $$ $$ y_{t}=W^{yh}h_{t} $$ 在该架构中，LSTM的任务是估计条件概率$p(y_{1},&amp;hellip;,y_{T&#39;}|x_{1},&amp;hellip;,x_{T})$，$x_{1},&amp;hellip;,x_{T}$是输入序列，$y_{1},&amp;hellip;,y_{T&#39;}$是输出序列，$T&#39;$和$T$可能是不同的。
+计算条件概率首先得到输入序列的固定维数表征$v$，然后利用标准的LSTM计算概率，其中初始化的隐含状态为$v$： $$ p(y_{1},&amp;hellip;,y_{T&#39;}|x_{1},&amp;hellip;,x_{T})=\prod_{t=1}^{T&#39;}p(y_{t}|v,y_{1},&amp;hellip;,y_{t-1}) $$ EOS为结束符。
+对LSTM有以下修改：使用两个LSTM，一个用于输入序列，另一个用于输出序列；深层LSTM比浅层LSTM更好；反转输入句子的单词顺序更有效，文中给出的解释是：让一开始的几个词他们的距离变短了，即如果要将$a,b,c$映射为$\alpha ,\beta,\gamma$，如果倒序输入的话，$a $与$\alpha$的距离就会变短，$b $与$\beta$的距离就会相对接近。
+Experiments Decoding  贪心思想：每一次解码都选取概率最大的那个值进行输出。
+使用beam search decoder：对贪心策略一个改进，在每一个时间步，不再只保留当前分数最高的1个输出，而是保留num_beams个。当num_beams=1时集束搜索就退化成了贪心搜索。 图中的num_beams=2，也就是说每个时间步都会保留到当前步为止条件概率最优的2个序列，是一种牺牲时间换性能的方法。
+Experimental Results 虽然LSTM ensemble并没有达到最先进的水平，但这是第一次纯神经翻译系统在大型MT任务上的表现明显优于基于短语的SMT基线。
+Model Analysis 上图为可视化一些中间表征，可以看出这些表征对单词的顺序很敏感，而对用被动语态替换主动语态则相当不敏感。
+Performance on long sentences 该结构在长句子上表现得很好。</description>
+    </item>
+    
+    <item>
+      <title>机器翻译</title>
+      <link>https://gdy0924.github.io/posts/%E6%9C%BA%E5%99%A8%E7%BF%BB%E8%AF%91/</link>
+      <pubDate>Mon, 17 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/%E6%9C%BA%E5%99%A8%E7%BF%BB%E8%AF%91/</guid>
+      <description>简介  自然语言翻译：如将一段汉语文字自动转化为英语文字，汉语被称为源语言（Source Lan-guage），英语被称为目标语言（Target Language），下图所示： 现代机器翻译系统大多是基于数据驱动的方法——从数据中自动学习翻译知识，并运用这些知识对新的文本进行翻译。
+从机器翻译系统的组成上来看，通常可以抽象为两个部分： 资源：如果把机器翻译系统比作一辆汽车，资源就好比是可以使汽车运行的“汽油”，它包括很多内容，如翻译规则、双（单）语数据、知识库等翻译知识，且这些“知识”都是计算机可读的。值得一提的是, 如果没有翻译资源的支持，任何机器翻译系统都无法运行起来。
+系统：机器翻译算法的程序实现被称作系统，也就是机器翻译研究人员开发的软件。
+在资源方面，随着语料库语言学的发展，已经有大量的高质量的双语和单语数据（称为语料）被整理并且被数字化存储，因此可以说具备了研发机器翻译系统所需要的语料基础。因此在现有语料库的基础上，很多研究者把精力集中在“系统”研发上。
+简史  公元前 196 年，据说是可供考证的最久远的记载平行文字的历史遗迹。石碑由上至下刻有同一段埃及国王诏书的三种语言版本，最上面是古埃及象形文，中间是埃及草书，最下面是古希腊文： 萌芽期  十七世纪开始，很多学者就提出采用机器词典（电子词典）来克服语言障碍的想法，这种想法在当时是很超前的；世界上第一台通用电子数字计算机于 1946 年研制成功，至此使用机器进行翻译有了真正实现的可能；1949 年，Weaver 撰写了一篇名为 TRANSLATION 的备忘录，在这个备忘录中提出用密码学的方法解决人类语言翻译任务的想法，比如把汉语看成英语的一个加密文本，那么将汉语翻译成英语就类似于解密的过程，并且在这篇备忘录中第一次提出了机器翻译，正式开创了机器翻译的概念。
+虽然，在那个年代进行机器翻译的研究条件并不成熟，包括使用加密解密技术进行自动翻译的很多尝试很快也被验证是不可行的，但是这些早期的探索为后来机器翻译的发展提供了思想的火种。
+受挫期  20世纪50年代中期；1957 年，Noam Chomsky 在 Syntactic Structures 中描述了转换生成语法，使用数学方法来研究自然语言，建立了包括上下文有关语法、上下文无关语法等 4 种类型的语法。
+虽然在这段时间，使用机器进行翻译的议题越加火热，但美国基金资助组织委任自动语言处理咨询会评估一下机器翻译的可行性，于 1966 年 11 月公布了一个题为 LANGUAGE AND MACHINES 的报告，该报告全面否定了机器翻译的可行性，为机器翻译的研究泼了一盆冷水。
+从历史上看，包括机器翻译在内，很多人工智能领域在那个年代并不受“待见”，其主要原因在于当时的技术水平还比较低，而大家又对机器翻译等技术的期望过高。
+快速成长期  上世纪 70 年代中后期，特别是 80 年代到 90 年代初，国家之间往来日益密切，而不同语言之间形成的交流障碍愈发严重，传统的人工作业方式已经远远不能满足需求。与此同时，语料库语言学的发展也为机器翻译提供了新的思路。一方面，随着传统纸质文字资料不断电子化，计算机可读的语料越来越多，这使得人们可以用计算机对语言规律进行统计分析。另一方面，随着可用数据越来越多，用数学模型描述这些数据中的规律并进行推理逐渐成为可能。这也衍生出一类数学建模方法——数据驱动（Data-driven）的方法。
+从上世纪 90 年代到本世纪初，随着语料库的完善与高性能计算机的发展，统计机器翻译很快成为了当时机器翻译研究与应用的代表性方法。一个标志性的事件是谷歌公司推出了一个在线的免费自动翻译服务。
+爆发期  进入二十一世纪，统计机器翻译拉开了黄金发展期的序幕。在这一时期，各种基于统计机器翻译模型层出不穷，在 2013 年以后，机器学习的进步带来了机器翻译技术的进一步提升。特别是基于神经网络的深度学习方法在机器视觉、语音识别中被成功应用，带来性能的飞跃式提升。很快，深度学习方法也被用于机器翻译。
+现状 在汉语到英语的新闻翻译任务中，如果对译文进行人工评价（五分制），那么机器翻译的译文得分为 3.9 分，人工译文得分为 4.7 分（人的翻译也不是完美的）。可见，在这个任务中机器翻译表现不错，但是与人还有一定差距。</description>
+    </item>
+    
     <item>
       <title>FCOS</title>
       <link>https://gdy0924.github.io/posts/fcos/</link>

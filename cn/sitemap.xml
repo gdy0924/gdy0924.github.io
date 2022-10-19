@@ -2,8 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://gdy0924.github.io/posts/bpe/</loc>
+    <lastmod>2022-10-19T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://gdy0924.github.io/categories/</loc>
-    <lastmod>2022-09-16T00:00:00+00:00</lastmod>
+    <lastmod>2022-10-19T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -15,14 +18,14 @@
                 href="https://gdy0924.github.io/categories/"
                 />
   </url><url>
-    <loc>https://gdy0924.github.io/posts/fcos/</loc>
-    <lastmod>2022-09-16T00:00:00+00:00</lastmod>
+    <loc>https://gdy0924.github.io/posts/google-nmts/</loc>
+    <lastmod>2022-10-19T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/categories/paper/</loc>
-    <lastmod>2022-09-16T00:00:00+00:00</lastmod>
+    <lastmod>2022-10-19T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/</loc>
-    <lastmod>2022-09-16T00:00:00+00:00</lastmod>
+    <lastmod>2022-10-19T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -35,7 +38,7 @@
                 />
   </url><url>
     <loc>https://gdy0924.github.io/</loc>
-    <lastmod>2022-09-16T00:00:00+00:00</lastmod>
+    <lastmod>2022-10-19T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -46,6 +49,21 @@
                 hreflang="cn"
                 href="https://gdy0924.github.io/"
                 />
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/align-and-translate/</loc>
+    <lastmod>2022-10-18T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/seq2seq/</loc>
+    <lastmod>2022-10-17T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/categories/summary/</loc>
+    <lastmod>2022-10-17T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/%E6%9C%BA%E5%99%A8%E7%BF%BB%E8%AF%91/</loc>
+    <lastmod>2022-10-17T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/fcos/</loc>
+    <lastmod>2022-09-16T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/retinanet/</loc>
     <lastmod>2022-09-15T00:00:00+00:00</lastmod>
@@ -69,9 +87,6 @@
     <lastmod>2022-08-09T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/segmentation/</loc>
-    <lastmod>2022-07-18T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://gdy0924.github.io/categories/summary/</loc>
     <lastmod>2022-07-18T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/mixformer/</loc>

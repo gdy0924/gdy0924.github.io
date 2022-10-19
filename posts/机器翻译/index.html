@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/%E6%9C%BA%E5%99%A8%E7%BF%BB%E8%AF%91/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/%E6%9C%BA%E5%99%A8%E7%BF%BB%E8%AF%91/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "机器翻译",
+      "headline" : "机器翻译",
+      "description" : "简介  自然语言翻译：如将一段汉语文字自动转化为英语文字，汉语被称为源语言（Source Lan-guage），英语被称为目标语言（Target Language），下图所示： 现代机器翻译系统大多是基于数据驱动的方法——从数据中自动学习翻译知识，并运用这些知识对新的文本进行翻译。\n从机器翻译系统的组成上来看，通常可以抽象为两个部分： 资源：如果把机器翻译系统比作一辆汽车，资源就好比是可以使汽车运行的“汽油”，它包括很多内容，如翻译规则、双（单）语数据、知识库等翻译知识，且这些“知识”都是计算机可读的。值得一提的是, 如果没有翻译资源的支持，任何机器翻译系统都无法运行起来。\n系统：机器翻译算法的程序实现被称作系统，也就是机器翻译研究人员开发的软件。\n在资源方面，随着语料库语言学的发展，已经有大量的高质量的双语和单语数据（称为语料）被整理并且被数字化存储，因此可以说具备了研发机器翻译系统所需要的语料基础。因此在现有语料库的基础上，很多研究者把精力集中在“系统”研发上。\n简史  公元前 196 年，据说是可供考证的最久远的记载平行文字的历史遗迹。石碑由上至下刻有同一段埃及国王诏书的三种语言版本，最上面是古埃及象形文，中间是埃及草书，最下面是古希腊文： 萌芽期  十七世纪开始，很多学者就提出采用机器词典（电子词典）来克服语言障碍的想法，这种想法在当时是很超前的；世界上第一台通用电子数字计算机于 1946 年研制成功，至此使用机器进行翻译有了真正实现的可能；1949 年，Weaver 撰写了一篇名为 TRANSLATION 的备忘录，在这个备忘录中提出用密码学的方法解决人类语言翻译任务的想法，比如把汉语看成英语的一个加密文本，那么将汉语翻译成英语就类似于解密的过程，并且在这篇备忘录中第一次提出了机器翻译，正式开创了机器翻译的概念。\n虽然，在那个年代进行机器翻译的研究条件并不成熟，包括使用加密解密技术进行自动翻译的很多尝试很快也被验证是不可行的，但是这些早期的探索为后来机器翻译的发展提供了思想的火种。\n受挫期  20世纪50年代中期；1957 年，Noam Chomsky 在 Syntactic Structures 中描述了转换生成语法，使用数学方法来研究自然语言，建立了包括上下文有关语法、上下文无关语法等 4 种类型的语法。\n虽然在这段时间，使用机器进行翻译的议题越加火热，但美国基金资助组织委任自动语言处理咨询会评估一下机器翻译的可行性，于 1966 年 11 月公布了一个题为 LANGUAGE AND MACHINES 的报告，该报告全面否定了机器翻译的可行性，为机器翻译的研究泼了一盆冷水。\n从历史上看，包括机器翻译在内，很多人工智能领域在那个年代并不受“待见”，其主要原因在于当时的技术水平还比较低，而大家又对机器翻译等技术的期望过高。\n快速成长期  上世纪 70 年代中后期，特别是 80 年代到 90 年代初，国家之间往来日益密切，而不同语言之间形成的交流障碍愈发严重，传统的人工作业方式已经远远不能满足需求。与此同时，语料库语言学的发展也为机器翻译提供了新的思路。一方面，随着传统纸质文字资料不断电子化，计算机可读的语料越来越多，这使得人们可以用计算机对语言规律进行统计分析。另一方面，随着可用数据越来越多，用数学模型描述这些数据中的规律并进行推理逐渐成为可能。这也衍生出一类数学建模方法——数据驱动（Data-driven）的方法。\n从上世纪 90 年代到本世纪初，随着语料库的完善与高性能计算机的发展，统计机器翻译很快成为了当时机器翻译研究与应用的代表性方法。一个标志性的事件是谷歌公司推出了一个在线的免费自动翻译服务。\n爆发期  进入二十一世纪，统计机器翻译拉开了黄金发展期的序幕。在这一时期，各种基于统计机器翻译模型层出不穷，在 2013 年以后，机器学习的进步带来了机器翻译技术的进一步提升。特别是基于神经网络的深度学习方法在机器视觉、语音识别中被成功应用，带来性能的飞跃式提升。很快，深度学习方法也被用于机器翻译。\n现状 在汉语到英语的新闻翻译任务中，如果对译文进行人工评价（五分制），那么机器翻译的译文得分为 3.9 分，人工译文得分为 4.7 分（人的翻译也不是完美的）。可见，在这个任务中机器翻译表现不错，但是与人还有一定差距。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-10-17 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-10-17 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/%E6%9C%BA%E5%99%A8%E7%BF%BB%E8%AF%91\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>机器翻译</title>
+  <meta property="og:title" content="机器翻译" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="简介  自然语言翻译：如将一段汉语文字自动转化为英语文字，汉语被称为源语言（Source Lan-guage），英语被称为目标语言（Target Language），下图所示： 现代机器翻译系统大多是基于数据驱动的方法——从数据中自动学习翻译知识，并运用这些知识对新的文本进行翻译。
+从机器翻译系统的组成上来看，通常可以抽象为两个部分： 资源：如果把机器翻译系统比作一辆汽车，资源就好比是可以使汽车运行的“汽油”，它包括很多内容，如翻译规则、双（单）语数据、知识库等翻译知识，且这些“知识”都是计算机可读的。值得一提的是, 如果没有翻译资源的支持，任何机器翻译系统都无法运行起来。
+系统：机器翻译算法的程序实现被称作系统，也就是机器翻译研究人员开发的软件。
+在资源方面，随着语料库语言学的发展，已经有大量的高质量的双语和单语数据（称为语料）被整理并且被数字化存储，因此可以说具备了研发机器翻译系统所需要的语料基础。因此在现有语料库的基础上，很多研究者把精力集中在“系统”研发上。
+简史  公元前 196 年，据说是可供考证的最久远的记载平行文字的历史遗迹。石碑由上至下刻有同一段埃及国王诏书的三种语言版本，最上面是古埃及象形文，中间是埃及草书，最下面是古希腊文： 萌芽期  十七世纪开始，很多学者就提出采用机器词典（电子词典）来克服语言障碍的想法，这种想法在当时是很超前的；世界上第一台通用电子数字计算机于 1946 年研制成功，至此使用机器进行翻译有了真正实现的可能；1949 年，Weaver 撰写了一篇名为 TRANSLATION 的备忘录，在这个备忘录中提出用密码学的方法解决人类语言翻译任务的想法，比如把汉语看成英语的一个加密文本，那么将汉语翻译成英语就类似于解密的过程，并且在这篇备忘录中第一次提出了机器翻译，正式开创了机器翻译的概念。
+虽然，在那个年代进行机器翻译的研究条件并不成熟，包括使用加密解密技术进行自动翻译的很多尝试很快也被验证是不可行的，但是这些早期的探索为后来机器翻译的发展提供了思想的火种。
+受挫期  20世纪50年代中期；1957 年，Noam Chomsky 在 Syntactic Structures 中描述了转换生成语法，使用数学方法来研究自然语言，建立了包括上下文有关语法、上下文无关语法等 4 种类型的语法。
+虽然在这段时间，使用机器进行翻译的议题越加火热，但美国基金资助组织委任自动语言处理咨询会评估一下机器翻译的可行性，于 1966 年 11 月公布了一个题为 LANGUAGE AND MACHINES 的报告，该报告全面否定了机器翻译的可行性，为机器翻译的研究泼了一盆冷水。
+从历史上看，包括机器翻译在内，很多人工智能领域在那个年代并不受“待见”，其主要原因在于当时的技术水平还比较低，而大家又对机器翻译等技术的期望过高。
+快速成长期  上世纪 70 年代中后期，特别是 80 年代到 90 年代初，国家之间往来日益密切，而不同语言之间形成的交流障碍愈发严重，传统的人工作业方式已经远远不能满足需求。与此同时，语料库语言学的发展也为机器翻译提供了新的思路。一方面，随着传统纸质文字资料不断电子化，计算机可读的语料越来越多，这使得人们可以用计算机对语言规律进行统计分析。另一方面，随着可用数据越来越多，用数学模型描述这些数据中的规律并进行推理逐渐成为可能。这也衍生出一类数学建模方法——数据驱动（Data-driven）的方法。
+从上世纪 90 年代到本世纪初，随着语料库的完善与高性能计算机的发展，统计机器翻译很快成为了当时机器翻译研究与应用的代表性方法。一个标志性的事件是谷歌公司推出了一个在线的免费自动翻译服务。
+爆发期  进入二十一世纪，统计机器翻译拉开了黄金发展期的序幕。在这一时期，各种基于统计机器翻译模型层出不穷，在 2013 年以后，机器学习的进步带来了机器翻译技术的进一步提升。特别是基于神经网络的深度学习方法在机器视觉、语音识别中被成功应用，带来性能的飞跃式提升。很快，深度学习方法也被用于机器翻译。
+现状 在汉语到英语的新闻翻译任务中，如果对译文进行人工评价（五分制），那么机器翻译的译文得分为 3.9 分，人工译文得分为 4.7 分（人的翻译也不是完美的）。可见，在这个任务中机器翻译表现不错，但是与人还有一定差距。" />
+  <meta name="description" content="简介  自然语言翻译：如将一段汉语文字自动转化为英语文字，汉语被称为源语言（Source Lan-guage），英语被称为目标语言（Target Language），下图所示： 现代机器翻译系统大多是基于数据驱动的方法——从数据中自动学习翻译知识，并运用这些知识对新的文本进行翻译。
+从机器翻译系统的组成上来看，通常可以抽象为两个部分： 资源：如果把机器翻译系统比作一辆汽车，资源就好比是可以使汽车运行的“汽油”，它包括很多内容，如翻译规则、双（单）语数据、知识库等翻译知识，且这些“知识”都是计算机可读的。值得一提的是, 如果没有翻译资源的支持，任何机器翻译系统都无法运行起来。
+系统：机器翻译算法的程序实现被称作系统，也就是机器翻译研究人员开发的软件。
+在资源方面，随着语料库语言学的发展，已经有大量的高质量的双语和单语数据（称为语料）被整理并且被数字化存储，因此可以说具备了研发机器翻译系统所需要的语料基础。因此在现有语料库的基础上，很多研究者把精力集中在“系统”研发上。
+简史  公元前 196 年，据说是可供考证的最久远的记载平行文字的历史遗迹。石碑由上至下刻有同一段埃及国王诏书的三种语言版本，最上面是古埃及象形文，中间是埃及草书，最下面是古希腊文： 萌芽期  十七世纪开始，很多学者就提出采用机器词典（电子词典）来克服语言障碍的想法，这种想法在当时是很超前的；世界上第一台通用电子数字计算机于 1946 年研制成功，至此使用机器进行翻译有了真正实现的可能；1949 年，Weaver 撰写了一篇名为 TRANSLATION 的备忘录，在这个备忘录中提出用密码学的方法解决人类语言翻译任务的想法，比如把汉语看成英语的一个加密文本，那么将汉语翻译成英语就类似于解密的过程，并且在这篇备忘录中第一次提出了机器翻译，正式开创了机器翻译的概念。
+虽然，在那个年代进行机器翻译的研究条件并不成熟，包括使用加密解密技术进行自动翻译的很多尝试很快也被验证是不可行的，但是这些早期的探索为后来机器翻译的发展提供了思想的火种。
+受挫期  20世纪50年代中期；1957 年，Noam Chomsky 在 Syntactic Structures 中描述了转换生成语法，使用数学方法来研究自然语言，建立了包括上下文有关语法、上下文无关语法等 4 种类型的语法。
+虽然在这段时间，使用机器进行翻译的议题越加火热，但美国基金资助组织委任自动语言处理咨询会评估一下机器翻译的可行性，于 1966 年 11 月公布了一个题为 LANGUAGE AND MACHINES 的报告，该报告全面否定了机器翻译的可行性，为机器翻译的研究泼了一盆冷水。
+从历史上看，包括机器翻译在内，很多人工智能领域在那个年代并不受“待见”，其主要原因在于当时的技术水平还比较低，而大家又对机器翻译等技术的期望过高。
+快速成长期  上世纪 70 年代中后期，特别是 80 年代到 90 年代初，国家之间往来日益密切，而不同语言之间形成的交流障碍愈发严重，传统的人工作业方式已经远远不能满足需求。与此同时，语料库语言学的发展也为机器翻译提供了新的思路。一方面，随着传统纸质文字资料不断电子化，计算机可读的语料越来越多，这使得人们可以用计算机对语言规律进行统计分析。另一方面，随着可用数据越来越多，用数学模型描述这些数据中的规律并进行推理逐渐成为可能。这也衍生出一类数学建模方法——数据驱动（Data-driven）的方法。
+从上世纪 90 年代到本世纪初，随着语料库的完善与高性能计算机的发展，统计机器翻译很快成为了当时机器翻译研究与应用的代表性方法。一个标志性的事件是谷歌公司推出了一个在线的免费自动翻译服务。
+爆发期  进入二十一世纪，统计机器翻译拉开了黄金发展期的序幕。在这一时期，各种基于统计机器翻译模型层出不穷，在 2013 年以后，机器学习的进步带来了机器翻译技术的进一步提升。特别是基于神经网络的深度学习方法在机器视觉、语音识别中被成功应用，带来性能的飞跃式提升。很快，深度学习方法也被用于机器翻译。
+现状 在汉语到英语的新闻翻译任务中，如果对译文进行人工评价（五分制），那么机器翻译的译文得分为 3.9 分，人工译文得分为 4.7 分（人的翻译也不是完美的）。可见，在这个任务中机器翻译表现不错，但是与人还有一定差距。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">机器翻译</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-10-17 00:00:00 UTC">
+                17 Oct 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <h2 id="简介">简介</h2>
+<p>    自然语言翻译：如将一段汉语文字自动转化为英语文字，汉语被称为源语言（Source Lan-guage），英语被称为目标语言（Target Language），下图所示：
+<img src="/img/mtbook1.PNG" alt="">
+    现代机器翻译系统大多是基于数据驱动的方法——从数据中自动学习翻译知识，并运用这些知识对新的文本进行翻译。<br>
+    从机器翻译系统的组成上来看，通常可以抽象为两个部分：
+<img src="/img/mtbook2.PNG" alt="">
+    资源：如果把机器翻译系统比作一辆汽车，资源就好比是可以使汽车运行的“汽油”，它包括很多内容，如翻译规则、双（单）语数据、知识库等翻译知识，且这些“知识”都是计算机可读的。值得一提的是, 如果没有翻译资源的支持，任何机器翻译系统都无法运行起来。<br>
+    系统：机器翻译算法的程序实现被称作系统，也就是机器翻译研究人员开发的软件。<br>
+    在资源方面，随着语料库语言学的发展，已经有大量的高质量的双语和单语数据（称为语料）被整理并且被数字化存储，因此可以说具备了研发机器翻译系统所需要的语料基础。因此在现有语料库的基础上，很多研究者把精力集中在“系统”研发上。</p>
+<h2 id="简史">简史</h2>
+<p>    公元前 196 年，据说是可供考证的最久远的记载平行文字的历史遗迹。石碑由上至下刻有同一段埃及国王诏书的三种语言版本，最上面是古埃及象形文，中间是埃及草书，最下面是古希腊文：
+<img src="/img/mtbook3.PNG" alt=""></p>
+<h3 id="萌芽期">萌芽期</h3>
+<p>    十七世纪开始，很多学者就提出采用机器词典（电子词典）来克服语言障碍的想法，这种想法在当时是很超前的；世界上第一台通用电子数字计算机于 1946 年研制成功，至此使用机器进行翻译有了真正实现的可能；1949 年，Weaver 撰写了一篇名为 TRANSLATION 的备忘录，在这个备忘录中提出用密码学的方法解决人类语言翻译任务的想法，比如把汉语看成英语的一个加密文本，那么将汉语翻译成英语就类似于解密的过程，并且在这篇备忘录中第一次提出了机器翻译，正式开创了机器翻译的概念。<br>
+    虽然，在那个年代进行机器翻译的研究条件并不成熟，包括使用加密解密技术进行自动翻译的很多尝试很快也被验证是不可行的，但是这些早期的探索为后来机器翻译的发展提供了思想的火种。</p>
+<h3 id="受挫期">受挫期</h3>
+<p>    20世纪50年代中期；1957 年，Noam Chomsky 在 Syntactic Structures 中描述了转换生成语法，使用数学方法来研究自然语言，建立了包括上下文有关语法、上下文无关语法等 4 种类型的语法。<br>
+    虽然在这段时间，使用机器进行翻译的议题越加火热，但美国基金资助组织委任自动语言处理咨询会评估一下机器翻译的可行性，于 1966 年 11 月公布了一个题为 LANGUAGE AND MACHINES 的报告，该报告全面否定了机器翻译的可行性，为机器翻译的研究泼了一盆冷水。<br>
+    从历史上看，包括机器翻译在内，很多人工智能领域在那个年代并不受“待见”，其主要原因在于当时的技术水平还比较低，而大家又对机器翻译等技术的期望过高。</p>
+<h3 id="快速成长期">快速成长期</h3>
+<p>    上世纪 70 年代中后期，特别是 80 年代到 90 年代初，国家之间往来日益密切，而不同语言之间形成的交流障碍愈发严重，传统的人工作业方式已经远远不能满足需求。与此同时，语料库语言学的发展也为机器翻译提供了新的思路。一方面，随着传统纸质文字资料不断电子化，计算机可读的语料越来越多，这使得人们可以用计算机对语言规律进行统计分析。另一方面，随着可用数据越来越多，用数学模型描述这些数据中的规律并进行推理逐渐成为可能。这也衍生出一类数学建模方法——数据驱动（Data-driven）的方法。<br>
+    从上世纪 90 年代到本世纪初，随着语料库的完善与高性能计算机的发展，统计机器翻译很快成为了当时机器翻译研究与应用的代表性方法。一个标志性的事件是谷歌公司推出了一个在线的免费自动翻译服务。</p>
+<h3 id="爆发期">爆发期</h3>
+<p>    进入二十一世纪，统计机器翻译拉开了黄金发展期的序幕。在这一时期，各种基于统计机器翻译模型层出不穷，在 2013 年以后，机器学习的进步带来了机器翻译技术的进一步提升。特别是基于神经网络的深度学习方法在机器视觉、语音识别中被成功应用，带来性能的飞跃式提升。很快，深度学习方法也被用于机器翻译。</p>
+<h3 id="现状">现状</h3>
+<p><img src="/img/mtbook4.PNG" alt="">
+    在汉语到英语的新闻翻译任务中，如果对译文进行人工评价（五分制），那么机器翻译的译文得分为 3.9 分，人工译文得分为 4.7 分（人的翻译也不是完美的）。可见，在这个任务中机器翻译表现不错，但是与人还有一定差距。<br>
+    如果把人的译文作为参考答案，用机器翻译的译文与其进行比对（百分制），会发现机器翻译的得分只有 47 分。这个结果并不是说机器翻译的译文质量很差，它更多的是表明机器翻译系统可以生成一些与人工翻译不同的译文，机器翻译也具有一定的创造性。<br>
+    机器翻译与人工翻译还是存在差距的，特别是在翻译一些具有感情色彩的词语时，机器翻译的译文缺一些味道。人工翻译的优势是具有感情色彩，机器翻译最大的优势就是快速。</p>
+<h3 id="挑战">挑战</h3>
+<p>    自然语言翻译问题的复杂性极高：自然语言具有高度的概括性、灵活性、多样性，这些都很难用几个简单的模型和算法进行描述。不同人对同一句话的理解不尽相同，一个句子往往不存在绝对的标准译文，其潜在的译文几乎是不可穷尽的。<br>
+    计算机的“理解”与人类的“理解”存在鸿沟：人类的语言能力是经过长时间在多种外部环境因素共同作用下形成的，这种能力很难用计算机准确地刻画。况且人类的语言知识本身就很难描述，更不用说让计算机来理解，即使在我们日常生活中对话，还会出现一些语言理解带来的误解、差错呢，更别说让计算机去理解我们的语言了；人和机器翻译系统理解语言的目的不一样，人理解和使用语言是为了进行生活和工作，而机器翻译系统更多的是为了对某些数学上定义的目标函数进行优化。<br>
+    单一的方法无法解决多样的翻译问题：如世界上存在的语言多达几千种，如果选择任意两种语言进行互译就会产生上百万种翻译方向。虽然已经有研究者尝试用同一个框架甚至同一个翻译系统进行全语种的翻译，但是这类系统离真正可用还有很远的距离；不同的领域，不同的应用场景对翻译也有不同的需求。</p>
+<h2 id="分类">分类：</h2>
+<h3 id="基于规则的方法">基于规则的方法</h3>
+<p><img src="/img/mtbook5.PNG" alt="">
+    中间语言本质上是独立于源语言和目标语言的，但如何定义中间语言是一个关键问题。如果中间语言的表示能力不强，会导致源语言句子信息丢失，这自然会影响目标语言生成结果。因此，在早期的基于规则的机器翻译研究中，基于中间语言的方法明显弱于基于转换的机器翻译方法。
+<img src="/img/mtbook6.PNG" alt="">
+    通过上图中规则的翻译实例中可以看出，规则的使用和人类进行翻译时所使用的思想非常类似，可以说基于规则的方法实际上在试图描述人类进行翻译的思维过程。这会带来一些问题，人工书写翻译规则的主观因素重，有时与客观事实有一定差距。并且人工书写翻译规则的难度大，代价非常高。该方式的关键在于构建高质量的翻译规则库。</p>
+<h3 id="数据驱动">数据驱动</h3>
+<h4 id="基于实例的方法">基于实例的方法</h4>
+<p><img src="/img/mtbook8.PNG" alt="">
+    基本思想是在双语句库中找到与待翻译句子相似的实例，之后对实例的译文进行修改。对翻译实例的精确度要求非常高，一个实例的错误可能会导致一个句型都无法翻译正确；实例维护较为困难，实例库的构建通常需要单词级对齐的标注，而保证词对齐的质量是非常困难的工作，这也大大增加了实例库维护的难度。</p>
+<h4 id="统计机器翻译">统计机器翻译</h4>
+<p><img src="/img/mtbook7.PNG" alt="">
+    翻译模型从双语平行语料中学习翻译知识，得到短语表，短语表包含了各种单词的翻译及其概率，这样可以度量源语言和目标语言片段之间互为翻译的可能性大小；语言模型从单语语料中学习目标语言的词序列生成规律，来衡量目标语言译文的流畅性。<br>
+    虽然没有显性地使用人工翻译规则和模板，但仍存在缺点，该系统仍然需要人工定义翻译特征，这导致人工特征设计的好坏会对系统产生决定性影响，随着训练数据增多，统计机器翻译的模型（比如短语翻译表）会明显增大，对系统存储资源消耗较大。<br>
+    <strong>Word-based Models</strong>：
+<img src="/img/mtbook11.PNG" alt="">
+    <strong>Phrase-based Models</strong>：
+<img src="/img/mtbook12.PNG" alt="">
+    <strong>Syntax-based Models</strong>：<br>
+    解决汉英翻译中的不同距离下的依赖问题；对于每个句子，都可以用句法树描述它的结构。
+<img src="/img/mtbook13.PNG" alt="">
+<img src="/img/mtbook14.PNG" alt="">
+    PP介词短语，PU断词符，VP动词短语。</p>
+<h4 id="神经机器翻译">神经机器翻译</h4>
+<p><img src="/img/mtbook9.PNG" alt="">
+    机器翻译可以被看作一个序列到另一个序列的转化，可以由编码器-解码器（Encoder-Decoder）框架实现。其中，编码器把源语言序列进行编码，并提取源语言中的信息进行分布式表示，之后解码器再把这种信息转换为另一种语言的表达。</p>
+<h3 id="比较">比较</h3>
+<p><img src="/img/mtbook10.PNG" alt=""></p>
+<h2 id="评估">评估</h2>
+<p>    人工给出的译文为reference，机器翻译的译文为candidate。<br>
+    BLEU 根据精确率(Precision)衡量翻译的质量，而 ROUGE 根据召回率(Recall)衡量翻译的质量。（Precision的分子为预测为真值，Recall的分子是真实为真值）</p>
+<h3 id="bleu">BLEU</h3>
+<p>    Kishore Papineni, Salim Roukos, Todd Ward, and Wei-Jing Zhu. 2002. BLEU: a Method for Automatic Evaluation of Machine Translation. In Proceedings of ACL 2002. (Citation: 8,499)<br>
+    BLEU 根据精确率(Precision)衡量翻译的质量，（Bilingual evaluation understudy），BLEU 的分数取值范围是 0～1，分数越接近1，说明翻译的质量越高：
+$$
+BLUE=BP\times exp(\sum_{n=1}^{N}W_{n}\times log P_{n})
+$$
+    （1）BP：是惩罚因子，如果译文的长度小于最短的参考译文，则 BP 小于 1：
+$$
+BP=1,lc&gt; lr
+$$
+$$
+BP=exp(1-lr/lc),lc\leq  lr
+$$
+    （2）$W_{n}$ 指 n-gram的权重，一般设为均匀权重，即对于任意 n 都有$W_{n}=\frac{1}{n}$<br>
+    （3）$P_{n}$指n-gram 的精确率，计算译文 1-gram，2-gram，&hellip;，N-gram 的精确率，一般 N 设置为 4 即可，1-gram 精确率表示译文忠于原文的程度，而其他 n-gram 表示翻译的流畅程度。<br>
+    例子：<br>
+    机器翻译结果：a cat is on the table<br>
+    参考翻译：there is a cat on the table 
+$$
+P_{1}=\frac{|a,cat,is,on,the,table|}{|a,cat,is,on,the,table|}=1
+$$
+$$
+P_{2}=\frac{|(a,cat),(on,the),(the,table)|}{|(a,cat),(cat,is),(is,on),(on,the),(the,table)|}=\frac{3}{5}
+$$
+    该计算方式存在问题，当只预测一个单词，重复预测好几遍，此时的$P_{1}$为1，如：<br>
+    机器翻译结果：there there there there there<br>
+    参考翻译：there is a cat on the table <br>
+    此时，$P_{1}$为1，但其余n-gram的精确率会很低。<br>
+    另一个问题是当机器翻译的长度比较短时，BLEU 得分也会比较高，如：<br>
+    机器翻译结果：a cat<br>
+    参考翻译：there is a cat on the table
+$$
+P_{1}=\frac{|a,cat|}{|a,cat|}=1
+$$
+$$
+P_{2}=\frac{|(a,cat)|}{|(a,cat)|}=1
+$$
+    因此，引入惩罚因子，惩罚较短的预测。</p>
+<h2 id="rouge">ROUGE</h2>
+<p>    ROUGE 指标的全称是 (Recall-Oriented Understudy for Gisting Evaluation)，主要是基于召回率 (recall) 的。<br>
+    ROUGE-N: 在 N-gram 上计算召回率（主要介绍）<br>
+    ROUGE-L: 考虑了机器译文和参考译文之间的最长公共子序列<br>
+    ROUGE-W: 改进了ROUGE-L，用加权的方法计算最长公共子序列<br>
+    <strong>ROUGE-N</strong>：
+$$
+ROUGE-N=\frac{\sum_{S\in reference}\sum_{gram_{N}\in S}Count_{match}(gram_{N})}{\sum_{S\in reference}\sum_{gram_{N}\in S}Count(gram_{N})}
+$$
+    公式的分母是统计在参考译文中 N-gram 的个数，而分子是统计参考译文与机器译文共有的 N-gram 个数。<br>
+    例子：<br>
+    机器翻译结果： a cat is on the table<br>
+    参考翻译：there is a cat on the table 
+$$
+ROUGE-1=\frac{|a,cat,is,on,the,table|}{|there,is,a,cat,on,the,table|}=\frac{6}{7}
+$$
+$$
+ROUGE-2=\frac{|(a,cat),(on,the),(the,table)|}{|(there,is),(is,a),(a,cat),(cat,on),(on,the),(the,table)|}=\frac{1}{2}
+$$</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>
