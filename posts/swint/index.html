@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/summary/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/summary/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/swint/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/swint/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Summary",
-      "headline" : "Summary",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "SwinT",
+      "headline" : "SwinT",
+      "description" : "Liu, Ze et al. “Swin Transformer: Hierarchical Vision Transformer using Shifted Windows.” 2021 IEEE\/CVF International Conference on Computer Vision (ICCV) (2021): 9992-10002.(cite:2,920)\n 将transformer从nlp领域转移到cv领域，面临两个挑战：\n（1）与nlp中的基本单元（单词）不同，图像上的目标物体规则有很大的变化，特别是在目标检测任务中，多尺度很重要；\n（2）图像的分辨率很高，在很多密集预测的任务，如分割中，transformer很难处理，因为计算复杂度是呈二次方的，不可能将一个像素作为一个token。 本文提出了swin transformer，线性复杂度，如上图左边所示，从小尺寸的patch开始，逐步合并相邻patch，从而得到层级的结构。相比于之前的transformer，该结构可以生成多尺度的特征图，同时计算复杂度更小。\nMethod Overall Architecture 由四个stage组成，每经过一个stage，特征图的尺寸减半，从而得到层级的多尺度特征图。\n（1）Patch Partition：输入token为4×4大小的patch（ViT中是16×16）；\n（2）接着将token经过改进版的Swin Transformer Block（线性复杂度）；\n（3）Patch Merging：减少特征图大小的操作，合并2×2个相邻token； （4） Swin Transformer Block：右边图所示，包括局部窗口多头自注意力W-MSA和移位窗口窗口多头自注意力SW-MSA。\nShifted Window based Self-Attention Self-attention in non-overlapped windows  为了减少计算复杂度，在局部窗口内计算自注意力。假设每个窗口包含M×M个token，那么： $$ \\Omega (MSA)=4hwC^{2}\u002b2(hw)^{2}C $$ $$ \\Omega (W-MSA)=4hwC^{2}\u002b2M^{2}hwC $$ W-MSA与token的数量呈线性关系了。\nShifted window partitioning in successive blocks  基于窗口的自注意模块缺乏跨窗口的连接，为了在保持非重叠局部窗口计算效率的同时引入跨窗口连接，提出了一种窗口移位的方法。 上图中，为局部窗口自注意力，为了引入跨窗口连接，在下一层重新划分窗口，新窗口中包含了上一层窗口的边界，因此，在窗口内部进行计算的时候，就实现了跨窗口连接。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,35 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-10-27 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-10-27 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/summary\/",
+      "datePublished": "2022-10-20 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-10-20 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/swint\/",
       "keywords" : [  ]
   }
 </script>
-<title>Summary</title>
-  <meta property="og:title" content="Summary" />
+<title>SwinT</title>
+  <meta property="og:title" content="SwinT" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Liu, Ze et al. “Swin Transformer: Hierarchical Vision Transformer using Shifted Windows.” 2021 IEEE/CVF International Conference on Computer Vision (ICCV) (2021): 9992-10002.(cite:2,920)
+ 将transformer从nlp领域转移到cv领域，面临两个挑战：
+（1）与nlp中的基本单元（单词）不同，图像上的目标物体规则有很大的变化，特别是在目标检测任务中，多尺度很重要；
+（2）图像的分辨率很高，在很多密集预测的任务，如分割中，transformer很难处理，因为计算复杂度是呈二次方的，不可能将一个像素作为一个token。 本文提出了swin transformer，线性复杂度，如上图左边所示，从小尺寸的patch开始，逐步合并相邻patch，从而得到层级的结构。相比于之前的transformer，该结构可以生成多尺度的特征图，同时计算复杂度更小。
+Method Overall Architecture 由四个stage组成，每经过一个stage，特征图的尺寸减半，从而得到层级的多尺度特征图。
+（1）Patch Partition：输入token为4×4大小的patch（ViT中是16×16）；
+（2）接着将token经过改进版的Swin Transformer Block（线性复杂度）；
+（3）Patch Merging：减少特征图大小的操作，合并2×2个相邻token； （4） Swin Transformer Block：右边图所示，包括局部窗口多头自注意力W-MSA和移位窗口窗口多头自注意力SW-MSA。
+Shifted Window based Self-Attention Self-attention in non-overlapped windows  为了减少计算复杂度，在局部窗口内计算自注意力。假设每个窗口包含M×M个token，那么： $$ \Omega (MSA)=4hwC^{2}&#43;2(hw)^{2}C $$ $$ \Omega (W-MSA)=4hwC^{2}&#43;2M^{2}hwC $$ W-MSA与token的数量呈线性关系了。
+Shifted window partitioning in successive blocks  基于窗口的自注意模块缺乏跨窗口的连接，为了在保持非重叠局部窗口计算效率的同时引入跨窗口连接，提出了一种窗口移位的方法。 上图中，为局部窗口自注意力，为了引入跨窗口连接，在下一层重新划分窗口，新窗口中包含了上一层窗口的边界，因此，在窗口内部进行计算的时候，就实现了跨窗口连接。" />
+  <meta name="description" content="Liu, Ze et al. “Swin Transformer: Hierarchical Vision Transformer using Shifted Windows.” 2021 IEEE/CVF International Conference on Computer Vision (ICCV) (2021): 9992-10002.(cite:2,920)
+ 将transformer从nlp领域转移到cv领域，面临两个挑战：
+（1）与nlp中的基本单元（单词）不同，图像上的目标物体规则有很大的变化，特别是在目标检测任务中，多尺度很重要；
+（2）图像的分辨率很高，在很多密集预测的任务，如分割中，transformer很难处理，因为计算复杂度是呈二次方的，不可能将一个像素作为一个token。 本文提出了swin transformer，线性复杂度，如上图左边所示，从小尺寸的patch开始，逐步合并相邻patch，从而得到层级的结构。相比于之前的transformer，该结构可以生成多尺度的特征图，同时计算复杂度更小。
+Method Overall Architecture 由四个stage组成，每经过一个stage，特征图的尺寸减半，从而得到层级的多尺度特征图。
+（1）Patch Partition：输入token为4×4大小的patch（ViT中是16×16）；
+（2）接着将token经过改进版的Swin Transformer Block（线性复杂度）；
+（3）Patch Merging：减少特征图大小的操作，合并2×2个相邻token； （4） Swin Transformer Block：右边图所示，包括局部窗口多头自注意力W-MSA和移位窗口窗口多头自注意力SW-MSA。
+Shifted Window based Self-Attention Self-attention in non-overlapped windows  为了减少计算复杂度，在局部窗口内计算自注意力。假设每个窗口包含M×M个token，那么： $$ \Omega (MSA)=4hwC^{2}&#43;2(hw)^{2}C $$ $$ \Omega (W-MSA)=4hwC^{2}&#43;2M^{2}hwC $$ W-MSA与token的数量呈线性关系了。
+Shifted window partitioning in successive blocks  基于窗口的自注意模块缺乏跨窗口的连接，为了在保持非重叠局部窗口计算效率的同时引入跨窗口连接，提出了一种窗口移位的方法。 上图中，为局部窗口自注意力，为了引入跨窗口连接，在下一层重新划分窗口，新窗口中包含了上一层窗口的边界，因此，在窗口内部进行计算的时候，就实现了跨窗口连接。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +121,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,203 +154,131 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term">Summary</h1>
-        <div id="posts-list">
-          <section>
-            <h1 class="site-date-catalog">2022</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-10-27 00:00:00 UTC">Oct 27</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/graph-embedding/">Graph Embedding</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-10-17 00:00:00 UTC">Oct 17</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E6%9C%BA%E5%99%A8%E7%BF%BB%E8%AF%91/">机器翻译</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-07-18 00:00:00 UTC">Jul 18</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/segmentation/">Segmentation</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-15 00:00:00 UTC">May 15</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E6%80%BB%E7%BB%93%E4%B8%80/">总结（一）</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-04 00:00:00 UTC">May 04</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E7%A9%BA%E6%B4%9E%E5%8D%B7%E7%A7%AF/">空洞卷积</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-26 00:00:00 UTC">Apr 26</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/upsampling/">Upsampling</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-25 00:00:00 UTC">Apr 25</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%BB%8F%E5%85%B8%E8%AE%BA%E6%96%87%E6%80%BB%E7%BB%93/">图像分割经典论文总结</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-25 00:00:00 UTC">Apr 25</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/transformer%E4%B8%AD%E7%9A%84%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81/">Transformer中的位置编码</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-12 00:00:00 UTC">Apr 12</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/r-cnn%E7%B3%BB%E5%88%97%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93/">R-CNN系列简单总结</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-11 00:00:00 UTC">Apr 11</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/iounms/">IoU&amp;NMS</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-08 00:00:00 UTC">Apr 08</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/attentionself-attention/">Attention&amp;Self-Attention</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-06 00:00:00 UTC">Apr 06</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E5%88%86%E7%BB%84%E5%8D%B7%E7%A7%AF%E5%8F%AF%E5%88%86%E7%A6%BB%E5%8D%B7%E7%A7%AF/">分组卷积&amp;可分离卷积</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-01-24 00:00:00 UTC">Jan 24</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/batchnormalization/">BatchNormalization</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          <section>
-            <h1 class="site-date-catalog">2021</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2021-12-11 15:52:51 CST">Dec 11</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87/">模型评价指标</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">SwinT</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-10-20 00:00:00 UTC">
+                20 Oct 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Liu, Ze et al. “Swin Transformer: Hierarchical Vision Transformer using Shifted Windows.” 2021 IEEE/CVF International Conference on Computer Vision (ICCV) (2021): 9992-10002.(cite:2,920)</p>
+<p>    将transformer从nlp领域转移到cv领域，面临两个挑战：<br>
+    （1）与nlp中的基本单元（单词）不同，图像上的目标物体规则有很大的变化，特别是在目标检测任务中，多尺度很重要；<br>
+    （2）图像的分辨率很高，在很多密集预测的任务，如分割中，transformer很难处理，因为计算复杂度是呈二次方的，不可能将一个像素作为一个token。
+<img src="/img/swin1.PNG" alt="">
+    本文提出了swin transformer，线性复杂度，如上图左边所示，从小尺寸的patch开始，逐步合并相邻patch，从而得到层级的结构。相比于之前的transformer，该结构可以生成多尺度的特征图，同时计算复杂度更小。</p>
+<h2 id="method">Method</h2>
+<h3 id="overall-architecture">Overall Architecture</h3>
+<p><img src="/img/swin2.PNG" alt="">
+    由四个stage组成，每经过一个stage，特征图的尺寸减半，从而得到层级的多尺度特征图。<br>
+    （1）Patch Partition：输入token为4×4大小的patch（ViT中是16×16）；<br>
+    （2）接着将token经过改进版的Swin Transformer Block（线性复杂度）；<br>
+    （3）Patch Merging：减少特征图大小的操作，合并2×2个相邻token；
+<img src="/img/swin5.png" alt="">
+    （4） Swin Transformer Block：右边图所示，包括局部窗口多头自注意力W-MSA和移位窗口窗口多头自注意力SW-MSA。</p>
+<h3 id="shifted-window-based-self-attention">Shifted Window based Self-Attention</h3>
+<h4 id="self-attention-in-non-overlapped-windows">Self-attention in non-overlapped windows</h4>
+<p>    为了减少计算复杂度，在局部窗口内计算自注意力。假设每个窗口包含M×M个token，那么：
+$$
+\Omega (MSA)=4hwC^{2}+2(hw)^{2}C
+$$
+$$
+\Omega (W-MSA)=4hwC^{2}+2M^{2}hwC
+$$
+    W-MSA与token的数量呈线性关系了。</p>
+<h4 id="shifted-window-partitioning-in-successive-blocks">Shifted window partitioning in successive blocks</h4>
+<p>    基于窗口的自注意模块缺乏跨窗口的连接，为了在保持非重叠局部窗口计算效率的同时引入跨窗口连接，提出了一种窗口移位的方法。
+<img src="/img/swin3.PNG" alt="">
+    上图中，为局部窗口自注意力，为了引入跨窗口连接，在下一层重新划分窗口，新窗口中包含了上一层窗口的边界，因此，在窗口内部进行计算的时候，就实现了跨窗口连接。<br>
+    但是存在一个问题，生成了更多新的窗口，导致有的窗口内大小不是M×M。一个简单的方法是直接填充到固定大小，计算自注意力时对填充的部分进行mask。但是这种方式会带来额外的计算量，如下图所示，原来有4个窗口，移位之后，变成9个窗口，那么就要计算9个窗口的自注意力。
+<img src="/img/swin4.PNG" alt="">
+    提出了一个新的高效的方法，即向左上角的方向循环移动，移位之后还是4个窗口，没有增加计算量，但会导致原来不相邻的token移到同一个窗口中，这时使用mask来解决。</p>
+<h4 id="relative-position-bias">Relative position bias</h4>
+<p>$$
+Attention(Q,K,V)=SoftMax(QK^{T}/\sqrt{d}+B)V
+$$
+    引入偏置矩阵B</p>
+<h3 id="architecture-variants">Architecture Variants</h3>
+<p><img src="/img/swin6.PNG" alt=""></p>
+<h2 id="实验">实验</h2>
+<h3 id="image-classification-on-imagenet-1k">Image Classification on ImageNet-1K</h3>
+<p><img src="/img/swin7.PNG" alt="">
+<img src="/img/swin8.PNG" alt=""></p>
+<h3 id="object-detection-on-coco">Object Detection on COCO</h3>
+<p><img src="/img/swin9.PNG" alt=""></p>
+<p><img src="/img/swin10.PNG" alt=""></p>
+<h3 id="semantic-segmentation-on-ade20k">Semantic Segmentation on ADE20K</h3>
+<p><img src="/img/swin11.PNG" alt=""></p>
+<h3 id="ablation-study">Ablation Study</h3>
+<p><img src="/img/swin12.PNG" alt="">
+    前两行比较Shifted windows<br>
+    后边比较position embedding methods：没有位置编码，绝对位置编码，绝对位置编码+相对位置偏差，<br>
+    app.: the first scaled dot-product term</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -351,6 +298,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

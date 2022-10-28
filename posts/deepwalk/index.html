@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/summary/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/summary/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/deepwalk/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/deepwalk/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Summary",
-      "headline" : "Summary",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "DeepWalk",
+      "headline" : "DeepWalk",
+      "description" : "Perozzi, B., Al-Rfou, R., \u0026amp; Skiena, S. (2014). DeepWalk: online learning of social representations. Proceedings of the 20th ACM SIGKDD international conference on Knowledge discovery and data mining.(Cite:6,573)\n截断随机游走\u002bSkip-gram\n提出一种新的方法来学习顶点的潜在表示，利用截断随机游走方法（ truncated random walks）获得顶点的局部信息，类比于句子。\nDeepWalk将一个Graph作为输入，并产生一个潜在的表征形式作为输出：\n定义  $G=(V,E)$，$V$为顶点集合，$E$为边集合，$E\\subseteq (V\\times V)$\n带有标签的网络图结构（labeled graph）：$G=(V,E,X,Y)$，其中$X\\in \\mathbb{R}^{|V|\\times S}$，$S$为每个顶点的向量的维数，$X$即为将每个顶点的向量结合在一起形成的矩阵，$Y\\in \\mathbb{R}^{|V|\\times |y|}$，$y$是标签集合，$Y$Y则是每个顶点的标签构成的矩阵（以一个分类问题为例）；我们的目的是学习$X$。\n学习到的表征应具备一下特点：\n（1）适应性（可扩展）：表征必须能适应网络的变化；网络是一个动态的图，不断地会有新的节点和边添加进来，表征需要适应网络的正常演化。\n（2）属于同一个社群的节点有着类似的表示：网络中往往会出现一些特征相似的点构成的团状结构，这些节点表示成向量后必须相似。\n（3）低维\n（4）连续性\nRandom Walks  在网络上不断重复地随机选择游走路径，最终形成一条贯穿网络的路径。从某个特定的端点开始，游走的每一步都从与当前节点相连的边中随机选择一条，沿着选定的边移动到下一个顶点，不断重复这个过程。 使用随机游走有两个好处：\n（1）并行化，随机游走是局部的，对于一个大的网络来说，可以同时在不同的顶点开始进行一定长度的随机游走，多个随机游走同时进行，可以减少采样的时间。\n（2）适应性：可以适应图结构中的微小变化，而不需要全局重新计算。网络的变化通常是局部的点和边的变化，只会对部分随机游走路径产生影响，因此在网络的变化过程中不需要每一次都重新计算整个网络的随机游走路径。\nPower laws  随机游走的分布规律与NLP中句子序列在语料库中出现的规律有着类似的幂律分布特征： 横坐标为顶点遍历的次数\/单词出现的次数，纵坐标为定点数\/单词数。即出现次数越多的单词数量是占小部分的，大部分单词出现的次数不多。\n分布一样，就可以考虑使用一样的方法去解决。\nDeepWalk 输入：图$G$，窗口大小$w$，向量维度$d$，每个点作为随机游走序列起点的次数$\\gamma $，游走最大长度$t$；\n输出：顶点的向量表征$\\Phi \\in \\mathbb{R}^{|V|\\times d}$",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -69,15 +69,49 @@ code.has-jax {
       "copyrightYear" : "2022",
       "datePublished": "2022-10-27 00:00:00 \u002b0000 UTC",
       "dateModified" : "2022-10-27 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/summary\/",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/deepwalk\/",
       "keywords" : [  ]
   }
 </script>
-<title>Summary</title>
-  <meta property="og:title" content="Summary" />
+<title>DeepWalk</title>
+  <meta property="og:title" content="DeepWalk" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Perozzi, B., Al-Rfou, R., &amp;amp; Skiena, S. (2014). DeepWalk: online learning of social representations. Proceedings of the 20th ACM SIGKDD international conference on Knowledge discovery and data mining.(Cite:6,573)
+截断随机游走&#43;Skip-gram
+提出一种新的方法来学习顶点的潜在表示，利用截断随机游走方法（ truncated random walks）获得顶点的局部信息，类比于句子。
+DeepWalk将一个Graph作为输入，并产生一个潜在的表征形式作为输出：
+定义  $G=(V,E)$，$V$为顶点集合，$E$为边集合，$E\subseteq (V\times V)$
+带有标签的网络图结构（labeled graph）：$G=(V,E,X,Y)$，其中$X\in \mathbb{R}^{|V|\times S}$，$S$为每个顶点的向量的维数，$X$即为将每个顶点的向量结合在一起形成的矩阵，$Y\in \mathbb{R}^{|V|\times |y|}$，$y$是标签集合，$Y$Y则是每个顶点的标签构成的矩阵（以一个分类问题为例）；我们的目的是学习$X$。
+学习到的表征应具备一下特点：
+（1）适应性（可扩展）：表征必须能适应网络的变化；网络是一个动态的图，不断地会有新的节点和边添加进来，表征需要适应网络的正常演化。
+（2）属于同一个社群的节点有着类似的表示：网络中往往会出现一些特征相似的点构成的团状结构，这些节点表示成向量后必须相似。
+（3）低维
+（4）连续性
+Random Walks  在网络上不断重复地随机选择游走路径，最终形成一条贯穿网络的路径。从某个特定的端点开始，游走的每一步都从与当前节点相连的边中随机选择一条，沿着选定的边移动到下一个顶点，不断重复这个过程。 使用随机游走有两个好处：
+（1）并行化，随机游走是局部的，对于一个大的网络来说，可以同时在不同的顶点开始进行一定长度的随机游走，多个随机游走同时进行，可以减少采样的时间。
+（2）适应性：可以适应图结构中的微小变化，而不需要全局重新计算。网络的变化通常是局部的点和边的变化，只会对部分随机游走路径产生影响，因此在网络的变化过程中不需要每一次都重新计算整个网络的随机游走路径。
+Power laws  随机游走的分布规律与NLP中句子序列在语料库中出现的规律有着类似的幂律分布特征： 横坐标为顶点遍历的次数/单词出现的次数，纵坐标为定点数/单词数。即出现次数越多的单词数量是占小部分的，大部分单词出现的次数不多。
+分布一样，就可以考虑使用一样的方法去解决。
+DeepWalk 输入：图$G$，窗口大小$w$，向量维度$d$，每个点作为随机游走序列起点的次数$\gamma $，游走最大长度$t$；
+输出：顶点的向量表征$\Phi \in \mathbb{R}^{|V|\times d}$" />
+  <meta name="description" content="Perozzi, B., Al-Rfou, R., &amp;amp; Skiena, S. (2014). DeepWalk: online learning of social representations. Proceedings of the 20th ACM SIGKDD international conference on Knowledge discovery and data mining.(Cite:6,573)
+截断随机游走&#43;Skip-gram
+提出一种新的方法来学习顶点的潜在表示，利用截断随机游走方法（ truncated random walks）获得顶点的局部信息，类比于句子。
+DeepWalk将一个Graph作为输入，并产生一个潜在的表征形式作为输出：
+定义  $G=(V,E)$，$V$为顶点集合，$E$为边集合，$E\subseteq (V\times V)$
+带有标签的网络图结构（labeled graph）：$G=(V,E,X,Y)$，其中$X\in \mathbb{R}^{|V|\times S}$，$S$为每个顶点的向量的维数，$X$即为将每个顶点的向量结合在一起形成的矩阵，$Y\in \mathbb{R}^{|V|\times |y|}$，$y$是标签集合，$Y$Y则是每个顶点的标签构成的矩阵（以一个分类问题为例）；我们的目的是学习$X$。
+学习到的表征应具备一下特点：
+（1）适应性（可扩展）：表征必须能适应网络的变化；网络是一个动态的图，不断地会有新的节点和边添加进来，表征需要适应网络的正常演化。
+（2）属于同一个社群的节点有着类似的表示：网络中往往会出现一些特征相似的点构成的团状结构，这些节点表示成向量后必须相似。
+（3）低维
+（4）连续性
+Random Walks  在网络上不断重复地随机选择游走路径，最终形成一条贯穿网络的路径。从某个特定的端点开始，游走的每一步都从与当前节点相连的边中随机选择一条，沿着选定的边移动到下一个顶点，不断重复这个过程。 使用随机游走有两个好处：
+（1）并行化，随机游走是局部的，对于一个大的网络来说，可以同时在不同的顶点开始进行一定长度的随机游走，多个随机游走同时进行，可以减少采样的时间。
+（2）适应性：可以适应图结构中的微小变化，而不需要全局重新计算。网络的变化通常是局部的点和边的变化，只会对部分随机游走路径产生影响，因此在网络的变化过程中不需要每一次都重新计算整个网络的随机游走路径。
+Power laws  随机游走的分布规律与NLP中句子序列在语料库中出现的规律有着类似的幂律分布特征： 横坐标为顶点遍历的次数/单词出现的次数，纵坐标为定点数/单词数。即出现次数越多的单词数量是占小部分的，大部分单词出现的次数不多。
+分布一样，就可以考虑使用一样的方法去解决。
+DeepWalk 输入：图$G$，窗口大小$w$，向量维度$d$，每个点作为随机游走序列起点的次数$\gamma $，游走最大长度$t$；
+输出：顶点的向量表征$\Phi \in \mathbb{R}^{|V|\times d}$" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +137,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,203 +170,127 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term">Summary</h1>
-        <div id="posts-list">
-          <section>
-            <h1 class="site-date-catalog">2022</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-10-27 00:00:00 UTC">Oct 27</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/graph-embedding/">Graph Embedding</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-10-17 00:00:00 UTC">Oct 17</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E6%9C%BA%E5%99%A8%E7%BF%BB%E8%AF%91/">机器翻译</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-07-18 00:00:00 UTC">Jul 18</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/segmentation/">Segmentation</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-15 00:00:00 UTC">May 15</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E6%80%BB%E7%BB%93%E4%B8%80/">总结（一）</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-04 00:00:00 UTC">May 04</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E7%A9%BA%E6%B4%9E%E5%8D%B7%E7%A7%AF/">空洞卷积</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-26 00:00:00 UTC">Apr 26</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/upsampling/">Upsampling</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-25 00:00:00 UTC">Apr 25</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%BB%8F%E5%85%B8%E8%AE%BA%E6%96%87%E6%80%BB%E7%BB%93/">图像分割经典论文总结</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-25 00:00:00 UTC">Apr 25</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/transformer%E4%B8%AD%E7%9A%84%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81/">Transformer中的位置编码</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-12 00:00:00 UTC">Apr 12</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/r-cnn%E7%B3%BB%E5%88%97%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93/">R-CNN系列简单总结</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-11 00:00:00 UTC">Apr 11</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/iounms/">IoU&amp;NMS</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-08 00:00:00 UTC">Apr 08</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/attentionself-attention/">Attention&amp;Self-Attention</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-06 00:00:00 UTC">Apr 06</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E5%88%86%E7%BB%84%E5%8D%B7%E7%A7%AF%E5%8F%AF%E5%88%86%E7%A6%BB%E5%8D%B7%E7%A7%AF/">分组卷积&amp;可分离卷积</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-01-24 00:00:00 UTC">Jan 24</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/batchnormalization/">BatchNormalization</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          <section>
-            <h1 class="site-date-catalog">2021</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2021-12-11 15:52:51 CST">Dec 11</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87/">模型评价指标</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">DeepWalk</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-10-27 00:00:00 UTC">
+                27 Oct 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p><a href="https://arxiv.org/pdf/1403.6652.pdf">Perozzi, B., Al-Rfou, R., &amp; Skiena, S. (2014). DeepWalk: online learning of social representations. Proceedings of the 20th ACM SIGKDD international conference on Knowledge discovery and data mining.</a>(Cite:6,573)<br>
+    截断随机游走+Skip-gram<br>
+    提出一种新的方法来学习顶点的潜在表示，利用截断随机游走方法（ truncated random walks）获得顶点的局部信息，类比于句子。<br>
+    DeepWalk将一个Graph作为输入，并产生一个潜在的表征形式作为输出：</p>
+<p><img src="/img/deepwalk1.PNG" alt=""></p>
+<h2 id="定义">定义</h2>
+<p>    $G=(V,E)$，$V$为顶点集合，$E$为边集合，$E\subseteq (V\times V)$<br>
+    带有标签的网络图结构（labeled graph）：$G=(V,E,X,Y)$，其中$X\in \mathbb{R}^{|V|\times S}$，$S$为每个顶点的向量的维数，$X$即为将每个顶点的向量结合在一起形成的矩阵，$Y\in \mathbb{R}^{|V|\times |y|}$，$y$是标签集合，$Y$Y则是每个顶点的标签构成的矩阵（以一个分类问题为例）；我们的目的是学习$X$。<br>
+    学习到的表征应具备一下特点：<br>
+    （1）适应性（可扩展）：表征必须能适应网络的变化；网络是一个动态的图，不断地会有新的节点和边添加进来，表征需要适应网络的正常演化。<br>
+    （2）属于同一个社群的节点有着类似的表示：网络中往往会出现一些特征相似的点构成的团状结构，这些节点表示成向量后必须相似。<br>
+    （3）低维<br>
+    （4）连续性</p>
+<h2 id="random-walks">Random Walks</h2>
+<p>    在网络上不断重复地随机选择游走路径，最终形成一条贯穿网络的路径。从某个特定的端点开始，游走的每一步都从与当前节点相连的边中随机选择一条，沿着选定的边移动到下一个顶点，不断重复这个过程。
+<img src="/img/deepwalk2.jpg" alt="">
+    使用随机游走有两个好处：<br>
+    （1）并行化，随机游走是局部的，对于一个大的网络来说，可以同时在不同的顶点开始进行一定长度的随机游走，多个随机游走同时进行，可以减少采样的时间。<br>
+    （2）适应性：可以适应图结构中的微小变化，而不需要全局重新计算。网络的变化通常是局部的点和边的变化，只会对部分随机游走路径产生影响，因此在网络的变化过程中不需要每一次都重新计算整个网络的随机游走路径。</p>
+<h2 id="power-laws">Power laws</h2>
+<p>    随机游走的分布规律与NLP中句子序列在语料库中出现的规律有着类似的幂律分布特征：
+<img src="/img/deepwalk3.PNG" alt="">
+    横坐标为顶点遍历的次数/单词出现的次数，纵坐标为定点数/单词数。即出现次数越多的单词数量是占小部分的，大部分单词出现的次数不多。<br>
+    分布一样，就可以考虑使用一样的方法去解决。</p>
+<h2 id="deepwalk">DeepWalk</h2>
+<p><img src="/img/deepwalk4.PNG" alt="">
+    输入：图$G$，窗口大小$w$，向量维度$d$，每个点作为随机游走序列起点的次数$\gamma $，游走最大长度$t$；<br>
+    输出：顶点的向量表征$\Phi \in \mathbb{R}^{|V|\times d}$<br>
+    外循环$\gamma $次，即每个顶点作为起点的次数；内循环顶点次，针对每个顶点都进行一次随机游走+SkipGram</p>
+<h2 id="实验">实验</h2>
+<h3 id="数据集">数据集</h3>
+<p><img src="/img/deepwalk5.PNG" alt=""></p>
+<h3 id="结果">结果</h3>
+<p>    $\gamma $= 80，$w $= 10，$d$ = 128</p>
+<h4 id="blogcatalog">BlogCatalog</h4>
+<p><img src="/img/deepwalk6.PNG" alt="">
+    在标记数据小于20%的时候，DeepWalk的效果最好。</p>
+<h4 id="flickr">Flickr</h4>
+<p><img src="/img/deepwalk7.PNG" alt=""></p>
+<h4 id="youtube">YouTube</h4>
+<p><img src="/img/deepwalk8.PNG" alt="">
+    数据量太大以至于不能在SpectralClustering和Modularity两个baseline上测试；与之前的结果类似，随着训练数据的增加，DeepWalk的领先优势逐渐缩小。</p>
+<h4 id="参数敏感度">参数敏感度</h4>
+<p>    固定w=10，t=40，改变维度d、采样次数$\gamma $和训练数据比例TR。
+<img src="/img/deepwalk9.PNG" alt="">
+    （1）5a1 vs. 5a3：比较向量维度和训练数据比例的影响，得出一个模型的最优维数取决于训练样本的数量；<br>
+    （2）5a2 vs. 5a4：比较维度和采样次数的影响，在不同$\gamma $下，维度之间的相对性能相对稳定；两个图中不同$\gamma $值之间的相对差异是相当一致的，即使两个数据集的数据量级不同；<br>
+    以上还表明，模型的性能取决于$\gamma $数量，而模型的适当维数取决于可用的训练样本。<br>
+    （3）对于不同维度（5b1 vs. 5b3）和训练数据量（5b2 vs. 5b4）的结果非常一致，最初，增加$\gamma $对结果有很大的影响，但这种影响很快减慢</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -351,6 +310,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

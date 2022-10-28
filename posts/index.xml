@@ -6,7 +6,180 @@
     <description>Recent content in Posts on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 19 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 28 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>LINE</title>
+      <link>https://gdy0924.github.io/posts/line/</link>
+      <pubDate>Fri, 28 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/line/</guid>
+      <description>Tang, J., Qu, M., Wang, M., Zhang, M., Yan, J., &amp;amp; Mei, Q. (2015). LINE: Large-scale Information Network Embedding. Proceedings of the 24th International Conference on World Wide Web.(cite:4,030)
+ LINE也是一种基于邻域相似假设的方法，只不过与DeepWalk使用DFS构造邻域不同的是，LINE可以看作是一种使用BFS构造邻域的算法。此外，LINE还可以应用在带权图中(DeepWalk仅能用于无权图)。
+LINE适用于任意类型的信息网络图结构：无向图、有向图、加权图。提出了一种新的优化目标，同时保留了局部和全局网络结构。
+局部结构由网络中观察到的连接来表示，捕获了顶点之间的一阶相似度。在一个现实世界的网络中，许多存在的连接实际上没有被观察到，即在真实世界的数据中观察到的一阶相似度并不足以保留全局网络结构。因此，引入二阶相似度，通过顶点的共享邻域结构来决定的，即具有共享邻居可能相似的节点。
+以下图为例： 顶点6和顶点7之间的边的权重很大（很粗），即顶点6和顶点7具有很高的一阶相似度；虽然顶点5和顶点6之间没有联系，一阶相似度为0，但它们共享许多共同的邻居节点，即它们具有很高的二阶相似度。
+定义 Information Network  $G=(V,E)$，$e\in E$，$e=(i,j)$，$w_{ij}&amp;gt; 0$（本研究中，我们只考虑非负权值。）
+First-order Proximity  两个顶点之间的局部成对相似度，权值$w_{ij}$表示$i$和$j$之间的一阶相似度，如果$i$和$j$之间没有边，则一阶相似度为0。
+Second-order Proximity  例如，在社交网络中，拥有相似朋友的人往往有相似的兴趣，因此可能成为朋友。
+$u$和$v$之间的二阶邻近度是它们的邻域网络结构之间的相似性。定义$p_{i}=(w_{i,1},&amp;hellip;,w_{i,|V|})$为顶点$i$与其他所有节点的一阶相似度，那么$i$和$j$之间的二阶相似度由$p_{i}$和p_{j}之间的相似度决定。如果没有节点同时与$i$和$j$相连，则二阶相似度为0（如上图中的顶点5和顶点7）。
+LINE LINE with First-order Proximity $$ p_{1}(v_{i},v_{j})=\frac{1}{1+exp(-\overrightarrow{u} _ {i}^{T}\cdot \overrightarrow{u}_ {j})} $$ $$ \hat{p}_ {1}(i,j)=\frac{w_{ij}}{W},W=\sum_{(i,j)\in E}w_{ij} $$ 其中，$\overrightarrow{u}_ {i}$为顶点$i$的低维向量表示；$p_{1}(v_{i},v_{j})$为顶点$i$与$j$的联合概率；$\hat{p}_ {1}(i,j)$顶点$i$与$j$的经验概率。</description>
+    </item>
+    
+    <item>
+      <title>node2vec</title>
+      <link>https://gdy0924.github.io/posts/node2vec/</link>
+      <pubDate>Fri, 28 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/node2vec/</guid>
+      <description>Grover, A., &amp;amp; Leskovec, J. (2016). node2vec: Scalable Feature Learning for Networks. Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining.(cite:6,832)
+ 本文定义了节点网络邻域的概念，并设计了一个有偏的随机游走过程，有效地探索不同的邻域。
+在评价网络节点的相似性时涉及两个概念：
+同质性：指同属于一个集群的两个节点更加相似，如下图的节点 S1 和节点 u；
+结构等价性：指两个具有相似结构的节点更加相似，如下图的节点 S6 和节点u FRAMEWORK  对于每一个节点$u$，定义其邻域为$N_{S}(U)\subset V$。使用Skip-Gram方法。
+原来的采样策略是通过深度优先或者广度优先，来生成节点的邻域；如上图中，广度优先采样得到s1、s2、s3，深度优先采样得到邻域s4、s5、s6。
+网络中节点的预测任务经常在两种相似性之间交换：同质性和结构等价性。
+BFS 可以获得每个节点的邻居，强调的是局部微观视图，所以通过 BFS 采样的网络更能体现网络的局部结构，从而 Embedding 结果更能体现结构性；而 DFS 可以探索更大的网络结构，只有从更高的角度才能观察到更大的集群，所以其 Embedding 结果更能体现同质性。（这个答案是不是与我们的直觉有所相悖？）
+Random Walks  起始节点为$c_{0}=u$，$c_{i}$为游走中的第i个顶点，则从顶点v走向顶点x的概率计算公式为： $$ P(c_{i}=x|c_{i-1}=v)=\frac{\pi _ {vx}}{Z},if; (v,x)\in E $$ $$ P(c_{i}=x|c_{i-1}=v)=0,otherwise $$ 其中，$\pi _ {vx}$是节点v和节点x直接未归一化转移概率，$Z$是归一化常数。
+Search bias  最简单的方式是将边的权重直接作为$\pi _ {vx}$，权重越大，采样概率越大；但是这不能控制DFS或者BFS。而我们要将DFS和BFS进行结合。</description>
+    </item>
+    
+    <item>
+      <title>DeepWalk</title>
+      <link>https://gdy0924.github.io/posts/deepwalk/</link>
+      <pubDate>Thu, 27 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/deepwalk/</guid>
+      <description>Perozzi, B., Al-Rfou, R., &amp;amp; Skiena, S. (2014). DeepWalk: online learning of social representations. Proceedings of the 20th ACM SIGKDD international conference on Knowledge discovery and data mining.(Cite:6,573)
+截断随机游走+Skip-gram
+提出一种新的方法来学习顶点的潜在表示，利用截断随机游走方法（ truncated random walks）获得顶点的局部信息，类比于句子。
+DeepWalk将一个Graph作为输入，并产生一个潜在的表征形式作为输出：
+定义  $G=(V,E)$，$V$为顶点集合，$E$为边集合，$E\subseteq (V\times V)$
+带有标签的网络图结构（labeled graph）：$G=(V,E,X,Y)$，其中$X\in \mathbb{R}^{|V|\times S}$，$S$为每个顶点的向量的维数，$X$即为将每个顶点的向量结合在一起形成的矩阵，$Y\in \mathbb{R}^{|V|\times |y|}$，$y$是标签集合，$Y$Y则是每个顶点的标签构成的矩阵（以一个分类问题为例）；我们的目的是学习$X$。
+学习到的表征应具备一下特点：
+（1）适应性（可扩展）：表征必须能适应网络的变化；网络是一个动态的图，不断地会有新的节点和边添加进来，表征需要适应网络的正常演化。
+（2）属于同一个社群的节点有着类似的表示：网络中往往会出现一些特征相似的点构成的团状结构，这些节点表示成向量后必须相似。
+（3）低维
+（4）连续性
+Random Walks  在网络上不断重复地随机选择游走路径，最终形成一条贯穿网络的路径。从某个特定的端点开始，游走的每一步都从与当前节点相连的边中随机选择一条，沿着选定的边移动到下一个顶点，不断重复这个过程。 使用随机游走有两个好处：
+（1）并行化，随机游走是局部的，对于一个大的网络来说，可以同时在不同的顶点开始进行一定长度的随机游走，多个随机游走同时进行，可以减少采样的时间。
+（2）适应性：可以适应图结构中的微小变化，而不需要全局重新计算。网络的变化通常是局部的点和边的变化，只会对部分随机游走路径产生影响，因此在网络的变化过程中不需要每一次都重新计算整个网络的随机游走路径。
+Power laws  随机游走的分布规律与NLP中句子序列在语料库中出现的规律有着类似的幂律分布特征： 横坐标为顶点遍历的次数/单词出现的次数，纵坐标为定点数/单词数。即出现次数越多的单词数量是占小部分的，大部分单词出现的次数不多。
+分布一样，就可以考虑使用一样的方法去解决。
+DeepWalk 输入：图$G$，窗口大小$w$，向量维度$d$，每个点作为随机游走序列起点的次数$\gamma $，游走最大长度$t$；
+输出：顶点的向量表征$\Phi \in \mathbb{R}^{|V|\times d}$</description>
+    </item>
+    
+    <item>
+      <title>Graph Embedding</title>
+      <link>https://gdy0924.github.io/posts/graph-embedding/</link>
+      <pubDate>Thu, 27 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/graph-embedding/</guid>
+      <description>图：无向图 &amp;amp; 有向图；有权图 &amp;amp; 无权图；入度 &amp;amp; 出度
+存储：邻接矩阵；邻接表
+Graph：图结构，顶点+关系边，比如社交网络中新的关系的预测，社群构建，推荐系统
+Embedding：是压缩的表示，如word embedding，用一个低维的向量表示一个物体；embedding向量的性质是能使距离相近的向量对应的物体有相近的含义，比如 Embedding(复仇者联盟)和Embedding(钢铁侠)之间的距离就会很接近，但 Embedding(复仇者联盟)和Embedding(乱世佳人)的距离就会远一些；Embedding甚至还具有数学运算的关系，比如Embedding（马德里）-Embedding（西班牙）+Embedding(法国)≈Embedding(巴黎)
+one hot encoding：对离散特征，特别是id类特征进行编码，但由于one hot encoding的维度等于物体的总数，比如阿里的商品one hot encoding的维度就至少是千万量级的。这样的编码方式对于商品来说是极端稀疏的。
+Graph Embedding 技术将图中的节点以低维稠密向量的形式进行表达，要求在原始图中相似 ( 不同的方法对相似的定义不同 ) 的节点其在低维表达空间也接近。
+如果邻接矩阵描述图中节点之间的连接。它是一个|V| x |V|矩阵，其中|V|是图中节点的个数。矩阵中的每一列和每一行表示一个节点。矩阵中的非零值表示两个节点相连。使用邻接矩阵作为大型图的特征空间几乎是不可能的。因此需要Graph Embedding。
+word2vec  让embedding方法空前流行，是Graph Embedding的基础。
+Word2Vec是轻量级的神经网络，其模型仅仅包括输入层、隐藏层和输出层，模型框架根据输入输出的不同，主要包括CBOW和Skip-gram模型： CBOW（左边）：知道当前词的上下文的情况下预测当前词；
+Skip-gram（右边）：知道了当前词的情况下，对当前词的上下文进行预测。
+输入为one-hot编码，训练得到的参数矩阵为压缩后的单词的向量，输出为one-hot编码： 上图中，共$V$个单词，隐含层节点数为$N$个，词向量即为输入向量矩阵$W_{V\times N}$中每一行对应的权重向量：  由神经网络得出的这个词向量的维度（与隐含层节点数一致）一般情况下要远远小于词语总数 V 的大小，所以Word2vec 本质上是一种降维操作——把词语从 one-hot encoder 形式的表示降维到 Word2vec 形式的表示。
+将graph比成整个语料库，图中的节点类比成单词，我们是否也可以通过共现关系对graph中的node进行embedding？
+Graph Embedding  word2vec是建立在“序列”样本（如句子）的基础上，并不适合图结构。
+挑战：
+（1）属性选择：节点的“良好”向量表示应保留图的结构和单个节点之间的连接；第一个挑战是选择嵌入应该保留的图形属性；考虑到图中所定义的距离度量和属性过多，这种选择可能很困难，性能可能取决于实际的应用场景。
+（2）可扩展性：大多数真实网络都很大，包含大量节点和边；嵌入方法应具有可扩展性，能够处理大型图。
+（3）嵌入的维数：实际嵌入时很难找到表示的最佳维数；例如，较高的维数可能会提高重建精度，但具有较高的时间和空间复杂性；较低的维度虽然时间、空间复杂度低，但无疑会损失很多图中原有的信息。
+分类：
+（1）顶点嵌入：每个顶点(节点)用其自身的向量表示进行编码。这种嵌入一般用于在顶点层次上执行可视化或预测。比如，在2D平面上显示顶点，或者基于顶点相似性预测新的连接。（DeepWalk，LINE，node2vec，SDNE）
+（2）图嵌入：用单个向量表示整个图。这种嵌入用于在图的层次上做出预测，可者想要比较或可视化整个图。例如，比较化学结构。（基于doc2vec）</description>
+    </item>
+    
+    <item>
+      <title>HITL-CPS</title>
+      <link>https://gdy0924.github.io/posts/hitl-cps/</link>
+      <pubDate>Wed, 26 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/hitl-cps/</guid>
+      <description>A Survey on Human-in-the-Loop Applications Towards an Internet of All
+CPS： cyber-physical systems
+IoT：Internet of Things
+CPS与IoT可以说是同义的
+Human-in-the-loop Cyber-Physical Systems (HiLCPS)：cyber-physical systems that take human interaction into consideration.
+ 人类的存在和行为不再被视为一个外部的未知因素，而是成为系统的关键部分。当前涉及控制回路的CPS开始将人类作为这种控制的固有要素。例如，飞机驾驶员仍然可以自行决定何时使用自动驾驶仪或手动控制飞机；汽车的巡航控制系统只需保持期望的速度，而不考虑驾驶员的行为。
+未来的HiLCPS将加强人类与控制循环之间的联系。
+Evolution of HITL system 在初始阶段，从可用的传感器中收集与人类个体相关的数据；然后对这些数据进行处理，以推断人类的状态；最后，系统基于/不基于当前确定的条件执行某个动作。
+Technologies for Supporting HiTLCPSs Data Acquisition in HiTLCPSs  HiTLCPSs以前使用过物理特性，如定位（GPS定位）、重要信号（心率、心电图、脑电图、体温）、运动、声音，这些信息可以直接从物理现实中获得。还有许多非物理属性，比如交流行为（例如，电话、短信），或社交习惯。
+这些变化可能被处理来推断当前的环境条件和人类活动、心理状态和意图。在这方面，已经提出了几种类型的架构和技术。
+（1）无线传感器网络（WSNs）
+（2）body-coupled communication（BBC）：信号在传感器之间通过电脉冲直接通过人体组织传输到一个数据收集点。
+State Inference in HiTLCPS  推断出人类的意图、身体和心理状态、情绪和行为。
+TAXONOMIC VIEW OF THE HITL PARADIGM Taxonomic View of Current HiTL Applications  （1）Human Control：操作员负责调整可能影响系统的某些设定点，自主机器人CPS完成/人类向网络物理系统发出命令，然后物理系统携带必要的操作并报告结果</description>
+    </item>
+    
+    <item>
+      <title>HITL-Medical Image Analysis</title>
+      <link>https://gdy0924.github.io/posts/hitl-medical-image-analysis/</link>
+      <pubDate>Tue, 25 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/hitl-medical-image-analysis/</guid>
+      <description>A Survey on Active Learning and Human-in-the-Loop Deep Learning for Medical Image Analysis
+Abstract  关注四个关键领域：
+（1）主动学习：选择最佳的数据来进标注，以获得最佳的性能；
+（2）与模型的输出进行交互：使用迭代反馈来引导模型优化给定的预测，提供有效的方法来对预测进行反馈；
+（3）实际考虑：开发和部署需要考虑的关键问题；
+（4）未来前景和未解决的问题
+医学成像正受益于分析图像等结构化数据的新计算技术的发展。图像采集、分析和解释算法的发展正在推动创新，特别是在重建、跟踪、分割和建模等领域。
+Introduction  医学图像很难解释，需要事先的专业知识来理解。数据所需的经验和先验知识意味着在标注医疗数据时，往往存在观察者间和观察者内部的可变性。因此，在标注时，需要许多oracles标注并达成共识。
+深度学习处理医疗图像在实际应用中，往往存在以下问题：复杂医学数据、法规遵从性问题和是否信任模型。
+在临床中，医学图像处理存在三个挑战：
+（1）缺乏训练数据；
+（2）最终训练结果：虽然DL效果很好，但是在关键安全问题上，即使是最小的错误也会导致灾难性的结果，因此，得到可信的输出需要对预测结果进行交互式解释，即用户必须有能力纠正和覆盖自动预测的结果；
+（3）透明度和可解释性：目前，大多数DL模型是黑盒模型，用户在解释、理解或纠正模型如何进行预测的有效方法上是有限的。
+Active Learning Query Types  Stream-based Selective Sampling：传入未标注的数据点的连续流
+Membership Query Synthesis：假设我们不是从真实的数据点分布中提取，而是生成一个需要标注的数据；模型可能不知道分布中不可见的区域，因此无法生成这些区域的数据；目前，基于GAN展示出了巨大的前景。
+Pool-based Sampling：存在一个大的未标注的真实数据集，从中选择样本进行标注；这种方法计算代价可能很高，因为每个迭代都需要对分布中的每个数据点进行度量评估；然而，却是与DL方法结合最有前景的，因为DL方法本质上依赖于批处理。
+Evaluating Informativeness Uncertainty  一个数据的预测结果越不确定，我们可以通过在训练集中包含该样本的真值中获得的信息就越多（least confident sampling）。
+The Power of Ensembles for Active Learning in Image Classification
+Representativeness  不确定性有可能只关注小区域的分布，而训练样本从同一区域的分布将引入冗余的选择策略，或可能倾斜模型对一个特定区域的分布。增加代表性度量旨在鼓励选择策略从分布的不同区域进行抽样，并增加样本的多样性.
+Generative Adversarial Networks for Informativeness  使用鉴别器D输出作为所提出的分割的不确定性的度量，并使用该度量对未标记数据集中的样本进行排序。
+Learning Active Learning  试图通过以前的样本选择结果的经验来了解信息最丰富的样本是什么，提供了一种更有效地选择样本的潜在方法，但所采用的启发式方法需要是可解释的。</description>
+    </item>
+    
+    <item>
+      <title>HITL-Health Informatics</title>
+      <link>https://gdy0924.github.io/posts/hitl-health-informatics/</link>
+      <pubDate>Sat, 22 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/hitl-health-informatics/</guid>
+      <description>Interactive machine learning for health informatics: when do we need the human-in-the-loop?
+Abstract  ML的目标是开发算法，可以学习和随着时间的推移而改进，并用于预测。大多数ML研究人员专注于 automatic machine learning（aML），例如，在语音识别、推荐系统、自动驾驶等。该方法极大地受益于大量训练数据。在样本数据较少的情况下，交互机器学习（interactive machine learning，iML）会更有用。
+我们将iML暂且定义为：algorithms that can interact with agents and can optimize their learning behavior through these interactions, where the agents can also be human.即human-in-the-loop，人类的专业知识可以通过启发式的样本选择来帮助减少指数搜索空间，大大降低了复杂性。
+Introduction  医疗数据可能包含缺失的数据、嘈杂的数据、肮脏的数据、不需要的数据，最重要的是，医疗领域的一些问题难以用自动机器学习算法来解决。自动机器学习算法的复杂性阻碍了非专家无法应用这类解决方案。因此，领域专家的知识的集成是必不可少的，而领域专家与数据的交互将极大地增强知识发现过程。协同两个领域：人机交互（HCI）和数据挖掘（KDD）
+iML：algorithms that can interact with both computational agents and human agents（oracles） and can optimize their learning behavior through these interactions.
+From black-box to glass-box: where is the human-in-the-loop?</description>
+    </item>
+    
+    <item>
+      <title>SwinT</title>
+      <link>https://gdy0924.github.io/posts/swint/</link>
+      <pubDate>Thu, 20 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/swint/</guid>
+      <description>Liu, Ze et al. “Swin Transformer: Hierarchical Vision Transformer using Shifted Windows.” 2021 IEEE/CVF International Conference on Computer Vision (ICCV) (2021): 9992-10002.(cite:2,920)
+ 将transformer从nlp领域转移到cv领域，面临两个挑战：
+（1）与nlp中的基本单元（单词）不同，图像上的目标物体规则有很大的变化，特别是在目标检测任务中，多尺度很重要；
+（2）图像的分辨率很高，在很多密集预测的任务，如分割中，transformer很难处理，因为计算复杂度是呈二次方的，不可能将一个像素作为一个token。 本文提出了swin transformer，线性复杂度，如上图左边所示，从小尺寸的patch开始，逐步合并相邻patch，从而得到层级的结构。相比于之前的transformer，该结构可以生成多尺度的特征图，同时计算复杂度更小。
+Method Overall Architecture 由四个stage组成，每经过一个stage，特征图的尺寸减半，从而得到层级的多尺度特征图。
+（1）Patch Partition：输入token为4×4大小的patch（ViT中是16×16）；
+（2）接着将token经过改进版的Swin Transformer Block（线性复杂度）；
+（3）Patch Merging：减少特征图大小的操作，合并2×2个相邻token； （4） Swin Transformer Block：右边图所示，包括局部窗口多头自注意力W-MSA和移位窗口窗口多头自注意力SW-MSA。
+Shifted Window based Self-Attention Self-attention in non-overlapped windows  为了减少计算复杂度，在局部窗口内计算自注意力。假设每个窗口包含M×M个token，那么： $$ \Omega (MSA)=4hwC^{2}+2(hw)^{2}C $$ $$ \Omega (W-MSA)=4hwC^{2}+2M^{2}hwC $$ W-MSA与token的数量呈线性关系了。
+Shifted window partitioning in successive blocks  基于窗口的自注意模块缺乏跨窗口的连接，为了在保持非重叠局部窗口计算效率的同时引入跨窗口连接，提出了一种窗口移位的方法。 上图中，为局部窗口自注意力，为了引入跨窗口连接，在下一层重新划分窗口，新窗口中包含了上一层窗口的边界，因此，在窗口内部进行计算的时候，就实现了跨窗口连接。</description>
+    </item>
+    
     <item>
       <title>BPE</title>
       <link>https://gdy0924.github.io/posts/bpe/</link>

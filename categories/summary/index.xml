@@ -6,7 +6,35 @@
     <description>Recent content in Summary on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 17 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/summary/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 27 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/summary/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Graph Embedding</title>
+      <link>https://gdy0924.github.io/posts/graph-embedding/</link>
+      <pubDate>Thu, 27 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/graph-embedding/</guid>
+      <description>图：无向图 &amp;amp; 有向图；有权图 &amp;amp; 无权图；入度 &amp;amp; 出度
+存储：邻接矩阵；邻接表
+Graph：图结构，顶点+关系边，比如社交网络中新的关系的预测，社群构建，推荐系统
+Embedding：是压缩的表示，如word embedding，用一个低维的向量表示一个物体；embedding向量的性质是能使距离相近的向量对应的物体有相近的含义，比如 Embedding(复仇者联盟)和Embedding(钢铁侠)之间的距离就会很接近，但 Embedding(复仇者联盟)和Embedding(乱世佳人)的距离就会远一些；Embedding甚至还具有数学运算的关系，比如Embedding（马德里）-Embedding（西班牙）+Embedding(法国)≈Embedding(巴黎)
+one hot encoding：对离散特征，特别是id类特征进行编码，但由于one hot encoding的维度等于物体的总数，比如阿里的商品one hot encoding的维度就至少是千万量级的。这样的编码方式对于商品来说是极端稀疏的。
+Graph Embedding 技术将图中的节点以低维稠密向量的形式进行表达，要求在原始图中相似 ( 不同的方法对相似的定义不同 ) 的节点其在低维表达空间也接近。
+如果邻接矩阵描述图中节点之间的连接。它是一个|V| x |V|矩阵，其中|V|是图中节点的个数。矩阵中的每一列和每一行表示一个节点。矩阵中的非零值表示两个节点相连。使用邻接矩阵作为大型图的特征空间几乎是不可能的。因此需要Graph Embedding。
+word2vec  让embedding方法空前流行，是Graph Embedding的基础。
+Word2Vec是轻量级的神经网络，其模型仅仅包括输入层、隐藏层和输出层，模型框架根据输入输出的不同，主要包括CBOW和Skip-gram模型： CBOW（左边）：知道当前词的上下文的情况下预测当前词；
+Skip-gram（右边）：知道了当前词的情况下，对当前词的上下文进行预测。
+输入为one-hot编码，训练得到的参数矩阵为压缩后的单词的向量，输出为one-hot编码： 上图中，共$V$个单词，隐含层节点数为$N$个，词向量即为输入向量矩阵$W_{V\times N}$中每一行对应的权重向量：  由神经网络得出的这个词向量的维度（与隐含层节点数一致）一般情况下要远远小于词语总数 V 的大小，所以Word2vec 本质上是一种降维操作——把词语从 one-hot encoder 形式的表示降维到 Word2vec 形式的表示。
+将graph比成整个语料库，图中的节点类比成单词，我们是否也可以通过共现关系对graph中的node进行embedding？
+Graph Embedding  word2vec是建立在“序列”样本（如句子）的基础上，并不适合图结构。
+挑战：
+（1）属性选择：节点的“良好”向量表示应保留图的结构和单个节点之间的连接；第一个挑战是选择嵌入应该保留的图形属性；考虑到图中所定义的距离度量和属性过多，这种选择可能很困难，性能可能取决于实际的应用场景。
+（2）可扩展性：大多数真实网络都很大，包含大量节点和边；嵌入方法应具有可扩展性，能够处理大型图。
+（3）嵌入的维数：实际嵌入时很难找到表示的最佳维数；例如，较高的维数可能会提高重建精度，但具有较高的时间和空间复杂性；较低的维度虽然时间、空间复杂度低，但无疑会损失很多图中原有的信息。
+分类：
+（1）顶点嵌入：每个顶点(节点)用其自身的向量表示进行编码。这种嵌入一般用于在顶点层次上执行可视化或预测。比如，在2D平面上显示顶点，或者基于顶点相似性预测新的连接。（DeepWalk，LINE，node2vec，SDNE）
+（2）图嵌入：用单个向量表示整个图。这种嵌入用于在图的层次上做出预测，可者想要比较或可视化整个图。例如，比较化学结构。（基于doc2vec）</description>
+    </item>
+    
     <item>
       <title>机器翻译</title>
       <link>https://gdy0924.github.io/posts/%E6%9C%BA%E5%99%A8%E7%BF%BB%E8%AF%91/</link>

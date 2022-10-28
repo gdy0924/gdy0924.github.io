@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/hitl-medical-image-analysis/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/hitl-medical-image-analysis/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "HITL-Medical Image Analysis",
+      "headline" : "HITL-Medical Image Analysis",
+      "description" : "A Survey on Active Learning and Human-in-the-Loop Deep Learning for Medical Image Analysis\nAbstract  关注四个关键领域：\n（1）主动学习：选择最佳的数据来进标注，以获得最佳的性能；\n（2）与模型的输出进行交互：使用迭代反馈来引导模型优化给定的预测，提供有效的方法来对预测进行反馈；\n（3）实际考虑：开发和部署需要考虑的关键问题；\n（4）未来前景和未解决的问题\n医学成像正受益于分析图像等结构化数据的新计算技术的发展。图像采集、分析和解释算法的发展正在推动创新，特别是在重建、跟踪、分割和建模等领域。\nIntroduction  医学图像很难解释，需要事先的专业知识来理解。数据所需的经验和先验知识意味着在标注医疗数据时，往往存在观察者间和观察者内部的可变性。因此，在标注时，需要许多oracles标注并达成共识。\n深度学习处理医疗图像在实际应用中，往往存在以下问题：复杂医学数据、法规遵从性问题和是否信任模型。\n在临床中，医学图像处理存在三个挑战：\n（1）缺乏训练数据；\n（2）最终训练结果：虽然DL效果很好，但是在关键安全问题上，即使是最小的错误也会导致灾难性的结果，因此，得到可信的输出需要对预测结果进行交互式解释，即用户必须有能力纠正和覆盖自动预测的结果；\n（3）透明度和可解释性：目前，大多数DL模型是黑盒模型，用户在解释、理解或纠正模型如何进行预测的有效方法上是有限的。\nActive Learning Query Types  Stream-based Selective Sampling：传入未标注的数据点的连续流\nMembership Query Synthesis：假设我们不是从真实的数据点分布中提取，而是生成一个需要标注的数据；模型可能不知道分布中不可见的区域，因此无法生成这些区域的数据；目前，基于GAN展示出了巨大的前景。\nPool-based Sampling：存在一个大的未标注的真实数据集，从中选择样本进行标注；这种方法计算代价可能很高，因为每个迭代都需要对分布中的每个数据点进行度量评估；然而，却是与DL方法结合最有前景的，因为DL方法本质上依赖于批处理。\nEvaluating Informativeness Uncertainty  一个数据的预测结果越不确定，我们可以通过在训练集中包含该样本的真值中获得的信息就越多（least confident sampling）。\nThe Power of Ensembles for Active Learning in Image Classification\nRepresentativeness  不确定性有可能只关注小区域的分布，而训练样本从同一区域的分布将引入冗余的选择策略，或可能倾斜模型对一个特定区域的分布。增加代表性度量旨在鼓励选择策略从分布的不同区域进行抽样，并增加样本的多样性.\nGenerative Adversarial Networks for Informativeness  使用鉴别器D输出作为所提出的分割的不确定性的度量，并使用该度量对未标记数据集中的样本进行排序。\nLearning Active Learning  试图通过以前的样本选择结果的经验来了解信息最丰富的样本是什么，提供了一种更有效地选择样本的潜在方法，但所采用的启发式方法需要是可解释的。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-10-25 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-10-25 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/hitl-medical-image-analysis\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>HITL-Medical Image Analysis</title>
+  <meta property="og:title" content="HITL-Medical Image Analysis" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="A Survey on Active Learning and Human-in-the-Loop Deep Learning for Medical Image Analysis
+Abstract  关注四个关键领域：
+（1）主动学习：选择最佳的数据来进标注，以获得最佳的性能；
+（2）与模型的输出进行交互：使用迭代反馈来引导模型优化给定的预测，提供有效的方法来对预测进行反馈；
+（3）实际考虑：开发和部署需要考虑的关键问题；
+（4）未来前景和未解决的问题
+医学成像正受益于分析图像等结构化数据的新计算技术的发展。图像采集、分析和解释算法的发展正在推动创新，特别是在重建、跟踪、分割和建模等领域。
+Introduction  医学图像很难解释，需要事先的专业知识来理解。数据所需的经验和先验知识意味着在标注医疗数据时，往往存在观察者间和观察者内部的可变性。因此，在标注时，需要许多oracles标注并达成共识。
+深度学习处理医疗图像在实际应用中，往往存在以下问题：复杂医学数据、法规遵从性问题和是否信任模型。
+在临床中，医学图像处理存在三个挑战：
+（1）缺乏训练数据；
+（2）最终训练结果：虽然DL效果很好，但是在关键安全问题上，即使是最小的错误也会导致灾难性的结果，因此，得到可信的输出需要对预测结果进行交互式解释，即用户必须有能力纠正和覆盖自动预测的结果；
+（3）透明度和可解释性：目前，大多数DL模型是黑盒模型，用户在解释、理解或纠正模型如何进行预测的有效方法上是有限的。
+Active Learning Query Types  Stream-based Selective Sampling：传入未标注的数据点的连续流
+Membership Query Synthesis：假设我们不是从真实的数据点分布中提取，而是生成一个需要标注的数据；模型可能不知道分布中不可见的区域，因此无法生成这些区域的数据；目前，基于GAN展示出了巨大的前景。
+Pool-based Sampling：存在一个大的未标注的真实数据集，从中选择样本进行标注；这种方法计算代价可能很高，因为每个迭代都需要对分布中的每个数据点进行度量评估；然而，却是与DL方法结合最有前景的，因为DL方法本质上依赖于批处理。
+Evaluating Informativeness Uncertainty  一个数据的预测结果越不确定，我们可以通过在训练集中包含该样本的真值中获得的信息就越多（least confident sampling）。
+The Power of Ensembles for Active Learning in Image Classification
+Representativeness  不确定性有可能只关注小区域的分布，而训练样本从同一区域的分布将引入冗余的选择策略，或可能倾斜模型对一个特定区域的分布。增加代表性度量旨在鼓励选择策略从分布的不同区域进行抽样，并增加样本的多样性.
+Generative Adversarial Networks for Informativeness  使用鉴别器D输出作为所提出的分割的不确定性的度量，并使用该度量对未标记数据集中的样本进行排序。
+Learning Active Learning  试图通过以前的样本选择结果的经验来了解信息最丰富的样本是什么，提供了一种更有效地选择样本的潜在方法，但所采用的启发式方法需要是可解释的。" />
+  <meta name="description" content="A Survey on Active Learning and Human-in-the-Loop Deep Learning for Medical Image Analysis
+Abstract  关注四个关键领域：
+（1）主动学习：选择最佳的数据来进标注，以获得最佳的性能；
+（2）与模型的输出进行交互：使用迭代反馈来引导模型优化给定的预测，提供有效的方法来对预测进行反馈；
+（3）实际考虑：开发和部署需要考虑的关键问题；
+（4）未来前景和未解决的问题
+医学成像正受益于分析图像等结构化数据的新计算技术的发展。图像采集、分析和解释算法的发展正在推动创新，特别是在重建、跟踪、分割和建模等领域。
+Introduction  医学图像很难解释，需要事先的专业知识来理解。数据所需的经验和先验知识意味着在标注医疗数据时，往往存在观察者间和观察者内部的可变性。因此，在标注时，需要许多oracles标注并达成共识。
+深度学习处理医疗图像在实际应用中，往往存在以下问题：复杂医学数据、法规遵从性问题和是否信任模型。
+在临床中，医学图像处理存在三个挑战：
+（1）缺乏训练数据；
+（2）最终训练结果：虽然DL效果很好，但是在关键安全问题上，即使是最小的错误也会导致灾难性的结果，因此，得到可信的输出需要对预测结果进行交互式解释，即用户必须有能力纠正和覆盖自动预测的结果；
+（3）透明度和可解释性：目前，大多数DL模型是黑盒模型，用户在解释、理解或纠正模型如何进行预测的有效方法上是有限的。
+Active Learning Query Types  Stream-based Selective Sampling：传入未标注的数据点的连续流
+Membership Query Synthesis：假设我们不是从真实的数据点分布中提取，而是生成一个需要标注的数据；模型可能不知道分布中不可见的区域，因此无法生成这些区域的数据；目前，基于GAN展示出了巨大的前景。
+Pool-based Sampling：存在一个大的未标注的真实数据集，从中选择样本进行标注；这种方法计算代价可能很高，因为每个迭代都需要对分布中的每个数据点进行度量评估；然而，却是与DL方法结合最有前景的，因为DL方法本质上依赖于批处理。
+Evaluating Informativeness Uncertainty  一个数据的预测结果越不确定，我们可以通过在训练集中包含该样本的真值中获得的信息就越多（least confident sampling）。
+The Power of Ensembles for Active Learning in Image Classification
+Representativeness  不确定性有可能只关注小区域的分布，而训练样本从同一区域的分布将引入冗余的选择策略，或可能倾斜模型对一个特定区域的分布。增加代表性度量旨在鼓励选择策略从分布的不同区域进行抽样，并增加样本的多样性.
+Generative Adversarial Networks for Informativeness  使用鉴别器D输出作为所提出的分割的不确定性的度量，并使用该度量对未标记数据集中的样本进行排序。
+Learning Active Learning  试图通过以前的样本选择结果的经验来了解信息最丰富的样本是什么，提供了一种更有效地选择样本的潜在方法，但所采用的启发式方法需要是可解释的。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">HITL-Medical Image Analysis</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-10-25 00:00:00 UTC">
+                25 Oct 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>A Survey on Active Learning and Human-in-the-Loop Deep Learning for Medical Image Analysis</p>
+<h2 id="abstract">Abstract</h2>
+<p>    关注四个关键领域：<br>
+    （1）主动学习：选择最佳的数据来进标注，以获得最佳的性能；<br>
+    （2）与模型的输出进行交互：使用迭代反馈来引导模型优化给定的预测，提供有效的方法来对预测进行反馈；<br>
+    （3）实际考虑：开发和部署需要考虑的关键问题；<br>
+    （4）未来前景和未解决的问题<br>
+    医学成像正受益于分析图像等结构化数据的新计算技术的发展。图像采集、分析和解释算法的发展正在推动创新，特别是在重建、跟踪、分割和建模等领域。</p>
+<h2 id="introduction">Introduction</h2>
+<p>    医学图像很难解释，需要事先的专业知识来理解。数据所需的经验和先验知识意味着在标注医疗数据时，往往存在观察者间和观察者内部的可变性。因此，在标注时，需要许多oracles标注并达成共识。<br>
+    深度学习处理医疗图像在实际应用中，往往存在以下问题：复杂医学数据、法规遵从性问题和是否信任模型。<br>
+    在临床中，医学图像处理存在三个挑战：<br>
+    （1）缺乏训练数据；<br>
+    （2）最终训练结果：虽然DL效果很好，但是在关键安全问题上，即使是最小的错误也会导致灾难性的结果，因此，得到可信的输出需要对预测结果进行交互式解释，即用户必须有能力纠正和覆盖自动预测的结果；<br>
+    （3）透明度和可解释性：目前，大多数DL模型是黑盒模型，用户在解释、理解或纠正模型如何进行预测的有效方法上是有限的。</p>
+<h2 id="active-learning">Active Learning</h2>
+<p><img src="/img/HITL-MIA1.PNG" alt=""></p>
+<h3 id="query-types">Query Types</h3>
+<p>    Stream-based Selective Sampling：传入未标注的数据点的连续流<br>
+    Membership Query Synthesis：假设我们不是从真实的数据点分布中提取，而是生成一个需要标注的数据；模型可能不知道分布中不可见的区域，因此无法生成这些区域的数据；目前，基于GAN展示出了巨大的前景。<br>
+    Pool-based Sampling：存在一个大的未标注的真实数据集，从中选择样本进行标注；这种方法计算代价可能很高，因为每个迭代都需要对分布中的每个数据点进行度量评估；然而，却是与DL方法结合最有前景的，因为DL方法本质上依赖于批处理。</p>
+<h3 id="evaluating-informativeness">Evaluating Informativeness</h3>
+<h4 id="uncertainty">Uncertainty</h4>
+<p>    一个数据的预测结果越不确定，我们可以通过在训练集中包含该样本的真值中获得的信息就越多（least confident sampling）。<br>
+<a href="https://openaccess.thecvf.com/content_cvpr_2018/CameraReady/1487.pdf">The Power of Ensembles for Active Learning in Image Classification</a></p>
+<h4 id="representativeness">Representativeness</h4>
+<p>    不确定性有可能只关注小区域的分布，而训练样本从同一区域的分布将引入冗余的选择策略，或可能倾斜模型对一个特定区域的分布。增加代表性度量旨在鼓励选择策略从分布的不同区域进行抽样，并增加样本的多样性.</p>
+<h4 id="generative-adversarial-networks-for-informativeness">Generative Adversarial Networks for Informativeness</h4>
+<p>    使用鉴别器D输出作为所提出的分割的不确定性的度量，并使用该度量对未标记数据集中的样本进行排序。</p>
+<h4 id="learning-active-learning">Learning Active Learning</h4>
+<p>    试图通过以前的样本选择结果的经验来了解信息最丰富的样本是什么，提供了一种更有效地选择样本的潜在方法，但所采用的启发式方法需要是可解释的。<br>
+<a href="https://www.semanticscholar.org/reader/81ea29bde0216e41420c4591bebb800142fa3269">Learning Active Learning from Data.</a><br>
+    使用强化学习来学习选择策略<br>
+<a href="https://www.semanticscholar.org/reader/d0edf834c1d86aac1835e23c11b23b8723b65136">Learning how to active learn: A deep reinforcement learning approach</a></p>
+<h3 id="fine-tuning-vs-retraining">Fine-tuning vs Retraining</h3>
+<p>    AL的最后一步是使用新获得的标注数据来改进模型。两种方式：使用所有可用数据对模型进行重新训练，包括新获得的标注数据；只使用新标注的或者新标注+现有的子集对模型进行微调。</p>
+<h2 id="the-final-percent-interactive-refinement-of-model-outputs">The Final Percent: Interactive refinement of model outputs</h2>
+<p>    之前的介绍中，人标注数据用于训练模型。在模型训练中，需要一个human-in-the-loop解释模型预测结果，并可能对其进行改进，以获得对未知数据最准确的结果。
+<img src="/img/HITL-MIA2.PNG" alt="">
+    用户将预测引导到更准确的结果或纠正错误预测，使用户能够在与模型输出交互时采取最佳行动，并减轻人为不确定性。</p>
+<h3 id="interactive-refinement">Interactive Refinement</h3>
+<p>    允许用户改进模型输出，并将更准确的结果反馈给模型以进行改进。<br>
+    分割任务：<br>
+<a href="https://ieeexplore.ieee.org/ielx7/34/8730438/08370732.pdf">DeepIGeoS: A Deep Interactive Geodesic Framework for Medical Image Segmentation</a><br>
+<a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&amp;arnumber=8270673https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&amp;arnumber=8270673">Interactive medical image segmentation using deep learning with image-specific fine tuning.</a><br>
+    分类：<br>
+<a href="https://europepmc.org/backend/ptpmcrender.fcgi?accid=PMC6203325&amp;blobtype=pdf">Landmark‐based deep multi‐instance learning for brain disease diagnosis</a></p>
+<h3 id="interactive-interpretation">Interactive Interpretation</h3>
+<p>    将重点放在模型输出的解释上，目的是在下游分析中适当加权自动预测，并使用户能够对模型预测进行最明智的修改调整。用户了解模型是如何做出某个决定是重要的。<br>
+<a href="https://dl.acm.org/doi/pdf/10.1145/3313831.3376718">A Human-Centered Evaluation of a Deep Learning System Deployed in Clinics for the Detection of Diabetic Retinopathy</a></p>
+<h2 id="practical-considerations">Practical Considerations</h2>
+<p><img src="/img/HITL-MIA3.PNG" alt=""></p>
+<h3 id="noisy-oracles">Noisy Oracles</h3>
+<p>    医学图像数据的标注是通过聚合来自多个专家的标注获得的；如果我们从没有领域专家中获得标签，以及在使用非专家标注时，我们可以使用什么技术来减轻标准质量的可疑下降，以避免任何潜在的准确性损失。</p>
+<h3 id="weakly-supervised-learning">Weakly Supervised Learning</h3>
+<p>    我们可以使用弱标注数据开发高性能模型，而且由于弱标注需要更少的专业知识，它们可以更快地从非专家群体中获得，而且比标准标注的准确性损失更小。</p>
+<h3 id="multi-task-learning">Multi-task learning</h3>
+<h3 id="annotation-interface">Annotation Interface</h3>
+<p>    标注接口</p>
+<h3 id="variable-learning-costs">Variable Learning Costs</h3>
+<h2 id="future-prospective-and-unanswered-questions">Future Prospective and Unanswered Questions</h2>
+<p>    半监督学习，迁移学习，领域自适应<br>
+<a href="https://arxiv.org/ftp/arxiv/papers/2004/2004.13175.pdf">A scoping review of transfer learning research on medical image analysis using ImageNet</a></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

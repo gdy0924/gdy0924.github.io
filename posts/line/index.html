@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/line/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/line/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "LINE",
+      "headline" : "LINE",
+      "description" : "Tang, J., Qu, M., Wang, M., Zhang, M., Yan, J., \u0026amp; Mei, Q. (2015). LINE: Large-scale Information Network Embedding. Proceedings of the 24th International Conference on World Wide Web.(cite:4,030)\n LINE也是一种基于邻域相似假设的方法，只不过与DeepWalk使用DFS构造邻域不同的是，LINE可以看作是一种使用BFS构造邻域的算法。此外，LINE还可以应用在带权图中(DeepWalk仅能用于无权图)。\nLINE适用于任意类型的信息网络图结构：无向图、有向图、加权图。提出了一种新的优化目标，同时保留了局部和全局网络结构。\n局部结构由网络中观察到的连接来表示，捕获了顶点之间的一阶相似度。在一个现实世界的网络中，许多存在的连接实际上没有被观察到，即在真实世界的数据中观察到的一阶相似度并不足以保留全局网络结构。因此，引入二阶相似度，通过顶点的共享邻域结构来决定的，即具有共享邻居可能相似的节点。\n以下图为例： 顶点6和顶点7之间的边的权重很大（很粗），即顶点6和顶点7具有很高的一阶相似度；虽然顶点5和顶点6之间没有联系，一阶相似度为0，但它们共享许多共同的邻居节点，即它们具有很高的二阶相似度。\n定义 Information Network  $G=(V,E)$，$e\\in E$，$e=(i,j)$，$w_{ij}\u0026gt; 0$（本研究中，我们只考虑非负权值。）\nFirst-order Proximity  两个顶点之间的局部成对相似度，权值$w_{ij}$表示$i$和$j$之间的一阶相似度，如果$i$和$j$之间没有边，则一阶相似度为0。\nSecond-order Proximity  例如，在社交网络中，拥有相似朋友的人往往有相似的兴趣，因此可能成为朋友。\n$u$和$v$之间的二阶邻近度是它们的邻域网络结构之间的相似性。定义$p_{i}=(w_{i,1},\u0026hellip;,w_{i,|V|})$为顶点$i$与其他所有节点的一阶相似度，那么$i$和$j$之间的二阶相似度由$p_{i}$和p_{j}之间的相似度决定。如果没有节点同时与$i$和$j$相连，则二阶相似度为0（如上图中的顶点5和顶点7）。\nLINE LINE with First-order Proximity $$ p_{1}(v_{i},v_{j})=\\frac{1}{1\u002bexp(-\\overrightarrow{u} _ {i}^{T}\\cdot \\overrightarrow{u}_ {j})} $$ $$ \\hat{p}_ {1}(i,j)=\\frac{w_{ij}}{W},W=\\sum_{(i,j)\\in E}w_{ij} $$ 其中，$\\overrightarrow{u}_ {i}$为顶点$i$的低维向量表示；$p_{1}(v_{i},v_{j})$为顶点$i$与$j$的联合概率；$\\hat{p}_ {1}(i,j)$顶点$i$与$j$的经验概率。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-10-28 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-10-28 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/line\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>LINE</title>
+  <meta property="og:title" content="LINE" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="Tang, J., Qu, M., Wang, M., Zhang, M., Yan, J., &amp;amp; Mei, Q. (2015). LINE: Large-scale Information Network Embedding. Proceedings of the 24th International Conference on World Wide Web.(cite:4,030)
+ LINE也是一种基于邻域相似假设的方法，只不过与DeepWalk使用DFS构造邻域不同的是，LINE可以看作是一种使用BFS构造邻域的算法。此外，LINE还可以应用在带权图中(DeepWalk仅能用于无权图)。
+LINE适用于任意类型的信息网络图结构：无向图、有向图、加权图。提出了一种新的优化目标，同时保留了局部和全局网络结构。
+局部结构由网络中观察到的连接来表示，捕获了顶点之间的一阶相似度。在一个现实世界的网络中，许多存在的连接实际上没有被观察到，即在真实世界的数据中观察到的一阶相似度并不足以保留全局网络结构。因此，引入二阶相似度，通过顶点的共享邻域结构来决定的，即具有共享邻居可能相似的节点。
+以下图为例： 顶点6和顶点7之间的边的权重很大（很粗），即顶点6和顶点7具有很高的一阶相似度；虽然顶点5和顶点6之间没有联系，一阶相似度为0，但它们共享许多共同的邻居节点，即它们具有很高的二阶相似度。
+定义 Information Network  $G=(V,E)$，$e\in E$，$e=(i,j)$，$w_{ij}&amp;gt; 0$（本研究中，我们只考虑非负权值。）
+First-order Proximity  两个顶点之间的局部成对相似度，权值$w_{ij}$表示$i$和$j$之间的一阶相似度，如果$i$和$j$之间没有边，则一阶相似度为0。
+Second-order Proximity  例如，在社交网络中，拥有相似朋友的人往往有相似的兴趣，因此可能成为朋友。
+$u$和$v$之间的二阶邻近度是它们的邻域网络结构之间的相似性。定义$p_{i}=(w_{i,1},&amp;hellip;,w_{i,|V|})$为顶点$i$与其他所有节点的一阶相似度，那么$i$和$j$之间的二阶相似度由$p_{i}$和p_{j}之间的相似度决定。如果没有节点同时与$i$和$j$相连，则二阶相似度为0（如上图中的顶点5和顶点7）。
+LINE LINE with First-order Proximity $$ p_{1}(v_{i},v_{j})=\frac{1}{1&#43;exp(-\overrightarrow{u} _ {i}^{T}\cdot \overrightarrow{u}_ {j})} $$ $$ \hat{p}_ {1}(i,j)=\frac{w_{ij}}{W},W=\sum_{(i,j)\in E}w_{ij} $$ 其中，$\overrightarrow{u}_ {i}$为顶点$i$的低维向量表示；$p_{1}(v_{i},v_{j})$为顶点$i$与$j$的联合概率；$\hat{p}_ {1}(i,j)$顶点$i$与$j$的经验概率。" />
+  <meta name="description" content="Tang, J., Qu, M., Wang, M., Zhang, M., Yan, J., &amp;amp; Mei, Q. (2015). LINE: Large-scale Information Network Embedding. Proceedings of the 24th International Conference on World Wide Web.(cite:4,030)
+ LINE也是一种基于邻域相似假设的方法，只不过与DeepWalk使用DFS构造邻域不同的是，LINE可以看作是一种使用BFS构造邻域的算法。此外，LINE还可以应用在带权图中(DeepWalk仅能用于无权图)。
+LINE适用于任意类型的信息网络图结构：无向图、有向图、加权图。提出了一种新的优化目标，同时保留了局部和全局网络结构。
+局部结构由网络中观察到的连接来表示，捕获了顶点之间的一阶相似度。在一个现实世界的网络中，许多存在的连接实际上没有被观察到，即在真实世界的数据中观察到的一阶相似度并不足以保留全局网络结构。因此，引入二阶相似度，通过顶点的共享邻域结构来决定的，即具有共享邻居可能相似的节点。
+以下图为例： 顶点6和顶点7之间的边的权重很大（很粗），即顶点6和顶点7具有很高的一阶相似度；虽然顶点5和顶点6之间没有联系，一阶相似度为0，但它们共享许多共同的邻居节点，即它们具有很高的二阶相似度。
+定义 Information Network  $G=(V,E)$，$e\in E$，$e=(i,j)$，$w_{ij}&amp;gt; 0$（本研究中，我们只考虑非负权值。）
+First-order Proximity  两个顶点之间的局部成对相似度，权值$w_{ij}$表示$i$和$j$之间的一阶相似度，如果$i$和$j$之间没有边，则一阶相似度为0。
+Second-order Proximity  例如，在社交网络中，拥有相似朋友的人往往有相似的兴趣，因此可能成为朋友。
+$u$和$v$之间的二阶邻近度是它们的邻域网络结构之间的相似性。定义$p_{i}=(w_{i,1},&amp;hellip;,w_{i,|V|})$为顶点$i$与其他所有节点的一阶相似度，那么$i$和$j$之间的二阶相似度由$p_{i}$和p_{j}之间的相似度决定。如果没有节点同时与$i$和$j$相连，则二阶相似度为0（如上图中的顶点5和顶点7）。
+LINE LINE with First-order Proximity $$ p_{1}(v_{i},v_{j})=\frac{1}{1&#43;exp(-\overrightarrow{u} _ {i}^{T}\cdot \overrightarrow{u}_ {j})} $$ $$ \hat{p}_ {1}(i,j)=\frac{w_{ij}}{W},W=\sum_{(i,j)\in E}w_{ij} $$ 其中，$\overrightarrow{u}_ {i}$为顶点$i$的低维向量表示；$p_{1}(v_{i},v_{j})$为顶点$i$与$j$的联合概率；$\hat{p}_ {1}(i,j)$顶点$i$与$j$的经验概率。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">LINE</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-10-28 00:00:00 UTC">
+                28 Oct 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Tang, J., Qu, M., Wang, M., Zhang, M., Yan, J., &amp; Mei, Q. (2015). LINE: Large-scale Information Network Embedding. Proceedings of the 24th International Conference on World Wide Web.(cite:4,030)</p>
+<p>    LINE也是一种基于邻域相似假设的方法，只不过与DeepWalk使用DFS构造邻域不同的是，LINE可以看作是一种使用BFS构造邻域的算法。此外，LINE还可以应用在带权图中(DeepWalk仅能用于无权图)。<br>
+    LINE适用于任意类型的信息网络图结构：无向图、有向图、加权图。提出了一种新的优化目标，同时保留了局部和全局网络结构。<br>
+    局部结构由网络中观察到的连接来表示，捕获了顶点之间的一阶相似度。在一个现实世界的网络中，许多存在的连接实际上没有被观察到，即在真实世界的数据中观察到的一阶相似度并不足以保留全局网络结构。因此，引入二阶相似度，通过顶点的共享邻域结构来决定的，即具有共享邻居可能相似的节点。<br>
+    以下图为例：
+<img src="/img/line1.PNG" alt="">
+    顶点6和顶点7之间的边的权重很大（很粗），即顶点6和顶点7具有很高的一阶相似度；虽然顶点5和顶点6之间没有联系，一阶相似度为0，但它们共享许多共同的邻居节点，即它们具有很高的二阶相似度。</p>
+<h2 id="定义">定义</h2>
+<h3 id="information-network">Information Network</h3>
+<p>    $G=(V,E)$，$e\in E$，$e=(i,j)$，$w_{ij}&gt; 0$（本研究中，我们只考虑非负权值。）</p>
+<h3 id="first-order-proximity">First-order Proximity</h3>
+<p>    两个顶点之间的局部成对相似度，权值$w_{ij}$表示$i$和$j$之间的一阶相似度，如果$i$和$j$之间没有边，则一阶相似度为0。</p>
+<h3 id="second-order-proximity">Second-order Proximity</h3>
+<p>    例如，在社交网络中，拥有相似朋友的人往往有相似的兴趣，因此可能成为朋友。<br>
+    $u$和$v$之间的二阶邻近度是它们的邻域网络结构之间的相似性。定义$p_{i}=(w_{i,1},&hellip;,w_{i,|V|})$为顶点$i$与其他所有节点的一阶相似度，那么$i$和$j$之间的二阶相似度由$p_{i}$和p_{j}之间的相似度决定。如果没有节点同时与$i$和$j$相连，则二阶相似度为0（如上图中的顶点5和顶点7）。</p>
+<h2 id="line">LINE</h2>
+<h3 id="line-with-first-order-proximity">LINE with First-order Proximity</h3>
+<p>$$
+p_{1}(v_{i},v_{j})=\frac{1}{1+exp(-\overrightarrow{u} _ {i}^{T}\cdot \overrightarrow{u}_ {j})}
+$$
+$$
+\hat{p}_ {1}(i,j)=\frac{w_{ij}}{W},W=\sum_{(i,j)\in E}w_{ij}
+$$
+    其中，$\overrightarrow{u}_ {i}$为顶点$i$的低维向量表示；$p_{1}(v_{i},v_{j})$为顶点$i$与$j$的联合概率；$\hat{p}_ {1}(i,j)$顶点$i$与$j$的经验概率。<br>
+    为了保持一阶相似度，即最小化目标函数：
+$$
+O_{1}=d(\hat{p}_ {1}(\cdot ,\cdot ),p_{1}(\cdot ,\cdot ))
+$$
+    其中，$d$为两个分布之间的距离，我们选择最小化KL散度。<br>
+    一阶相似度只适用于无向图，而不适用于有向图。</p>
+<h3 id="line-with-second-order-proximity">LINE with Second-order Proximity</h3>
+<p>    二阶接近性假设与其他顶点共享许多连接的顶点是相似的。<br>
+    针对每个顶点扮演两个角色，顶点本身和其他顶点的特定“上下文”，因此，用两个向量来表示，$\overrightarrow{u}_ {i}$为视为顶点时的向量表示，$\overrightarrow{u}_ {i}'$是视作特定上下文时的向量表示。假设以$v_{i}$为顶点：
+$$
+p_{2}(v_{j}|v_{i})=\frac{exp(\overrightarrow{u} _ {j}^{&lsquo;T}\cdot \overrightarrow{u}_ {i})}{\sum_{k=1}^{|V|}exp(\overrightarrow{u} _ {k}^{&lsquo;T}\cdot \overrightarrow{u}_ {i})}
+$$
+$$
+\hat{p}_ {2}(v_{j}|v_{i})=\frac{w_{ij}}{d_{i}},d_{i}=\sum_{k\in N(i)}w_{ik}
+$$
+    其中，$|V|$是特定上下文的数量；$p_{2}(v_{j}|v_{i})$为条件分布；$\hat{p}_ {2}(v_{j}|v_{i})$为经验分布；$d_{i}$是顶点$i$的出度之和（无向图可以看作双向有向连接，权重相同）。<br>
+    为了保持二阶相似度，即最小化目标函数：
+$$
+O_{2}=\sum_{i\in V}\lambda _ {i}d(\hat{p}_ {2}(\cdot |v_{i}),p_{2}(\cdot |v_{i}))
+$$
+    由于网络中的顶点的重要性可能会有所不同，引入$\lambda _ {i}$；同样选择KL散度。</p>
+<h3 id="combining-first-order-and-second-order-proximities">Combining first-order and second-order proximities</h3>
+<p>    一个简单而有效的方法：分别训练并保留一阶相似度模型和二阶相似度模型，将两种模型得到的embedding concat起来。</p>
+<h3 id="optimization">Optimization</h3>
+<p>    Edge Sampling+negative sampling<br>
+    Edge Sampling：注意到目标函数在log之前还有一个权重系数w，在使用梯度下降方法优化参数时，  会直接乘在梯度上。如果图中的边权方差很大，则很难选择一个合适的学习率。若使用较大的学习率那么对于较大的边权可能会引起梯度爆炸，较小的学习率对于较小的边权则会导致梯度过小。<br>
+    对于上述问题，如果所有边权相同，那么选择一个合适的学习率会变得容易。这里采用了将带权边拆分为等权边的一种方法，假如一个权重为 w 的边，则拆分后为w个权重为1的边。这样可以解决学习率选择的问题，但是由于边数的增长，存储的需求也会增加。<br>
+    另一种方法则是从原始的带权边中进行采样，每条边被采样的概率正比于原始图中边的权重，这样既解决了学习率的问题，又没有带来过多的存储开销。</p>
+<h2 id="实验">实验</h2>
+<h3 id="flickr-network">Flickr Network</h3>
+<p><img src="/img/line2.PNG" alt="">
+    LINE（1st+2nd）明显优于所有其他方法。<br>
+    LINE(1st)略优于LINE（2nd）：原因有两个方面，社交网络中的一阶相似度比二阶相似度更重要，其联系更强；当网络过于稀疏，节点的平均邻居数量太少时，二阶相似度可能会变得不准确。</p>
+<h3 id="youtube-network">Youtube Network</h3>
+<p><img src="/img/line3.PNG" alt="">
+    该网络更加稀疏。可以看到，LINE的优势相比于上一个结果不明显，也就是说针对更加稀疏的图结构，DeepWalk通过截断随机游走来解决网络的稀疏性是很有用的，即丰富了每个顶点的邻居或上下文；随机游走类似深度有限搜索，通过引入间接邻域来缓解节点邻域的稀疏性。<br>
+    因此，我们扩展了度小于1000的顶点的邻域，通过添加邻居的邻域，直到扩展邻域的大小达到1000个节点，结果展示在括号中，可以看到对性能提升有帮助。</p>
+<h3 id="可视化">可视化</h3>
+<p><img src="/img/line4.PNG" alt="">
+    GF效果不好<br>
+    DeepWalk效果好一点，但是许多属于不同社群的顶点紧密地聚集在中心区域，最可能的原因是随机游走的随机性带来了很多的噪声<br>
+    LINE效果最好</p>
+<h3 id="其余影响">其余影响</h3>
+<p><img src="/img/line5.PNG" alt="">
+    （a）网络稀疏性的影响：当网络极其稀疏时，二阶会受到影响，而当节点附近有足够的节点时，二阶会优于一阶；<br>
+    （b）随着顶点组数的增加，不同模型的性能也会增加。</p>
+<p>    为什么一阶相似度只适用于无向图，不适用于有向图：<br>
+    一阶相似度定义是取相邻节点的向量作内积再输入sigmoid，而内积操作是对称的。而有向图的权重是天然不对称的。通过作者的一阶相似度定义无法建模。<br>
+    对比 p1 和 p2，作者定义的 p1 是联合概率，而 p2 是条件概率，联合概率是对称的，而条件概率是有“方向”的，这也是为什么一阶相似度只能用于无向图，而二阶相似图可以用于有向图。p1的无向用对称的内积表示，而p2的有向也是用内积表示的，所以个人认为从内积角度看有点勉强</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

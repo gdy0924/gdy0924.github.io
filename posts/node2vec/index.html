@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/summary/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/summary/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/node2vec/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/node2vec/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Summary",
-      "headline" : "Summary",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "node2vec",
+      "headline" : "node2vec",
+      "description" : "Grover, A., \u0026amp; Leskovec, J. (2016). node2vec: Scalable Feature Learning for Networks. Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining.(cite:6,832)\n 本文定义了节点网络邻域的概念，并设计了一个有偏的随机游走过程，有效地探索不同的邻域。\n在评价网络节点的相似性时涉及两个概念：\n同质性：指同属于一个集群的两个节点更加相似，如下图的节点 S1 和节点 u；\n结构等价性：指两个具有相似结构的节点更加相似，如下图的节点 S6 和节点u FRAMEWORK  对于每一个节点$u$，定义其邻域为$N_{S}(U)\\subset V$。使用Skip-Gram方法。\n原来的采样策略是通过深度优先或者广度优先，来生成节点的邻域；如上图中，广度优先采样得到s1、s2、s3，深度优先采样得到邻域s4、s5、s6。\n网络中节点的预测任务经常在两种相似性之间交换：同质性和结构等价性。\nBFS 可以获得每个节点的邻居，强调的是局部微观视图，所以通过 BFS 采样的网络更能体现网络的局部结构，从而 Embedding 结果更能体现结构性；而 DFS 可以探索更大的网络结构，只有从更高的角度才能观察到更大的集群，所以其 Embedding 结果更能体现同质性。（这个答案是不是与我们的直觉有所相悖？）\nRandom Walks  起始节点为$c_{0}=u$，$c_{i}$为游走中的第i个顶点，则从顶点v走向顶点x的概率计算公式为： $$ P(c_{i}=x|c_{i-1}=v)=\\frac{\\pi _ {vx}}{Z},if; (v,x)\\in E $$ $$ P(c_{i}=x|c_{i-1}=v)=0,otherwise $$ 其中，$\\pi _ {vx}$是节点v和节点x直接未归一化转移概率，$Z$是归一化常数。\nSearch bias  最简单的方式是将边的权重直接作为$\\pi _ {vx}$，权重越大，采样概率越大；但是这不能控制DFS或者BFS。而我们要将DFS和BFS进行结合。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,35 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-10-27 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-10-27 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/summary\/",
+      "datePublished": "2022-10-28 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-10-28 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/node2vec\/",
       "keywords" : [  ]
   }
 </script>
-<title>Summary</title>
-  <meta property="og:title" content="Summary" />
+<title>node2vec</title>
+  <meta property="og:title" content="node2vec" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Grover, A., &amp;amp; Leskovec, J. (2016). node2vec: Scalable Feature Learning for Networks. Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining.(cite:6,832)
+ 本文定义了节点网络邻域的概念，并设计了一个有偏的随机游走过程，有效地探索不同的邻域。
+在评价网络节点的相似性时涉及两个概念：
+同质性：指同属于一个集群的两个节点更加相似，如下图的节点 S1 和节点 u；
+结构等价性：指两个具有相似结构的节点更加相似，如下图的节点 S6 和节点u FRAMEWORK  对于每一个节点$u$，定义其邻域为$N_{S}(U)\subset V$。使用Skip-Gram方法。
+原来的采样策略是通过深度优先或者广度优先，来生成节点的邻域；如上图中，广度优先采样得到s1、s2、s3，深度优先采样得到邻域s4、s5、s6。
+网络中节点的预测任务经常在两种相似性之间交换：同质性和结构等价性。
+BFS 可以获得每个节点的邻居，强调的是局部微观视图，所以通过 BFS 采样的网络更能体现网络的局部结构，从而 Embedding 结果更能体现结构性；而 DFS 可以探索更大的网络结构，只有从更高的角度才能观察到更大的集群，所以其 Embedding 结果更能体现同质性。（这个答案是不是与我们的直觉有所相悖？）
+Random Walks  起始节点为$c_{0}=u$，$c_{i}$为游走中的第i个顶点，则从顶点v走向顶点x的概率计算公式为： $$ P(c_{i}=x|c_{i-1}=v)=\frac{\pi _ {vx}}{Z},if; (v,x)\in E $$ $$ P(c_{i}=x|c_{i-1}=v)=0,otherwise $$ 其中，$\pi _ {vx}$是节点v和节点x直接未归一化转移概率，$Z$是归一化常数。
+Search bias  最简单的方式是将边的权重直接作为$\pi _ {vx}$，权重越大，采样概率越大；但是这不能控制DFS或者BFS。而我们要将DFS和BFS进行结合。" />
+  <meta name="description" content="Grover, A., &amp;amp; Leskovec, J. (2016). node2vec: Scalable Feature Learning for Networks. Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining.(cite:6,832)
+ 本文定义了节点网络邻域的概念，并设计了一个有偏的随机游走过程，有效地探索不同的邻域。
+在评价网络节点的相似性时涉及两个概念：
+同质性：指同属于一个集群的两个节点更加相似，如下图的节点 S1 和节点 u；
+结构等价性：指两个具有相似结构的节点更加相似，如下图的节点 S6 和节点u FRAMEWORK  对于每一个节点$u$，定义其邻域为$N_{S}(U)\subset V$。使用Skip-Gram方法。
+原来的采样策略是通过深度优先或者广度优先，来生成节点的邻域；如上图中，广度优先采样得到s1、s2、s3，深度优先采样得到邻域s4、s5、s6。
+网络中节点的预测任务经常在两种相似性之间交换：同质性和结构等价性。
+BFS 可以获得每个节点的邻居，强调的是局部微观视图，所以通过 BFS 采样的网络更能体现网络的局部结构，从而 Embedding 结果更能体现结构性；而 DFS 可以探索更大的网络结构，只有从更高的角度才能观察到更大的集群，所以其 Embedding 结果更能体现同质性。（这个答案是不是与我们的直觉有所相悖？）
+Random Walks  起始节点为$c_{0}=u$，$c_{i}$为游走中的第i个顶点，则从顶点v走向顶点x的概率计算公式为： $$ P(c_{i}=x|c_{i-1}=v)=\frac{\pi _ {vx}}{Z},if; (v,x)\in E $$ $$ P(c_{i}=x|c_{i-1}=v)=0,otherwise $$ 其中，$\pi _ {vx}$是节点v和节点x直接未归一化转移概率，$Z$是归一化常数。
+Search bias  最简单的方式是将边的权重直接作为$\pi _ {vx}$，权重越大，采样概率越大；但是这不能控制DFS或者BFS。而我们要将DFS和BFS进行结合。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +121,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,203 +154,117 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term">Summary</h1>
-        <div id="posts-list">
-          <section>
-            <h1 class="site-date-catalog">2022</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-10-27 00:00:00 UTC">Oct 27</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/graph-embedding/">Graph Embedding</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-10-17 00:00:00 UTC">Oct 17</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E6%9C%BA%E5%99%A8%E7%BF%BB%E8%AF%91/">机器翻译</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-07-18 00:00:00 UTC">Jul 18</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/segmentation/">Segmentation</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-15 00:00:00 UTC">May 15</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E6%80%BB%E7%BB%93%E4%B8%80/">总结（一）</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-04 00:00:00 UTC">May 04</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E7%A9%BA%E6%B4%9E%E5%8D%B7%E7%A7%AF/">空洞卷积</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-26 00:00:00 UTC">Apr 26</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/upsampling/">Upsampling</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-25 00:00:00 UTC">Apr 25</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%BB%8F%E5%85%B8%E8%AE%BA%E6%96%87%E6%80%BB%E7%BB%93/">图像分割经典论文总结</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-25 00:00:00 UTC">Apr 25</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/transformer%E4%B8%AD%E7%9A%84%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81/">Transformer中的位置编码</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-12 00:00:00 UTC">Apr 12</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/r-cnn%E7%B3%BB%E5%88%97%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93/">R-CNN系列简单总结</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-11 00:00:00 UTC">Apr 11</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/iounms/">IoU&amp;NMS</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-08 00:00:00 UTC">Apr 08</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/attentionself-attention/">Attention&amp;Self-Attention</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-06 00:00:00 UTC">Apr 06</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E5%88%86%E7%BB%84%E5%8D%B7%E7%A7%AF%E5%8F%AF%E5%88%86%E7%A6%BB%E5%8D%B7%E7%A7%AF/">分组卷积&amp;可分离卷积</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-01-24 00:00:00 UTC">Jan 24</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/batchnormalization/">BatchNormalization</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          <section>
-            <h1 class="site-date-catalog">2021</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2021-12-11 15:52:51 CST">Dec 11</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87/">模型评价指标</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">node2vec</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-10-28 00:00:00 UTC">
+                28 Oct 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Grover, A., &amp; Leskovec, J. (2016). node2vec: Scalable Feature Learning for Networks. Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining.(cite:6,832)</p>
+<p>    本文定义了节点网络邻域的概念，并设计了一个有偏的随机游走过程，有效地探索不同的邻域。<br>
+    在评价网络节点的相似性时涉及两个概念：<br>
+    同质性：指同属于一个集群的两个节点更加相似，如下图的节点 S1 和节点 u；<br>
+    结构等价性：指两个具有相似结构的节点更加相似，如下图的节点 S6 和节点u
+<img src="/img/node2vec1.PNG" alt=""></p>
+<h2 id="framework">FRAMEWORK</h2>
+<p>    对于每一个节点$u$，定义其邻域为$N_{S}(U)\subset V$。使用Skip-Gram方法。<br>
+    原来的采样策略是通过深度优先或者广度优先，来生成节点的邻域；如上图中，广度优先采样得到s1、s2、s3，深度优先采样得到邻域s4、s5、s6。<br>
+    网络中节点的预测任务经常在两种相似性之间交换：同质性和结构等价性。<br>
+    BFS 可以获得每个节点的邻居，强调的是局部微观视图，所以通过 BFS 采样的网络更能体现网络的局部结构，从而 Embedding 结果更能体现结构性；而 DFS 可以探索更大的网络结构，只有从更高的角度才能观察到更大的集群，所以其 Embedding 结果更能体现同质性。（这个答案是不是与我们的直觉有所相悖？）</p>
+<h3 id="random-walks">Random Walks</h3>
+<p>    起始节点为$c_{0}=u$，$c_{i}$为游走中的第i个顶点，则从顶点v走向顶点x的概率计算公式为：
+$$
+P(c_{i}=x|c_{i-1}=v)=\frac{\pi _ {vx}}{Z},if; (v,x)\in E
+$$
+$$
+P(c_{i}=x|c_{i-1}=v)=0,otherwise
+$$
+    其中，$\pi _ {vx}$是节点v和节点x直接未归一化转移概率，$Z$是归一化常数。</p>
+<h3 id="search-bias">Search bias</h3>
+<p>    最简单的方式是将边的权重直接作为$\pi _ {vx}$，权重越大，采样概率越大；但是这不能控制DFS或者BFS。而我们要将DFS和BFS进行结合。<br>
+    因此，引入两个参数$p$和$q$，假设刚刚采样了边$(t,v)$，现在位于节点$v$处，计算：
+$$
+\pi _ {vx}=\alpha _ {pq}(t,x)\cdot w_{vx}
+$$
+$$
+\alpha _ {pq}(t,x)=\frac{1}{p},if; d_{tx}=0
+$$
+$$
+\alpha _ {pq}(t,x)=1,if; d_{tx}=1
+$$
+$$
+\alpha _ {pq}(t,x)=\frac{1}{q},if; d_{tx}=2
+$$
+    其中，$d_{tx}$表示节点t和节点x之间的最短路径距离。<br>
+    <strong>Return parameter  p</strong>：参数p控制了在游走过程中重新访问一个节点的可能性，即重复访问刚刚访问过的顶点的概率大小；$d_{tx}$为0，表示顶点x就是访问当前顶点v之前刚刚访问过的顶点；那么若p较高，则访问刚刚访问过的顶点的概率会变低，反之变高。<br>
+    <strong>In-out parameter  q</strong>：参数q控制向外走还是向内走，若 q大于1，随机游走倾向于访问和t接近的顶点(偏向BFS)。若 q小于1，倾向于访问远离t的顶点(偏向DFS)。
+<img src="/img/node2vec2.PNG" alt=""></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -351,6 +284,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 
