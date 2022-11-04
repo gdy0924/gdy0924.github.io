@@ -6,7 +6,156 @@
     <description>Recent content in Posts on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 28 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 03 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>HITL-Design</title>
+      <link>https://gdy0924.github.io/posts/hitl-design/</link>
+      <pubDate>Thu, 03 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/hitl-design/</guid>
+      <description>HUMAN-IN-THE-LOOP DESIGN WITH MACHINE LEARNING
+ 自动生成带有个人偏好的设计一直是设计领域的一个持续挑战。在时装、家具设计等场景中，引入深度学习方法可以带有某些随机因素的生成图像作为设计的结果。然而，这些生成方法并没有考虑人的因素，即随机生成的图像结果并没有引入人类的认知。
+本文提出使用一个编码器在受试者观看图像时，记录其脑信号，提取脑电图特征；其次，以编码的脑电图特征为条件，训练一个GAN模型，生成设计图像；利用训练后的模型从一个人的认知过程中测量的大脑活动中生成设计图像。
+该方法可以在与偏好相关的大脑信号的引导下生成首选的设计风格。
+METHOD 训练阶段：首先受试者看到图片，通过训练编码器从受试者原始的脑电图数据中提取特征，来探索脑信号与图像之间的关系；接着利用编码的大脑信号特征条件的GAN框架训练生成器，重建所呈现的图像。
+使用阶段：使用训练好的模型在偏好图像实验中重建真实的偏好设计图像。
+共包括两个阶段：
+（1）学习生成函数：$G_{BD}=B\rightarrow D$，该函数用于将脑电测量到的脑活动 B 映射到相应的设计图像 D；（2）设计阶段：利用学习到的生成函数和特定的脑信号生成一个涉及人类偏好的产品。 在训练阶段，当受试者观看设计的「真实」图像时，记录其脑电图信号。基于 LSTM 的脑电编码器将脑信号$B_{i}$编码成与所见图像的设计语义相关的 EEG 特征。下图为EEG feature encoder： 将脑电特征作为生成条件嵌入到基于 GAN 的生成器中，生成模型重构出与原始图像具有相同设计语义的图像$D_{i}$。
+在设计阶段，要求受试者想象一个他们喜欢的产品或设计的例子，然后将测量到的可能包含受试者偏好的设计特征的 EEG 信号编码输入到训练得到的生成器中。生成器生成包含与受试者想象相对应的设计特征的样本设计。
+实验结果 人工评价 被参与者选择为他们喜欢的设计的比例。
+图像重建与偏好设计 </description>
+    </item>
+    
+    <item>
+      <title>HITL-VOS</title>
+      <link>https://gdy0924.github.io/posts/hitl-vos/</link>
+      <pubDate>Thu, 03 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/hitl-vos/</guid>
+      <description>Interactive Video Object Segmentation in the Wild
+ 本文提出了一种深度交互式图像分割方法，只需点击少量的鼠标就能精确地分割对象。其使用了一个深度卷积神经网络，联合使用用户的点击和RGB信息来分割图像。
+如上图所示，第一帧通过几次点击进行分割；然后，使用OSVOS对视频片段进行分割；最后，用户可以选择通过1-2次点击来优化分割不好的帧。
+Method  整体包括两个主要步骤：第一帧的半自动标注，将此分割掩模自动传播到视频的剩余帧中。
+Interactive image segmentation  本文提出了一个卷积网络，其根据当前分割、用户输入和RGB图像来预测像素级分割。 （上图中，左边为当前预测和点击得到的正负样本，右图为真值）
+（1）当前分割：一个二值图像，作为一个额外的通道进行输入；
+（2）为了以点击的形式对用户输入进行编码，我们创建了一个零初始化通道，在该通道中，每次正点击或负点击分别添加或减去具有小标准偏差的高斯值。
+由于手动收集用户交互太昂贵，我们使用模拟用户交互。对于正样本，随机采样物体边界内的像素点；对于负样本，随机采样远离物体边界40个像素点的位置，或者从图像中的其他对象中采样负片点击。
+网络架构选择ResNet-101，并且引入CRF细化边界。
+Video segmentation  对于分割完整的视频，给定第一帧，依赖于单镜头实现视频分割，使用OSVOS网络。
+Progressive Refinement  由于一次性分割可能在视频序列上效果不好，因此我们使用渐进改进的方式，逐步细化结果，每次循环都使用上边提到的交互分割方式，来进一步改进结果。由于我们的方法将当前的分割掩码作为输入，因此它提供了一种快速、直观的方法来细化初始掩码，而不是要求从零开始对其进行注释。
+实验 Ablation study 上表比较了点击时使用高斯分布、CRF细化以及将当前结果作为额外的输入通道，在点击多少次的情况下能达到好的效果。
+Comparison to the State of the Art Pascal数据集中物体分辨率普遍很小，因此挑战比较大。
+Segmentation Refinement 我们的点击交互方式能带来更大的效果提升。</description>
+    </item>
+    
+    <item>
+      <title>HITL-hip assistance optimization</title>
+      <link>https://gdy0924.github.io/posts/hitl-hip-assistance-optimization/</link>
+      <pubDate>Wed, 02 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/hitl-hip-assistance-optimization/</guid>
+      <description>Ding, Ye et al. “Human-in-the-loop optimization of hip assistance with a soft exosuit during walking.” Science Robotics 3 (2018)(cite:275)
+ 可穿戴设备可以大幅减少人类行走的能量消耗，使用贝叶斯优化（适合在非常有限的数据下优化噪声性能信号）来识别髋关节伸展辅助的峰值和偏移时间，从而最小化使用可穿戴设备行走的能量消耗。
+可穿戴设备的问题之一：个体之间的生理和神经上的差异会导致对相同控制器的不同反应，也就是说，一个参与者的最佳控制策略可能在另一个控制策略上表现不佳。目前的解决办法使用曲线拟合，需要时间很长。
+人在回路（HIL）优化旨在通过基于人类生理信号的实时测量，如代谢成本，调整控制穿戴设备参数。这种优化的灵感来自于观察人类不断调整其协调模式，例如，人类在行走过程中是如何最小化步行代谢成本的。本文提出了一种实验方法来快速识别二维空间中的最佳控制参数以最小化步行的代谢成本。  （上图：采用贝叶斯优化方法调整辅助装置的控制参数，使步行的代谢成本最小化。根据呼吸测量估计代谢率，并用于计算代谢率相对于自由对照参数的后验分布。）
+一名受试者者穿着可穿戴设备进行髋关节伸展辅助行走，辅助剖面由多个控制参数组成，这些参数通过优化迭代更新，并应用于具有导纳力控制的系链驱动系统。在此基础上，作者建立了优化算法，目标是最大化期望改进（Expected Improvement，EI）。
+算法利用高斯过程和下一次迭代的控制参数迭代估计受试者的代谢成本分布。在每次迭代中，通过将一阶动态模型拟合到 2 分钟的瞬时代谢数据来估计代谢成本。
+总结：HITL 有希望提高可穿戴机器人设备在各种任务中的性能。本文所提出的方法证明了该可穿戴设备能够实质性的减少人体代谢，并提出了使用低维控制参数化优化可穿戴设备的可能性。本文利用有噪声的呼吸信号作为优化的目标函数，然而，还可以考虑引入其他生理或生物信号，如利用运动对称性优化中风后患者的可穿戴设备，或使用平衡相关测量值优化假体等。</description>
+    </item>
+    
+    <item>
+      <title>人机混合的智能控制（人在回路控制）</title>
+      <link>https://gdy0924.github.io/posts/%E4%BA%BA%E6%9C%BA%E6%B7%B7%E5%90%88%E7%9A%84%E6%99%BA%E8%83%BD%E6%8E%A7%E5%88%B6%E4%BA%BA%E5%9C%A8%E5%9B%9E%E8%B7%AF%E6%8E%A7%E5%88%B6/</link>
+      <pubDate>Wed, 02 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/%E4%BA%BA%E6%9C%BA%E6%B7%B7%E5%90%88%E7%9A%84%E6%99%BA%E8%83%BD%E6%8E%A7%E5%88%B6%E4%BA%BA%E5%9C%A8%E5%9B%9E%E8%B7%AF%E6%8E%A7%E5%88%B6/</guid>
+      <description>基于混合智能的控制
+ 混合智能有两种形式：
+（1）基于认知计算的混合增强智能：计算智能技术的混合，如模糊系统、神经网络系统、进化遗传算法等；
+（2）人机混合增强智能：将人的作用直接引入到智能系统中
+人机混合  两种人机混合的两种控制形式：人在回路控制和人机协同控制。
+控制系统=控制的目标+控制的方法+物理构成（传感器+控制器+执行器）
+人在控制系统中的作用：
+（1）控制系统目标的终极来源，为控制系统设定目标；
+（2）充当控制系统任意组件，如人的各种感觉器官具有感知各种相关物理量的能力，从而可以充当传感器，人的大脑具有独特的智能，可以胜任控制器；人的手、脚等也具有活动能力，也从而可以充当执行器（下图所示）。 为什么需要人在回路中，而不能脱离回路：
+（1）人的需求是在变化的不可预知的，同样控制系统的目标也要变化，人不在回路中作出修改，系统的目的就不再符合人的需求；
+（2）在一些场景下，人的某些特殊能力是任何机器都难以达到的，需要人机混合得到更优的控制系统。
+两个例子：
+（1）霍金的高科技轮椅：霍金所佩戴的眼镜可使用红外线感应他的面颊移动，这产生了一个开关切换信号，该信号进一步用来控制字符输入并进行其他操控，这是霍金与轮椅的唯一交互手段，在这一过程中，人就是一个需要密切关注和考虑的显式因素；
+（2）新式战机中的智能座舱必须将人和机器有机融合在一起，在人意识清醒具有行动能力时由人控制，在人丧失触发弹射能力时，自行触发弹射；
+（3）任何武器系统的最终控制一定在人的手上，比如，智能导弹飞出后也还需要保留人改变攻击目标的能力。
+典型场景：
+（1）人的需求/目标太过复杂或因人、因时而变，比如各类康复或增强人类身体机能的机器人，如上边的霍金轮椅；
+（2）保持人类控制：如上边提到的武器必须保留人的最终绝对控制；
+（3）防止人类出现低级错误或在特定情况下强制接管人类控制的机器设计：如新式战机中的智能座舱；
+（4）分别利用机器和人的独特优势获得单独一方都无法取得的性能的设计。
+上边前两个中人主要是作为控制系统的目的存在，即人在回路；后二个中人则与机器处于相同的地位，都是控制系统平等的构成组件，即人机协同。（作为人机混合的智能控制的两种具体控制形式，二者是紧密联系在一起的，并不能截然分开。）
+人在回路控制  “人在回路控制”是一种特殊的控制形式，其中人显式的存在于系统闭环回路中且不可简单剥离。
+人在控制系统中的可能角色如下表所示： in-the-loop：控制系统的操控需要人的具体指令；
+on-the-loop：系统目标由人给出，执行则由具有部分自主性的机器自行进行；
+out-of-the-loop：机器可根据感知信息独立地确定目标并给出具体指令。
+上述定义包括in-the-loop和on-the-loop。
+两个人在回路的例子：
+（1）智能家居与智能可穿戴设备：将人显式地置于智能家居系统的闭环中，如利用对人的状态的观测和估计，智能家居产品的运行可以按照人的状态变化而变，比如随着人的情绪或工作状态而变的灯光系统，或者智能系统提供执行选项，而由人根据主观意图进行最终选择；
+（2）自行车控制：自行车骑手配备一个测量心率的可穿戴设备，该设备实时进行心率测量，然后与设定心率相比，以此信号调整骑手的骑行功率。
+因此，人在回路的控制系统大多具有以人为中心、机器是人的辅助的特点，最为关键的问题就是对人的需求的准确理解和建模。</description>
+    </item>
+    
+    <item>
+      <title>EGES</title>
+      <link>https://gdy0924.github.io/posts/eges/</link>
+      <pubDate>Tue, 01 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/eges/</guid>
+      <description>Billion-scale Commodity Embedding for E-commerce Recommendation in Alibaba
+Wang, Jizhe et al. “Billion-scale Commodity Embedding for E-commerce Recommendation in Alibaba.” Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery &amp;amp; Data Mining (2018)(cite:301)
+ 推荐系统存在三大挑战：
+（1）可扩展性：淘宝数据集规模巨大；
+（2）稀疏性：用户通常与少量的物品交互；
+（3）冷启动：淘宝中每小时有数百万件新物品添加进来，这些物品没有任何用户行为，难以得到embedding。
+本文先从用户的行为历史中构建一个图，并学习graph embedding；为了缓解稀疏性和冷启动问题，将边信息整合到graph embedding框架中，提出了两种聚合方法来集成embedding和边信息。
+之前的工作只考虑用户的历史交互行为，为了解决这一问题，提出使用边信息来增强embedding过程，称为Graph Embedding with Side information (GES)。同时，物品具有多种属性信息，如类别、品牌、价格等，我们利用加权的方式对边信息进行embedding，称为 Enhanced Graph Embedding with Side information (EGES)
+FRAMEWORK Item graph construction  将用户的行为看作是顺序的，构造有向图；只考虑固定时间窗口内的用户行为，减少计算与空间成本，同时考虑到用户的兴趣随时间变化。
+Base Graph Embedding  采用随机游走的方式（类似deepwalk），但该图是带权重的有向图，因此，采样概率由权重决定： $$ p(v_{j}|v_{i})=\frac{M_{ij}}{\sum_{j\in N_{+}(v_{i})}M_{ij}},v_{j}\in N_{+}(v_{i}) $$ $$ p(v_{j}|v_{i})=0,e_{ij}\notin \varepsilon $$ 其中，$M_{ij}$表示权重，$v_{j}\in N_{+}(v_{i})$表示存在边。</description>
+    </item>
+    
+    <item>
+      <title>图嵌入简单总结</title>
+      <link>https://gdy0924.github.io/posts/%E5%9B%BE%E5%B5%8C%E5%85%A5%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93/</link>
+      <pubDate>Tue, 01 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/%E5%9B%BE%E5%B5%8C%E5%85%A5%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93/</guid>
+      <description>DeepWalk使用随机游走的方式产生序列（类似nlp中的句子），输入skip-gram进行训练。
+LINE同时保留一阶相似度和二阶相似度，通过设计相应的优化函数，每个节点拥有自身的embedding和上下文embedding，一阶相似度逼近边权值，二阶相似度通过上下文embedding计算，将一阶相似度计算得到的embedding与二阶相似度计算得到的embedding进行简单拼接。
+node2vec引入两个参数q和p，用来控制随机游走策略是更偏向DFS还是BFS，节点的采样概率不同。
+SDNE提出半监督自编码深度模型，同时保留一阶和二阶相似度，邻接矩阵能够表示邻域结构，作为输入学习二阶相似度，一阶相似度作为监督信息，有边相连则计算损失函数优化。
+EGES引入侧边信息，解决冷启动问题，新加入的节点，没有用户点击信息，那么通过属性embedding（如商品的品牌，价格等），得到初始的embedding，每个边信息对应的embedding有自己的权重，通过神经网络学习得到。
+比较总结：
+1、DeepWalk 使用的深度优先搜索策略，而 LINE 使用了广度优先搜索策略。
+2、DeepWalk仅适用于无权图，而LINE模型适用于带权图与无权图。
+3、node2vec是一种综合考虑DFS邻域和BFS邻域的graph embedding方法，可以看作是deepwalk的一种扩展，是结合了DFS和BFS随机游走的deepwalk。
+4、之前工作都是浅层网络，SDNE是深层网络，并明确定义了目标函数。</description>
+    </item>
+    
+    <item>
+      <title>SDNE</title>
+      <link>https://gdy0924.github.io/posts/sdne/</link>
+      <pubDate>Mon, 31 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/sdne/</guid>
+      <description>Wang, Daixin et al. “Structural Deep Network Embedding.” Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (2016) (cite:1,960)
+ 之前的方法，如LINE、DeepWalk、node2vec，使用的都是浅层模型，不能捕获高度非线性的网络结构。因此，本文提出了结构性深度网络embedding方法SDNE：
+（1）提出了一个半监督的深度模型，具有多层非线性函数，从而能够捕获高度非线性的网络结构；
+（2）提出联合利用一阶和二阶相似度来保留网络结构，一阶相似度作为监督信息，保留网络局部信息，二阶相似度由无监督部分来捕获全局结构信息。
+定义  $G=(V,E)$，$V$为节点，$E$为边，$s_{i,j}\geq 0$为边的权重，没有边相连权重为0。
+一阶相似度：与两个节点之间的边权重决定；
+二阶相似度：两节点的邻域结构的相似性，即如果两个顶点共享许多共同的邻居，它们往往是相似的。
+The Model Framework 上图为本文提出的半监督深度模型，通过无监督部分保持二阶相似度，一阶相似度作为监督信息。
+Loss Functions  下表为一些术语和符号定义： 对于任意一个图，我们可以得到其邻接矩阵$S$，对于邻接矩阵中的每一个实例$s_{i}$，都描述了该顶点的邻域结构，即$S$提供了每个顶点的邻域结构信息，因此我们将$S$作为网络的输入，让深度模型学习潜在表示并通过decoder重构出来，相应的损失函数为： $$ L=\sum_{i=1}^{n}|| \hat{X}_ {i}-X_{i} ||_ {2}^{2} $$ 使用邻接矩阵的输入autoencoder，即$X_{i}=s_{i}$，每个$s_{i}$都描述了顶点的邻域结构，因此重构过程可以学习到二阶相似度。
+由于网络的稀疏性，$S$中非零元素的数量远小于零元素的数量,如果我们直接使用$S$作为输入，很容易重构$S$中的零元素。为了解决上述问题，引入带权损失函数，即对于非零元素具有更高的惩罚系数： $$ L_{2nd}=\sum_{i=1}^{n}|| (\hat{X}_ {i}-X_{i})\odot b_{i} || _ {2}^{2} $$ 其中，$b_{i}=\lbrace b_{i,j} \rbrace_{j=1}^{n}$，当顶点i和j之间无边时，$b_{i,j}=1$，否则，$b_{i,j}&amp;gt; 1$。此时，无监督自编码深度模型可以重构顶点之间的二阶相似度来保持全局网络结构。
+一阶相似度可以看作是约束一对顶点的潜在表示的相似性的监督信息，我们利用有监督方式来解决，损失函数为： $$ L_{1st}=\sum_{i,j=1}^{n}s_{i,j}|| y_{i}^{(K)}-y_{j}^{(K)} ||_ {2}^{2} $$ 即相连节点（$s_{i,j}\neq 0$）得到的潜在表示应该也是相近的。</description>
+    </item>
+    
     <item>
       <title>LINE</title>
       <link>https://gdy0924.github.io/posts/line/</link>

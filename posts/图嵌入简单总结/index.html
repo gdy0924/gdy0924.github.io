@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/%E5%9B%BE%E5%B5%8C%E5%85%A5%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/%E5%9B%BE%E5%B5%8C%E5%85%A5%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "图嵌入简单总结",
+      "headline" : "图嵌入简单总结",
+      "description" : "DeepWalk使用随机游走的方式产生序列（类似nlp中的句子），输入skip-gram进行训练。\nLINE同时保留一阶相似度和二阶相似度，通过设计相应的优化函数，每个节点拥有自身的embedding和上下文embedding，一阶相似度逼近边权值，二阶相似度通过上下文embedding计算，将一阶相似度计算得到的embedding与二阶相似度计算得到的embedding进行简单拼接。\nnode2vec引入两个参数q和p，用来控制随机游走策略是更偏向DFS还是BFS，节点的采样概率不同。\nSDNE提出半监督自编码深度模型，同时保留一阶和二阶相似度，邻接矩阵能够表示邻域结构，作为输入学习二阶相似度，一阶相似度作为监督信息，有边相连则计算损失函数优化。\nEGES引入侧边信息，解决冷启动问题，新加入的节点，没有用户点击信息，那么通过属性embedding（如商品的品牌，价格等），得到初始的embedding，每个边信息对应的embedding有自己的权重，通过神经网络学习得到。\n比较总结：\n1、DeepWalk 使用的深度优先搜索策略，而 LINE 使用了广度优先搜索策略。\n2、DeepWalk仅适用于无权图，而LINE模型适用于带权图与无权图。\n3、node2vec是一种综合考虑DFS邻域和BFS邻域的graph embedding方法，可以看作是deepwalk的一种扩展，是结合了DFS和BFS随机游走的deepwalk。\n4、之前工作都是浅层网络，SDNE是深层网络，并明确定义了目标函数。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,35 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-11-03 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-11-03 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "datePublished": "2022-11-01 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-11-01 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/%E5%9B%BE%E5%B5%8C%E5%85%A5%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>图嵌入简单总结</title>
+  <meta property="og:title" content="图嵌入简单总结" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="DeepWalk使用随机游走的方式产生序列（类似nlp中的句子），输入skip-gram进行训练。
+LINE同时保留一阶相似度和二阶相似度，通过设计相应的优化函数，每个节点拥有自身的embedding和上下文embedding，一阶相似度逼近边权值，二阶相似度通过上下文embedding计算，将一阶相似度计算得到的embedding与二阶相似度计算得到的embedding进行简单拼接。
+node2vec引入两个参数q和p，用来控制随机游走策略是更偏向DFS还是BFS，节点的采样概率不同。
+SDNE提出半监督自编码深度模型，同时保留一阶和二阶相似度，邻接矩阵能够表示邻域结构，作为输入学习二阶相似度，一阶相似度作为监督信息，有边相连则计算损失函数优化。
+EGES引入侧边信息，解决冷启动问题，新加入的节点，没有用户点击信息，那么通过属性embedding（如商品的品牌，价格等），得到初始的embedding，每个边信息对应的embedding有自己的权重，通过神经网络学习得到。
+比较总结：
+1、DeepWalk 使用的深度优先搜索策略，而 LINE 使用了广度优先搜索策略。
+2、DeepWalk仅适用于无权图，而LINE模型适用于带权图与无权图。
+3、node2vec是一种综合考虑DFS邻域和BFS邻域的graph embedding方法，可以看作是deepwalk的一种扩展，是结合了DFS和BFS随机游走的deepwalk。
+4、之前工作都是浅层网络，SDNE是深层网络，并明确定义了目标函数。" />
+  <meta name="description" content="DeepWalk使用随机游走的方式产生序列（类似nlp中的句子），输入skip-gram进行训练。
+LINE同时保留一阶相似度和二阶相似度，通过设计相应的优化函数，每个节点拥有自身的embedding和上下文embedding，一阶相似度逼近边权值，二阶相似度通过上下文embedding计算，将一阶相似度计算得到的embedding与二阶相似度计算得到的embedding进行简单拼接。
+node2vec引入两个参数q和p，用来控制随机游走策略是更偏向DFS还是BFS，节点的采样概率不同。
+SDNE提出半监督自编码深度模型，同时保留一阶和二阶相似度，邻接矩阵能够表示邻域结构，作为输入学习二阶相似度，一阶相似度作为监督信息，有边相连则计算损失函数优化。
+EGES引入侧边信息，解决冷启动问题，新加入的节点，没有用户点击信息，那么通过属性embedding（如商品的品牌，价格等），得到初始的embedding，每个边信息对应的embedding有自己的权重，通过神经网络学习得到。
+比较总结：
+1、DeepWalk 使用的深度优先搜索策略，而 LINE 使用了广度优先搜索策略。
+2、DeepWalk仅适用于无权图，而LINE模型适用于带权图与无权图。
+3、node2vec是一种综合考虑DFS邻域和BFS邻域的graph embedding方法，可以看作是deepwalk的一种扩展，是结合了DFS和BFS随机游走的deepwalk。
+4、之前工作都是浅层网络，SDNE是深层网络，并明确定义了目标函数。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +121,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +154,88 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">图嵌入简单总结</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-01 00:00:00 UTC">
+                01 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>    DeepWalk使用随机游走的方式产生序列（类似nlp中的句子），输入skip-gram进行训练。<br>
+    LINE同时保留一阶相似度和二阶相似度，通过设计相应的优化函数，每个节点拥有自身的embedding和上下文embedding，一阶相似度逼近边权值，二阶相似度通过上下文embedding计算，将一阶相似度计算得到的embedding与二阶相似度计算得到的embedding进行简单拼接。<br>
+    node2vec引入两个参数q和p，用来控制随机游走策略是更偏向DFS还是BFS，节点的采样概率不同。<br>
+    SDNE提出半监督自编码深度模型，同时保留一阶和二阶相似度，邻接矩阵能够表示邻域结构，作为输入学习二阶相似度，一阶相似度作为监督信息，有边相连则计算损失函数优化。<br>
+    EGES引入侧边信息，解决冷启动问题，新加入的节点，没有用户点击信息，那么通过属性embedding（如商品的品牌，价格等），得到初始的embedding，每个边信息对应的embedding有自己的权重，通过神经网络学习得到。<br>
+    比较总结：<br>
+    1、DeepWalk 使用的深度优先搜索策略，而 LINE 使用了广度优先搜索策略。<br>
+    2、DeepWalk仅适用于无权图，而LINE模型适用于带权图与无权图。<br>
+    3、node2vec是一种综合考虑DFS邻域和BFS邻域的graph embedding方法，可以看作是deepwalk的一种扩展，是结合了DFS和BFS随机游走的deepwalk。<br>
+    4、之前工作都是浅层网络，SDNE是深层网络，并明确定义了目标函数。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +255,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/sdne/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/sdne/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "SDNE",
+      "headline" : "SDNE",
+      "description" : "Wang, Daixin et al. “Structural Deep Network Embedding.” Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (2016) (cite:1,960)\n 之前的方法，如LINE、DeepWalk、node2vec，使用的都是浅层模型，不能捕获高度非线性的网络结构。因此，本文提出了结构性深度网络embedding方法SDNE：\n（1）提出了一个半监督的深度模型，具有多层非线性函数，从而能够捕获高度非线性的网络结构；\n（2）提出联合利用一阶和二阶相似度来保留网络结构，一阶相似度作为监督信息，保留网络局部信息，二阶相似度由无监督部分来捕获全局结构信息。\n定义  $G=(V,E)$，$V$为节点，$E$为边，$s_{i,j}\\geq 0$为边的权重，没有边相连权重为0。\n一阶相似度：与两个节点之间的边权重决定；\n二阶相似度：两节点的邻域结构的相似性，即如果两个顶点共享许多共同的邻居，它们往往是相似的。\nThe Model Framework 上图为本文提出的半监督深度模型，通过无监督部分保持二阶相似度，一阶相似度作为监督信息。\nLoss Functions  下表为一些术语和符号定义： 对于任意一个图，我们可以得到其邻接矩阵$S$，对于邻接矩阵中的每一个实例$s_{i}$，都描述了该顶点的邻域结构，即$S$提供了每个顶点的邻域结构信息，因此我们将$S$作为网络的输入，让深度模型学习潜在表示并通过decoder重构出来，相应的损失函数为： $$ L=\\sum_{i=1}^{n}|| \\hat{X}_ {i}-X_{i} ||_ {2}^{2} $$ 使用邻接矩阵的输入autoencoder，即$X_{i}=s_{i}$，每个$s_{i}$都描述了顶点的邻域结构，因此重构过程可以学习到二阶相似度。\n由于网络的稀疏性，$S$中非零元素的数量远小于零元素的数量,如果我们直接使用$S$作为输入，很容易重构$S$中的零元素。为了解决上述问题，引入带权损失函数，即对于非零元素具有更高的惩罚系数： $$ L_{2nd}=\\sum_{i=1}^{n}|| (\\hat{X}_ {i}-X_{i})\\odot b_{i} || _ {2}^{2} $$ 其中，$b_{i}=\\lbrace b_{i,j} \\rbrace_{j=1}^{n}$，当顶点i和j之间无边时，$b_{i,j}=1$，否则，$b_{i,j}\u0026gt; 1$。此时，无监督自编码深度模型可以重构顶点之间的二阶相似度来保持全局网络结构。\n一阶相似度可以看作是约束一对顶点的潜在表示的相似性的监督信息，我们利用有监督方式来解决，损失函数为： $$ L_{1st}=\\sum_{i,j=1}^{n}s_{i,j}|| y_{i}^{(K)}-y_{j}^{(K)} ||_ {2}^{2} $$ 即相连节点（$s_{i,j}\\neq 0$）得到的潜在表示应该也是相近的。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,37 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-11-03 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-11-03 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "datePublished": "2022-10-31 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-10-31 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/sdne\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>SDNE</title>
+  <meta property="og:title" content="SDNE" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Wang, Daixin et al. “Structural Deep Network Embedding.” Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (2016) (cite:1,960)
+ 之前的方法，如LINE、DeepWalk、node2vec，使用的都是浅层模型，不能捕获高度非线性的网络结构。因此，本文提出了结构性深度网络embedding方法SDNE：
+（1）提出了一个半监督的深度模型，具有多层非线性函数，从而能够捕获高度非线性的网络结构；
+（2）提出联合利用一阶和二阶相似度来保留网络结构，一阶相似度作为监督信息，保留网络局部信息，二阶相似度由无监督部分来捕获全局结构信息。
+定义  $G=(V,E)$，$V$为节点，$E$为边，$s_{i,j}\geq 0$为边的权重，没有边相连权重为0。
+一阶相似度：与两个节点之间的边权重决定；
+二阶相似度：两节点的邻域结构的相似性，即如果两个顶点共享许多共同的邻居，它们往往是相似的。
+The Model Framework 上图为本文提出的半监督深度模型，通过无监督部分保持二阶相似度，一阶相似度作为监督信息。
+Loss Functions  下表为一些术语和符号定义： 对于任意一个图，我们可以得到其邻接矩阵$S$，对于邻接矩阵中的每一个实例$s_{i}$，都描述了该顶点的邻域结构，即$S$提供了每个顶点的邻域结构信息，因此我们将$S$作为网络的输入，让深度模型学习潜在表示并通过decoder重构出来，相应的损失函数为： $$ L=\sum_{i=1}^{n}|| \hat{X}_ {i}-X_{i} ||_ {2}^{2} $$ 使用邻接矩阵的输入autoencoder，即$X_{i}=s_{i}$，每个$s_{i}$都描述了顶点的邻域结构，因此重构过程可以学习到二阶相似度。
+由于网络的稀疏性，$S$中非零元素的数量远小于零元素的数量,如果我们直接使用$S$作为输入，很容易重构$S$中的零元素。为了解决上述问题，引入带权损失函数，即对于非零元素具有更高的惩罚系数： $$ L_{2nd}=\sum_{i=1}^{n}|| (\hat{X}_ {i}-X_{i})\odot b_{i} || _ {2}^{2} $$ 其中，$b_{i}=\lbrace b_{i,j} \rbrace_{j=1}^{n}$，当顶点i和j之间无边时，$b_{i,j}=1$，否则，$b_{i,j}&amp;gt; 1$。此时，无监督自编码深度模型可以重构顶点之间的二阶相似度来保持全局网络结构。
+一阶相似度可以看作是约束一对顶点的潜在表示的相似性的监督信息，我们利用有监督方式来解决，损失函数为： $$ L_{1st}=\sum_{i,j=1}^{n}s_{i,j}|| y_{i}^{(K)}-y_{j}^{(K)} ||_ {2}^{2} $$ 即相连节点（$s_{i,j}\neq 0$）得到的潜在表示应该也是相近的。" />
+  <meta name="description" content="Wang, Daixin et al. “Structural Deep Network Embedding.” Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (2016) (cite:1,960)
+ 之前的方法，如LINE、DeepWalk、node2vec，使用的都是浅层模型，不能捕获高度非线性的网络结构。因此，本文提出了结构性深度网络embedding方法SDNE：
+（1）提出了一个半监督的深度模型，具有多层非线性函数，从而能够捕获高度非线性的网络结构；
+（2）提出联合利用一阶和二阶相似度来保留网络结构，一阶相似度作为监督信息，保留网络局部信息，二阶相似度由无监督部分来捕获全局结构信息。
+定义  $G=(V,E)$，$V$为节点，$E$为边，$s_{i,j}\geq 0$为边的权重，没有边相连权重为0。
+一阶相似度：与两个节点之间的边权重决定；
+二阶相似度：两节点的邻域结构的相似性，即如果两个顶点共享许多共同的邻居，它们往往是相似的。
+The Model Framework 上图为本文提出的半监督深度模型，通过无监督部分保持二阶相似度，一阶相似度作为监督信息。
+Loss Functions  下表为一些术语和符号定义： 对于任意一个图，我们可以得到其邻接矩阵$S$，对于邻接矩阵中的每一个实例$s_{i}$，都描述了该顶点的邻域结构，即$S$提供了每个顶点的邻域结构信息，因此我们将$S$作为网络的输入，让深度模型学习潜在表示并通过decoder重构出来，相应的损失函数为： $$ L=\sum_{i=1}^{n}|| \hat{X}_ {i}-X_{i} ||_ {2}^{2} $$ 使用邻接矩阵的输入autoencoder，即$X_{i}=s_{i}$，每个$s_{i}$都描述了顶点的邻域结构，因此重构过程可以学习到二阶相似度。
+由于网络的稀疏性，$S$中非零元素的数量远小于零元素的数量,如果我们直接使用$S$作为输入，很容易重构$S$中的零元素。为了解决上述问题，引入带权损失函数，即对于非零元素具有更高的惩罚系数： $$ L_{2nd}=\sum_{i=1}^{n}|| (\hat{X}_ {i}-X_{i})\odot b_{i} || _ {2}^{2} $$ 其中，$b_{i}=\lbrace b_{i,j} \rbrace_{j=1}^{n}$，当顶点i和j之间无边时，$b_{i,j}=1$，否则，$b_{i,j}&amp;gt; 1$。此时，无监督自编码深度模型可以重构顶点之间的二阶相似度来保持全局网络结构。
+一阶相似度可以看作是约束一对顶点的潜在表示的相似性的监督信息，我们利用有监督方式来解决，损失函数为： $$ L_{1st}=\sum_{i,j=1}^{n}s_{i,j}|| y_{i}^{(K)}-y_{j}^{(K)} ||_ {2}^{2} $$ 即相连节点（$s_{i,j}\neq 0$）得到的潜在表示应该也是相近的。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +123,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +156,135 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">SDNE</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-10-31 00:00:00 UTC">
+                31 Oct 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Wang, Daixin et al. “Structural Deep Network Embedding.” Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (2016) (cite:1,960)</p>
+<p>    之前的方法，如LINE、DeepWalk、node2vec，使用的都是浅层模型，不能捕获高度非线性的网络结构。因此，本文提出了结构性深度网络embedding方法SDNE：<br>
+    （1）提出了一个半监督的深度模型，具有多层非线性函数，从而能够捕获高度非线性的网络结构；<br>
+    （2）提出联合利用一阶和二阶相似度来保留网络结构，一阶相似度作为监督信息，保留网络局部信息，二阶相似度由无监督部分来捕获全局结构信息。</p>
+<h2 id="定义">定义</h2>
+<p>    $G=(V,E)$，$V$为节点，$E$为边，$s_{i,j}\geq 0$为边的权重，没有边相连权重为0。<br>
+    一阶相似度：与两个节点之间的边权重决定；<br>
+    二阶相似度：两节点的邻域结构的相似性，即如果两个顶点共享许多共同的邻居，它们往往是相似的。</p>
+<h2 id="the-model">The Model</h2>
+<h3 id="framework">Framework</h3>
+<p><img src="/img/sdne.PNG" alt="">
+    上图为本文提出的半监督深度模型，通过无监督部分保持二阶相似度，一阶相似度作为监督信息。</p>
+<h3 id="loss-functions">Loss Functions</h3>
+<p>    下表为一些术语和符号定义：
+<img src="/img/sdne1.PNG" alt="">
+    对于任意一个图，我们可以得到其邻接矩阵$S$，对于邻接矩阵中的每一个实例$s_{i}$，都描述了该顶点的邻域结构，即$S$提供了每个顶点的邻域结构信息，因此我们将$S$作为网络的输入，让深度模型学习潜在表示并通过decoder重构出来，相应的损失函数为：
+$$
+L=\sum_{i=1}^{n}|| \hat{X}_ {i}-X_{i} ||_ {2}^{2}
+$$
+    使用邻接矩阵的输入autoencoder，即$X_{i}=s_{i}$，每个$s_{i}$都描述了顶点的邻域结构，因此重构过程可以学习到二阶相似度。<br>
+    由于网络的稀疏性，$S$中非零元素的数量远小于零元素的数量,如果我们直接使用$S$作为输入，很容易重构$S$中的零元素。为了解决上述问题，引入带权损失函数，即对于非零元素具有更高的惩罚系数：
+$$
+L_{2nd}=\sum_{i=1}^{n}|| (\hat{X}_ {i}-X_{i})\odot b_{i} || _ {2}^{2}
+$$
+    其中，$b_{i}=\lbrace b_{i,j} \rbrace_{j=1}^{n}$，当顶点i和j之间无边时，$b_{i,j}=1$，否则，$b_{i,j}&gt; 1$。此时，无监督自编码深度模型可以重构顶点之间的二阶相似度来保持全局网络结构。<br>
+    一阶相似度可以看作是约束一对顶点的潜在表示的相似性的监督信息，我们利用有监督方式来解决，损失函数为：
+$$
+L_{1st}=\sum_{i,j=1}^{n}s_{i,j}|| y_{i}^{(K)}-y_{j}^{(K)} ||_ {2}^{2}
+$$
+    即相连节点（$s_{i,j}\neq 0$）得到的潜在表示应该也是相近的。<br>
+    为了同时保持一阶和二阶的相似度，将他们进行结合：
+$$
+L_{mix}=L_{2nd}+\alpha L_{1st}+vL_{reg}
+$$
+    其中，$L_{reg}$为防止过拟合的L2正则化。</p>
+<h3 id="analysis-and-discussions">Analysis and Discussions</h3>
+<p>    当添加新顶点时，得到其邻接向量，将邻接向量作为输入。</p>
+<h2 id="实验">实验</h2>
+<h3 id="数据集">数据集</h3>
+<p><img src="/img/sdne2.PNG" alt=""></p>
+<h3 id="结果">结果</h3>
+<h4 id="reconstruction-task">reconstruction task</h4>
+<p><img src="/img/sdne3.PNG" alt="">
+    SDNE效果最好。<br>
+    虽然SDNE和LINE都利用了一阶和二阶的相似度来保持网络结构，但SDNE却取得了更好的性能。原因可能有两方面：首先，LINE采用了浅层结构，很难捕获底层网络中的高度非线性结构；其次，LINE直接连接了一阶和二阶相似度的表示形式。<br>
+    SDNE和LINE的表现都优于LE，LE只利用一级邻近性来保持网络结构，这表明二级邻近性的输入可以更好地保持网络结构。</p>
+<h4 id="multi-label-classification">Multi-label Classification</h4>
+<p><img src="/img/sdne4.PNG" alt="">
+    当标记数据有限时（如10%），SDNE可以实现比基线更显著的改进。<br>
+    在大多数情况下，DeepWalk性能最差。原因有两方面：首先，DeepWalk没有一个明确的目标函数；其次，DeepWalk使用随机游走的方法，由于随机性而引入了大量的噪声。</p>
+<h4 id="可视化">可视化</h4>
+<p><img src="/img/sdne5.PNG" alt="">
+    LE和DeepWalk的效果最差；LINE的中间部分有混合，GraRep结果看起来更好，但是每个组的界限并不是很清楚。</p>
+<h4 id="参数">参数</h4>
+<p><img src="/img/sdne6.PNG" alt="">
+    左边：当$\alpha $为0时，表示没有一阶相似度，可以看出，为0.1和0.2时效果最好；<br>
+    右边（非零元素的重构误差）：当为1时，结果并不好，在这种情况下，该模型将平等地重建训练网络中的非零元素和零元素；越大也不好，在这种情况下，该模型在执行重构时几乎忽略了零元素</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +304,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

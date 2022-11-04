@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/hitl-design/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/hitl-design/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "HITL-Design",
+      "headline" : "HITL-Design",
+      "description" : "HUMAN-IN-THE-LOOP DESIGN WITH MACHINE LEARNING\n 自动生成带有个人偏好的设计一直是设计领域的一个持续挑战。在时装、家具设计等场景中，引入深度学习方法可以带有某些随机因素的生成图像作为设计的结果。然而，这些生成方法并没有考虑人的因素，即随机生成的图像结果并没有引入人类的认知。\n本文提出使用一个编码器在受试者观看图像时，记录其脑信号，提取脑电图特征；其次，以编码的脑电图特征为条件，训练一个GAN模型，生成设计图像；利用训练后的模型从一个人的认知过程中测量的大脑活动中生成设计图像。\n该方法可以在与偏好相关的大脑信号的引导下生成首选的设计风格。\nMETHOD 训练阶段：首先受试者看到图片，通过训练编码器从受试者原始的脑电图数据中提取特征，来探索脑信号与图像之间的关系；接着利用编码的大脑信号特征条件的GAN框架训练生成器，重建所呈现的图像。\n使用阶段：使用训练好的模型在偏好图像实验中重建真实的偏好设计图像。\n共包括两个阶段：\n（1）学习生成函数：$G_{BD}=B\\rightarrow D$，该函数用于将脑电测量到的脑活动 B 映射到相应的设计图像 D；（2）设计阶段：利用学习到的生成函数和特定的脑信号生成一个涉及人类偏好的产品。 在训练阶段，当受试者观看设计的「真实」图像时，记录其脑电图信号。基于 LSTM 的脑电编码器将脑信号$B_{i}$编码成与所见图像的设计语义相关的 EEG 特征。下图为EEG feature encoder： 将脑电特征作为生成条件嵌入到基于 GAN 的生成器中，生成模型重构出与原始图像具有相同设计语义的图像$D_{i}$。\n在设计阶段，要求受试者想象一个他们喜欢的产品或设计的例子，然后将测量到的可能包含受试者偏好的设计特征的 EEG 信号编码输入到训练得到的生成器中。生成器生成包含与受试者想象相对应的设计特征的样本设计。\n实验结果 人工评价 被参与者选择为他们喜欢的设计的比例。\n图像重建与偏好设计 ",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -69,15 +69,35 @@ code.has-jax {
       "copyrightYear" : "2022",
       "datePublished": "2022-11-03 00:00:00 \u002b0000 UTC",
       "dateModified" : "2022-11-03 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/hitl-design\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>HITL-Design</title>
+  <meta property="og:title" content="HITL-Design" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="HUMAN-IN-THE-LOOP DESIGN WITH MACHINE LEARNING
+ 自动生成带有个人偏好的设计一直是设计领域的一个持续挑战。在时装、家具设计等场景中，引入深度学习方法可以带有某些随机因素的生成图像作为设计的结果。然而，这些生成方法并没有考虑人的因素，即随机生成的图像结果并没有引入人类的认知。
+本文提出使用一个编码器在受试者观看图像时，记录其脑信号，提取脑电图特征；其次，以编码的脑电图特征为条件，训练一个GAN模型，生成设计图像；利用训练后的模型从一个人的认知过程中测量的大脑活动中生成设计图像。
+该方法可以在与偏好相关的大脑信号的引导下生成首选的设计风格。
+METHOD 训练阶段：首先受试者看到图片，通过训练编码器从受试者原始的脑电图数据中提取特征，来探索脑信号与图像之间的关系；接着利用编码的大脑信号特征条件的GAN框架训练生成器，重建所呈现的图像。
+使用阶段：使用训练好的模型在偏好图像实验中重建真实的偏好设计图像。
+共包括两个阶段：
+（1）学习生成函数：$G_{BD}=B\rightarrow D$，该函数用于将脑电测量到的脑活动 B 映射到相应的设计图像 D；（2）设计阶段：利用学习到的生成函数和特定的脑信号生成一个涉及人类偏好的产品。 在训练阶段，当受试者观看设计的「真实」图像时，记录其脑电图信号。基于 LSTM 的脑电编码器将脑信号$B_{i}$编码成与所见图像的设计语义相关的 EEG 特征。下图为EEG feature encoder： 将脑电特征作为生成条件嵌入到基于 GAN 的生成器中，生成模型重构出与原始图像具有相同设计语义的图像$D_{i}$。
+在设计阶段，要求受试者想象一个他们喜欢的产品或设计的例子，然后将测量到的可能包含受试者偏好的设计特征的 EEG 信号编码输入到训练得到的生成器中。生成器生成包含与受试者想象相对应的设计特征的样本设计。
+实验结果 人工评价 被参与者选择为他们喜欢的设计的比例。
+图像重建与偏好设计 " />
+  <meta name="description" content="HUMAN-IN-THE-LOOP DESIGN WITH MACHINE LEARNING
+ 自动生成带有个人偏好的设计一直是设计领域的一个持续挑战。在时装、家具设计等场景中，引入深度学习方法可以带有某些随机因素的生成图像作为设计的结果。然而，这些生成方法并没有考虑人的因素，即随机生成的图像结果并没有引入人类的认知。
+本文提出使用一个编码器在受试者观看图像时，记录其脑信号，提取脑电图特征；其次，以编码的脑电图特征为条件，训练一个GAN模型，生成设计图像；利用训练后的模型从一个人的认知过程中测量的大脑活动中生成设计图像。
+该方法可以在与偏好相关的大脑信号的引导下生成首选的设计风格。
+METHOD 训练阶段：首先受试者看到图片，通过训练编码器从受试者原始的脑电图数据中提取特征，来探索脑信号与图像之间的关系；接着利用编码的大脑信号特征条件的GAN框架训练生成器，重建所呈现的图像。
+使用阶段：使用训练好的模型在偏好图像实验中重建真实的偏好设计图像。
+共包括两个阶段：
+（1）学习生成函数：$G_{BD}=B\rightarrow D$，该函数用于将脑电测量到的脑活动 B 映射到相应的设计图像 D；（2）设计阶段：利用学习到的生成函数和特定的脑信号生成一个涉及人类偏好的产品。 在训练阶段，当受试者观看设计的「真实」图像时，记录其脑电图信号。基于 LSTM 的脑电编码器将脑信号$B_{i}$编码成与所见图像的设计语义相关的 EEG 特征。下图为EEG feature encoder： 将脑电特征作为生成条件嵌入到基于 GAN 的生成器中，生成模型重构出与原始图像具有相同设计语义的图像$D_{i}$。
+在设计阶段，要求受试者想象一个他们喜欢的产品或设计的例子，然后将测量到的可能包含受试者偏好的设计特征的 EEG 信号编码输入到训练得到的生成器中。生成器生成包含与受试者想象相对应的设计特征的样本设计。
+实验结果 人工评价 被参与者选择为他们喜欢的设计的比例。
+图像重建与偏好设计 " />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +123,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +156,99 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">HITL-Design</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-03 00:00:00 UTC">
+                03 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>HUMAN-IN-THE-LOOP DESIGN WITH MACHINE LEARNING</p>
+<p>    自动生成带有个人偏好的设计一直是设计领域的一个持续挑战。在时装、家具设计等场景中，引入深度学习方法可以带有某些随机因素的生成图像作为设计的结果。然而，这些生成方法并没有考虑人的因素，即随机生成的图像结果并没有引入人类的认知。<br>
+    本文提出使用一个编码器在受试者观看图像时，记录其脑信号，提取脑电图特征；其次，以编码的脑电图特征为条件，训练一个GAN模型，生成设计图像；利用训练后的模型从一个人的认知过程中测量的大脑活动中生成设计图像。<br>
+    该方法可以在与偏好相关的大脑信号的引导下生成首选的设计风格。</p>
+<h2 id="method">METHOD</h2>
+<p><img src="/img/HITL-design1.PNG" alt="">
+    训练阶段：首先受试者看到图片，通过训练编码器从受试者原始的脑电图数据中提取特征，来探索脑信号与图像之间的关系；接着利用编码的大脑信号特征条件的GAN框架训练生成器，重建所呈现的图像。<br>
+    使用阶段：使用训练好的模型在偏好图像实验中重建真实的偏好设计图像。<br>
+    共包括两个阶段：<br>
+    （1）学习生成函数：$G_{BD}=B\rightarrow D$，该函数用于将脑电测量到的脑活动 B 映射到相应的设计图像 D；（2）设计阶段：利用学习到的生成函数和特定的脑信号生成一个涉及人类偏好的产品。
+<img src="/img/HITL-design3.PNG" alt="">
+    在训练阶段，当受试者观看设计的「真实」图像时，记录其脑电图信号。基于 LSTM 的脑电编码器将脑信号$B_{i}$编码成与所见图像的设计语义相关的 EEG 特征。下图为EEG feature encoder：
+<img src="/img/HITL-design2.PNG" alt="">
+    将脑电特征作为生成条件嵌入到基于 GAN 的生成器中，生成模型重构出与原始图像具有相同设计语义的图像$D_{i}$。<br>
+    在设计阶段，要求受试者想象一个他们喜欢的产品或设计的例子，然后将测量到的可能包含受试者偏好的设计特征的 EEG 信号编码输入到训练得到的生成器中。生成器生成包含与受试者想象相对应的设计特征的样本设计。</p>
+<h2 id="实验结果">实验结果</h2>
+<h3 id="人工评价">人工评价</h3>
+<p><img src="/img/HITL-design4.PNG" alt="">
+    被参与者选择为他们喜欢的设计的比例。</p>
+<h3 id="图像重建与偏好设计">图像重建与偏好设计</h3>
+<p><img src="/img/HITL-design5.PNG" alt=""></p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +268,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

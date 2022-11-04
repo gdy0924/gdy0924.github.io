@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/hitl-vos/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/hitl-vos/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "HITL-VOS",
+      "headline" : "HITL-VOS",
+      "description" : "Interactive Video Object Segmentation in the Wild\n 本文提出了一种深度交互式图像分割方法，只需点击少量的鼠标就能精确地分割对象。其使用了一个深度卷积神经网络，联合使用用户的点击和RGB信息来分割图像。\n如上图所示，第一帧通过几次点击进行分割；然后，使用OSVOS对视频片段进行分割；最后，用户可以选择通过1-2次点击来优化分割不好的帧。\nMethod  整体包括两个主要步骤：第一帧的半自动标注，将此分割掩模自动传播到视频的剩余帧中。\nInteractive image segmentation  本文提出了一个卷积网络，其根据当前分割、用户输入和RGB图像来预测像素级分割。 （上图中，左边为当前预测和点击得到的正负样本，右图为真值）\n（1）当前分割：一个二值图像，作为一个额外的通道进行输入；\n（2）为了以点击的形式对用户输入进行编码，我们创建了一个零初始化通道，在该通道中，每次正点击或负点击分别添加或减去具有小标准偏差的高斯值。\n由于手动收集用户交互太昂贵，我们使用模拟用户交互。对于正样本，随机采样物体边界内的像素点；对于负样本，随机采样远离物体边界40个像素点的位置，或者从图像中的其他对象中采样负片点击。\n网络架构选择ResNet-101，并且引入CRF细化边界。\nVideo segmentation  对于分割完整的视频，给定第一帧，依赖于单镜头实现视频分割，使用OSVOS网络。\nProgressive Refinement  由于一次性分割可能在视频序列上效果不好，因此我们使用渐进改进的方式，逐步细化结果，每次循环都使用上边提到的交互分割方式，来进一步改进结果。由于我们的方法将当前的分割掩码作为输入，因此它提供了一种快速、直观的方法来细化初始掩码，而不是要求从零开始对其进行注释。\n实验 Ablation study 上表比较了点击时使用高斯分布、CRF细化以及将当前结果作为额外的输入通道，在点击多少次的情况下能达到好的效果。\nComparison to the State of the Art Pascal数据集中物体分辨率普遍很小，因此挑战比较大。\nSegmentation Refinement 我们的点击交互方式能带来更大的效果提升。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -69,15 +69,41 @@ code.has-jax {
       "copyrightYear" : "2022",
       "datePublished": "2022-11-03 00:00:00 \u002b0000 UTC",
       "dateModified" : "2022-11-03 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/hitl-vos\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>HITL-VOS</title>
+  <meta property="og:title" content="HITL-VOS" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Interactive Video Object Segmentation in the Wild
+ 本文提出了一种深度交互式图像分割方法，只需点击少量的鼠标就能精确地分割对象。其使用了一个深度卷积神经网络，联合使用用户的点击和RGB信息来分割图像。
+如上图所示，第一帧通过几次点击进行分割；然后，使用OSVOS对视频片段进行分割；最后，用户可以选择通过1-2次点击来优化分割不好的帧。
+Method  整体包括两个主要步骤：第一帧的半自动标注，将此分割掩模自动传播到视频的剩余帧中。
+Interactive image segmentation  本文提出了一个卷积网络，其根据当前分割、用户输入和RGB图像来预测像素级分割。 （上图中，左边为当前预测和点击得到的正负样本，右图为真值）
+（1）当前分割：一个二值图像，作为一个额外的通道进行输入；
+（2）为了以点击的形式对用户输入进行编码，我们创建了一个零初始化通道，在该通道中，每次正点击或负点击分别添加或减去具有小标准偏差的高斯值。
+由于手动收集用户交互太昂贵，我们使用模拟用户交互。对于正样本，随机采样物体边界内的像素点；对于负样本，随机采样远离物体边界40个像素点的位置，或者从图像中的其他对象中采样负片点击。
+网络架构选择ResNet-101，并且引入CRF细化边界。
+Video segmentation  对于分割完整的视频，给定第一帧，依赖于单镜头实现视频分割，使用OSVOS网络。
+Progressive Refinement  由于一次性分割可能在视频序列上效果不好，因此我们使用渐进改进的方式，逐步细化结果，每次循环都使用上边提到的交互分割方式，来进一步改进结果。由于我们的方法将当前的分割掩码作为输入，因此它提供了一种快速、直观的方法来细化初始掩码，而不是要求从零开始对其进行注释。
+实验 Ablation study 上表比较了点击时使用高斯分布、CRF细化以及将当前结果作为额外的输入通道，在点击多少次的情况下能达到好的效果。
+Comparison to the State of the Art Pascal数据集中物体分辨率普遍很小，因此挑战比较大。
+Segmentation Refinement 我们的点击交互方式能带来更大的效果提升。" />
+  <meta name="description" content="Interactive Video Object Segmentation in the Wild
+ 本文提出了一种深度交互式图像分割方法，只需点击少量的鼠标就能精确地分割对象。其使用了一个深度卷积神经网络，联合使用用户的点击和RGB信息来分割图像。
+如上图所示，第一帧通过几次点击进行分割；然后，使用OSVOS对视频片段进行分割；最后，用户可以选择通过1-2次点击来优化分割不好的帧。
+Method  整体包括两个主要步骤：第一帧的半自动标注，将此分割掩模自动传播到视频的剩余帧中。
+Interactive image segmentation  本文提出了一个卷积网络，其根据当前分割、用户输入和RGB图像来预测像素级分割。 （上图中，左边为当前预测和点击得到的正负样本，右图为真值）
+（1）当前分割：一个二值图像，作为一个额外的通道进行输入；
+（2）为了以点击的形式对用户输入进行编码，我们创建了一个零初始化通道，在该通道中，每次正点击或负点击分别添加或减去具有小标准偏差的高斯值。
+由于手动收集用户交互太昂贵，我们使用模拟用户交互。对于正样本，随机采样物体边界内的像素点；对于负样本，随机采样远离物体边界40个像素点的位置，或者从图像中的其他对象中采样负片点击。
+网络架构选择ResNet-101，并且引入CRF细化边界。
+Video segmentation  对于分割完整的视频，给定第一帧，依赖于单镜头实现视频分割，使用OSVOS网络。
+Progressive Refinement  由于一次性分割可能在视频序列上效果不好，因此我们使用渐进改进的方式，逐步细化结果，每次循环都使用上边提到的交互分割方式，来进一步改进结果。由于我们的方法将当前的分割掩码作为输入，因此它提供了一种快速、直观的方法来细化初始掩码，而不是要求从零开始对其进行注释。
+实验 Ablation study 上表比较了点击时使用高斯分布、CRF细化以及将当前结果作为额外的输入通道，在点击多少次的情况下能达到好的效果。
+Comparison to the State of the Art Pascal数据集中物体分辨率普遍很小，因此挑战比较大。
+Segmentation Refinement 我们的点击交互方式能带来更大的效果提升。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +129,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +162,106 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">HITL-VOS</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-03 00:00:00 UTC">
+                03 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Interactive Video Object Segmentation in the Wild</p>
+<p>    本文提出了一种深度交互式图像分割方法，只需点击少量的鼠标就能精确地分割对象。其使用了一个深度卷积神经网络，联合使用用户的点击和RGB信息来分割图像。</p>
+<p><img src="/img/HITL-VOS1.PNG" alt="">
+    如上图所示，第一帧通过几次点击进行分割；然后，使用OSVOS对视频片段进行分割；最后，用户可以选择通过1-2次点击来优化分割不好的帧。</p>
+<h2 id="method">Method</h2>
+<p>    整体包括两个主要步骤：第一帧的半自动标注，将此分割掩模自动传播到视频的剩余帧中。</p>
+<h3 id="interactive-image-segmentation">Interactive image segmentation</h3>
+<p>    本文提出了一个卷积网络，其根据当前分割、用户输入和RGB图像来预测像素级分割。
+<img src="/img/HITL-VOS2.PNG" alt="">
+    （上图中，左边为当前预测和点击得到的正负样本，右图为真值）<br>
+    （1）当前分割：一个二值图像，作为一个额外的通道进行输入；<br>
+    （2）为了以点击的形式对用户输入进行编码，我们创建了一个零初始化通道，在该通道中，每次正点击或负点击分别添加或减去具有小标准偏差的高斯值。<br>
+    由于手动收集用户交互太昂贵，我们使用模拟用户交互。对于正样本，随机采样物体边界内的像素点；对于负样本，随机采样远离物体边界40个像素点的位置，或者从图像中的其他对象中采样负片点击。<br>
+    网络架构选择ResNet-101，并且引入CRF细化边界。</p>
+<h3 id="video-segmentation">Video segmentation</h3>
+<p>    对于分割完整的视频，给定第一帧，依赖于单镜头实现视频分割，使用OSVOS网络。</p>
+<h3 id="progressive-refinement">Progressive Refinement</h3>
+<p>    由于一次性分割可能在视频序列上效果不好，因此我们使用渐进改进的方式，逐步细化结果，每次循环都使用上边提到的交互分割方式，来进一步改进结果。由于我们的方法将当前的分割掩码作为输入，因此它提供了一种快速、直观的方法来细化初始掩码，而不是要求从零开始对其进行注释。</p>
+<h2 id="实验">实验</h2>
+<h3 id="ablation-study">Ablation study</h3>
+<p><img src="/img/HITL-VOS3.PNG" alt="">
+    上表比较了点击时使用高斯分布、CRF细化以及将当前结果作为额外的输入通道，在点击多少次的情况下能达到好的效果。</p>
+<h3 id="comparison-to-the-state-of-the-art">Comparison to the State of the Art</h3>
+<p><img src="/img/HITL-VOS4.PNG" alt="">
+    Pascal数据集中物体分辨率普遍很小，因此挑战比较大。</p>
+<h3 id="segmentation-refinement">Segmentation Refinement</h3>
+<p><img src="/img/HITL-VOS5.PNG" alt="">
+    我们的点击交互方式能带来更大的效果提升。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +281,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

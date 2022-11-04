@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/eges/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/eges/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "EGES",
+      "headline" : "EGES",
+      "description" : "Billion-scale Commodity Embedding for E-commerce Recommendation in Alibaba\nWang, Jizhe et al. “Billion-scale Commodity Embedding for E-commerce Recommendation in Alibaba.” Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery \u0026amp; Data Mining (2018)(cite:301)\n 推荐系统存在三大挑战：\n（1）可扩展性：淘宝数据集规模巨大；\n（2）稀疏性：用户通常与少量的物品交互；\n（3）冷启动：淘宝中每小时有数百万件新物品添加进来，这些物品没有任何用户行为，难以得到embedding。\n本文先从用户的行为历史中构建一个图，并学习graph embedding；为了缓解稀疏性和冷启动问题，将边信息整合到graph embedding框架中，提出了两种聚合方法来集成embedding和边信息。\n之前的工作只考虑用户的历史交互行为，为了解决这一问题，提出使用边信息来增强embedding过程，称为Graph Embedding with Side information (GES)。同时，物品具有多种属性信息，如类别、品牌、价格等，我们利用加权的方式对边信息进行embedding，称为 Enhanced Graph Embedding with Side information (EGES)\nFRAMEWORK Item graph construction  将用户的行为看作是顺序的，构造有向图；只考虑固定时间窗口内的用户行为，减少计算与空间成本，同时考虑到用户的兴趣随时间变化。\nBase Graph Embedding  采用随机游走的方式（类似deepwalk），但该图是带权重的有向图，因此，采样概率由权重决定： $$ p(v_{j}|v_{i})=\\frac{M_{ij}}{\\sum_{j\\in N_{\u002b}(v_{i})}M_{ij}},v_{j}\\in N_{\u002b}(v_{i}) $$ $$ p(v_{j}|v_{i})=0,e_{ij}\\notin \\varepsilon $$ 其中，$M_{ij}$表示权重，$v_{j}\\in N_{\u002b}(v_{i})$表示存在边。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,35 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-11-03 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-11-03 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "datePublished": "2022-11-01 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-11-01 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/eges\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>EGES</title>
+  <meta property="og:title" content="EGES" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Billion-scale Commodity Embedding for E-commerce Recommendation in Alibaba
+Wang, Jizhe et al. “Billion-scale Commodity Embedding for E-commerce Recommendation in Alibaba.” Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery &amp;amp; Data Mining (2018)(cite:301)
+ 推荐系统存在三大挑战：
+（1）可扩展性：淘宝数据集规模巨大；
+（2）稀疏性：用户通常与少量的物品交互；
+（3）冷启动：淘宝中每小时有数百万件新物品添加进来，这些物品没有任何用户行为，难以得到embedding。
+本文先从用户的行为历史中构建一个图，并学习graph embedding；为了缓解稀疏性和冷启动问题，将边信息整合到graph embedding框架中，提出了两种聚合方法来集成embedding和边信息。
+之前的工作只考虑用户的历史交互行为，为了解决这一问题，提出使用边信息来增强embedding过程，称为Graph Embedding with Side information (GES)。同时，物品具有多种属性信息，如类别、品牌、价格等，我们利用加权的方式对边信息进行embedding，称为 Enhanced Graph Embedding with Side information (EGES)
+FRAMEWORK Item graph construction  将用户的行为看作是顺序的，构造有向图；只考虑固定时间窗口内的用户行为，减少计算与空间成本，同时考虑到用户的兴趣随时间变化。
+Base Graph Embedding  采用随机游走的方式（类似deepwalk），但该图是带权重的有向图，因此，采样概率由权重决定： $$ p(v_{j}|v_{i})=\frac{M_{ij}}{\sum_{j\in N_{&#43;}(v_{i})}M_{ij}},v_{j}\in N_{&#43;}(v_{i}) $$ $$ p(v_{j}|v_{i})=0,e_{ij}\notin \varepsilon $$ 其中，$M_{ij}$表示权重，$v_{j}\in N_{&#43;}(v_{i})$表示存在边。" />
+  <meta name="description" content="Billion-scale Commodity Embedding for E-commerce Recommendation in Alibaba
+Wang, Jizhe et al. “Billion-scale Commodity Embedding for E-commerce Recommendation in Alibaba.” Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery &amp;amp; Data Mining (2018)(cite:301)
+ 推荐系统存在三大挑战：
+（1）可扩展性：淘宝数据集规模巨大；
+（2）稀疏性：用户通常与少量的物品交互；
+（3）冷启动：淘宝中每小时有数百万件新物品添加进来，这些物品没有任何用户行为，难以得到embedding。
+本文先从用户的行为历史中构建一个图，并学习graph embedding；为了缓解稀疏性和冷启动问题，将边信息整合到graph embedding框架中，提出了两种聚合方法来集成embedding和边信息。
+之前的工作只考虑用户的历史交互行为，为了解决这一问题，提出使用边信息来增强embedding过程，称为Graph Embedding with Side information (GES)。同时，物品具有多种属性信息，如类别、品牌、价格等，我们利用加权的方式对边信息进行embedding，称为 Enhanced Graph Embedding with Side information (EGES)
+FRAMEWORK Item graph construction  将用户的行为看作是顺序的，构造有向图；只考虑固定时间窗口内的用户行为，减少计算与空间成本，同时考虑到用户的兴趣随时间变化。
+Base Graph Embedding  采用随机游走的方式（类似deepwalk），但该图是带权重的有向图，因此，采样概率由权重决定： $$ p(v_{j}|v_{i})=\frac{M_{ij}}{\sum_{j\in N_{&#43;}(v_{i})}M_{ij}},v_{j}\in N_{&#43;}(v_{i}) $$ $$ p(v_{j}|v_{i})=0,e_{ij}\notin \varepsilon $$ 其中，$M_{ij}$表示权重，$v_{j}\in N_{&#43;}(v_{i})$表示存在边。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +121,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +154,130 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">EGES</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-01 00:00:00 UTC">
+                01 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p><a href="https://arxiv.org/pdf/1803.02349.pdf">Billion-scale Commodity Embedding for E-commerce Recommendation in Alibaba</a></p>
+<p>Wang, Jizhe et al. “Billion-scale Commodity Embedding for E-commerce Recommendation in Alibaba.” Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery &amp; Data Mining (2018)(cite:301)</p>
+<p>    推荐系统存在三大挑战：<br>
+    （1）可扩展性：淘宝数据集规模巨大；<br>
+    （2）稀疏性：用户通常与少量的物品交互；<br>
+    （3）冷启动：淘宝中每小时有数百万件新物品添加进来，这些物品没有任何用户行为，难以得到embedding。<br>
+    本文先从用户的行为历史中构建一个图，并学习graph embedding；为了缓解稀疏性和冷启动问题，将边信息整合到graph embedding框架中，提出了两种聚合方法来集成embedding和边信息。<br>
+    之前的工作只考虑用户的历史交互行为，为了解决这一问题，提出使用边信息来增强embedding过程，称为Graph Embedding with Side information (GES)。同时，物品具有多种属性信息，如类别、品牌、价格等，我们利用加权的方式对边信息进行embedding，称为 Enhanced Graph Embedding with Side information (EGES)</p>
+<h2 id="framework">FRAMEWORK</h2>
+<p><img src="/img/EGES1.PNG" alt=""></p>
+<h3 id="item-graph-construction">Item graph construction</h3>
+<p>    将用户的行为看作是顺序的，构造有向图；只考虑固定时间窗口内的用户行为，减少计算与空间成本，同时考虑到用户的兴趣随时间变化。</p>
+<h3 id="base-graph-embedding">Base Graph Embedding</h3>
+<p>    采用随机游走的方式（类似deepwalk），但该图是带权重的有向图，因此，采样概率由权重决定：
+$$
+p(v_{j}|v_{i})=\frac{M_{ij}}{\sum_{j\in N_{+}(v_{i})}M_{ij}},v_{j}\in N_{+}(v_{i})
+$$
+$$
+p(v_{j}|v_{i})=0,e_{ij}\notin \varepsilon 
+$$
+    其中，$M_{ij}$表示权重，$v_{j}\in N_{+}(v_{i})$表示存在边。</p>
+<h3 id="graph-embedding-with-side-information">Graph Embedding with Side Information</h3>
+<p>    用于解决冷启动的问题。<br>
+    在该任务中，边信息是指商品的类别、商店、价格等。例如，来自UNIQLO（同一家商店）的两件连帽衫（同一类别的）可能看起来很相似，一个喜欢尼康镜头的人也可能对佳能相机（类似的类别和类似的品牌）感兴趣。<br>
+    通过 DeepWalk 方案得到 item 的游走序列，同时得到对应的category（brand, price）序列。然后将所有序列数据放到word2vec模型中进行训练。针对每个 item，将得到：item_embedding，category_embedding，brand_embedding，price_embedding 等 embedding 信息。将这些 embedding 信息求均值来表示该 item。
+$$
+H_{v}=\frac{1}{n+1}\sum_{s=0}^{n}W_{v}^{s}
+$$
+    其中，$H_{v}$为物品v的embedding，$W_{v}^{s}$为物品v的第s类边信息的embedding。</p>
+<h3 id="enhanced-graph-embedding-with-side-information">Enhanced Graph Embedding with Side Information</h3>
+<p>    在GES中，不同类型的边信息对最终嵌入的贡献是相等的，但在现实生活中，不同类型的边信息对用户行为中项目共现的贡献也不同。<br>
+    因此，计算公式如下：
+$$
+H_{v}=\frac{\sum_{j=0}^{n}e^{a_{v}^{j}}W_{v}^{j}}{\sum_{j=0}^{n}e^{a_{v}^{j}}}
+$$
+    即聚合表示 item_embedding 时，对 item 和 side information（例如category, brand, price等）的embedding施加不同的权重$a_{v}^{j}$，该权重值通过模型训练得到，为了使得权重为恒大于零，引入指数计算。
+<img src="/img/EGES2.PNG" alt="">
+    （1）上图的Sparse Features代表 item 和 side information 的信息；<br>
+    （2）Dense Embeddings 表示 item 和 side information 的 embedding 信息；<br>
+    （3）$a$分别代表 item 和 side information 的 embedding 权重；<br>
+    （4）Sampled Softmax Classifier中的N代表采样的负样本，P代表正样本（某个item周边上下n个item均为正样本，在模型中表示时不区分远近）。</p>
+<h2 id="实验">实验</h2>
+<h3 id="offline-evaluation">Offline Evaluation</h3>
+<p><img src="/img/EGES3.PNG" alt=""></p>
+<h3 id="online-ab-test">Online A/B Test</h3>
+<p><img src="/img/EGES4.PNG" alt="">
+    Click-Through-Rate (CTR)指用户对推荐物品的点击率。</p>
+<h3 id="similar-items-for-cold-start-items">Similar items for cold start items</h3>
+<p><img src="/img/EGES5.PNG" alt=""></p>
+<h3 id="weights-in-eges">Weights in EGES</h3>
+<p><img src="/img/EGES6.PNG" alt="">
+    得出结论：不同物品的权重分布是不同的；表示物品本身embedding的“item”的权重始终大于其他所有边信息的权重；“shop”的权重相对也大，即用户更倾向在同一家购买。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +297,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

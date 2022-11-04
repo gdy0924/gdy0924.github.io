@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/%E4%BA%BA%E6%9C%BA%E6%B7%B7%E5%90%88%E7%9A%84%E6%99%BA%E8%83%BD%E6%8E%A7%E5%88%B6%E4%BA%BA%E5%9C%A8%E5%9B%9E%E8%B7%AF%E6%8E%A7%E5%88%B6/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/%E4%BA%BA%E6%9C%BA%E6%B7%B7%E5%90%88%E7%9A%84%E6%99%BA%E8%83%BD%E6%8E%A7%E5%88%B6%E4%BA%BA%E5%9C%A8%E5%9B%9E%E8%B7%AF%E6%8E%A7%E5%88%B6/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "人机混合的智能控制（人在回路控制）",
+      "headline" : "人机混合的智能控制（人在回路控制）",
+      "description" : "基于混合智能的控制\n 混合智能有两种形式：\n（1）基于认知计算的混合增强智能：计算智能技术的混合，如模糊系统、神经网络系统、进化遗传算法等；\n（2）人机混合增强智能：将人的作用直接引入到智能系统中\n人机混合  两种人机混合的两种控制形式：人在回路控制和人机协同控制。\n控制系统=控制的目标\u002b控制的方法\u002b物理构成（传感器\u002b控制器\u002b执行器）\n人在控制系统中的作用：\n（1）控制系统目标的终极来源，为控制系统设定目标；\n（2）充当控制系统任意组件，如人的各种感觉器官具有感知各种相关物理量的能力，从而可以充当传感器，人的大脑具有独特的智能，可以胜任控制器；人的手、脚等也具有活动能力，也从而可以充当执行器（下图所示）。 为什么需要人在回路中，而不能脱离回路：\n（1）人的需求是在变化的不可预知的，同样控制系统的目标也要变化，人不在回路中作出修改，系统的目的就不再符合人的需求；\n（2）在一些场景下，人的某些特殊能力是任何机器都难以达到的，需要人机混合得到更优的控制系统。\n两个例子：\n（1）霍金的高科技轮椅：霍金所佩戴的眼镜可使用红外线感应他的面颊移动，这产生了一个开关切换信号，该信号进一步用来控制字符输入并进行其他操控，这是霍金与轮椅的唯一交互手段，在这一过程中，人就是一个需要密切关注和考虑的显式因素；\n（2）新式战机中的智能座舱必须将人和机器有机融合在一起，在人意识清醒具有行动能力时由人控制，在人丧失触发弹射能力时，自行触发弹射；\n（3）任何武器系统的最终控制一定在人的手上，比如，智能导弹飞出后也还需要保留人改变攻击目标的能力。\n典型场景：\n（1）人的需求\/目标太过复杂或因人、因时而变，比如各类康复或增强人类身体机能的机器人，如上边的霍金轮椅；\n（2）保持人类控制：如上边提到的武器必须保留人的最终绝对控制；\n（3）防止人类出现低级错误或在特定情况下强制接管人类控制的机器设计：如新式战机中的智能座舱；\n（4）分别利用机器和人的独特优势获得单独一方都无法取得的性能的设计。\n上边前两个中人主要是作为控制系统的目的存在，即人在回路；后二个中人则与机器处于相同的地位，都是控制系统平等的构成组件，即人机协同。（作为人机混合的智能控制的两种具体控制形式，二者是紧密联系在一起的，并不能截然分开。）\n人在回路控制  “人在回路控制”是一种特殊的控制形式，其中人显式的存在于系统闭环回路中且不可简单剥离。\n人在控制系统中的可能角色如下表所示： in-the-loop：控制系统的操控需要人的具体指令；\non-the-loop：系统目标由人给出，执行则由具有部分自主性的机器自行进行；\nout-of-the-loop：机器可根据感知信息独立地确定目标并给出具体指令。\n上述定义包括in-the-loop和on-the-loop。\n两个人在回路的例子：\n（1）智能家居与智能可穿戴设备：将人显式地置于智能家居系统的闭环中，如利用对人的状态的观测和估计，智能家居产品的运行可以按照人的状态变化而变，比如随着人的情绪或工作状态而变的灯光系统，或者智能系统提供执行选项，而由人根据主观意图进行最终选择；\n（2）自行车控制：自行车骑手配备一个测量心率的可穿戴设备，该设备实时进行心率测量，然后与设定心率相比，以此信号调整骑手的骑行功率。\n因此，人在回路的控制系统大多具有以人为中心、机器是人的辅助的特点，最为关键的问题就是对人的需求的准确理解和建模。",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-11-02 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-11-02 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/%E4%BA%BA%E6%9C%BA%E6%B7%B7%E5%90%88%E7%9A%84%E6%99%BA%E8%83%BD%E6%8E%A7%E5%88%B6%E4%BA%BA%E5%9C%A8%E5%9B%9E%E8%B7%AF%E6%8E%A7%E5%88%B6\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>人机混合的智能控制（人在回路控制）</title>
+  <meta property="og:title" content="人机混合的智能控制（人在回路控制）" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="基于混合智能的控制
+ 混合智能有两种形式：
+（1）基于认知计算的混合增强智能：计算智能技术的混合，如模糊系统、神经网络系统、进化遗传算法等；
+（2）人机混合增强智能：将人的作用直接引入到智能系统中
+人机混合  两种人机混合的两种控制形式：人在回路控制和人机协同控制。
+控制系统=控制的目标&#43;控制的方法&#43;物理构成（传感器&#43;控制器&#43;执行器）
+人在控制系统中的作用：
+（1）控制系统目标的终极来源，为控制系统设定目标；
+（2）充当控制系统任意组件，如人的各种感觉器官具有感知各种相关物理量的能力，从而可以充当传感器，人的大脑具有独特的智能，可以胜任控制器；人的手、脚等也具有活动能力，也从而可以充当执行器（下图所示）。 为什么需要人在回路中，而不能脱离回路：
+（1）人的需求是在变化的不可预知的，同样控制系统的目标也要变化，人不在回路中作出修改，系统的目的就不再符合人的需求；
+（2）在一些场景下，人的某些特殊能力是任何机器都难以达到的，需要人机混合得到更优的控制系统。
+两个例子：
+（1）霍金的高科技轮椅：霍金所佩戴的眼镜可使用红外线感应他的面颊移动，这产生了一个开关切换信号，该信号进一步用来控制字符输入并进行其他操控，这是霍金与轮椅的唯一交互手段，在这一过程中，人就是一个需要密切关注和考虑的显式因素；
+（2）新式战机中的智能座舱必须将人和机器有机融合在一起，在人意识清醒具有行动能力时由人控制，在人丧失触发弹射能力时，自行触发弹射；
+（3）任何武器系统的最终控制一定在人的手上，比如，智能导弹飞出后也还需要保留人改变攻击目标的能力。
+典型场景：
+（1）人的需求/目标太过复杂或因人、因时而变，比如各类康复或增强人类身体机能的机器人，如上边的霍金轮椅；
+（2）保持人类控制：如上边提到的武器必须保留人的最终绝对控制；
+（3）防止人类出现低级错误或在特定情况下强制接管人类控制的机器设计：如新式战机中的智能座舱；
+（4）分别利用机器和人的独特优势获得单独一方都无法取得的性能的设计。
+上边前两个中人主要是作为控制系统的目的存在，即人在回路；后二个中人则与机器处于相同的地位，都是控制系统平等的构成组件，即人机协同。（作为人机混合的智能控制的两种具体控制形式，二者是紧密联系在一起的，并不能截然分开。）
+人在回路控制  “人在回路控制”是一种特殊的控制形式，其中人显式的存在于系统闭环回路中且不可简单剥离。
+人在控制系统中的可能角色如下表所示： in-the-loop：控制系统的操控需要人的具体指令；
+on-the-loop：系统目标由人给出，执行则由具有部分自主性的机器自行进行；
+out-of-the-loop：机器可根据感知信息独立地确定目标并给出具体指令。
+上述定义包括in-the-loop和on-the-loop。
+两个人在回路的例子：
+（1）智能家居与智能可穿戴设备：将人显式地置于智能家居系统的闭环中，如利用对人的状态的观测和估计，智能家居产品的运行可以按照人的状态变化而变，比如随着人的情绪或工作状态而变的灯光系统，或者智能系统提供执行选项，而由人根据主观意图进行最终选择；
+（2）自行车控制：自行车骑手配备一个测量心率的可穿戴设备，该设备实时进行心率测量，然后与设定心率相比，以此信号调整骑手的骑行功率。
+因此，人在回路的控制系统大多具有以人为中心、机器是人的辅助的特点，最为关键的问题就是对人的需求的准确理解和建模。" />
+  <meta name="description" content="基于混合智能的控制
+ 混合智能有两种形式：
+（1）基于认知计算的混合增强智能：计算智能技术的混合，如模糊系统、神经网络系统、进化遗传算法等；
+（2）人机混合增强智能：将人的作用直接引入到智能系统中
+人机混合  两种人机混合的两种控制形式：人在回路控制和人机协同控制。
+控制系统=控制的目标&#43;控制的方法&#43;物理构成（传感器&#43;控制器&#43;执行器）
+人在控制系统中的作用：
+（1）控制系统目标的终极来源，为控制系统设定目标；
+（2）充当控制系统任意组件，如人的各种感觉器官具有感知各种相关物理量的能力，从而可以充当传感器，人的大脑具有独特的智能，可以胜任控制器；人的手、脚等也具有活动能力，也从而可以充当执行器（下图所示）。 为什么需要人在回路中，而不能脱离回路：
+（1）人的需求是在变化的不可预知的，同样控制系统的目标也要变化，人不在回路中作出修改，系统的目的就不再符合人的需求；
+（2）在一些场景下，人的某些特殊能力是任何机器都难以达到的，需要人机混合得到更优的控制系统。
+两个例子：
+（1）霍金的高科技轮椅：霍金所佩戴的眼镜可使用红外线感应他的面颊移动，这产生了一个开关切换信号，该信号进一步用来控制字符输入并进行其他操控，这是霍金与轮椅的唯一交互手段，在这一过程中，人就是一个需要密切关注和考虑的显式因素；
+（2）新式战机中的智能座舱必须将人和机器有机融合在一起，在人意识清醒具有行动能力时由人控制，在人丧失触发弹射能力时，自行触发弹射；
+（3）任何武器系统的最终控制一定在人的手上，比如，智能导弹飞出后也还需要保留人改变攻击目标的能力。
+典型场景：
+（1）人的需求/目标太过复杂或因人、因时而变，比如各类康复或增强人类身体机能的机器人，如上边的霍金轮椅；
+（2）保持人类控制：如上边提到的武器必须保留人的最终绝对控制；
+（3）防止人类出现低级错误或在特定情况下强制接管人类控制的机器设计：如新式战机中的智能座舱；
+（4）分别利用机器和人的独特优势获得单独一方都无法取得的性能的设计。
+上边前两个中人主要是作为控制系统的目的存在，即人在回路；后二个中人则与机器处于相同的地位，都是控制系统平等的构成组件，即人机协同。（作为人机混合的智能控制的两种具体控制形式，二者是紧密联系在一起的，并不能截然分开。）
+人在回路控制  “人在回路控制”是一种特殊的控制形式，其中人显式的存在于系统闭环回路中且不可简单剥离。
+人在控制系统中的可能角色如下表所示： in-the-loop：控制系统的操控需要人的具体指令；
+on-the-loop：系统目标由人给出，执行则由具有部分自主性的机器自行进行；
+out-of-the-loop：机器可根据感知信息独立地确定目标并给出具体指令。
+上述定义包括in-the-loop和on-the-loop。
+两个人在回路的例子：
+（1）智能家居与智能可穿戴设备：将人显式地置于智能家居系统的闭环中，如利用对人的状态的观测和估计，智能家居产品的运行可以按照人的状态变化而变，比如随着人的情绪或工作状态而变的灯光系统，或者智能系统提供执行选项，而由人根据主观意图进行最终选择；
+（2）自行车控制：自行车骑手配备一个测量心率的可穿戴设备，该设备实时进行心率测量，然后与设定心率相比，以此信号调整骑手的骑行功率。
+因此，人在回路的控制系统大多具有以人为中心、机器是人的辅助的特点，最为关键的问题就是对人的需求的准确理解和建模。" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">人机混合的智能控制（人在回路控制）</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-02 00:00:00 UTC">
+                02 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p><a href="http://staff.ustc.edu.cn/~ybzhao1/assets/pdf/2020-%E4%BA%BA%E6%9C%BA%E6%B7%B7%E5%90%88%E7%9A%84%E6%99%BA%E8%83%BD%E6%8E%A7%E5%88%B6.pdf">基于混合智能的控制</a></p>
+<p>    混合智能有两种形式：<br>
+    （1）基于认知计算的混合增强智能：计算智能技术的混合，如模糊系统、神经网络系统、进化遗传算法等；<br>
+    （2）人机混合增强智能：将人的作用直接引入到智能系统中</p>
+<h2 id="人机混合">人机混合</h2>
+<p>    两种人机混合的两种控制形式：人在回路控制和人机协同控制。<br>
+    <strong>控制系统=控制的目标+控制的方法+物理构成</strong>（传感器+控制器+执行器）<br>
+    人在控制系统中的<strong>作用</strong>：<br>
+    （1）控制系统目标的终极来源，为控制系统设定目标；<br>
+    （2）充当控制系统任意组件，如人的各种感觉器官具有感知各种相关物理量的能力，从而可以充当传感器，人的大脑具有独特的智能，可以胜任控制器；人的手、脚等也具有活动能力，也从而可以充当执行器（下图所示）。
+<img src="/img/HITL1.PNG" alt="">
+    <strong>为什么</strong>需要人在回路中，而不能脱离回路：<br>
+    （1）人的需求是在变化的不可预知的，同样控制系统的目标也要变化，人不在回路中作出修改，系统的目的就不再符合人的需求；<br>
+    （2）在一些场景下，人的某些特殊能力是任何机器都难以达到的，需要人机混合得到更优的控制系统。<br>
+    两个<strong>例子</strong>：<br>
+    （1）霍金的高科技轮椅：霍金所佩戴的眼镜可使用红外线感应他的面颊移动，这产生了一个开关切换信号，该信号进一步用来控制字符输入并进行其他操控，这是霍金与轮椅的唯一交互手段，在这一过程中，人就是一个需要密切关注和考虑的显式因素；<br>
+    （2）新式战机中的智能座舱必须将人和机器有机融合在一起，在人意识清醒具有行动能力时由人控制，在人丧失触发弹射能力时，自行触发弹射；<br>
+    （3）任何武器系统的最终控制一定在人的手上，比如，智能导弹飞出后也还需要保留人改变攻击目标的能力。<br>
+    <strong>典型场景</strong>：<br>
+    （1）人的需求/目标太过复杂或因人、因时而变，比如各类康复或增强人类身体机能的机器人，如上边的霍金轮椅；<br>
+    （2）保持人类控制：如上边提到的武器必须保留人的最终绝对控制；<br>
+    （3）防止人类出现低级错误或在特定情况下强制接管人类控制的机器设计：如新式战机中的智能座舱；<br>
+    （4）分别利用机器和人的独特优势获得单独一方都无法取得的性能的设计。<br>
+    上边前两个中人主要是作为控制系统的目的存在，即人在回路；后二个中人则与机器处于相同的地位，都是控制系统平等的构成组件，即人机协同。（作为人机混合的智能控制的两种具体控制形式，二者是紧密联系在一起的，并不能截然分开。）</p>
+<h2 id="人在回路控制">人在回路控制</h2>
+<p>    “人在回路控制”是一种特殊的控制形式，其中人显式的存在于系统闭环回路中且不可简单剥离。<br>
+    人在控制系统中的可能<strong>角色</strong>如下表所示：
+<img src="/img/HITL2.PNG" alt="">
+    <strong>in-the-loop</strong>：控制系统的操控需要人的具体指令；<br>
+    <strong>on-the-loop</strong>：系统目标由人给出，执行则由具有部分自主性的机器自行进行；<br>
+    <strong>out-of-the-loop</strong>：机器可根据感知信息独立地确定目标并给出具体指令。<br>
+    上述定义包括in-the-loop和on-the-loop。<br>
+    两个人在回路的<strong>例子</strong>：<br>
+    （1）智能家居与智能可穿戴设备：将人显式地置于智能家居系统的闭环中，如利用对人的状态的观测和估计，智能家居产品的运行可以按照人的状态变化而变，比如随着人的情绪或工作状态而变的灯光系统，或者智能系统提供执行选项，而由人根据主观意图进行最终选择；<br>
+    （2）自行车控制：自行车骑手配备一个测量心率的可穿戴设备，该设备实时进行心率测量，然后与设定心率相比，以此信号调整骑手的骑行功率。<br>
+    因此，人在回路的控制系统大多具有以人为中心、机器是人的辅助的<strong>特点</strong>，最为<strong>关键</strong>的问题就是对人的需求的准确理解和建模。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>

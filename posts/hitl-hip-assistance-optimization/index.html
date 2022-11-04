@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/hitl-hip-assistance-optimization/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/hitl-hip-assistance-optimization/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "HITL-hip assistance optimization",
+      "headline" : "HITL-hip assistance optimization",
+      "description" : "Ding, Ye et al. “Human-in-the-loop optimization of hip assistance with a soft exosuit during walking.” Science Robotics 3 (2018)(cite:275)\n 可穿戴设备可以大幅减少人类行走的能量消耗，使用贝叶斯优化（适合在非常有限的数据下优化噪声性能信号）来识别髋关节伸展辅助的峰值和偏移时间，从而最小化使用可穿戴设备行走的能量消耗。\n可穿戴设备的问题之一：个体之间的生理和神经上的差异会导致对相同控制器的不同反应，也就是说，一个参与者的最佳控制策略可能在另一个控制策略上表现不佳。目前的解决办法使用曲线拟合，需要时间很长。\n人在回路（HIL）优化旨在通过基于人类生理信号的实时测量，如代谢成本，调整控制穿戴设备参数。这种优化的灵感来自于观察人类不断调整其协调模式，例如，人类在行走过程中是如何最小化步行代谢成本的。本文提出了一种实验方法来快速识别二维空间中的最佳控制参数以最小化步行的代谢成本。  （上图：采用贝叶斯优化方法调整辅助装置的控制参数，使步行的代谢成本最小化。根据呼吸测量估计代谢率，并用于计算代谢率相对于自由对照参数的后验分布。）\n一名受试者者穿着可穿戴设备进行髋关节伸展辅助行走，辅助剖面由多个控制参数组成，这些参数通过优化迭代更新，并应用于具有导纳力控制的系链驱动系统。在此基础上，作者建立了优化算法，目标是最大化期望改进（Expected Improvement，EI）。\n算法利用高斯过程和下一次迭代的控制参数迭代估计受试者的代谢成本分布。在每次迭代中，通过将一阶动态模型拟合到 2 分钟的瞬时代谢数据来估计代谢成本。\n总结：HITL 有希望提高可穿戴机器人设备在各种任务中的性能。本文所提出的方法证明了该可穿戴设备能够实质性的减少人体代谢，并提出了使用低维控制参数化优化可穿戴设备的可能性。本文利用有噪声的呼吸信号作为优化的目标函数，然而，还可以考虑引入其他生理或生物信号，如利用运动对称性优化中风后患者的可穿戴设备，或使用平衡相关测量值优化假体等。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,29 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-11-03 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-11-03 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "datePublished": "2022-11-02 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-11-02 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/hitl-hip-assistance-optimization\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>HITL-hip assistance optimization</title>
+  <meta property="og:title" content="HITL-hip assistance optimization" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Ding, Ye et al. “Human-in-the-loop optimization of hip assistance with a soft exosuit during walking.” Science Robotics 3 (2018)(cite:275)
+ 可穿戴设备可以大幅减少人类行走的能量消耗，使用贝叶斯优化（适合在非常有限的数据下优化噪声性能信号）来识别髋关节伸展辅助的峰值和偏移时间，从而最小化使用可穿戴设备行走的能量消耗。
+可穿戴设备的问题之一：个体之间的生理和神经上的差异会导致对相同控制器的不同反应，也就是说，一个参与者的最佳控制策略可能在另一个控制策略上表现不佳。目前的解决办法使用曲线拟合，需要时间很长。
+人在回路（HIL）优化旨在通过基于人类生理信号的实时测量，如代谢成本，调整控制穿戴设备参数。这种优化的灵感来自于观察人类不断调整其协调模式，例如，人类在行走过程中是如何最小化步行代谢成本的。本文提出了一种实验方法来快速识别二维空间中的最佳控制参数以最小化步行的代谢成本。  （上图：采用贝叶斯优化方法调整辅助装置的控制参数，使步行的代谢成本最小化。根据呼吸测量估计代谢率，并用于计算代谢率相对于自由对照参数的后验分布。）
+一名受试者者穿着可穿戴设备进行髋关节伸展辅助行走，辅助剖面由多个控制参数组成，这些参数通过优化迭代更新，并应用于具有导纳力控制的系链驱动系统。在此基础上，作者建立了优化算法，目标是最大化期望改进（Expected Improvement，EI）。
+算法利用高斯过程和下一次迭代的控制参数迭代估计受试者的代谢成本分布。在每次迭代中，通过将一阶动态模型拟合到 2 分钟的瞬时代谢数据来估计代谢成本。
+总结：HITL 有希望提高可穿戴机器人设备在各种任务中的性能。本文所提出的方法证明了该可穿戴设备能够实质性的减少人体代谢，并提出了使用低维控制参数化优化可穿戴设备的可能性。本文利用有噪声的呼吸信号作为优化的目标函数，然而，还可以考虑引入其他生理或生物信号，如利用运动对称性优化中风后患者的可穿戴设备，或使用平衡相关测量值优化假体等。" />
+  <meta name="description" content="Ding, Ye et al. “Human-in-the-loop optimization of hip assistance with a soft exosuit during walking.” Science Robotics 3 (2018)(cite:275)
+ 可穿戴设备可以大幅减少人类行走的能量消耗，使用贝叶斯优化（适合在非常有限的数据下优化噪声性能信号）来识别髋关节伸展辅助的峰值和偏移时间，从而最小化使用可穿戴设备行走的能量消耗。
+可穿戴设备的问题之一：个体之间的生理和神经上的差异会导致对相同控制器的不同反应，也就是说，一个参与者的最佳控制策略可能在另一个控制策略上表现不佳。目前的解决办法使用曲线拟合，需要时间很长。
+人在回路（HIL）优化旨在通过基于人类生理信号的实时测量，如代谢成本，调整控制穿戴设备参数。这种优化的灵感来自于观察人类不断调整其协调模式，例如，人类在行走过程中是如何最小化步行代谢成本的。本文提出了一种实验方法来快速识别二维空间中的最佳控制参数以最小化步行的代谢成本。  （上图：采用贝叶斯优化方法调整辅助装置的控制参数，使步行的代谢成本最小化。根据呼吸测量估计代谢率，并用于计算代谢率相对于自由对照参数的后验分布。）
+一名受试者者穿着可穿戴设备进行髋关节伸展辅助行走，辅助剖面由多个控制参数组成，这些参数通过优化迭代更新，并应用于具有导纳力控制的系链驱动系统。在此基础上，作者建立了优化算法，目标是最大化期望改进（Expected Improvement，EI）。
+算法利用高斯过程和下一次迭代的控制参数迭代估计受试者的代谢成本分布。在每次迭代中，通过将一阶动态模型拟合到 2 分钟的瞬时代谢数据来估计代谢成本。
+总结：HITL 有希望提高可穿戴机器人设备在各种任务中的性能。本文所提出的方法证明了该可穿戴设备能够实质性的减少人体代谢，并提出了使用低维控制参数化优化可穿戴设备的可能性。本文利用有噪声的呼吸信号作为优化的目标函数，然而，还可以考虑引入其他生理或生物信号，如利用运动对称性优化中风后患者的可穿戴设备，或使用平衡相关测量值优化假体等。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +115,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +148,87 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">HITL-hip assistance optimization</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-02 00:00:00 UTC">
+                02 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Ding, Ye et al. “Human-in-the-loop optimization of hip assistance with a soft exosuit during walking.” Science Robotics 3 (2018)(cite:275)</p>
+<p>    可穿戴设备可以大幅减少人类行走的能量消耗，使用贝叶斯优化（适合在非常有限的数据下优化噪声性能信号）来识别髋关节伸展辅助的峰值和偏移时间，从而最小化使用可穿戴设备行走的能量消耗。<br>
+    可穿戴设备的问题之一：个体之间的生理和神经上的差异会导致对相同控制器的不同反应，也就是说，一个参与者的最佳控制策略可能在另一个控制策略上表现不佳。目前的解决办法使用曲线拟合，需要时间很长。<br>
+    人在回路（HIL）优化旨在通过基于人类生理信号的实时测量，如代谢成本，调整控制穿戴设备参数。这种优化的灵感来自于观察人类不断调整其协调模式，例如，人类在行走过程中是如何最小化步行代谢成本的。本文提出了一种实验方法来快速识别二维空间中的最佳控制参数以最小化步行的代谢成本。
+<img src="/img/HITL-HA1.PNG" alt=""></p>
+<p>    （上图：采用贝叶斯优化方法调整辅助装置的控制参数，使步行的代谢成本最小化。根据呼吸测量估计代谢率，并用于计算代谢率相对于自由对照参数的后验分布。）<br>
+    一名受试者者穿着可穿戴设备进行髋关节伸展辅助行走，辅助剖面由多个控制参数组成，这些参数通过优化迭代更新，并应用于具有导纳力控制的系链驱动系统。在此基础上，作者建立了优化算法，目标是最大化期望改进（Expected Improvement，EI）。<br>
+    算法利用高斯过程和下一次迭代的控制参数迭代估计受试者的代谢成本分布。在每次迭代中，通过将一阶动态模型拟合到 2 分钟的瞬时代谢数据来估计代谢成本。<br>
+    总结：HITL 有希望提高可穿戴机器人设备在各种任务中的性能。本文所提出的方法证明了该可穿戴设备能够实质性的减少人体代谢，并提出了使用低维控制参数化优化可穿戴设备的可能性。本文利用有噪声的呼吸信号作为优化的目标函数，然而，还可以考虑引入其他生理或生物信号，如利用运动对称性优化中风后患者的可穿戴设备，或使用平衡相关测量值优化假体等。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +248,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 
