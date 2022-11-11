@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/wsss-ae/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/wsss-ae/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "WSSS-AE",
+      "headline" : "WSSS-AE",
+      "description" : "Wei, Yunchao et al. “Object Region Mining with Adversarial Erasing: A Simple Classification to Semantic Segmentation Approach.” 2017 IEEE Conference on Computer Vision and Pattern Recognition (CVPR) (2017): 6488-6496.(cite:550)\n 提出了一个利用分类网络逐步挖掘识别目标区域的方法来解决弱监督语义分割问题。\n分类网络只响应小而稀疏的部分区域，与分割任务相反，分割需要密集的像素级推理。为了缓解差距，提出了一种对抗性擦除方法来逐步定位和扩展目标区域。\n通常分类网络识别出来物体只对一小部分区域感兴趣（如上图中的a），与分割任务的需求有偏差，造成使用该方法解决分割问题的主要障碍。提出一种新的对抗性擦除（AE）方法，能够驱动分类网络逐步学习整体目标区域（上图中b所示）。\n具体来说，训练一个图像分类网络，定位最具鉴别性的区域，将其删除，分类网络就需要定位另一个区域，从而逐渐挖掘更多的具有鉴别信息的区域，最后将被擦除的区域作为像素级语义分割的伪掩码进行训练。\n为了避免AE方法引入很多噪声，提出了PSL（prohibitive segmentation learning），利用置信度来减少噪声影响。\nClassification to Semantic Segmentation  包括两部分： object region mining with AE和online PSL for semantic segmentation\nObject Region Mining with AE AE迭代进行两个操作：学习一个分类网络来定位目标区域，反向擦除所发现的区域。\n对于生成的热力图CAM，根据预先设定的阈值，来得到目标区域，用所有训练数据的平均像素代替目标区域的像素，从的得到擦除目标区域的图像。该图像被再次输入网络进行迭代学习训练。\n由于目标区域被擦除，不再对分类预测有帮助，分类网络自然会发现新的对象区域，以保持其分类精度水平。 Online PSL for Semantic Segmentation  AE方法会使一些与object相关或者与背景相关的像素遗漏掉，如上图（a）中的蓝色像素。我们提出PSL方法对AE得到的mask进一步进行细化，利用未被AE标记的像素。\n简单来说就是利用分类置信度，加权生成map，从而禁止那些分类置信度低的类别产生掩码，作为辅助信息，与AE生成的mask一起优化分割网络。如上图（b）所示，PSL包含两个分支，分别用于分类和语义分割，使用其产生的分类置信度来对相应的特定类别的分割得分图进行加权。在分类结果的帮助下，在线PSL能够将多类别分割映射到一个辅助的分割掩码中，作为AE的辅助。\n实验 最后一行为分割失败的例子。 随着AE的迭代，性能增加，但是在执行4个步骤之后，效果降低了，这是由于过擦除，如下图所示： 上表证明了PSL的有效性，PSL\u002b \u002b是PSL也经过迭代优化的结果，\u002bGT是指使用图像级标签的真实值来作为PSL中的map加权值，提供了可实现性能的一个上界。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,39 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-11-11 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-11-11 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "datePublished": "2022-11-09 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-11-09 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/wsss-ae\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>WSSS-AE</title>
+  <meta property="og:title" content="WSSS-AE" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Wei, Yunchao et al. “Object Region Mining with Adversarial Erasing: A Simple Classification to Semantic Segmentation Approach.” 2017 IEEE Conference on Computer Vision and Pattern Recognition (CVPR) (2017): 6488-6496.(cite:550)
+ 提出了一个利用分类网络逐步挖掘识别目标区域的方法来解决弱监督语义分割问题。
+分类网络只响应小而稀疏的部分区域，与分割任务相反，分割需要密集的像素级推理。为了缓解差距，提出了一种对抗性擦除方法来逐步定位和扩展目标区域。
+通常分类网络识别出来物体只对一小部分区域感兴趣（如上图中的a），与分割任务的需求有偏差，造成使用该方法解决分割问题的主要障碍。提出一种新的对抗性擦除（AE）方法，能够驱动分类网络逐步学习整体目标区域（上图中b所示）。
+具体来说，训练一个图像分类网络，定位最具鉴别性的区域，将其删除，分类网络就需要定位另一个区域，从而逐渐挖掘更多的具有鉴别信息的区域，最后将被擦除的区域作为像素级语义分割的伪掩码进行训练。
+为了避免AE方法引入很多噪声，提出了PSL（prohibitive segmentation learning），利用置信度来减少噪声影响。
+Classification to Semantic Segmentation  包括两部分： object region mining with AE和online PSL for semantic segmentation
+Object Region Mining with AE AE迭代进行两个操作：学习一个分类网络来定位目标区域，反向擦除所发现的区域。
+对于生成的热力图CAM，根据预先设定的阈值，来得到目标区域，用所有训练数据的平均像素代替目标区域的像素，从的得到擦除目标区域的图像。该图像被再次输入网络进行迭代学习训练。
+由于目标区域被擦除，不再对分类预测有帮助，分类网络自然会发现新的对象区域，以保持其分类精度水平。 Online PSL for Semantic Segmentation  AE方法会使一些与object相关或者与背景相关的像素遗漏掉，如上图（a）中的蓝色像素。我们提出PSL方法对AE得到的mask进一步进行细化，利用未被AE标记的像素。
+简单来说就是利用分类置信度，加权生成map，从而禁止那些分类置信度低的类别产生掩码，作为辅助信息，与AE生成的mask一起优化分割网络。如上图（b）所示，PSL包含两个分支，分别用于分类和语义分割，使用其产生的分类置信度来对相应的特定类别的分割得分图进行加权。在分类结果的帮助下，在线PSL能够将多类别分割映射到一个辅助的分割掩码中，作为AE的辅助。
+实验 最后一行为分割失败的例子。 随着AE的迭代，性能增加，但是在执行4个步骤之后，效果降低了，这是由于过擦除，如下图所示： 上表证明了PSL的有效性，PSL&#43; &#43;是PSL也经过迭代优化的结果，&#43;GT是指使用图像级标签的真实值来作为PSL中的map加权值，提供了可实现性能的一个上界。" />
+  <meta name="description" content="Wei, Yunchao et al. “Object Region Mining with Adversarial Erasing: A Simple Classification to Semantic Segmentation Approach.” 2017 IEEE Conference on Computer Vision and Pattern Recognition (CVPR) (2017): 6488-6496.(cite:550)
+ 提出了一个利用分类网络逐步挖掘识别目标区域的方法来解决弱监督语义分割问题。
+分类网络只响应小而稀疏的部分区域，与分割任务相反，分割需要密集的像素级推理。为了缓解差距，提出了一种对抗性擦除方法来逐步定位和扩展目标区域。
+通常分类网络识别出来物体只对一小部分区域感兴趣（如上图中的a），与分割任务的需求有偏差，造成使用该方法解决分割问题的主要障碍。提出一种新的对抗性擦除（AE）方法，能够驱动分类网络逐步学习整体目标区域（上图中b所示）。
+具体来说，训练一个图像分类网络，定位最具鉴别性的区域，将其删除，分类网络就需要定位另一个区域，从而逐渐挖掘更多的具有鉴别信息的区域，最后将被擦除的区域作为像素级语义分割的伪掩码进行训练。
+为了避免AE方法引入很多噪声，提出了PSL（prohibitive segmentation learning），利用置信度来减少噪声影响。
+Classification to Semantic Segmentation  包括两部分： object region mining with AE和online PSL for semantic segmentation
+Object Region Mining with AE AE迭代进行两个操作：学习一个分类网络来定位目标区域，反向擦除所发现的区域。
+对于生成的热力图CAM，根据预先设定的阈值，来得到目标区域，用所有训练数据的平均像素代替目标区域的像素，从的得到擦除目标区域的图像。该图像被再次输入网络进行迭代学习训练。
+由于目标区域被擦除，不再对分类预测有帮助，分类网络自然会发现新的对象区域，以保持其分类精度水平。 Online PSL for Semantic Segmentation  AE方法会使一些与object相关或者与背景相关的像素遗漏掉，如上图（a）中的蓝色像素。我们提出PSL方法对AE得到的mask进一步进行细化，利用未被AE标记的像素。
+简单来说就是利用分类置信度，加权生成map，从而禁止那些分类置信度低的类别产生掩码，作为辅助信息，与AE生成的mask一起优化分割网络。如上图（b）所示，PSL包含两个分支，分别用于分类和语义分割，使用其产生的分类置信度来对相应的特定类别的分割得分图进行加权。在分类结果的帮助下，在线PSL能够将多类别分割映射到一个辅助的分割掩码中，作为AE的辅助。
+实验 最后一行为分割失败的例子。 随着AE的迭代，性能增加，但是在执行4个步骤之后，效果降低了，这是由于过擦除，如下图所示： 上表证明了PSL的有效性，PSL&#43; &#43;是PSL也经过迭代优化的结果，&#43;GT是指使用图像级标签的真实值来作为PSL中的map加权值，提供了可实现性能的一个上界。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +125,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +158,104 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">WSSS-AE</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-09 00:00:00 UTC">
+                09 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Wei, Yunchao et al. “Object Region Mining with Adversarial Erasing: A Simple Classification to Semantic Segmentation Approach.” 2017 IEEE Conference on Computer Vision and Pattern Recognition (CVPR) (2017): 6488-6496.(cite:550)</p>
+<p>    提出了一个利用分类网络逐步挖掘识别目标区域的方法来解决弱监督语义分割问题。<br>
+    分类网络只响应小而稀疏的部分区域，与分割任务相反，分割需要密集的像素级推理。为了缓解差距，提出了一种对抗性擦除方法来逐步定位和扩展目标区域。</p>
+<p><img src="/img/WSSS-AE1.PNG" alt="">
+    通常分类网络识别出来物体只对一小部分区域感兴趣（如上图中的a），与分割任务的需求有偏差，造成使用该方法解决分割问题的主要障碍。提出一种新的对抗性擦除（AE）方法，能够驱动分类网络逐步学习整体目标区域（上图中b所示）。<br>
+    具体来说，训练一个图像分类网络，定位最具鉴别性的区域，将其删除，分类网络就需要定位另一个区域，从而逐渐挖掘更多的具有鉴别信息的区域，最后将被擦除的区域作为像素级语义分割的伪掩码进行训练。<br>
+    为了避免AE方法引入很多噪声，提出了PSL（prohibitive segmentation learning），利用置信度来减少噪声影响。</p>
+<h2 id="classification-to-semantic-segmentation">Classification to Semantic Segmentation</h2>
+<p>    包括两部分： object region mining with AE和online PSL for semantic segmentation</p>
+<h3 id="object-region-mining-with-ae">Object Region Mining with AE</h3>
+<p><img src="/img/WSSS-AE2.PNG" alt="">
+    AE迭代进行两个操作：学习一个分类网络来定位目标区域，反向擦除所发现的区域。<br>
+    对于生成的热力图CAM，根据预先设定的阈值，来得到目标区域，用所有训练数据的平均像素代替目标区域的像素，从的得到擦除目标区域的图像。该图像被再次输入网络进行迭代学习训练。<br>
+    由于目标区域被擦除，不再对分类预测有帮助，分类网络自然会发现新的对象区域，以保持其分类精度水平。
+<img src="/img/WSSS-AE3.PNG" alt=""></p>
+<h3 id="online-psl-for-semantic-segmentation">Online PSL for Semantic Segmentation</h3>
+<p>    AE方法会使一些与object相关或者与背景相关的像素遗漏掉，如上图（a）中的蓝色像素。我们提出PSL方法对AE得到的mask进一步进行细化，利用未被AE标记的像素。<br>
+    简单来说就是利用分类置信度，加权生成map，从而禁止那些分类置信度低的类别产生掩码，作为辅助信息，与AE生成的mask一起优化分割网络。如上图（b）所示，PSL包含两个分支，分别用于分类和语义分割，使用其产生的分类置信度来对相应的特定类别的分割得分图进行加权。在分类结果的帮助下，在线PSL能够将多类别分割映射到一个辅助的分割掩码中，作为AE的辅助。</p>
+<h2 id="实验">实验</h2>
+<p><img src="/img/WSSS-AE4.PNG" alt="">
+    最后一行为分割失败的例子。
+<img src="/img/WSSS-AE5.PNG" alt="">
+    随着AE的迭代，性能增加，但是在执行4个步骤之后，效果降低了，这是由于过擦除，如下图所示：
+<img src="/img/WSSS-AE6.PNG" alt="">
+<img src="/img/WSSS-AE7.PNG" alt="">
+    上表证明了PSL的有效性，PSL+ +是PSL也经过迭代优化的结果，+GT是指使用图像级标签的真实值来作为PSL中的map加权值，提供了可实现性能的一个上界。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +275,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

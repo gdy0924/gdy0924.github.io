@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/wsss-recam/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/wsss-recam/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "WSSS-ReCAM",
+      "headline" : "WSSS-ReCAM",
+      "description" : "Chen, Zhaozheng et al. “Class Re-Activation Maps for Weakly-Supervised Semantic Segmentation.” 2022 IEEE\/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2022): 959-968.\n CAM是弱监督语义分割任务中生成伪掩码的常用基础步骤，但是CAM的质量会决定最终的分割结果。在生成CAM中的BCE（二分类交叉熵损失）操作，会使某一像素对多个类别产生响应，即给定一个类别，其热力像素可能会干扰到其他类别的区域，也有可能未响应的区域属于该类别。\n提出一种简单的方法，通过使用softmax交叉熵损失（SCE），用BCE重新激活收敛的CAM，称为ReCAM。\n简单来说，给定一个图像，使用CAM提取每个类别的特征像素，并将它们与类标签一起使用SCE训练，一旦收敛，以与CAM中相同的方式提取ReCAM。\n基于CAM的弱监督语义分割通常包括三个步骤：\n（1）图像级类别标签训练一个多标签分类模型；\n（2）提取每个类的CAM生成0-1伪掩码；\n（3）以伪掩码作为监督信息，训练分割模型。\nFindings：BCE损失计算并不是类相互排斥的，就会出现同一个区域在多个类别中进行响应，并且这对多标签分类是不友好的。我们进一步验证了该发现：分别使用BCE和SCE来训练两个模型，选择80类和5个易混淆的类别（这种情况下更容易产生假阳性） 总的来说，我们使用SCE作为一个额外的损失来重新激活模型并生成ReCAM。\nClass Re-Activation Maps (ReCAM) （上图中为了简洁，省略了特征提取过程）\nFC Layer-1 with BCE Loss：在传统的CAM模型中，特征$f(x)$首先经过一个GAP层，然后将结果输入一个FC层，进行预测： $$ z=FC_{1}(GAP(f(x))) $$ 使用$z$和图像级标签$y$来计算BCE损失。\nExtracting CAM：根据FC层的权重$w_{k}$，计算每个类$k$对应的CAM图$M_{k}$。\nSingle-Label Feature：使用$M_{k}$作为soft mask来提取对应于类别$k$的特征$f_{k}(x)$，如上图中的$f_{1},f_{2},f_{3}$： $$ f_{k}^{c}(x)=M_{k}\\otimes f^{c}(x) $$ $f_{k}^{c}(x)$和$f^{c}(x)$分别代表$C$个通道和单个通道。\nFC Layer-2 with SCE Loss：每一个$f_{k}(x)$都有单个object标签，得到： $$ z\u0027_ {k}=FC_{2}(GAP(f_{k}(x))) $$ 并计算SCE损失优化。\n因此，我们的总体目标函数为： $$ L_{ReCAM}=L_{bce}\u002b\\lambda L_{sce} $$ Extracting ReCAM：由于我们有两个FC层，因此权重的选择有以下几种选择：$FC_{1}$的权重$w$、$FC_{2}$的权重$w\u0027$、$w\\oplus w\u0027$、$w\\otimes w\u0027$。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,45 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-11-11 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-11-11 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "datePublished": "2022-11-10 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-11-10 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/wsss-recam\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>WSSS-ReCAM</title>
+  <meta property="og:title" content="WSSS-ReCAM" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Chen, Zhaozheng et al. “Class Re-Activation Maps for Weakly-Supervised Semantic Segmentation.” 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2022): 959-968.
+ CAM是弱监督语义分割任务中生成伪掩码的常用基础步骤，但是CAM的质量会决定最终的分割结果。在生成CAM中的BCE（二分类交叉熵损失）操作，会使某一像素对多个类别产生响应，即给定一个类别，其热力像素可能会干扰到其他类别的区域，也有可能未响应的区域属于该类别。
+提出一种简单的方法，通过使用softmax交叉熵损失（SCE），用BCE重新激活收敛的CAM，称为ReCAM。
+简单来说，给定一个图像，使用CAM提取每个类别的特征像素，并将它们与类标签一起使用SCE训练，一旦收敛，以与CAM中相同的方式提取ReCAM。
+基于CAM的弱监督语义分割通常包括三个步骤：
+（1）图像级类别标签训练一个多标签分类模型；
+（2）提取每个类的CAM生成0-1伪掩码；
+（3）以伪掩码作为监督信息，训练分割模型。
+Findings：BCE损失计算并不是类相互排斥的，就会出现同一个区域在多个类别中进行响应，并且这对多标签分类是不友好的。我们进一步验证了该发现：分别使用BCE和SCE来训练两个模型，选择80类和5个易混淆的类别（这种情况下更容易产生假阳性） 总的来说，我们使用SCE作为一个额外的损失来重新激活模型并生成ReCAM。
+Class Re-Activation Maps (ReCAM) （上图中为了简洁，省略了特征提取过程）
+FC Layer-1 with BCE Loss：在传统的CAM模型中，特征$f(x)$首先经过一个GAP层，然后将结果输入一个FC层，进行预测： $$ z=FC_{1}(GAP(f(x))) $$ 使用$z$和图像级标签$y$来计算BCE损失。
+Extracting CAM：根据FC层的权重$w_{k}$，计算每个类$k$对应的CAM图$M_{k}$。
+Single-Label Feature：使用$M_{k}$作为soft mask来提取对应于类别$k$的特征$f_{k}(x)$，如上图中的$f_{1},f_{2},f_{3}$： $$ f_{k}^{c}(x)=M_{k}\otimes f^{c}(x) $$ $f_{k}^{c}(x)$和$f^{c}(x)$分别代表$C$个通道和单个通道。
+FC Layer-2 with SCE Loss：每一个$f_{k}(x)$都有单个object标签，得到： $$ z&#39;_ {k}=FC_{2}(GAP(f_{k}(x))) $$ 并计算SCE损失优化。
+因此，我们的总体目标函数为： $$ L_{ReCAM}=L_{bce}&#43;\lambda L_{sce} $$ Extracting ReCAM：由于我们有两个FC层，因此权重的选择有以下几种选择：$FC_{1}$的权重$w$、$FC_{2}$的权重$w&#39;$、$w\oplus w&#39;$、$w\otimes w&#39;$。" />
+  <meta name="description" content="Chen, Zhaozheng et al. “Class Re-Activation Maps for Weakly-Supervised Semantic Segmentation.” 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2022): 959-968.
+ CAM是弱监督语义分割任务中生成伪掩码的常用基础步骤，但是CAM的质量会决定最终的分割结果。在生成CAM中的BCE（二分类交叉熵损失）操作，会使某一像素对多个类别产生响应，即给定一个类别，其热力像素可能会干扰到其他类别的区域，也有可能未响应的区域属于该类别。
+提出一种简单的方法，通过使用softmax交叉熵损失（SCE），用BCE重新激活收敛的CAM，称为ReCAM。
+简单来说，给定一个图像，使用CAM提取每个类别的特征像素，并将它们与类标签一起使用SCE训练，一旦收敛，以与CAM中相同的方式提取ReCAM。
+基于CAM的弱监督语义分割通常包括三个步骤：
+（1）图像级类别标签训练一个多标签分类模型；
+（2）提取每个类的CAM生成0-1伪掩码；
+（3）以伪掩码作为监督信息，训练分割模型。
+Findings：BCE损失计算并不是类相互排斥的，就会出现同一个区域在多个类别中进行响应，并且这对多标签分类是不友好的。我们进一步验证了该发现：分别使用BCE和SCE来训练两个模型，选择80类和5个易混淆的类别（这种情况下更容易产生假阳性） 总的来说，我们使用SCE作为一个额外的损失来重新激活模型并生成ReCAM。
+Class Re-Activation Maps (ReCAM) （上图中为了简洁，省略了特征提取过程）
+FC Layer-1 with BCE Loss：在传统的CAM模型中，特征$f(x)$首先经过一个GAP层，然后将结果输入一个FC层，进行预测： $$ z=FC_{1}(GAP(f(x))) $$ 使用$z$和图像级标签$y$来计算BCE损失。
+Extracting CAM：根据FC层的权重$w_{k}$，计算每个类$k$对应的CAM图$M_{k}$。
+Single-Label Feature：使用$M_{k}$作为soft mask来提取对应于类别$k$的特征$f_{k}(x)$，如上图中的$f_{1},f_{2},f_{3}$： $$ f_{k}^{c}(x)=M_{k}\otimes f^{c}(x) $$ $f_{k}^{c}(x)$和$f^{c}(x)$分别代表$C$个通道和单个通道。
+FC Layer-2 with SCE Loss：每一个$f_{k}(x)$都有单个object标签，得到： $$ z&#39;_ {k}=FC_{2}(GAP(f_{k}(x))) $$ 并计算SCE损失优化。
+因此，我们的总体目标函数为： $$ L_{ReCAM}=L_{bce}&#43;\lambda L_{sce} $$ Extracting ReCAM：由于我们有两个FC层，因此权重的选择有以下几种选择：$FC_{1}$的权重$w$、$FC_{2}$的权重$w&#39;$、$w\oplus w&#39;$、$w\otimes w&#39;$。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +131,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +164,113 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">WSSS-ReCAM</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-10 00:00:00 UTC">
+                10 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Chen, Zhaozheng et al. “Class Re-Activation Maps for Weakly-Supervised Semantic Segmentation.” 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2022): 959-968.</p>
+<p>    CAM是弱监督语义分割任务中生成伪掩码的常用基础步骤，但是CAM的质量会决定最终的分割结果。在生成CAM中的BCE（二分类交叉熵损失）操作，会使某一像素对多个类别产生响应，即给定一个类别，其热力像素可能会干扰到其他类别的区域，也有可能未响应的区域属于该类别。<br>
+    提出一种简单的方法，通过使用softmax交叉熵损失（SCE），用BCE重新激活收敛的CAM，称为ReCAM。<br>
+    简单来说，给定一个图像，使用CAM提取每个类别的特征像素，并将它们与类标签一起使用SCE训练，一旦收敛，以与CAM中相同的方式提取ReCAM。<br>
+    基于CAM的弱监督语义分割通常包括三个步骤：<br>
+    （1）图像级类别标签训练一个多标签分类模型；<br>
+    （2）提取每个类的CAM生成0-1伪掩码；<br>
+    （3）以伪掩码作为监督信息，训练分割模型。<br>
+    <strong>Findings</strong>：BCE损失计算并不是类相互排斥的，就会出现同一个区域在多个类别中进行响应，并且这对多标签分类是不友好的。我们进一步验证了该发现：分别使用BCE和SCE来训练两个模型，选择80类和5个易混淆的类别（这种情况下更容易产生假阳性）
+<img src="/img/WSSS-ReCAM1.PNG" alt="">
+    总的来说，我们使用SCE作为一个额外的损失来重新激活模型并生成ReCAM。</p>
+<h2 id="class-re-activation-maps-recam">Class Re-Activation Maps (ReCAM)</h2>
+<p><img src="/img/WSSS-ReCAM2.PNG" alt="">
+    （上图中为了简洁，省略了特征提取过程）<br>
+    <strong>FC Layer-1 with BCE Loss</strong>：在传统的CAM模型中，特征$f(x)$首先经过一个GAP层，然后将结果输入一个FC层，进行预测：
+$$
+z=FC_{1}(GAP(f(x)))
+$$
+    使用$z$和图像级标签$y$来计算BCE损失。<br>
+    <strong>Extracting CAM</strong>：根据FC层的权重$w_{k}$，计算每个类$k$对应的CAM图$M_{k}$。<br>
+    <strong>Single-Label Feature</strong>：使用$M_{k}$作为soft mask来提取对应于类别$k$的特征$f_{k}(x)$，如上图中的$f_{1},f_{2},f_{3}$：
+$$
+f_{k}^{c}(x)=M_{k}\otimes  f^{c}(x)
+$$
+    $f_{k}^{c}(x)$和$f^{c}(x)$分别代表$C$个通道和单个通道。<br>
+    <strong>FC Layer-2 with SCE Loss</strong>：每一个$f_{k}(x)$都有单个object标签，得到：
+$$
+z'_ {k}=FC_{2}(GAP(f_{k}(x)))
+$$
+    并计算SCE损失优化。<br>
+    因此，我们的总体目标函数为：
+$$
+L_{ReCAM}=L_{bce}+\lambda L_{sce}
+$$
+    <strong>Extracting ReCAM</strong>：由于我们有两个FC层，因此权重的选择有以下几种选择：$FC_{1}$的权重$w$、$FC_{2}$的权重$w'$、$w\oplus w'$、$w\otimes  w'$。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +290,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

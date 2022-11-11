@@ -6,7 +6,113 @@
     <description>Recent content on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 03 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 11 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>WSSS-Affinity</title>
+      <link>https://gdy0924.github.io/posts/wsss-affinity/</link>
+      <pubDate>Fri, 11 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/wsss-affinity/</guid>
+      <description>Ru, Lixiang et al. “Learning Affinity from Attention: End-to-End Weakly-Supervised Semantic Segmentation with Transformers.” 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2022): 16825-16834.
+ 卷积网络不能很好的获取到图像的全局信息，会生成不完整的object区域，因此，本文提出使用transformer来集成全局信息，以生成更好的CAM伪掩码。
+目前的方法：训练一个分类模型，生成CAM，细化CAM得到伪掩码进行训练。这种方式不需要训练多个模型，串行的方式大大降低了效率。
+Transformer很适合WSSS任务的原有有：全局的注意力相比于卷积的局部注意力，更够生成更好的CAM图；多头自注意力机制可以捕获像素之间的语义亲和性，完全可以细化原来的CAM；但是仍然不够准确，效果并不是很好。
+总的来说，我们使用transformer生成伪标签，代替CNN网络，同时用transformer block中得到的的像素亲和性来改进伪标签，由于该步骤的像素亲和性是粗粒度的，因此提出一个Affinity from Attention (AFA)模块，以得到可靠准确的伪亲和度标签作为监督信息训练transformer中学习到的亲和度；为了得到伪亲和标签，提出了Pixel-Adaptive Refinement module (PAR)模块。
+Affinity  本文提出了Affinity from Attention（AFA）模块来学习可靠的语义亲和度，并将学习到的亲和度传播给初始伪标签；接着引入了一个Pixel-Adaptive Refinement（PAR）模块，以确保伪标签的局部一致性。
+Affinity from Attention 从第一张图中可以看出多头自注意力中包含语义亲和性，因此，我们可以使用多头自注意力来得到object区域。但是，由于在训练过程中没有对自注意力矩阵有明确的约束，因此在MHSA中学习到的亲和度通常是粗糙和不准确的，这意味着直接应用MHSA作为亲和度来细化初始标签效果不佳，因此使用AFA来解决该问题。
+我们直接通过线性组合多头自注意力，即使用一个MLP层，由于亲和矩阵应该是应该是对称的，因为共享相同语义的节点应该是相等的，只需与其转置进行相加，即： $$ A=MLP(S+S^{T}) $$ 其中，$S\in \mathbb{R}^{hw\times hw\times n}$，$A$为预测的语义亲和度矩阵。
+Pseudo Affinity Label Generation：监督信号$Y_{aff}$由初始化的伪标签，经过PAR模块做优化得到$Y_{p}$，然后按照一定的规则生成亲和度矩阵的标签。
+设定两个分数$\beta_{l}$和$\beta_{h}$，用来将CAM分为可信背景区域、不确定区域和可信前景区域： $Y_{p}$取值为 255 的区域代表不确定区域，剩余区域代表确定区域；其中确定区域又分为取值为0的背景区域，和取值为各个类别标签数值的前景区域。
+对于每个位置，都把它半径r以内的区域视为邻域，然后分析它与邻域的关系。假设已知某个位置为i，它的一个邻域为j，如果都属于确定区域，并且都是确定前景或确定背景，即$Y_{p}^{i}=Y_{p}^{j}$，那么$Y_{aff}^{i,j}=1$，同时位置 i、j记为positive位置对；如果一个是确定前景一个是确定背景，即$Y_{p}^{i}\neq Y_{p}^{j}$，那么$Y_{aff}^{i,j}=0$，同时位置 i、j记为negative位置对；如果i、j任意一个处于不确定区域，则$Y_{aff}^{i,j}=255$表示忽略；此外，邻域外的关系均置为 255，$Y_{aff}^{i,j}=Y_{aff}^{j,i}$。
+Propagation with Affinity：通过随机游走的方式，将亲和矩阵融合到CAM中以进行修正：</description>
+    </item>
+    
+    <item>
+      <title>WSSS-ReCAM</title>
+      <link>https://gdy0924.github.io/posts/wsss-recam/</link>
+      <pubDate>Thu, 10 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/wsss-recam/</guid>
+      <description>Chen, Zhaozheng et al. “Class Re-Activation Maps for Weakly-Supervised Semantic Segmentation.” 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2022): 959-968.
+ CAM是弱监督语义分割任务中生成伪掩码的常用基础步骤，但是CAM的质量会决定最终的分割结果。在生成CAM中的BCE（二分类交叉熵损失）操作，会使某一像素对多个类别产生响应，即给定一个类别，其热力像素可能会干扰到其他类别的区域，也有可能未响应的区域属于该类别。
+提出一种简单的方法，通过使用softmax交叉熵损失（SCE），用BCE重新激活收敛的CAM，称为ReCAM。
+简单来说，给定一个图像，使用CAM提取每个类别的特征像素，并将它们与类标签一起使用SCE训练，一旦收敛，以与CAM中相同的方式提取ReCAM。
+基于CAM的弱监督语义分割通常包括三个步骤：
+（1）图像级类别标签训练一个多标签分类模型；
+（2）提取每个类的CAM生成0-1伪掩码；
+（3）以伪掩码作为监督信息，训练分割模型。
+Findings：BCE损失计算并不是类相互排斥的，就会出现同一个区域在多个类别中进行响应，并且这对多标签分类是不友好的。我们进一步验证了该发现：分别使用BCE和SCE来训练两个模型，选择80类和5个易混淆的类别（这种情况下更容易产生假阳性） 总的来说，我们使用SCE作为一个额外的损失来重新激活模型并生成ReCAM。
+Class Re-Activation Maps (ReCAM) （上图中为了简洁，省略了特征提取过程）
+FC Layer-1 with BCE Loss：在传统的CAM模型中，特征$f(x)$首先经过一个GAP层，然后将结果输入一个FC层，进行预测： $$ z=FC_{1}(GAP(f(x))) $$ 使用$z$和图像级标签$y$来计算BCE损失。
+Extracting CAM：根据FC层的权重$w_{k}$，计算每个类$k$对应的CAM图$M_{k}$。
+Single-Label Feature：使用$M_{k}$作为soft mask来提取对应于类别$k$的特征$f_{k}(x)$，如上图中的$f_{1},f_{2},f_{3}$： $$ f_{k}^{c}(x)=M_{k}\otimes f^{c}(x) $$ $f_{k}^{c}(x)$和$f^{c}(x)$分别代表$C$个通道和单个通道。
+FC Layer-2 with SCE Loss：每一个$f_{k}(x)$都有单个object标签，得到： $$ z&#39;_ {k}=FC_{2}(GAP(f_{k}(x))) $$ 并计算SCE损失优化。
+因此，我们的总体目标函数为： $$ L_{ReCAM}=L_{bce}+\lambda L_{sce} $$ Extracting ReCAM：由于我们有两个FC层，因此权重的选择有以下几种选择：$FC_{1}$的权重$w$、$FC_{2}$的权重$w&#39;$、$w\oplus w&#39;$、$w\otimes w&#39;$。</description>
+    </item>
+    
+    <item>
+      <title>WSSS-AE</title>
+      <link>https://gdy0924.github.io/posts/wsss-ae/</link>
+      <pubDate>Wed, 09 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/wsss-ae/</guid>
+      <description>Wei, Yunchao et al. “Object Region Mining with Adversarial Erasing: A Simple Classification to Semantic Segmentation Approach.” 2017 IEEE Conference on Computer Vision and Pattern Recognition (CVPR) (2017): 6488-6496.(cite:550)
+ 提出了一个利用分类网络逐步挖掘识别目标区域的方法来解决弱监督语义分割问题。
+分类网络只响应小而稀疏的部分区域，与分割任务相反，分割需要密集的像素级推理。为了缓解差距，提出了一种对抗性擦除方法来逐步定位和扩展目标区域。
+通常分类网络识别出来物体只对一小部分区域感兴趣（如上图中的a），与分割任务的需求有偏差，造成使用该方法解决分割问题的主要障碍。提出一种新的对抗性擦除（AE）方法，能够驱动分类网络逐步学习整体目标区域（上图中b所示）。
+具体来说，训练一个图像分类网络，定位最具鉴别性的区域，将其删除，分类网络就需要定位另一个区域，从而逐渐挖掘更多的具有鉴别信息的区域，最后将被擦除的区域作为像素级语义分割的伪掩码进行训练。
+为了避免AE方法引入很多噪声，提出了PSL（prohibitive segmentation learning），利用置信度来减少噪声影响。
+Classification to Semantic Segmentation  包括两部分： object region mining with AE和online PSL for semantic segmentation
+Object Region Mining with AE AE迭代进行两个操作：学习一个分类网络来定位目标区域，反向擦除所发现的区域。
+对于生成的热力图CAM，根据预先设定的阈值，来得到目标区域，用所有训练数据的平均像素代替目标区域的像素，从的得到擦除目标区域的图像。该图像被再次输入网络进行迭代学习训练。
+由于目标区域被擦除，不再对分类预测有帮助，分类网络自然会发现新的对象区域，以保持其分类精度水平。 Online PSL for Semantic Segmentation  AE方法会使一些与object相关或者与背景相关的像素遗漏掉，如上图（a）中的蓝色像素。我们提出PSL方法对AE得到的mask进一步进行细化，利用未被AE标记的像素。
+简单来说就是利用分类置信度，加权生成map，从而禁止那些分类置信度低的类别产生掩码，作为辅助信息，与AE生成的mask一起优化分割网络。如上图（b）所示，PSL包含两个分支，分别用于分类和语义分割，使用其产生的分类置信度来对相应的特定类别的分割得分图进行加权。在分类结果的帮助下，在线PSL能够将多类别分割映射到一个辅助的分割掩码中，作为AE的辅助。
+实验 最后一行为分割失败的例子。 随着AE的迭代，性能增加，但是在执行4个步骤之后，效果降低了，这是由于过擦除，如下图所示： 上表证明了PSL的有效性，PSL+ +是PSL也经过迭代优化的结果，+GT是指使用图像级标签的真实值来作为PSL中的map加权值，提供了可实现性能的一个上界。</description>
+    </item>
+    
+    <item>
+      <title>WSSS-SEAM</title>
+      <link>https://gdy0924.github.io/posts/wsss-seam/</link>
+      <pubDate>Tue, 08 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/wsss-seam/</guid>
+      <description>Wang, Yude et al. “Self-Supervised Equivariant Attention Mechanism for Weakly Supervised Semantic Segmentation.” 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2020): 12272-12281.(cite:222)
+ 大多数先进的WSSS方法都是基于CAM图，一种通过图像分类标签来定位对象的有效方法。但是，CAM通常只覆盖物体中最具鉴别性的部分区域，同时，当图像进行增强变换时，生成的CAM并不一样。如下图（a）所示，输入图像进行缩放后，其得到的CAM不一致。 造成这些现象的根本原因在于全监督语义分割和弱监督语义分割之间的监督gap。
+本文引入PCM模块，捕获上下文信息，通过学习到的affinity attention maps对CAM进行修正，SEAM是使用equivariant cross regularization（ECR）损失的孪生网络实现的，该网络将原始CAM和修改后的CAM进行正则化。结果对比如上图（b）所示。
+SEAM Motivation  segmentation任务在data augmentation的时候可以有scale的变化，旋转，平移等，data和label是统一变换的，而classification是不一致的，在弱监督的分割时，利用class activation map（CAM）就会损失掉equivariance。即对于一个样本如果进行变换，分割倾向于保持等变，而分类更多关注不变性。因此，需要引入额外的正则化操作进行一致性约束。
+EAM的核心思想包含两个部分：一是对图像不同变换后生成的CAM图进行一致性约束（consistency regularization）为网络学习提供自监督；二是引入像素相关模块（pixel correlation module, PCM），借助该模块通过每个像素的上下文信息（context appearance information）生成亲密度注意力图（affinity attention maps），以此来修正原始的CAM图。
+Equivariant Regularization  在全监督语义分割的数据增强中，标签采用与输入图像相同的增强变换，为网络引入了一个隐式的等变约束。但是，考虑到WSSS只能得到图像级分类标签，缺少隐式约束。因此，提出等变正则化： $$ R_{ER}=||F(A(I))-A(F(I))||_ {1} $$ 其中，$F$为网络，$A$为变换，通过共享权重的孪生网络，来引入正则化。即其中一个输入原始图像，对网络输出进行仿射变化，另一个网络对输入图像仿射变换。最终，最小化两个网络的ER loss。
+Pixel Correlation Module  虽然等变正则化为网络学习提供了额外的监督，但仅用经典卷积层很难实现理想的一致性。
+像素相关模块（pixel correlation module ，PCM）获取每个像素的情景信息（context appearance information），通过学习生成亲密度注意力图（affinity attention maps），以此来修正原始的CAM图。 该模块是一个典型的自注意力模块（上图），Non-local（下图）的变体，去掉了残差链接，并去掉了$\phi $和$g$两个卷积操作，是考虑到该任务中没有确切的像素级标注，更多的参数可能会带来过拟合。</description>
+    </item>
+    
+    <item>
+      <title>WSSS-Sub Category Exploration</title>
+      <link>https://gdy0924.github.io/posts/wsss-sub-category-exploration/</link>
+      <pubDate>Mon, 07 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/wsss-sub-category-exploration/</guid>
+      <description>Chang, Yu-Ting et al. “Weakly-Supervised Semantic Segmentation via Sub-Category Exploration.” 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2020): 8988-8997.(cite:121)
+ 现有的使用图像级注释的弱监督语义分割方法通常依赖于初始响应来定位目标区域。由于CAM应用于分类网络，而分类的任务即意味着网络的网络参数优化并不要求CAM返回object的整体轮廓，仅仅只需要object的localization部分即可返回正确的标签。
+为了使网络关注object的其他部分，引入子分类任务。具体来说，通过对图像特征进行聚类，在每个标注的父类别中生成子类别标签，并构建一个子类别目标，将网络分配到一个更具挑战性的任务中。
+现有的流程是：生成CAM；将CAM细化为伪GT；基于伪标签训练分割网络。（该工作主要提升第一部分，即提高CAM的质量，因为CAM的质量直接决定了之后的性能）
+技术想法是将一个更具挑战性的任务强加给网络，以学习更好的表示，即子类别分类任务，包括两个步骤：
+（1）对从分类网络中提取的图像特征进行聚类，得到子类别标签；
+（2）使用每个图像的聚类分配作为伪标签来优化子类别目标。
+总的来说，通过引入自监督聚类任务增强分类网络中的特征表示，同时改进弱监督语义分割的初始CAM。
+Weakly-supervised Semantic Segmentation Algorithm Overview （1）对于每个父类别，通过对图像特征应用K-means聚类来确定K个子类别；
+（2）根据聚类结果，我们给每个图像分配一个伪标签，该伪标签被识别为子类别的索引；
+（3）构造了子分类目标来联合训练分类网络。
+通过迭代更新特征提取器、两个分类器和子类别伪标签，增强的特征表示可以更好地进行分类，从而逐步生成达到对象更完整区域的CAM。
+Sub-category Exploration Sub-Category Objective  引入一个无监督任务：对于每个父类别$p_{c}$，定义$K$个子类别$s_{c}^{k}$，对于每一个图像$I$，其子标签为$Y_{s}^{c,k}$，当某张图像的父类别为0，则其子类别也全为0。
+优化目标是学习一个子分类器$H_{s}$，其与特征提取器$E$共享参数，与父类别的分类损失$L_{p}$类似，子类别也使用多标签分类损失。
+Sub-category Discovery  由于子类别没有ground-truth，那么就是用聚类的结果作为伪标签。
+我们使用每个图像的聚类赋值$Y_{s}^{c}$作为子类别伪标签来优化$L_{s}$。
+Joint Training  共同优化$f=E(I)$和两个分类器$H_{p}$、H_{s}： $$ min\frac{1}{N}\sum_{i=1}^{N}l_{p}(H_{p}(f_{i}),Y_{p})+\lambda l_{s}(H_{s}(f_{i}),Y_{s}) $$
+Iterative Optimization  我们使用的是聚类方法得到子类别伪标签，仅通过$l_{p}$学习到的特征对于聚类任务性能较差，因此，我，恶魔采用迭代训练的方式，交替优化特征提取器和聚类任务。即先进行$L_{p}$优化，得到能够提取比较好特征的网络，从而促进聚类任务生成更好的伪标签。
+Details  选择resnet-38作为Classification Network；random walk method生成细化的分割伪标签；CRF细化结果；使用Deeplab-v2和ResNet-101作为分割网络的backbone。</description>
+    </item>
+    
     <item>
       <title>HITL-Design</title>
       <link>https://gdy0924.github.io/posts/hitl-design/</link>

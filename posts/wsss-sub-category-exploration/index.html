@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/wsss-sub-category-exploration/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/wsss-sub-category-exploration/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "WSSS-Sub Category Exploration",
+      "headline" : "WSSS-Sub Category Exploration",
+      "description" : "Chang, Yu-Ting et al. “Weakly-Supervised Semantic Segmentation via Sub-Category Exploration.” 2020 IEEE\/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2020): 8988-8997.(cite:121)\n 现有的使用图像级注释的弱监督语义分割方法通常依赖于初始响应来定位目标区域。由于CAM应用于分类网络，而分类的任务即意味着网络的网络参数优化并不要求CAM返回object的整体轮廓，仅仅只需要object的localization部分即可返回正确的标签。\n为了使网络关注object的其他部分，引入子分类任务。具体来说，通过对图像特征进行聚类，在每个标注的父类别中生成子类别标签，并构建一个子类别目标，将网络分配到一个更具挑战性的任务中。\n现有的流程是：生成CAM；将CAM细化为伪GT；基于伪标签训练分割网络。（该工作主要提升第一部分，即提高CAM的质量，因为CAM的质量直接决定了之后的性能）\n技术想法是将一个更具挑战性的任务强加给网络，以学习更好的表示，即子类别分类任务，包括两个步骤：\n（1）对从分类网络中提取的图像特征进行聚类，得到子类别标签；\n（2）使用每个图像的聚类分配作为伪标签来优化子类别目标。\n总的来说，通过引入自监督聚类任务增强分类网络中的特征表示，同时改进弱监督语义分割的初始CAM。\nWeakly-supervised Semantic Segmentation Algorithm Overview （1）对于每个父类别，通过对图像特征应用K-means聚类来确定K个子类别；\n（2）根据聚类结果，我们给每个图像分配一个伪标签，该伪标签被识别为子类别的索引；\n（3）构造了子分类目标来联合训练分类网络。\n通过迭代更新特征提取器、两个分类器和子类别伪标签，增强的特征表示可以更好地进行分类，从而逐步生成达到对象更完整区域的CAM。\nSub-category Exploration Sub-Category Objective  引入一个无监督任务：对于每个父类别$p_{c}$，定义$K$个子类别$s_{c}^{k}$，对于每一个图像$I$，其子标签为$Y_{s}^{c,k}$，当某张图像的父类别为0，则其子类别也全为0。\n优化目标是学习一个子分类器$H_{s}$，其与特征提取器$E$共享参数，与父类别的分类损失$L_{p}$类似，子类别也使用多标签分类损失。\nSub-category Discovery  由于子类别没有ground-truth，那么就是用聚类的结果作为伪标签。\n我们使用每个图像的聚类赋值$Y_{s}^{c}$作为子类别伪标签来优化$L_{s}$。\nJoint Training  共同优化$f=E(I)$和两个分类器$H_{p}$、H_{s}： $$ min\\frac{1}{N}\\sum_{i=1}^{N}l_{p}(H_{p}(f_{i}),Y_{p})\u002b\\lambda l_{s}(H_{s}(f_{i}),Y_{s}) $$\nIterative Optimization  我们使用的是聚类方法得到子类别伪标签，仅通过$l_{p}$学习到的特征对于聚类任务性能较差，因此，我，恶魔采用迭代训练的方式，交替优化特征提取器和聚类任务。即先进行$L_{p}$优化，得到能够提取比较好特征的网络，从而促进聚类任务生成更好的伪标签。\nDetails  选择resnet-38作为Classification Network；random walk method生成细化的分割伪标签；CRF细化结果；使用Deeplab-v2和ResNet-101作为分割网络的backbone。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,53 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-11-11 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-11-11 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "datePublished": "2022-11-07 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-11-07 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/wsss-sub-category-exploration\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>WSSS-Sub Category Exploration</title>
+  <meta property="og:title" content="WSSS-Sub Category Exploration" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Chang, Yu-Ting et al. “Weakly-Supervised Semantic Segmentation via Sub-Category Exploration.” 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2020): 8988-8997.(cite:121)
+ 现有的使用图像级注释的弱监督语义分割方法通常依赖于初始响应来定位目标区域。由于CAM应用于分类网络，而分类的任务即意味着网络的网络参数优化并不要求CAM返回object的整体轮廓，仅仅只需要object的localization部分即可返回正确的标签。
+为了使网络关注object的其他部分，引入子分类任务。具体来说，通过对图像特征进行聚类，在每个标注的父类别中生成子类别标签，并构建一个子类别目标，将网络分配到一个更具挑战性的任务中。
+现有的流程是：生成CAM；将CAM细化为伪GT；基于伪标签训练分割网络。（该工作主要提升第一部分，即提高CAM的质量，因为CAM的质量直接决定了之后的性能）
+技术想法是将一个更具挑战性的任务强加给网络，以学习更好的表示，即子类别分类任务，包括两个步骤：
+（1）对从分类网络中提取的图像特征进行聚类，得到子类别标签；
+（2）使用每个图像的聚类分配作为伪标签来优化子类别目标。
+总的来说，通过引入自监督聚类任务增强分类网络中的特征表示，同时改进弱监督语义分割的初始CAM。
+Weakly-supervised Semantic Segmentation Algorithm Overview （1）对于每个父类别，通过对图像特征应用K-means聚类来确定K个子类别；
+（2）根据聚类结果，我们给每个图像分配一个伪标签，该伪标签被识别为子类别的索引；
+（3）构造了子分类目标来联合训练分类网络。
+通过迭代更新特征提取器、两个分类器和子类别伪标签，增强的特征表示可以更好地进行分类，从而逐步生成达到对象更完整区域的CAM。
+Sub-category Exploration Sub-Category Objective  引入一个无监督任务：对于每个父类别$p_{c}$，定义$K$个子类别$s_{c}^{k}$，对于每一个图像$I$，其子标签为$Y_{s}^{c,k}$，当某张图像的父类别为0，则其子类别也全为0。
+优化目标是学习一个子分类器$H_{s}$，其与特征提取器$E$共享参数，与父类别的分类损失$L_{p}$类似，子类别也使用多标签分类损失。
+Sub-category Discovery  由于子类别没有ground-truth，那么就是用聚类的结果作为伪标签。
+我们使用每个图像的聚类赋值$Y_{s}^{c}$作为子类别伪标签来优化$L_{s}$。
+Joint Training  共同优化$f=E(I)$和两个分类器$H_{p}$、H_{s}： $$ min\frac{1}{N}\sum_{i=1}^{N}l_{p}(H_{p}(f_{i}),Y_{p})&#43;\lambda l_{s}(H_{s}(f_{i}),Y_{s}) $$
+Iterative Optimization  我们使用的是聚类方法得到子类别伪标签，仅通过$l_{p}$学习到的特征对于聚类任务性能较差，因此，我，恶魔采用迭代训练的方式，交替优化特征提取器和聚类任务。即先进行$L_{p}$优化，得到能够提取比较好特征的网络，从而促进聚类任务生成更好的伪标签。
+Details  选择resnet-38作为Classification Network；random walk method生成细化的分割伪标签；CRF细化结果；使用Deeplab-v2和ResNet-101作为分割网络的backbone。" />
+  <meta name="description" content="Chang, Yu-Ting et al. “Weakly-Supervised Semantic Segmentation via Sub-Category Exploration.” 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2020): 8988-8997.(cite:121)
+ 现有的使用图像级注释的弱监督语义分割方法通常依赖于初始响应来定位目标区域。由于CAM应用于分类网络，而分类的任务即意味着网络的网络参数优化并不要求CAM返回object的整体轮廓，仅仅只需要object的localization部分即可返回正确的标签。
+为了使网络关注object的其他部分，引入子分类任务。具体来说，通过对图像特征进行聚类，在每个标注的父类别中生成子类别标签，并构建一个子类别目标，将网络分配到一个更具挑战性的任务中。
+现有的流程是：生成CAM；将CAM细化为伪GT；基于伪标签训练分割网络。（该工作主要提升第一部分，即提高CAM的质量，因为CAM的质量直接决定了之后的性能）
+技术想法是将一个更具挑战性的任务强加给网络，以学习更好的表示，即子类别分类任务，包括两个步骤：
+（1）对从分类网络中提取的图像特征进行聚类，得到子类别标签；
+（2）使用每个图像的聚类分配作为伪标签来优化子类别目标。
+总的来说，通过引入自监督聚类任务增强分类网络中的特征表示，同时改进弱监督语义分割的初始CAM。
+Weakly-supervised Semantic Segmentation Algorithm Overview （1）对于每个父类别，通过对图像特征应用K-means聚类来确定K个子类别；
+（2）根据聚类结果，我们给每个图像分配一个伪标签，该伪标签被识别为子类别的索引；
+（3）构造了子分类目标来联合训练分类网络。
+通过迭代更新特征提取器、两个分类器和子类别伪标签，增强的特征表示可以更好地进行分类，从而逐步生成达到对象更完整区域的CAM。
+Sub-category Exploration Sub-Category Objective  引入一个无监督任务：对于每个父类别$p_{c}$，定义$K$个子类别$s_{c}^{k}$，对于每一个图像$I$，其子标签为$Y_{s}^{c,k}$，当某张图像的父类别为0，则其子类别也全为0。
+优化目标是学习一个子分类器$H_{s}$，其与特征提取器$E$共享参数，与父类别的分类损失$L_{p}$类似，子类别也使用多标签分类损失。
+Sub-category Discovery  由于子类别没有ground-truth，那么就是用聚类的结果作为伪标签。
+我们使用每个图像的聚类赋值$Y_{s}^{c}$作为子类别伪标签来优化$L_{s}$。
+Joint Training  共同优化$f=E(I)$和两个分类器$H_{p}$、H_{s}： $$ min\frac{1}{N}\sum_{i=1}^{N}l_{p}(H_{p}(f_{i}),Y_{p})&#43;\lambda l_{s}(H_{s}(f_{i}),Y_{s}) $$
+Iterative Optimization  我们使用的是聚类方法得到子类别伪标签，仅通过$l_{p}$学习到的特征对于聚类任务性能较差，因此，我，恶魔采用迭代训练的方式，交替优化特征提取器和聚类任务。即先进行$L_{p}$优化，得到能够提取比较好特征的网络，从而促进聚类任务生成更好的伪标签。
+Details  选择resnet-38作为Classification Network；random walk method生成细化的分割伪标签；CRF细化结果；使用Deeplab-v2和ResNet-101作为分割网络的backbone。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +139,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +172,109 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">WSSS-Sub Category Exploration</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-07 00:00:00 UTC">
+                07 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Chang, Yu-Ting et al. “Weakly-Supervised Semantic Segmentation via Sub-Category Exploration.” 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2020): 8988-8997.(cite:121)</p>
+<p>    现有的使用图像级注释的弱监督语义分割方法通常依赖于初始响应来定位目标区域。由于CAM应用于分类网络，而分类的任务即意味着网络的网络参数优化并不要求CAM返回object的整体轮廓，仅仅只需要object的localization部分即可返回正确的标签。<br>
+    为了使网络关注object的其他部分，引入子分类任务。具体来说，通过对图像特征进行聚类，在每个标注的父类别中生成子类别标签，并构建一个子类别目标，将网络分配到一个更具挑战性的任务中。<br>
+    现有的流程是：生成CAM；将CAM细化为伪GT；基于伪标签训练分割网络。（该工作主要提升第一部分，即提高CAM的质量，因为CAM的质量直接决定了之后的性能）<br>
+    技术想法是将一个更具挑战性的任务强加给网络，以学习更好的表示，即子类别分类任务，包括两个步骤：<br>
+    （1）对从分类网络中提取的图像特征进行聚类，得到子类别标签；<br>
+    （2）使用每个图像的聚类分配作为伪标签来优化子类别目标。<br>
+    总的来说，通过引入自监督聚类任务增强分类网络中的特征表示，同时改进弱监督语义分割的初始CAM。</p>
+<h2 id="weakly-supervised-semantic-segmentation">Weakly-supervised Semantic Segmentation</h2>
+<h3 id="algorithm-overview">Algorithm Overview</h3>
+<p><img src="/img/WSSS-SCE1.PNG" alt="">
+    （1）对于每个父类别，通过对图像特征应用K-means聚类来确定K个子类别；<br>
+    （2）根据聚类结果，我们给每个图像分配一个伪标签，该伪标签被识别为子类别的索引；<br>
+    （3）构造了子分类目标来联合训练分类网络。<br>
+    通过迭代更新特征提取器、两个分类器和子类别伪标签，增强的特征表示可以更好地进行分类，从而逐步生成达到对象更完整区域的CAM。</p>
+<h3 id="sub-category-exploration">Sub-category Exploration</h3>
+<h4 id="sub-category-objective">Sub-Category Objective</h4>
+<p>    引入一个无监督任务：对于每个父类别$p_{c}$，定义$K$个子类别$s_{c}^{k}$，对于每一个图像$I$，其子标签为$Y_{s}^{c,k}$，当某张图像的父类别为0，则其子类别也全为0。<br>
+    优化目标是学习一个子分类器$H_{s}$，其与特征提取器$E$共享参数，与父类别的分类损失$L_{p}$类似，子类别也使用多标签分类损失。</p>
+<h4 id="sub-category-discovery">Sub-category Discovery</h4>
+<p>    由于子类别没有ground-truth，那么就是用聚类的结果作为伪标签。<br>
+    我们使用每个图像的聚类赋值$Y_{s}^{c}$作为子类别伪标签来优化$L_{s}$。</p>
+<h4 id="joint-training">Joint Training</h4>
+<p>    共同优化$f=E(I)$和两个分类器$H_{p}$、H_{s}：
+$$
+min\frac{1}{N}\sum_{i=1}^{N}l_{p}(H_{p}(f_{i}),Y_{p})+\lambda l_{s}(H_{s}(f_{i}),Y_{s})
+$$</p>
+<h4 id="iterative-optimization">Iterative Optimization</h4>
+<p>    我们使用的是聚类方法得到子类别伪标签，仅通过$l_{p}$学习到的特征对于聚类任务性能较差，因此，我，恶魔采用迭代训练的方式，交替优化特征提取器和聚类任务。即先进行$L_{p}$优化，得到能够提取比较好特征的网络，从而促进聚类任务生成更好的伪标签。</p>
+<h3 id="details">Details</h3>
+<p>    选择resnet-38作为Classification Network；random walk method生成细化的分割伪标签；CRF细化结果；使用Deeplab-v2和ResNet-101作为分割网络的backbone。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +294,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 
