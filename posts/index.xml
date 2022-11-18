@@ -6,7 +6,114 @@
     <description>Recent content in Posts on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 11 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 18 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>MIRG-CDGPT2</title>
+      <link>https://gdy0924.github.io/posts/mirg-cdgpt2/</link>
+      <pubDate>Fri, 18 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/mirg-cdgpt2/</guid>
+      <description>Automated radiology report generation using conditioned transformers
+ 提出CDGPT2：conditioned distil generative pre-trained transformer 2；该模型包括一个从图像中提取视觉和语义特征的encoder，和一个生成单词序列的decoder组成；encoder是一个预训练的Chexnet，经过微调以预测图像中的多标签，每个标签的预测分数乘以word2vec embedding，得到语义特征向量；decoder是一个预训练的distilGPT2，输入为视觉的语义标签的embed顶，输出全文报告。
+Methodology 如上图所示，包括三个部分：视觉模型、语义特征生成和decoder。视觉模型作为encoder，预测图像中的多标签，生成视觉特征；语义特征生成是通过预测得到的标签乘以预训练的embedding，得到语义特征；decoder是一个基于transformer的以视觉和语义特征为条件的预训练模型。
+Visual features  使用Chexnet网络，检测和定位14中疾病或异常。但14个标签不足以提供很好的语义特征，因此，调整网络结构，使最后预测105个节点。并且使用二元交叉熵损失函数训练该多标签分类任务。
+Semantic features  视觉模型会输出一个大小为105的向量，表示每个标签在0到1之间的置信度分数。并使用一个预训练好的word2vec将预测标签转换为embedding，如果一个标签由多个单词组成，那么该标签的embedding将是其单个单词embedding的平均值。
+得到的标签embedding大小为$105×400$，最后的语义特征是标签的置信度分数与其相应embedding的乘积。加权标签embedding可以帮助decoder了解哪些语义与图像相关，哪些与图像无关。
+Decoder  预训练的distilGPT2作为decoder，由6层组成，在OpenWeb文本语料库上进行了预训练，可以生成所有的医学术语。
+Conditioning details  原始的自注意力机制中包含q、k和v： $$ SA(Z)=softmax((ZW_{q})(ZW_{k})^{T})(ZW_{v}) $$ 在该工作中，要融合视觉特征和语义特征，因此使用conditioned self-attention： $$ CSA(X,Y,Z)=softmax((ZW_{q})\begin{bmatrix}XU_{k} \ YH_{k} \ ZW_{k} \end{bmatrix}^{T})\begin{bmatrix} XU_{v}
+YH_{v}
+ZW_{v} \end{bmatrix} $$ 其中，$Z$为输入的token，$X$为语义特征，$Y$为视觉特征。</description>
+    </item>
+    
+    <item>
+      <title>MIRG-KGAE</title>
+      <link>https://gdy0924.github.io/posts/mirg-kgae/</link>
+      <pubDate>Fri, 18 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/mirg-kgae/</guid>
+      <description>Auto-Encoding Knowledge Graph for Unsupervised Medical Report Generation
+ 在医疗领域，构建一个大规模的图像报告配对数据集既耗时又昂贵。因此，提出an unsupervised model Knowledge Graph Auto-Encoder（KGAE），在训练中接受独立的图像和报告数据。KGAE由一个预先构建的知识图，作为共享的潜在空间，连接视觉和文本数据；一个知识驱动的decoder，投影医学图像到潜在空间的相应坐标上；一个知识驱动的decoder，生成该空间中给定坐标的医疗报告。由于知识驱动的encoder和decoder可以用独立的图像和报告数据集进行训练，因此KGAE是无监督的。
+知识驱动的encoder可以将图像$I$或报告$R$作为查询，并将它们投影到潜在空间中相应的坐标$G_{I}$和$G_{R}$中。通过这种方式，由于$G_{I}$和$G_{R}$共享相同的潜在空间，我们可以使用潜在空间中的位置来测量图像和报告之间的关系，从而缩小了视觉和文本领域之间的差距。
+在训练过程中，通过基于$G_{R}$重构输入报告$R$来训练decoder的参数；在测试阶段，直接将$G_{I}$作为输入，使用训练好的decoder生成报告。
+Approach Knowledge Graph  搭建一个知识图谱，建模了特定领域的知识结构，作为一个桥梁来关联视觉和文本领域的知识表示。
+知识图谱$G=(V,E)$包含了常见的异常，作为节点；通过从语料库中计算出的不同节点的归一化共现来计算边权值： $$ v_{i}&#39;=v_{i}+ReLU(\sum_{j=1}^{N}e_{i,j}W_{v}v_{j}) $$ 从而我们可以得到node embedding：$V&#39;=\lbrace v_{1}&#39;,v_{2}&#39;,&amp;hellip;,v_{N}&#39;\rbrace$
+Knowledge-driven Encoder  KE模块利用知识图谱$G$来同时提取图像$I$和报告$R$的知识表征$G_{I}$和$G_{R}$，以连接视觉和文本领域。
+具体来说，分别采用ResNet-50和Transformer来作为图像和报告的特征提取网络，分别得到图像embedding$I&#39;\in \mathbb{R}^{N_{I}\times d}$和报告embedding$R&#39;\in \mathbb{R}^{N_{R}\times d}$。
+为了从知识图谱$G$中提取知识表示，我们采用注意力机制来实现KE；因为注意机制可以计算不同特征之间的关联权重，并允许概率多对多关系，而不是单调关系。因此，将$I&#39;$和$R&#39;$作为query，知识图谱$G$，即$V&#39;=\lbrace v_{1}&#39;,v_{2}&#39;,&amp;hellip;,v_{N}&#39;\rbrace$，作为查找矩阵： $$ G_{I}=F(Attention_{I}(I&#39;,V&#39;)) $$ $$ G_{R}=F(Attention_{R}(R&#39;,V&#39;)) $$ $$ Attention(x,y)=softmax(\frac{xW_{q}(yW_{k})^{T}}{\sqrt{d}})yW_{v} $$ 其中，$F$为FC-ReLU-FC；采用了两个KE，即$KE_{I}$和$KE_{R}$，每个KE都包含一个注意力模块和一个共同的映射函数$F$；$KE_{I}$和$KE_{R}$唯一共享的权重是$F$的参数，注意力模块的参数是独立的。
+Knowledge-driven Decoder  使用$G_{k}$分别在训练和测试阶段表示$G_{R}$和$G_{I}$。在实现中，由于医疗报告的生成需要生成一个长段落，我们选择（三层）Transformer作为decoder的基本模块，并结合提出的知识驱动的注意力模块（Knowledge-driven Attention，KA），以有效地建模长序列。
+针对每一时间步，输入为word$x_{t}=w_{t}+e_{t}$，即word embedding与位置embedding相加，生成报告中的word$r_{t}$： $$ h_{t}=Attention(x_{t},x_{1:t}) $$ $$ h_{t}&#39;=KA(h_{t},G_{k},B) $$ $$ r_{t}=softmax(FFN(h_{t}&#39;)W_{p}) $$ 其中，$B$为KA模块中的知识库。
+我们采用了一种知识记忆机制来提取和保存与报告生成任务相关的细粒度医学知识，即引入知识库$B=\lbrace b_{1},b_{2},&amp;hellip;,b_{N_{b}}\rbrace$，其中$N_{b}$表示报告生成对应的知识的总数，并且$B$是可以通过端到端的方式训练得到的，那么knowledge-driven attention模块计算如下： $$ h_{t}&#39;=Attention(h_{t},\left [ G_{k};B_{K} \right ])=Attention(h_{t},\left [ G_{k};softmax(G_{k}B^{T})B \right ]) $$ 通过上述操作，$G_{k}$中的特征可以提取出$B$中保存的细粒度知识。</description>
+    </item>
+    
+    <item>
+      <title>MIRG-HRGR Agent</title>
+      <link>https://gdy0924.github.io/posts/mirg-hrgr-agent/</link>
+      <pubDate>Thu, 17 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/mirg-hrgr-agent/</guid>
+      <description>Hybrid Retrieval-Generation Reinforced Agent for Medical Image Report Generation
+ HRGR-Agent采用了一个分层的决策程序：对于每个句子，高级检索策略模块选择从现成的模板数据库中检索模板句子，或者调用低级生成模块来生成新句子，同时通过强化学习进行更新，通过句子级和单词级的奖励进行指导。
+由于医生经常遵循模板来编写报告，并对每个病例进行相应的修改，因此，本文提出HRGR-Agent，采用检索策略模块来决定是通过生成模块自动生成句子还是从模板数据库中检索特定句子，然后通过分层决策依次生成多个句子；该模板数据库是基于从现有医疗报告中收集到的人类先验知识而建立的。
+Approach  为了生成长且主题连贯的报告，我们在一个层次框架中构建decoder过程，首先生成一系列topic，然后预测每个句子对每个主题的影响。
+撰写报告的医生倾向于遵循某些模式和重用模板，同时在必要时根据每个案例调整陈述。为了模拟这个过程，我们提出结合检索和生成来自动生成报告。我们首先构建了一个模板数据库，由一组在训练语料库中经常出现的句子组成；这些句子通常描述一般的观察结果，并经常出现在医疗报告中。 流程：
+（1）输入样本的一组图像，通过CNN提取特征；
+（2）通过image encoder得到上下文向量；
+（3）sentence decoder生成句子的topic隐含状态$q$；
+（4）给定隐含状态$q$，检索策略模块（retrieval policy module）决定通过调用生成模块自动生成一个新的句子，还是从模板数据库中检索一个现有的模板；
+（5）检索策略模块（在自动生成或模板检索之间确定）和生成模块（生成单词）都通过强化算法进行更新，并分别为这两个模块设计了句子级和单词级的奖励。
+Hybrid Retrieval-Generation Reinforced Agent Image Encoder  对于输入的$K$个图像，将其得到的视觉特征进行平均得到向量$v$，并输入到image encoder中将其转换为上下文向量$h^{v}$。具体来说，image encoder为一个简单的全连接层，特征提取使用DenseNet或者VGG网络。
+Sentence Decoder  由堆叠的RNN组成，输入为上下文向量$h^{v}$，输出为topic状态$q$，并引入注意力机制来增强文本生成。
+首先生成注意力上下文向量$c_{i}^{s}$，其中$i$表示时间步，即通过上一个时间步的隐藏状态$h_{i-1}^{s}$和图像上下文向量$h^{v}$来计算注意力上下文向量： $$ c_{i}^{s}=F_{attn}^{s}(h^{v},h_{i-1}^{s}) $$ 其次，将注意力上下文向量$c_{i}^{s}$和上一个时间步的隐藏状态$h_{i-1}^{s}$输入到RNN中，得到当前时间步的隐藏状态$h_{i}^{s}$，利用$h_{i}^{s}$输出topic状态$q_{i}$和stop control概率$z_{i}\in \left [ 0,1 \right ]$： $$ h_{i}^{s}=F_{RNN}^{s}(c_{i}^{s},h_{i-1}^{s}) $$ $$ q_{i}=\sigma (W_{q}h_{i}^{s}+b_{q}) $$ $$ z_{i}=sigmoid (W_{z}h_{i}^{s}+b_{z}) $$
+Retrieval Policy Module  对于给定的topic状态$q_{i}$，该模块首先预测生成新句子和从候选模板$|T|$中检索的概率分布$u_{i}\in R^{1+|T|}$。根据对第一步的预测，触发不同的动作：如果自动生成获得的概率高，则激活生成模块，生成一个基于当前topic状态的单词序列；如果模板库中的一个模板获得了最高的概率，则从现成的模板数据库中检索到它，并作为当前句子主题的生成结果。 $$ u_{i}=Softmax(W_{u}q_{i}+b_{u}) $$ $$ m_{i}=argmax(u_{i}) $$</description>
+    </item>
+    
+    <item>
+      <title>MIRG-KERP</title>
+      <link>https://gdy0924.github.io/posts/mirg-kerp/</link>
+      <pubDate>Thu, 17 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/mirg-kerp/</guid>
+      <description>Knowledge-driven Encode, Retrieve, Paraphrase for Medical Image Report Generation
+ KERP将医疗报告生成分解为医学异常图像区域学习和自然语言建模。首先通过Encode模块，将视觉特征转换为结构化的异常图结构，同时结合了先验医疗知识；Retrieve模块根据检测到的异常检索文本模板；最后Paraphrase模块，根据特定情况重写模板。
+为了撰写医学图像报告，医生通常首先检查患者的图像是否有异常，然后按照特定的模板编写报告，并在必要时调整每个病例的模板中的陈述。基于上述过程，我们将自动医疗报告生成划分为：knowledge-driven encode、retrieve和paraphrase（KERP）。
+knowledge-driven encode：将图像视觉特征转换为异常图结构，节点表示临床异常，，其特征描述了从视觉输入观察到的异常，边的权值表示异常节点的相关性；
+retrieve：根据检测到的异常检索模板序列；
+paraphrase：扩展和改写模板，生成详细报告。
+提出GTR模块，通过该模块，KERP可以将视觉特征转换为异常图（Encode），然后转换为模板序列（Retrieve），最后转换为单词序列（Paraphrase）。
+Graph Transformer (GTR)  用于将特征编码为相同图类型内的更高级语义，或者将一个图的特征（例如，知识图）转换为另一个图（例如，单词序列）。
+定义：图$G=(V,E)$，边权$e_{s_{i},t_{j}}$，其中$s_{i}$为源图中的第$i$个节点，$t_{j}$为目标图中的第$j$个节点。
+在GTR中有两种信息传递方式：从源图到目标图（inter-graph message passing），同一图中传递消息（intra-graph message passing）
+Inter-graph message passing  为了学习源图中的内容，将源节点的特征进行转换并将相应的边权值传递给目标节点： $$ v_{j}&#39;=v_{j}&#39;+\sigma (\sum_{i=1}^{N}e_{s_{i},t_{j}}W_{s}v_{j}) $$ 其中，$W_{s}$为参数矩阵。
+我们考虑通过注意力机制自动学习权值，那么目标节点的更新考虑到不同源节点的重要性： $$ \hat{e}_ {s_{i},t_{j}}=Attention(W_{s}^{a}v_{i},W_{t}^{a}v_{j}&#39;) $$ $\hat{e}_ {s_{i},t_{j}}$是源节点$i$到目标节点$j$的边的注意力权重。同时要对注意力权重进行归一化操作。
+我们采用学习到的注意力边权值和先验边权值的加权和作为动态边权值： $$ \tilde{e}{s{i},t_{j}}=\lambda e_{s_{i},t_{j}}+(1-\lambda )\hat{e}_ {s_{i},t_{j}} $$ 用$\lambda$来控制先验边权重或者学习边权重的重要性。
+Intra-graph message passing  对同一图中节点之间的相关性进行建模，并根据它们之间的紧密程度来融合特征。具体来说，一个目标节点是通过结合相邻节点和其自身的特征来进行更新的： $$ v_{j}&#39;=v_{j}&#39;+\sigma (\sum_{i=1}^{N}\tilde{e}_ {i,j}W_{t}v_{i}&#39;) $$
+GTR as a module GTR通过定期对源图计算源注意力和对自身执行自注意来得到目标图。每个图节点的颜色暗度表示目标节点关注的注意程度。
+首先将和连接到一个步骤中，即在目标图内进行信息传递，从一个或多个源图进行信息传递；然后将多个这样的步骤叠加成一个模块，以便逐步将目标图特征转换为高级语义。</description>
+    </item>
+    
+    <item>
+      <title>MIRG-CoAtt</title>
+      <link>https://gdy0924.github.io/posts/mirg-coatt/</link>
+      <pubDate>Wed, 16 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/mirg-coatt/</guid>
+      <description>医学图像报告生成主要包括个挑战：
+（1）一个完整的报告包括多种形式的信息，包括findings和tags；
+（2）医学图像中的异常区域难以识别；
+（3）报告通常很长，包括多个句子。
+本文提出了一个多任务学习框架，同时进行tags的预测和段落的生成；提出注意力机制来定位异常区域并生成句子；提出层级的lstm来生成长段落。
+医学报告中通常会描述图像中每个区域的findings，特别是每个区域是否正常或存在潜在异常，如下图所示： （1）上图中，报告中包含多个形式的信息，impression、findings和tags，为了同时生成不同形式的信息，使用一个多任务框架来实现，讲tags视为多标签分类任务，将描述视为文本生成任务。
+（2）针对异常区域定位并生成对应的描述问题，通过一种注意力机制来实现，其同时关注图像个预测tags；
+（3）报告中生成的句子都很长，因此我们不选择使用单层lstm，而是层级的lstm结构。
+Methods Overview 一个完整的医学图像诊断报告由文本描述（长段落）和tag列表组成。
+首先将图像划分为不同的区域，利用一个CNN来学习这些patch的视觉表征；然后将视觉表征输入多标签分类（multi-label classification，MLC）网络中，预测相关tag，每一个tag都由一个word embedding向量表示；预测得到的word embedding作为该图像的语义特征，将语义特征和视觉特征输入到注意力模块中，生成上下文向量。以上为encoder过程。
+使用encoder得到的上下文向量进行decoder，以生成文本描述。对于医学报告包含的多个句子，通常每个句子都属于一个特定的topic，因此我们使用层级的方式生成报告：首先生成表示句子的high-level topic向量序列，即将上下文向量输入到sentence lstm中，经过几个步骤的处理，每一步骤都会生成一个topic向量，topic向量就表示要生成句子的语义信息；接着，topic向量输入到word lstm中，生成一系列单词，形成句子。
+Tag Prediction  对于给定的图像，先通过CNN网络提取特征，将特征输入到多标签预测（MLC）网络中，生成标签列表。
+将M个最有可能的标签的embedding作为topic生成的语义特征。
+Co-Attention  提出了一个可以同时关注视觉和语义信息的共同注意力机制。
+在sentence lstm中的时间步$s$下，联合上下文向量$ctx^{(s)}$是由co-attention network生成的，$f_{co_{att}}(\lbrace v_{n} \rbrace_{n=1}^{N},\lbrace a_{m} \rbrace_{m=1}^{M},h_{sent}^{(s-1)})$，其中，$\lbrace v_{n} \rbrace_{n=1}^{N}$是视觉向量，$\lbrace a_{m} \rbrace_{m=1}^{M}$是语义向量，$h_{sent}^{(s-1)}$是上一个时间步$s-1$的sentence lstm的隐含状态；$f_{co_{att}}$使用一层前馈网络来计算soft注意力分数： $$ \alpha _ {v,n}=exp(W_{v_{att}}tanh(W_{v}v_{n}+W_{v,h}h_{sent}^{(s-1)})) $$ $$ \alpha _ {a,m}=exp(W_{a_{att}}tanh(W_{a}a_{m}+W_{a,h}h_{sent}^{(s-1)})) $$ $W$都是参数矩阵；视觉和语义上下文向量计算如下： $$ v_{att}^{(s)}=\sum_{n=1}^{N}\alpha _ {v,n}v_{n} $$ $$ a_{att}^{(s)}=\sum_{m=1}^{M}\alpha _ {a,m}a_{m} $$ 先将上述两个向量拼接起来后经过一个fc层来融合得到联合上下文向量： $$ ctx^{(s)}=W_{fc}\left [ v_{att}^{(s)};a_{att}^{(s)} \right ] $$</description>
+    </item>
+    
     <item>
       <title>WSSS-Affinity</title>
       <link>https://gdy0924.github.io/posts/wsss-affinity/</link>
@@ -68,6 +175,22 @@ Object Region Mining with AE AE迭代进行两个操作：学习一个分类网�
 由于目标区域被擦除，不再对分类预测有帮助，分类网络自然会发现新的对象区域，以保持其分类精度水平。 Online PSL for Semantic Segmentation  AE方法会使一些与object相关或者与背景相关的像素遗漏掉，如上图（a）中的蓝色像素。我们提出PSL方法对AE得到的mask进一步进行细化，利用未被AE标记的像素。
 简单来说就是利用分类置信度，加权生成map，从而禁止那些分类置信度低的类别产生掩码，作为辅助信息，与AE生成的mask一起优化分割网络。如上图（b）所示，PSL包含两个分支，分别用于分类和语义分割，使用其产生的分类置信度来对相应的特定类别的分割得分图进行加权。在分类结果的帮助下，在线PSL能够将多类别分割映射到一个辅助的分割掩码中，作为AE的辅助。
 实验 最后一行为分割失败的例子。 随着AE的迭代，性能增加，但是在执行4个步骤之后，效果降低了，这是由于过擦除，如下图所示： 上表证明了PSL的有效性，PSL+ +是PSL也经过迭代优化的结果，+GT是指使用图像级标签的真实值来作为PSL中的map加权值，提供了可实现性能的一个上界。</description>
+    </item>
+    
+    <item>
+      <title>WSSS-IRN</title>
+      <link>https://gdy0924.github.io/posts/wsss-irn/</link>
+      <pubDate>Tue, 08 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/wsss-irn/</guid>
+      <description>Wang, Yude et al. “Self-Supervised Equivariant Attention Mechanism for Weakly Supervised Semantic Segmentation.” 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2020): 12272-12281.(cite:222)
+ 大多数先进的WSSS方法都是基于CAM图，一种通过图像分类标签来定位对象的有效方法。但是，CAM通常只覆盖物体中最具鉴别性的部分区域，同时，当图像进行增强变换时，生成的CAM并不一样。如下图（a）所示，输入图像进行缩放后，其得到的CAM不一致。 造成这些现象的根本原因在于全监督语义分割和弱监督语义分割之间的监督gap。
+本文引入PCM模块，捕获上下文信息，通过学习到的affinity attention maps对CAM进行修正，SEAM是使用equivariant cross regularization（ECR）损失的孪生网络实现的，该网络将原始CAM和修改后的CAM进行正则化。结果对比如上图（b）所示。
+SEAM Motivation  segmentation任务在data augmentation的时候可以有scale的变化，旋转，平移等，data和label是统一变换的，而classification是不一致的，在弱监督的分割时，利用class activation map（CAM）就会损失掉equivariance。即对于一个样本如果进行变换，分割倾向于保持等变，而分类更多关注不变性。因此，需要引入额外的正则化操作进行一致性约束。
+EAM的核心思想包含两个部分：一是对图像不同变换后生成的CAM图进行一致性约束（consistency regularization）为网络学习提供自监督；二是引入像素相关模块（pixel correlation module, PCM），借助该模块通过每个像素的上下文信息（context appearance information）生成亲密度注意力图（affinity attention maps），以此来修正原始的CAM图。
+Equivariant Regularization  在全监督语义分割的数据增强中，标签采用与输入图像相同的增强变换，为网络引入了一个隐式的等变约束。但是，考虑到WSSS只能得到图像级分类标签，缺少隐式约束。因此，提出等变正则化： $$ R_{ER}=||F(A(I))-A(F(I))||_ {1} $$ 其中，$F$为网络，$A$为变换，通过共享权重的孪生网络，来引入正则化。即其中一个输入原始图像，对网络输出进行仿射变化，另一个网络对输入图像仿射变换。最终，最小化两个网络的ER loss。
+Pixel Correlation Module  虽然等变正则化为网络学习提供了额外的监督，但仅用经典卷积层很难实现理想的一致性。
+像素相关模块（pixel correlation module ，PCM）获取每个像素的情景信息（context appearance information），通过学习生成亲密度注意力图（affinity attention maps），以此来修正原始的CAM图。 该模块是一个典型的自注意力模块（上图），Non-local（下图）的变体，去掉了残差链接，并去掉了$\phi $和$g$两个卷积操作，是考虑到该任务中没有确切的像素级标注，更多的参数可能会带来过拟合。</description>
     </item>
     
     <item>

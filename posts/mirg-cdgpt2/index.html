@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/mirg-cdgpt2/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/mirg-cdgpt2/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "MIRG-CDGPT2",
+      "headline" : "MIRG-CDGPT2",
+      "description" : "Automated radiology report generation using conditioned transformers\n 提出CDGPT2：conditioned distil generative pre-trained transformer 2；该模型包括一个从图像中提取视觉和语义特征的encoder，和一个生成单词序列的decoder组成；encoder是一个预训练的Chexnet，经过微调以预测图像中的多标签，每个标签的预测分数乘以word2vec embedding，得到语义特征向量；decoder是一个预训练的distilGPT2，输入为视觉的语义标签的embed顶，输出全文报告。\nMethodology 如上图所示，包括三个部分：视觉模型、语义特征生成和decoder。视觉模型作为encoder，预测图像中的多标签，生成视觉特征；语义特征生成是通过预测得到的标签乘以预训练的embedding，得到语义特征；decoder是一个基于transformer的以视觉和语义特征为条件的预训练模型。\nVisual features  使用Chexnet网络，检测和定位14中疾病或异常。但14个标签不足以提供很好的语义特征，因此，调整网络结构，使最后预测105个节点。并且使用二元交叉熵损失函数训练该多标签分类任务。\nSemantic features  视觉模型会输出一个大小为105的向量，表示每个标签在0到1之间的置信度分数。并使用一个预训练好的word2vec将预测标签转换为embedding，如果一个标签由多个单词组成，那么该标签的embedding将是其单个单词embedding的平均值。\n得到的标签embedding大小为$105×400$，最后的语义特征是标签的置信度分数与其相应embedding的乘积。加权标签embedding可以帮助decoder了解哪些语义与图像相关，哪些与图像无关。\nDecoder  预训练的distilGPT2作为decoder，由6层组成，在OpenWeb文本语料库上进行了预训练，可以生成所有的医学术语。\nConditioning details  原始的自注意力机制中包含q、k和v： $$ SA(Z)=softmax((ZW_{q})(ZW_{k})^{T})(ZW_{v}) $$ 在该工作中，要融合视觉特征和语义特征，因此使用conditioned self-attention： $$ CSA(X,Y,Z)=softmax((ZW_{q})\\begin{bmatrix}XU_{k} \\ YH_{k} \\ ZW_{k} \\end{bmatrix}^{T})\\begin{bmatrix} XU_{v}\nYH_{v}\nZW_{v} \\end{bmatrix} $$ 其中，$Z$为输入的token，$X$为语义特征，$Y$为视觉特征。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -69,15 +69,33 @@ code.has-jax {
       "copyrightYear" : "2022",
       "datePublished": "2022-11-18 00:00:00 \u002b0000 UTC",
       "dateModified" : "2022-11-18 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/mirg-cdgpt2\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>MIRG-CDGPT2</title>
+  <meta property="og:title" content="MIRG-CDGPT2" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Automated radiology report generation using conditioned transformers
+ 提出CDGPT2：conditioned distil generative pre-trained transformer 2；该模型包括一个从图像中提取视觉和语义特征的encoder，和一个生成单词序列的decoder组成；encoder是一个预训练的Chexnet，经过微调以预测图像中的多标签，每个标签的预测分数乘以word2vec embedding，得到语义特征向量；decoder是一个预训练的distilGPT2，输入为视觉的语义标签的embed顶，输出全文报告。
+Methodology 如上图所示，包括三个部分：视觉模型、语义特征生成和decoder。视觉模型作为encoder，预测图像中的多标签，生成视觉特征；语义特征生成是通过预测得到的标签乘以预训练的embedding，得到语义特征；decoder是一个基于transformer的以视觉和语义特征为条件的预训练模型。
+Visual features  使用Chexnet网络，检测和定位14中疾病或异常。但14个标签不足以提供很好的语义特征，因此，调整网络结构，使最后预测105个节点。并且使用二元交叉熵损失函数训练该多标签分类任务。
+Semantic features  视觉模型会输出一个大小为105的向量，表示每个标签在0到1之间的置信度分数。并使用一个预训练好的word2vec将预测标签转换为embedding，如果一个标签由多个单词组成，那么该标签的embedding将是其单个单词embedding的平均值。
+得到的标签embedding大小为$105×400$，最后的语义特征是标签的置信度分数与其相应embedding的乘积。加权标签embedding可以帮助decoder了解哪些语义与图像相关，哪些与图像无关。
+Decoder  预训练的distilGPT2作为decoder，由6层组成，在OpenWeb文本语料库上进行了预训练，可以生成所有的医学术语。
+Conditioning details  原始的自注意力机制中包含q、k和v： $$ SA(Z)=softmax((ZW_{q})(ZW_{k})^{T})(ZW_{v}) $$ 在该工作中，要融合视觉特征和语义特征，因此使用conditioned self-attention： $$ CSA(X,Y,Z)=softmax((ZW_{q})\begin{bmatrix}XU_{k} \ YH_{k} \ ZW_{k} \end{bmatrix}^{T})\begin{bmatrix} XU_{v}
+YH_{v}
+ZW_{v} \end{bmatrix} $$ 其中，$Z$为输入的token，$X$为语义特征，$Y$为视觉特征。" />
+  <meta name="description" content="Automated radiology report generation using conditioned transformers
+ 提出CDGPT2：conditioned distil generative pre-trained transformer 2；该模型包括一个从图像中提取视觉和语义特征的encoder，和一个生成单词序列的decoder组成；encoder是一个预训练的Chexnet，经过微调以预测图像中的多标签，每个标签的预测分数乘以word2vec embedding，得到语义特征向量；decoder是一个预训练的distilGPT2，输入为视觉的语义标签的embed顶，输出全文报告。
+Methodology 如上图所示，包括三个部分：视觉模型、语义特征生成和decoder。视觉模型作为encoder，预测图像中的多标签，生成视觉特征；语义特征生成是通过预测得到的标签乘以预训练的embedding，得到语义特征；decoder是一个基于transformer的以视觉和语义特征为条件的预训练模型。
+Visual features  使用Chexnet网络，检测和定位14中疾病或异常。但14个标签不足以提供很好的语义特征，因此，调整网络结构，使最后预测105个节点。并且使用二元交叉熵损失函数训练该多标签分类任务。
+Semantic features  视觉模型会输出一个大小为105的向量，表示每个标签在0到1之间的置信度分数。并使用一个预训练好的word2vec将预测标签转换为embedding，如果一个标签由多个单词组成，那么该标签的embedding将是其单个单词embedding的平均值。
+得到的标签embedding大小为$105×400$，最后的语义特征是标签的置信度分数与其相应embedding的乘积。加权标签embedding可以帮助decoder了解哪些语义与图像相关，哪些与图像无关。
+Decoder  预训练的distilGPT2作为decoder，由6层组成，在OpenWeb文本语料库上进行了预训练，可以生成所有的医学术语。
+Conditioning details  原始的自注意力机制中包含q、k和v： $$ SA(Z)=softmax((ZW_{q})(ZW_{k})^{T})(ZW_{v}) $$ 在该工作中，要融合视觉特征和语义特征，因此使用conditioned self-attention： $$ CSA(X,Y,Z)=softmax((ZW_{q})\begin{bmatrix}XU_{k} \ YH_{k} \ ZW_{k} \end{bmatrix}^{T})\begin{bmatrix} XU_{v}
+YH_{v}
+ZW_{v} \end{bmatrix} $$ 其中，$Z$为输入的token，$X$为语义特征，$Y$为视觉特征。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +121,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +154,107 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">MIRG-CDGPT2</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-18 00:00:00 UTC">
+                18 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Automated radiology report generation using conditioned transformers</p>
+<p>    提出CDGPT2：conditioned distil generative pre-trained transformer 2；该模型包括一个从图像中提取视觉和语义特征的encoder，和一个生成单词序列的decoder组成；encoder是一个预训练的Chexnet，经过微调以预测图像中的多标签，每个标签的预测分数乘以word2vec embedding，得到语义特征向量；decoder是一个预训练的distilGPT2，输入为视觉的语义标签的embed顶，输出全文报告。</p>
+<h3 id="methodology">Methodology</h3>
+<p><img src="/img/MIRG-CDGPT2-1.PNG" alt="">
+    如上图所示，包括三个部分：视觉模型、语义特征生成和decoder。视觉模型作为encoder，预测图像中的多标签，生成视觉特征；语义特征生成是通过预测得到的标签乘以预训练的embedding，得到语义特征；decoder是一个基于transformer的以视觉和语义特征为条件的预训练模型。</p>
+<h3 id="visual-features">Visual features</h3>
+<p>    使用Chexnet网络，检测和定位14中疾病或异常。但14个标签不足以提供很好的语义特征，因此，调整网络结构，使最后预测105个节点。并且使用二元交叉熵损失函数训练该多标签分类任务。</p>
+<h3 id="semantic-features">Semantic features</h3>
+<p>    视觉模型会输出一个大小为105的向量，表示每个标签在0到1之间的置信度分数。并使用一个预训练好的word2vec将预测标签转换为embedding，如果一个标签由多个单词组成，那么该标签的embedding将是其单个单词embedding的平均值。<br>
+    得到的标签embedding大小为$105×400$，最后的语义特征是标签的置信度分数与其相应embedding的乘积。加权标签embedding可以帮助decoder了解哪些语义与图像相关，哪些与图像无关。</p>
+<h3 id="decoder">Decoder</h3>
+<p>    预训练的distilGPT2作为decoder，由6层组成，在OpenWeb文本语料库上进行了预训练，可以生成所有的医学术语。</p>
+<h3 id="conditioning-details">Conditioning details</h3>
+<p>    原始的自注意力机制中包含q、k和v：
+$$
+SA(Z)=softmax((ZW_{q})(ZW_{k})^{T})(ZW_{v})
+$$
+    在该工作中，要融合视觉特征和语义特征，因此使用conditioned self-attention：
+$$
+CSA(X,Y,Z)=softmax((ZW_{q})\begin{bmatrix}XU_{k}
+\ YH_{k}
+\ ZW_{k}
+\end{bmatrix}^{T})\begin{bmatrix}
+XU_{v}<br>
+YH_{v}<br>
+ZW_{v}
+\end{bmatrix}
+$$
+    其中，$Z$为输入的token，$X$为语义特征，$Y$为视觉特征。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +274,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

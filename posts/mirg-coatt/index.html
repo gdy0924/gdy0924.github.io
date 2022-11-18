@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/mirg-coatt/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/mirg-coatt/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "MIRG-CoAtt",
+      "headline" : "MIRG-CoAtt",
+      "description" : "医学图像报告生成主要包括个挑战：\n（1）一个完整的报告包括多种形式的信息，包括findings和tags；\n（2）医学图像中的异常区域难以识别；\n（3）报告通常很长，包括多个句子。\n本文提出了一个多任务学习框架，同时进行tags的预测和段落的生成；提出注意力机制来定位异常区域并生成句子；提出层级的lstm来生成长段落。\n医学报告中通常会描述图像中每个区域的findings，特别是每个区域是否正常或存在潜在异常，如下图所示： （1）上图中，报告中包含多个形式的信息，impression、findings和tags，为了同时生成不同形式的信息，使用一个多任务框架来实现，讲tags视为多标签分类任务，将描述视为文本生成任务。\n（2）针对异常区域定位并生成对应的描述问题，通过一种注意力机制来实现，其同时关注图像个预测tags；\n（3）报告中生成的句子都很长，因此我们不选择使用单层lstm，而是层级的lstm结构。\nMethods Overview 一个完整的医学图像诊断报告由文本描述（长段落）和tag列表组成。\n首先将图像划分为不同的区域，利用一个CNN来学习这些patch的视觉表征；然后将视觉表征输入多标签分类（multi-label classification，MLC）网络中，预测相关tag，每一个tag都由一个word embedding向量表示；预测得到的word embedding作为该图像的语义特征，将语义特征和视觉特征输入到注意力模块中，生成上下文向量。以上为encoder过程。\n使用encoder得到的上下文向量进行decoder，以生成文本描述。对于医学报告包含的多个句子，通常每个句子都属于一个特定的topic，因此我们使用层级的方式生成报告：首先生成表示句子的high-level topic向量序列，即将上下文向量输入到sentence lstm中，经过几个步骤的处理，每一步骤都会生成一个topic向量，topic向量就表示要生成句子的语义信息；接着，topic向量输入到word lstm中，生成一系列单词，形成句子。\nTag Prediction  对于给定的图像，先通过CNN网络提取特征，将特征输入到多标签预测（MLC）网络中，生成标签列表。\n将M个最有可能的标签的embedding作为topic生成的语义特征。\nCo-Attention  提出了一个可以同时关注视觉和语义信息的共同注意力机制。\n在sentence lstm中的时间步$s$下，联合上下文向量$ctx^{(s)}$是由co-attention network生成的，$f_{co_{att}}(\\lbrace v_{n} \\rbrace_{n=1}^{N},\\lbrace a_{m} \\rbrace_{m=1}^{M},h_{sent}^{(s-1)})$，其中，$\\lbrace v_{n} \\rbrace_{n=1}^{N}$是视觉向量，$\\lbrace a_{m} \\rbrace_{m=1}^{M}$是语义向量，$h_{sent}^{(s-1)}$是上一个时间步$s-1$的sentence lstm的隐含状态；$f_{co_{att}}$使用一层前馈网络来计算soft注意力分数： $$ \\alpha _ {v,n}=exp(W_{v_{att}}tanh(W_{v}v_{n}\u002bW_{v,h}h_{sent}^{(s-1)})) $$ $$ \\alpha _ {a,m}=exp(W_{a_{att}}tanh(W_{a}a_{m}\u002bW_{a,h}h_{sent}^{(s-1)})) $$ $W$都是参数矩阵；视觉和语义上下文向量计算如下： $$ v_{att}^{(s)}=\\sum_{n=1}^{N}\\alpha _ {v,n}v_{n} $$ $$ a_{att}^{(s)}=\\sum_{m=1}^{M}\\alpha _ {a,m}a_{m} $$ 先将上述两个向量拼接起来后经过一个fc层来融合得到联合上下文向量： $$ ctx^{(s)}=W_{fc}\\left [ v_{att}^{(s)};a_{att}^{(s)} \\right ] $$",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,45 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-11-18 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-11-18 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "datePublished": "2022-11-16 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-11-16 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/mirg-coatt\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>MIRG-CoAtt</title>
+  <meta property="og:title" content="MIRG-CoAtt" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="医学图像报告生成主要包括个挑战：
+（1）一个完整的报告包括多种形式的信息，包括findings和tags；
+（2）医学图像中的异常区域难以识别；
+（3）报告通常很长，包括多个句子。
+本文提出了一个多任务学习框架，同时进行tags的预测和段落的生成；提出注意力机制来定位异常区域并生成句子；提出层级的lstm来生成长段落。
+医学报告中通常会描述图像中每个区域的findings，特别是每个区域是否正常或存在潜在异常，如下图所示： （1）上图中，报告中包含多个形式的信息，impression、findings和tags，为了同时生成不同形式的信息，使用一个多任务框架来实现，讲tags视为多标签分类任务，将描述视为文本生成任务。
+（2）针对异常区域定位并生成对应的描述问题，通过一种注意力机制来实现，其同时关注图像个预测tags；
+（3）报告中生成的句子都很长，因此我们不选择使用单层lstm，而是层级的lstm结构。
+Methods Overview 一个完整的医学图像诊断报告由文本描述（长段落）和tag列表组成。
+首先将图像划分为不同的区域，利用一个CNN来学习这些patch的视觉表征；然后将视觉表征输入多标签分类（multi-label classification，MLC）网络中，预测相关tag，每一个tag都由一个word embedding向量表示；预测得到的word embedding作为该图像的语义特征，将语义特征和视觉特征输入到注意力模块中，生成上下文向量。以上为encoder过程。
+使用encoder得到的上下文向量进行decoder，以生成文本描述。对于医学报告包含的多个句子，通常每个句子都属于一个特定的topic，因此我们使用层级的方式生成报告：首先生成表示句子的high-level topic向量序列，即将上下文向量输入到sentence lstm中，经过几个步骤的处理，每一步骤都会生成一个topic向量，topic向量就表示要生成句子的语义信息；接着，topic向量输入到word lstm中，生成一系列单词，形成句子。
+Tag Prediction  对于给定的图像，先通过CNN网络提取特征，将特征输入到多标签预测（MLC）网络中，生成标签列表。
+将M个最有可能的标签的embedding作为topic生成的语义特征。
+Co-Attention  提出了一个可以同时关注视觉和语义信息的共同注意力机制。
+在sentence lstm中的时间步$s$下，联合上下文向量$ctx^{(s)}$是由co-attention network生成的，$f_{co_{att}}(\lbrace v_{n} \rbrace_{n=1}^{N},\lbrace a_{m} \rbrace_{m=1}^{M},h_{sent}^{(s-1)})$，其中，$\lbrace v_{n} \rbrace_{n=1}^{N}$是视觉向量，$\lbrace a_{m} \rbrace_{m=1}^{M}$是语义向量，$h_{sent}^{(s-1)}$是上一个时间步$s-1$的sentence lstm的隐含状态；$f_{co_{att}}$使用一层前馈网络来计算soft注意力分数： $$ \alpha _ {v,n}=exp(W_{v_{att}}tanh(W_{v}v_{n}&#43;W_{v,h}h_{sent}^{(s-1)})) $$ $$ \alpha _ {a,m}=exp(W_{a_{att}}tanh(W_{a}a_{m}&#43;W_{a,h}h_{sent}^{(s-1)})) $$ $W$都是参数矩阵；视觉和语义上下文向量计算如下： $$ v_{att}^{(s)}=\sum_{n=1}^{N}\alpha _ {v,n}v_{n} $$ $$ a_{att}^{(s)}=\sum_{m=1}^{M}\alpha _ {a,m}a_{m} $$ 先将上述两个向量拼接起来后经过一个fc层来融合得到联合上下文向量： $$ ctx^{(s)}=W_{fc}\left [ v_{att}^{(s)};a_{att}^{(s)} \right ] $$" />
+  <meta name="description" content="医学图像报告生成主要包括个挑战：
+（1）一个完整的报告包括多种形式的信息，包括findings和tags；
+（2）医学图像中的异常区域难以识别；
+（3）报告通常很长，包括多个句子。
+本文提出了一个多任务学习框架，同时进行tags的预测和段落的生成；提出注意力机制来定位异常区域并生成句子；提出层级的lstm来生成长段落。
+医学报告中通常会描述图像中每个区域的findings，特别是每个区域是否正常或存在潜在异常，如下图所示： （1）上图中，报告中包含多个形式的信息，impression、findings和tags，为了同时生成不同形式的信息，使用一个多任务框架来实现，讲tags视为多标签分类任务，将描述视为文本生成任务。
+（2）针对异常区域定位并生成对应的描述问题，通过一种注意力机制来实现，其同时关注图像个预测tags；
+（3）报告中生成的句子都很长，因此我们不选择使用单层lstm，而是层级的lstm结构。
+Methods Overview 一个完整的医学图像诊断报告由文本描述（长段落）和tag列表组成。
+首先将图像划分为不同的区域，利用一个CNN来学习这些patch的视觉表征；然后将视觉表征输入多标签分类（multi-label classification，MLC）网络中，预测相关tag，每一个tag都由一个word embedding向量表示；预测得到的word embedding作为该图像的语义特征，将语义特征和视觉特征输入到注意力模块中，生成上下文向量。以上为encoder过程。
+使用encoder得到的上下文向量进行decoder，以生成文本描述。对于医学报告包含的多个句子，通常每个句子都属于一个特定的topic，因此我们使用层级的方式生成报告：首先生成表示句子的high-level topic向量序列，即将上下文向量输入到sentence lstm中，经过几个步骤的处理，每一步骤都会生成一个topic向量，topic向量就表示要生成句子的语义信息；接着，topic向量输入到word lstm中，生成一系列单词，形成句子。
+Tag Prediction  对于给定的图像，先通过CNN网络提取特征，将特征输入到多标签预测（MLC）网络中，生成标签列表。
+将M个最有可能的标签的embedding作为topic生成的语义特征。
+Co-Attention  提出了一个可以同时关注视觉和语义信息的共同注意力机制。
+在sentence lstm中的时间步$s$下，联合上下文向量$ctx^{(s)}$是由co-attention network生成的，$f_{co_{att}}(\lbrace v_{n} \rbrace_{n=1}^{N},\lbrace a_{m} \rbrace_{m=1}^{M},h_{sent}^{(s-1)})$，其中，$\lbrace v_{n} \rbrace_{n=1}^{N}$是视觉向量，$\lbrace a_{m} \rbrace_{m=1}^{M}$是语义向量，$h_{sent}^{(s-1)}$是上一个时间步$s-1$的sentence lstm的隐含状态；$f_{co_{att}}$使用一层前馈网络来计算soft注意力分数： $$ \alpha _ {v,n}=exp(W_{v_{att}}tanh(W_{v}v_{n}&#43;W_{v,h}h_{sent}^{(s-1)})) $$ $$ \alpha _ {a,m}=exp(W_{a_{att}}tanh(W_{a}a_{m}&#43;W_{a,h}h_{sent}^{(s-1)})) $$ $W$都是参数矩阵；视觉和语义上下文向量计算如下： $$ v_{att}^{(s)}=\sum_{n=1}^{N}\alpha _ {v,n}v_{n} $$ $$ a_{att}^{(s)}=\sum_{m=1}^{M}\alpha _ {a,m}a_{m} $$ 先将上述两个向量拼接起来后经过一个fc层来融合得到联合上下文向量： $$ ctx^{(s)}=W_{fc}\left [ v_{att}^{(s)};a_{att}^{(s)} \right ] $$" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +131,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +164,132 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">MIRG-CoAtt</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-16 00:00:00 UTC">
+                16 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>    医学图像报告生成主要包括个挑战：<br>
+    （1）一个完整的报告包括多种形式的信息，包括findings和tags；<br>
+    （2）医学图像中的异常区域难以识别；<br>
+    （3）报告通常很长，包括多个句子。<br>
+    本文提出了一个多任务学习框架，同时进行tags的预测和段落的生成；提出注意力机制来定位异常区域并生成句子；提出层级的lstm来生成长段落。<br>
+    医学报告中通常会描述图像中每个区域的findings，特别是每个区域是否正常或存在潜在异常，如下图所示：
+<img src="/img/MIR1-1.PNG" alt="">
+    （1）上图中，报告中包含多个形式的信息，impression、findings和tags，为了同时生成不同形式的信息，使用一个多任务框架来实现，讲tags视为多标签分类任务，将描述视为文本生成任务。<br>
+    （2）针对异常区域定位并生成对应的描述问题，通过一种注意力机制来实现，其同时关注图像个预测tags；<br>
+    （3）报告中生成的句子都很长，因此我们不选择使用单层lstm，而是层级的lstm结构。</p>
+<h2 id="methods">Methods</h2>
+<h3 id="overview">Overview</h3>
+<p><img src="/img/MIR1-2.PNG" alt="">
+    一个完整的医学图像诊断报告由文本描述（长段落）和tag列表组成。<br>
+    首先将图像划分为不同的区域，利用一个CNN来学习这些patch的视觉表征；然后将视觉表征输入多标签分类（multi-label classification，MLC）网络中，预测相关tag，每一个tag都由一个word embedding向量表示；预测得到的word embedding作为该图像的语义特征，将语义特征和视觉特征输入到注意力模块中，生成上下文向量。以上为encoder过程。<br>
+    使用encoder得到的上下文向量进行decoder，以生成文本描述。对于医学报告包含的多个句子，通常每个句子都属于一个特定的topic，因此我们使用层级的方式生成报告：首先生成表示句子的high-level topic向量序列，即将上下文向量输入到sentence lstm中，经过几个步骤的处理，每一步骤都会生成一个topic向量，topic向量就表示要生成句子的语义信息；接着，topic向量输入到word lstm中，生成一系列单词，形成句子。</p>
+<h3 id="tag-prediction">Tag Prediction</h3>
+<p>    对于给定的图像，先通过CNN网络提取特征，将特征输入到多标签预测（MLC）网络中，生成标签列表。<br>
+    将M个最有可能的标签的embedding作为topic生成的语义特征。</p>
+<h3 id="co-attention">Co-Attention</h3>
+<p>    提出了一个可以同时关注视觉和语义信息的共同注意力机制。<br>
+    在sentence lstm中的时间步$s$下，联合上下文向量$ctx^{(s)}$是由co-attention network生成的，$f_{co_{att}}(\lbrace v_{n} \rbrace_{n=1}^{N},\lbrace a_{m} \rbrace_{m=1}^{M},h_{sent}^{(s-1)})$，其中，$\lbrace v_{n} \rbrace_{n=1}^{N}$是视觉向量，$\lbrace a_{m} \rbrace_{m=1}^{M}$是语义向量，$h_{sent}^{(s-1)}$是上一个时间步$s-1$的sentence lstm的隐含状态；$f_{co_{att}}$使用一层前馈网络来计算soft注意力分数：
+$$
+\alpha _ {v,n}=exp(W_{v_{att}}tanh(W_{v}v_{n}+W_{v,h}h_{sent}^{(s-1)}))
+$$
+$$
+\alpha _ {a,m}=exp(W_{a_{att}}tanh(W_{a}a_{m}+W_{a,h}h_{sent}^{(s-1)}))
+$$
+    $W$都是参数矩阵；视觉和语义上下文向量计算如下：
+$$
+v_{att}^{(s)}=\sum_{n=1}^{N}\alpha _ {v,n}v_{n}
+$$
+$$
+a_{att}^{(s)}=\sum_{m=1}^{M}\alpha _ {a,m}a_{m}
+$$
+    先将上述两个向量拼接起来后经过一个fc层来融合得到联合上下文向量：
+$$
+ctx^{(s)}=W_{fc}\left [ v_{att}^{(s)};a_{att}^{(s)} \right ]
+$$</p>
+<h3 id="sentence-lstm">Sentence LSTM</h3>
+<p>    sentence lstm是单层的lstm，输入为联合上下文向量，输出是topic向量$t\in \mathbb{R}^{K}$，并控制是否继续或停止生成topic向量。</p>
+<h4 id="topic-generator">Topic generator</h4>
+<p>    结合当前步的信函状态和上下文向量生成topic向量：
+$$
+t^{(s)}=tanh(W_{t,h_{sent}}h_{sent}^{(s)}+W_{t,ctx}ctx^{(s)})
+$$</p>
+<h4 id="stop-control">Stop control</h4>
+<p>    使用用一个深层网络来输出控制信号，即输出停止或继续的概率（分类问题）：
+$$
+p(STOP|h_{sent}^{(s-1)},h_{sent}^{(s)})=exp\lbrace W_{stop}tanh(W_{top,s-1}h_{sent}^{(s-1)}+W_{stop,s}h_{sent}^{(s)})\rbrace
+$$
+    如果$p(STOP|h_{sent}^{(s-1)},h_{sent}^{(s)})$大于阈值，如0.5，那么则停止产生新的topic向量，同时word lstm也停止产生新单词。</p>
+<h3 id="word-lstm">Word LSTM</h3>
+<p>    word lstm的输入是topic向量（sentence lstm生成）和起始标志，随后的输入是单词序列。在每个word-LSTM生成了它的单词序列之后，最终的报告只是所有生成的序列的连接。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +309,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

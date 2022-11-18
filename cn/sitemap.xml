@@ -3,7 +3,7 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://gdy0924.github.io/categories/</loc>
-    <lastmod>2022-11-11T00:00:00+00:00</lastmod>
+    <lastmod>2022-11-18T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -15,11 +15,17 @@
                 href="https://gdy0924.github.io/categories/"
                 />
   </url><url>
+    <loc>https://gdy0924.github.io/posts/mirg-cdgpt2/</loc>
+    <lastmod>2022-11-18T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/mirg-kgae/</loc>
+    <lastmod>2022-11-18T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://gdy0924.github.io/categories/paper/</loc>
-    <lastmod>2022-11-11T00:00:00+00:00</lastmod>
+    <lastmod>2022-11-18T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/</loc>
-    <lastmod>2022-11-11T00:00:00+00:00</lastmod>
+    <lastmod>2022-11-18T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -31,11 +37,8 @@
                 href="https://gdy0924.github.io/posts/"
                 />
   </url><url>
-    <loc>https://gdy0924.github.io/posts/wsss-affinity/</loc>
-    <lastmod>2022-11-11T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://gdy0924.github.io/</loc>
-    <lastmod>2022-11-11T00:00:00+00:00</lastmod>
+    <lastmod>2022-11-18T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -47,11 +50,26 @@
                 href="https://gdy0924.github.io/"
                 />
   </url><url>
+    <loc>https://gdy0924.github.io/posts/mirg-hrgr-agent/</loc>
+    <lastmod>2022-11-17T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/mirg-kerp/</loc>
+    <lastmod>2022-11-17T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/mirg-coatt/</loc>
+    <lastmod>2022-11-16T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/wsss-affinity/</loc>
+    <lastmod>2022-11-11T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://gdy0924.github.io/posts/wsss-recam/</loc>
     <lastmod>2022-11-10T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/wsss-ae/</loc>
     <lastmod>2022-11-09T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://gdy0924.github.io/posts/wsss-irn/</loc>
+    <lastmod>2022-11-08T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://gdy0924.github.io/posts/wsss-seam/</loc>
     <lastmod>2022-11-08T00:00:00+00:00</lastmod>

@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/wsss-irn/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/wsss-irn/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "WSSS-IRN",
+      "headline" : "WSSS-IRN",
+      "description" : "Wang, Yude et al. “Self-Supervised Equivariant Attention Mechanism for Weakly Supervised Semantic Segmentation.” 2020 IEEE\/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2020): 12272-12281.(cite:222)\n 大多数先进的WSSS方法都是基于CAM图，一种通过图像分类标签来定位对象的有效方法。但是，CAM通常只覆盖物体中最具鉴别性的部分区域，同时，当图像进行增强变换时，生成的CAM并不一样。如下图（a）所示，输入图像进行缩放后，其得到的CAM不一致。 造成这些现象的根本原因在于全监督语义分割和弱监督语义分割之间的监督gap。\n本文引入PCM模块，捕获上下文信息，通过学习到的affinity attention maps对CAM进行修正，SEAM是使用equivariant cross regularization（ECR）损失的孪生网络实现的，该网络将原始CAM和修改后的CAM进行正则化。结果对比如上图（b）所示。\nSEAM Motivation  segmentation任务在data augmentation的时候可以有scale的变化，旋转，平移等，data和label是统一变换的，而classification是不一致的，在弱监督的分割时，利用class activation map（CAM）就会损失掉equivariance。即对于一个样本如果进行变换，分割倾向于保持等变，而分类更多关注不变性。因此，需要引入额外的正则化操作进行一致性约束。\nEAM的核心思想包含两个部分：一是对图像不同变换后生成的CAM图进行一致性约束（consistency regularization）为网络学习提供自监督；二是引入像素相关模块（pixel correlation module, PCM），借助该模块通过每个像素的上下文信息（context appearance information）生成亲密度注意力图（affinity attention maps），以此来修正原始的CAM图。\nEquivariant Regularization  在全监督语义分割的数据增强中，标签采用与输入图像相同的增强变换，为网络引入了一个隐式的等变约束。但是，考虑到WSSS只能得到图像级分类标签，缺少隐式约束。因此，提出等变正则化： $$ R_{ER}=||F(A(I))-A(F(I))||_ {1} $$ 其中，$F$为网络，$A$为变换，通过共享权重的孪生网络，来引入正则化。即其中一个输入原始图像，对网络输出进行仿射变化，另一个网络对输入图像仿射变换。最终，最小化两个网络的ER loss。\nPixel Correlation Module  虽然等变正则化为网络学习提供了额外的监督，但仅用经典卷积层很难实现理想的一致性。\n像素相关模块（pixel correlation module ，PCM）获取每个像素的情景信息（context appearance information），通过学习生成亲密度注意力图（affinity attention maps），以此来修正原始的CAM图。 该模块是一个典型的自注意力模块（上图），Non-local（下图）的变体，去掉了残差链接，并去掉了$\\phi $和$g$两个卷积操作，是考虑到该任务中没有确切的像素级标注，更多的参数可能会带来过拟合。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,31 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-11-18 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-11-18 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "datePublished": "2022-11-08 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-11-08 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/wsss-irn\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>WSSS-IRN</title>
+  <meta property="og:title" content="WSSS-IRN" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Wang, Yude et al. “Self-Supervised Equivariant Attention Mechanism for Weakly Supervised Semantic Segmentation.” 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2020): 12272-12281.(cite:222)
+ 大多数先进的WSSS方法都是基于CAM图，一种通过图像分类标签来定位对象的有效方法。但是，CAM通常只覆盖物体中最具鉴别性的部分区域，同时，当图像进行增强变换时，生成的CAM并不一样。如下图（a）所示，输入图像进行缩放后，其得到的CAM不一致。 造成这些现象的根本原因在于全监督语义分割和弱监督语义分割之间的监督gap。
+本文引入PCM模块，捕获上下文信息，通过学习到的affinity attention maps对CAM进行修正，SEAM是使用equivariant cross regularization（ECR）损失的孪生网络实现的，该网络将原始CAM和修改后的CAM进行正则化。结果对比如上图（b）所示。
+SEAM Motivation  segmentation任务在data augmentation的时候可以有scale的变化，旋转，平移等，data和label是统一变换的，而classification是不一致的，在弱监督的分割时，利用class activation map（CAM）就会损失掉equivariance。即对于一个样本如果进行变换，分割倾向于保持等变，而分类更多关注不变性。因此，需要引入额外的正则化操作进行一致性约束。
+EAM的核心思想包含两个部分：一是对图像不同变换后生成的CAM图进行一致性约束（consistency regularization）为网络学习提供自监督；二是引入像素相关模块（pixel correlation module, PCM），借助该模块通过每个像素的上下文信息（context appearance information）生成亲密度注意力图（affinity attention maps），以此来修正原始的CAM图。
+Equivariant Regularization  在全监督语义分割的数据增强中，标签采用与输入图像相同的增强变换，为网络引入了一个隐式的等变约束。但是，考虑到WSSS只能得到图像级分类标签，缺少隐式约束。因此，提出等变正则化： $$ R_{ER}=||F(A(I))-A(F(I))||_ {1} $$ 其中，$F$为网络，$A$为变换，通过共享权重的孪生网络，来引入正则化。即其中一个输入原始图像，对网络输出进行仿射变化，另一个网络对输入图像仿射变换。最终，最小化两个网络的ER loss。
+Pixel Correlation Module  虽然等变正则化为网络学习提供了额外的监督，但仅用经典卷积层很难实现理想的一致性。
+像素相关模块（pixel correlation module ，PCM）获取每个像素的情景信息（context appearance information），通过学习生成亲密度注意力图（affinity attention maps），以此来修正原始的CAM图。 该模块是一个典型的自注意力模块（上图），Non-local（下图）的变体，去掉了残差链接，并去掉了$\phi $和$g$两个卷积操作，是考虑到该任务中没有确切的像素级标注，更多的参数可能会带来过拟合。" />
+  <meta name="description" content="Wang, Yude et al. “Self-Supervised Equivariant Attention Mechanism for Weakly Supervised Semantic Segmentation.” 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2020): 12272-12281.(cite:222)
+ 大多数先进的WSSS方法都是基于CAM图，一种通过图像分类标签来定位对象的有效方法。但是，CAM通常只覆盖物体中最具鉴别性的部分区域，同时，当图像进行增强变换时，生成的CAM并不一样。如下图（a）所示，输入图像进行缩放后，其得到的CAM不一致。 造成这些现象的根本原因在于全监督语义分割和弱监督语义分割之间的监督gap。
+本文引入PCM模块，捕获上下文信息，通过学习到的affinity attention maps对CAM进行修正，SEAM是使用equivariant cross regularization（ECR）损失的孪生网络实现的，该网络将原始CAM和修改后的CAM进行正则化。结果对比如上图（b）所示。
+SEAM Motivation  segmentation任务在data augmentation的时候可以有scale的变化，旋转，平移等，data和label是统一变换的，而classification是不一致的，在弱监督的分割时，利用class activation map（CAM）就会损失掉equivariance。即对于一个样本如果进行变换，分割倾向于保持等变，而分类更多关注不变性。因此，需要引入额外的正则化操作进行一致性约束。
+EAM的核心思想包含两个部分：一是对图像不同变换后生成的CAM图进行一致性约束（consistency regularization）为网络学习提供自监督；二是引入像素相关模块（pixel correlation module, PCM），借助该模块通过每个像素的上下文信息（context appearance information）生成亲密度注意力图（affinity attention maps），以此来修正原始的CAM图。
+Equivariant Regularization  在全监督语义分割的数据增强中，标签采用与输入图像相同的增强变换，为网络引入了一个隐式的等变约束。但是，考虑到WSSS只能得到图像级分类标签，缺少隐式约束。因此，提出等变正则化： $$ R_{ER}=||F(A(I))-A(F(I))||_ {1} $$ 其中，$F$为网络，$A$为变换，通过共享权重的孪生网络，来引入正则化。即其中一个输入原始图像，对网络输出进行仿射变化，另一个网络对输入图像仿射变换。最终，最小化两个网络的ER loss。
+Pixel Correlation Module  虽然等变正则化为网络学习提供了额外的监督，但仅用经典卷积层很难实现理想的一致性。
+像素相关模块（pixel correlation module ，PCM）获取每个像素的情景信息（context appearance information），通过学习生成亲密度注意力图（affinity attention maps），以此来修正原始的CAM图。 该模块是一个典型的自注意力模块（上图），Non-local（下图）的变体，去掉了残差链接，并去掉了$\phi $和$g$两个卷积操作，是考虑到该任务中没有确切的像素级标注，更多的参数可能会带来过拟合。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +117,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +150,110 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">WSSS-IRN</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-08 00:00:00 UTC">
+                08 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Wang, Yude et al. “Self-Supervised Equivariant Attention Mechanism for Weakly Supervised Semantic Segmentation.” 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2020): 12272-12281.(cite:222)</p>
+<p>    大多数先进的WSSS方法都是基于CAM图，一种通过图像分类标签来定位对象的有效方法。但是，CAM通常只覆盖物体中最具鉴别性的部分区域，同时，当图像进行增强变换时，生成的CAM并不一样。如下图（a）所示，输入图像进行缩放后，其得到的CAM不一致。
+<img src="/img/WSSS-SEAM1.PNG" alt="">
+    造成这些现象的根本原因在于全监督语义分割和弱监督语义分割之间的监督gap。<br>
+    本文引入PCM模块，捕获上下文信息，通过学习到的affinity attention maps对CAM进行修正，SEAM是使用equivariant cross regularization（ECR）损失的孪生网络实现的，该网络将原始CAM和修改后的CAM进行正则化。结果对比如上图（b）所示。</p>
+<h2 id="seam">SEAM</h2>
+<p><img src="/img/WSSS-SEAM2.PNG" alt=""></p>
+<h3 id="motivation">Motivation</h3>
+<p>    segmentation任务在data augmentation的时候可以有scale的变化，旋转，平移等，data和label是统一变换的，而classification是不一致的，在弱监督的分割时，利用class activation map（CAM）就会损失掉equivariance。即对于一个样本如果进行变换，分割倾向于保持等变，而分类更多关注不变性。因此，需要引入额外的正则化操作进行一致性约束。<br>
+    EAM的核心思想包含两个部分：一是对图像不同变换后生成的CAM图进行一致性约束（consistency regularization）为网络学习提供自监督；二是引入像素相关模块（pixel correlation module, PCM），借助该模块通过每个像素的上下文信息（context appearance information）生成亲密度注意力图（affinity attention maps），以此来修正原始的CAM图。</p>
+<h3 id="equivariant-regularization">Equivariant Regularization</h3>
+<p>    在全监督语义分割的数据增强中，标签采用与输入图像相同的增强变换，为网络引入了一个隐式的等变约束。但是，考虑到WSSS只能得到图像级分类标签，缺少隐式约束。因此，提出等变正则化：
+$$
+R_{ER}=||F(A(I))-A(F(I))||_ {1}
+$$
+    其中，$F$为网络，$A$为变换，通过共享权重的孪生网络，来引入正则化。即其中一个输入原始图像，对网络输出进行仿射变化，另一个网络对输入图像仿射变换。最终，最小化两个网络的ER loss。</p>
+<h3 id="pixel-correlation-module">Pixel Correlation Module</h3>
+<p>    虽然等变正则化为网络学习提供了额外的监督，但仅用经典卷积层很难实现理想的一致性。<br>
+    像素相关模块（pixel correlation module ，PCM）获取每个像素的情景信息（context appearance information），通过学习生成亲密度注意力图（affinity attention maps），以此来修正原始的CAM图。
+<img src="/img/WSSS-SEAM3.PNG" alt="">
+    该模块是一个典型的自注意力模块（上图），Non-local（下图）的变体，去掉了残差链接，并去掉了$\phi $和$g$两个卷积操作，是考虑到该任务中没有确切的像素级标注，更多的参数可能会带来过拟合。</p>
+<p><img src="/img/WSSS-SEAM4.png" alt=""></p>
+<h3 id="loss-design-of-seam">Loss Design of SEAM</h3>
+<p>    分类损失$L_{cls}$与其它任务的分类损失函数基本一致，采用multi-label soft margin loss方式进行衡量。由于孪生网络，因此两个类别损失都要计算上。<br>
+    等变换损失$L_{ER}=||A(\hat{y}^{o}-\hat{y}^{t})||_ {1}$。<br>
+    等变换交叉损失$L_{ECR}=||A(y^{o}-\hat{y}^{t})||_ {1}+||A(\hat{y}^{o}-y^{t})||_ {1}$，即PCM的输出由其孪生网络的另一个分支的原始CAM进行正则化，可以避免PCM细化过程中的CAM退化。<br>
+    得到$L=L_{cls}+L_{ER}+L_{ECR}$</p>
+<h2 id="实验">实验</h2>
+<p><img src="/img/WSSS-SEAM5.PNG" alt="">
+    ER: equivariant regularization. PCM: pixel correlation module. OHEM:online hard example mining. CRF: conditional random field.
+<img src="/img/WSSS-SEAM6.PNG" alt="">
+    使用缩放时，显著提高；翻转、旋转和平移之间的CAM太相似，无法产生足够的监督，因此，改进不大。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +273,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 
