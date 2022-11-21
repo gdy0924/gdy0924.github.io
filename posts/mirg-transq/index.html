@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/mirg-transq/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/mirg-transq/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "MIRG-TranSQ",
+      "headline" : "MIRG-TranSQ",
+      "description" : "TranSQ: Transformer-Based Semantic Query for Medical Report Generation\n TranSQ(Transformer-based Semantic Query)将医疗报告生成视为直接集预测问题，即生成一组语义特征，以匹配可能的临床问题，并通过句子检索和选择来生成医学报告。\nTranSQ对视觉特征进行语义查询，以逐句生成医学报告：首先提取输入图像的视觉特征；可训练的语义embedding通过语义encoder（基于Transformer）查询视觉特征以生成语义特征；最后通过检索生成句子，根据得到的语义特征和ground-truth的二分匹配动态标记输出选择。\nMethod 医学报告生成分为三个步骤：视觉特征理解；为视觉特征标注观察结果；将每个观察结果描述成一个句子，并判断该句子是否值得输出。以上三个步骤分别对应该模型的三个主要模块：visual extractor、semantic encoder、report generator。\nvisual extractor  使用ViT作为visual encoder，输入为图像分割成patch，得到patch embedding后加上位置embedding作为输入，输出为一系列的视觉特征$f^{v}=\\left [ f_{1}^{v},\u0026hellip;,f_{N}^{v} \\right ]$。\nSemantic Encoder  得到了视觉特征，使用一组可训练的semantic queries（$q=\\left [ q_{1},\u0026hellip;,q_{K} \\right ]$）来提取重要的有价值的图像区域特征，每一个query$q_{i}$对应一个潜在的topic。\n（Note that since the semantic queries are permutation-invariant, the diﬀerence of the outputs comes from the value of semantic query embeddings, which are obtained by the training process.）\nSemantic Encoder将语义query$q$转换为语义特征集合$f^{s}=\\left [ f_{1}^{s},\u0026hellip;,f_{K}^{s} \\right ]$。具体结构参考DETR，对于每一层，首先输入到多头自注意力，以得到潜在topic之间的相关性，接着将视觉特征和语义特征输入到多头交叉自注意力中，最后经过一个前馈层。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -69,15 +69,29 @@ code.has-jax {
       "copyrightYear" : "2022",
       "datePublished": "2022-11-19 00:00:00 \u002b0000 UTC",
       "dateModified" : "2022-11-19 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/mirg-transq\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>MIRG-TranSQ</title>
+  <meta property="og:title" content="MIRG-TranSQ" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="TranSQ: Transformer-Based Semantic Query for Medical Report Generation
+ TranSQ(Transformer-based Semantic Query)将医疗报告生成视为直接集预测问题，即生成一组语义特征，以匹配可能的临床问题，并通过句子检索和选择来生成医学报告。
+TranSQ对视觉特征进行语义查询，以逐句生成医学报告：首先提取输入图像的视觉特征；可训练的语义embedding通过语义encoder（基于Transformer）查询视觉特征以生成语义特征；最后通过检索生成句子，根据得到的语义特征和ground-truth的二分匹配动态标记输出选择。
+Method 医学报告生成分为三个步骤：视觉特征理解；为视觉特征标注观察结果；将每个观察结果描述成一个句子，并判断该句子是否值得输出。以上三个步骤分别对应该模型的三个主要模块：visual extractor、semantic encoder、report generator。
+visual extractor  使用ViT作为visual encoder，输入为图像分割成patch，得到patch embedding后加上位置embedding作为输入，输出为一系列的视觉特征$f^{v}=\left [ f_{1}^{v},&amp;hellip;,f_{N}^{v} \right ]$。
+Semantic Encoder  得到了视觉特征，使用一组可训练的semantic queries（$q=\left [ q_{1},&amp;hellip;,q_{K} \right ]$）来提取重要的有价值的图像区域特征，每一个query$q_{i}$对应一个潜在的topic。
+（Note that since the semantic queries are permutation-invariant, the diﬀerence of the outputs comes from the value of semantic query embeddings, which are obtained by the training process.）
+Semantic Encoder将语义query$q$转换为语义特征集合$f^{s}=\left [ f_{1}^{s},&amp;hellip;,f_{K}^{s} \right ]$。具体结构参考DETR，对于每一层，首先输入到多头自注意力，以得到潜在topic之间的相关性，接着将视觉特征和语义特征输入到多头交叉自注意力中，最后经过一个前馈层。" />
+  <meta name="description" content="TranSQ: Transformer-Based Semantic Query for Medical Report Generation
+ TranSQ(Transformer-based Semantic Query)将医疗报告生成视为直接集预测问题，即生成一组语义特征，以匹配可能的临床问题，并通过句子检索和选择来生成医学报告。
+TranSQ对视觉特征进行语义查询，以逐句生成医学报告：首先提取输入图像的视觉特征；可训练的语义embedding通过语义encoder（基于Transformer）查询视觉特征以生成语义特征；最后通过检索生成句子，根据得到的语义特征和ground-truth的二分匹配动态标记输出选择。
+Method 医学报告生成分为三个步骤：视觉特征理解；为视觉特征标注观察结果；将每个观察结果描述成一个句子，并判断该句子是否值得输出。以上三个步骤分别对应该模型的三个主要模块：visual extractor、semantic encoder、report generator。
+visual extractor  使用ViT作为visual encoder，输入为图像分割成patch，得到patch embedding后加上位置embedding作为输入，输出为一系列的视觉特征$f^{v}=\left [ f_{1}^{v},&amp;hellip;,f_{N}^{v} \right ]$。
+Semantic Encoder  得到了视觉特征，使用一组可训练的semantic queries（$q=\left [ q_{1},&amp;hellip;,q_{K} \right ]$）来提取重要的有价值的图像区域特征，每一个query$q_{i}$对应一个潜在的topic。
+（Note that since the semantic queries are permutation-invariant, the diﬀerence of the outputs comes from the value of semantic query embeddings, which are obtained by the training process.）
+Semantic Encoder将语义query$q$转换为语义特征集合$f^{s}=\left [ f_{1}^{s},&amp;hellip;,f_{K}^{s} \right ]$。具体结构参考DETR，对于每一层，首先输入到多头自注意力，以得到潜在topic之间的相关性，接着将视觉特征和语义特征输入到多头交叉自注意力中，最后经过一个前馈层。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +117,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +150,102 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">MIRG-TranSQ</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-19 00:00:00 UTC">
+                19 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>TranSQ: Transformer-Based Semantic Query for Medical Report Generation</p>
+<p>    TranSQ(Transformer-based Semantic Query)将医疗报告生成视为直接集预测问题，即生成一组语义特征，以匹配可能的临床问题，并通过句子检索和选择来生成医学报告。<br>
+    TranSQ对视觉特征进行语义查询，以逐句生成医学报告：首先提取输入图像的视觉特征；可训练的语义embedding通过语义encoder（基于Transformer）查询视觉特征以生成语义特征；最后通过检索生成句子，根据得到的语义特征和ground-truth的二分匹配动态标记输出选择。</p>
+<h2 id="method">Method</h2>
+<p><img src="/img/MIRG-TranSQ1.PNG" alt="">
+    医学报告生成分为三个步骤：视觉特征理解；为视觉特征标注观察结果；将每个观察结果描述成一个句子，并判断该句子是否值得输出。以上三个步骤分别对应该模型的三个主要模块：visual extractor、semantic encoder、report generator。</p>
+<h3 id="visual-extractor">visual extractor</h3>
+<p>    使用ViT作为visual encoder，输入为图像分割成patch，得到patch embedding后加上位置embedding作为输入，输出为一系列的视觉特征$f^{v}=\left [ f_{1}^{v},&hellip;,f_{N}^{v} \right ]$。</p>
+<h3 id="semantic-encoder">Semantic Encoder</h3>
+<p>    得到了视觉特征，使用一组可训练的semantic queries（$q=\left [ q_{1},&hellip;,q_{K} \right ]$）来提取重要的有价值的图像区域特征，每一个query$q_{i}$对应一个潜在的topic。<br>
+    （Note that since the semantic queries are permutation-invariant, the diﬀerence of the outputs comes from the value of semantic query embeddings, which are obtained by the training process.）<br>
+    Semantic Encoder将语义query$q$转换为语义特征集合$f^{s}=\left [ f_{1}^{s},&hellip;,f_{K}^{s} \right ]$。具体结构参考DETR，对于每一层，首先输入到多头自注意力，以得到潜在topic之间的相关性，接着将视觉特征和语义特征输入到多头交叉自注意力中，最后经过一个前馈层。</p>
+<h3 id="report-generator">Report Generator</h3>
+<p>    该模块有两个任务：生成候选句子，预测句子选择的概率。使用检索的方式生成候选句子，即将语义特征$f_{i}^{s}$输入到前馈网络，得到句子embedding$\hat{v}_ {i}$，并在数据库中检索生成候选句子$\hat{y}_ {i}$；通过多标签分类器预测得到选择来自$f_{i}^{s}$的概率$\hat{p}_ {i}$。<br>
+    Semantic Encoder生成$K$个语义特征，其数量远远大于句子的数量，是为了保证候选集的多样性。<br>
+    $y$表示the ground truth report sentence set，Report Generator需要从$\hat{y}=\lbrace \hat{y}_ {i}\rbrace_{i=1}^{K}$中选择适当的子集来组成报告。我们将$y$进行填充（empty string），填充成大小为$K$的集合。那么问题就转换为两个集合之间的二分匹配问题，搜索成本最低的$K$个元素组合$\sigma \in \theta _ {K}$：
+$$
+\hat{\sigma }=\underset{\sigma \in \theta _ {K}}{arg; min}\sum_{i}^{K}L_{match}(y_{i},\hat{y}_ {\sigma (i)})
+$$
+    其中，$L(y_{i},\hat{y}_ {\sigma (i)})$是ground truth句子$y_{i}$和生成的索引为$\sigma (i)$的候选句子的pair-wise matching cost。（通过匈牙利算法进行计算）match损失同时考虑句子embedding的相似：</p>
+<p><img src="/img/MIRG-TranSQ2.PNG" alt="">
+    $L_{sim}$是句子embedding相似度的计算。对于候选句子$\hat{y}_ {\sigma (i)}$，当$y_{i}\neq \varnothing $时，$c_{\sigma (i)}$为1，否则为0。最终的损失函数为：
+<img src="/img/MIRG-TranSQ3.PNG" alt="">
+    其中，$L_{sim}$为cosine embedding loss，$L_{cls}$为多标签损失，使用DistributionBalanced Loss。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +265,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

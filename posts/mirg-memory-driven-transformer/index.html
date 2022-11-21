@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/mirg-memory-driven-transformer/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/mirg-memory-driven-transformer/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "MIRG-Memory Driven Transformer",
+      "headline" : "MIRG-Memory Driven Transformer",
+      "description" : "Generating Radiology Reports via Memory-driven Transformer\n 使用memory-driven Transformer生成报告，提出了两个新模块：RM（relational memory）记录之前生成的信息；MCLN（memory-driven conditional layer normalization）将RM的信息融合到transformer中。\nThe Proposed Method The Model Structure Visual Extractor  使用卷积网络（VGG\/ResNet）提取图像的视觉特征。\nEncoder  医疗影像经过Visual Extractor后得到一个 width x height x dim 的特征，将二维图像特征 flatten 之后得到一个(width x height) x dim的序列特征作为encoder的输入，经过encoder得到输出序列。\nDecoder  将encoder得到的embedding作为decoder中的V和K，并在transformer中引入了提出的新模块memory module和MCLN。\n论文作者尝试后发现简单地使用 Transformer 不能完全解决生成报告长度短和生成内容准确性不足的问题，于是引入了 RelationalMemory 模块，改进了层归一化模块。\nRelational Memory 旨在学习影像报告的模式化信息，把 Relational Memory 引入层归一化，使得影像报告生成时，用 Memory 控制 Transformer 输出特征的均值和方差，从而深度利用了影像报告的模式化信息。\nRelational Memory  使用一个矩阵M来存储之前的信息，大小为slots x dim，在生成过程中，矩阵通过融合前一个时间步的输出来逐步进行更新，即每输出一个字，矩阵M就要更新一次。\n在时间步$t$，上一步的矩阵$M_{t-1}$作为query，上一时间步的矩阵$M_{t-1}$和输出$y_{t-1}$的拼接作为key和value，输入到多头自注意力机制中，在经过残差链接和MLP，得到更新后的记忆矩阵$\\tilde{M}_ {t}$。\n与 RNN 相似，由于 Memory 每一步都要更新，于是加入了门机制来防止梯度消失或梯度爆炸。门机制由遗忘门和输入门构成： $$ G_{t}^{f}=Y_{t-1}W^{f}\u002btanh(M_{t-1})\\cdot U^{f} $$ $$ G_{t}^{i}=Y_{t-1}W^{i}\u002btanh(M_{t-1})\\cdot U^{i} $$ 其中，$Y_{t-1}$为上一个时间步的输出$y_{t-1}$的扩展，确保可以计算。最终，RM模块的输出，即更新后的记忆矩阵为： $$ M_{t}=\\sigma (G_{t}^{f})\\odot M_{t-1}\u002b\\sigma (G_{t}^{i})\\odot \\tilde{M}_ {t} $$",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -69,15 +69,33 @@ code.has-jax {
       "copyrightYear" : "2022",
       "datePublished": "2022-11-19 00:00:00 \u002b0000 UTC",
       "dateModified" : "2022-11-19 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/mirg-memory-driven-transformer\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>MIRG-Memory Driven Transformer</title>
+  <meta property="og:title" content="MIRG-Memory Driven Transformer" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Generating Radiology Reports via Memory-driven Transformer
+ 使用memory-driven Transformer生成报告，提出了两个新模块：RM（relational memory）记录之前生成的信息；MCLN（memory-driven conditional layer normalization）将RM的信息融合到transformer中。
+The Proposed Method The Model Structure Visual Extractor  使用卷积网络（VGG/ResNet）提取图像的视觉特征。
+Encoder  医疗影像经过Visual Extractor后得到一个 width x height x dim 的特征，将二维图像特征 flatten 之后得到一个(width x height) x dim的序列特征作为encoder的输入，经过encoder得到输出序列。
+Decoder  将encoder得到的embedding作为decoder中的V和K，并在transformer中引入了提出的新模块memory module和MCLN。
+论文作者尝试后发现简单地使用 Transformer 不能完全解决生成报告长度短和生成内容准确性不足的问题，于是引入了 RelationalMemory 模块，改进了层归一化模块。
+Relational Memory 旨在学习影像报告的模式化信息，把 Relational Memory 引入层归一化，使得影像报告生成时，用 Memory 控制 Transformer 输出特征的均值和方差，从而深度利用了影像报告的模式化信息。
+Relational Memory  使用一个矩阵M来存储之前的信息，大小为slots x dim，在生成过程中，矩阵通过融合前一个时间步的输出来逐步进行更新，即每输出一个字，矩阵M就要更新一次。
+在时间步$t$，上一步的矩阵$M_{t-1}$作为query，上一时间步的矩阵$M_{t-1}$和输出$y_{t-1}$的拼接作为key和value，输入到多头自注意力机制中，在经过残差链接和MLP，得到更新后的记忆矩阵$\tilde{M}_ {t}$。
+与 RNN 相似，由于 Memory 每一步都要更新，于是加入了门机制来防止梯度消失或梯度爆炸。门机制由遗忘门和输入门构成： $$ G_{t}^{f}=Y_{t-1}W^{f}&#43;tanh(M_{t-1})\cdot U^{f} $$ $$ G_{t}^{i}=Y_{t-1}W^{i}&#43;tanh(M_{t-1})\cdot U^{i} $$ 其中，$Y_{t-1}$为上一个时间步的输出$y_{t-1}$的扩展，确保可以计算。最终，RM模块的输出，即更新后的记忆矩阵为： $$ M_{t}=\sigma (G_{t}^{f})\odot M_{t-1}&#43;\sigma (G_{t}^{i})\odot \tilde{M}_ {t} $$" />
+  <meta name="description" content="Generating Radiology Reports via Memory-driven Transformer
+ 使用memory-driven Transformer生成报告，提出了两个新模块：RM（relational memory）记录之前生成的信息；MCLN（memory-driven conditional layer normalization）将RM的信息融合到transformer中。
+The Proposed Method The Model Structure Visual Extractor  使用卷积网络（VGG/ResNet）提取图像的视觉特征。
+Encoder  医疗影像经过Visual Extractor后得到一个 width x height x dim 的特征，将二维图像特征 flatten 之后得到一个(width x height) x dim的序列特征作为encoder的输入，经过encoder得到输出序列。
+Decoder  将encoder得到的embedding作为decoder中的V和K，并在transformer中引入了提出的新模块memory module和MCLN。
+论文作者尝试后发现简单地使用 Transformer 不能完全解决生成报告长度短和生成内容准确性不足的问题，于是引入了 RelationalMemory 模块，改进了层归一化模块。
+Relational Memory 旨在学习影像报告的模式化信息，把 Relational Memory 引入层归一化，使得影像报告生成时，用 Memory 控制 Transformer 输出特征的均值和方差，从而深度利用了影像报告的模式化信息。
+Relational Memory  使用一个矩阵M来存储之前的信息，大小为slots x dim，在生成过程中，矩阵通过融合前一个时间步的输出来逐步进行更新，即每输出一个字，矩阵M就要更新一次。
+在时间步$t$，上一步的矩阵$M_{t-1}$作为query，上一时间步的矩阵$M_{t-1}$和输出$y_{t-1}$的拼接作为key和value，输入到多头自注意力机制中，在经过残差链接和MLP，得到更新后的记忆矩阵$\tilde{M}_ {t}$。
+与 RNN 相似，由于 Memory 每一步都要更新，于是加入了门机制来防止梯度消失或梯度爆炸。门机制由遗忘门和输入门构成： $$ G_{t}^{f}=Y_{t-1}W^{f}&#43;tanh(M_{t-1})\cdot U^{f} $$ $$ G_{t}^{i}=Y_{t-1}W^{i}&#43;tanh(M_{t-1})\cdot U^{i} $$ 其中，$Y_{t-1}$为上一个时间步的输出$y_{t-1}$的扩展，确保可以计算。最终，RM模块的输出，即更新后的记忆矩阵为： $$ M_{t}=\sigma (G_{t}^{f})\odot M_{t-1}&#43;\sigma (G_{t}^{i})\odot \tilde{M}_ {t} $$" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +121,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +154,122 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">MIRG-Memory Driven Transformer</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-19 00:00:00 UTC">
+                19 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Generating Radiology Reports via Memory-driven Transformer</p>
+<p>    使用memory-driven Transformer生成报告，提出了两个新模块：RM（relational memory）记录之前生成的信息；MCLN（memory-driven conditional layer normalization）将RM的信息融合到transformer中。</p>
+<h2 id="the-proposed-method">The Proposed Method</h2>
+<p><img src="/img/MIRG-RM1.PNG" alt=""></p>
+<h3 id="the-model-structure">The Model Structure</h3>
+<h4 id="visual-extractor">Visual Extractor</h4>
+<p>    使用卷积网络（VGG/ResNet）提取图像的视觉特征。</p>
+<h4 id="encoder">Encoder</h4>
+<p>    医疗影像经过Visual Extractor后得到一个 width x height x dim 的特征，将二维图像特征 flatten 之后得到一个(width x height) x dim的序列特征作为encoder的输入，经过encoder得到输出序列。</p>
+<h4 id="decoder">Decoder</h4>
+<p>    将encoder得到的embedding作为decoder中的V和K，并在transformer中引入了提出的新模块memory module和MCLN。<br>
+    论文作者尝试后发现简单地使用 Transformer 不能完全解决生成报告长度短和生成内容准确性不足的问题，于是引入了 RelationalMemory 模块，改进了层归一化模块。<br>
+    Relational Memory 旨在学习影像报告的模式化信息，把 Relational Memory 引入层归一化，使得影像报告生成时，用 Memory 控制 Transformer 输出特征的均值和方差，从而深度利用了影像报告的模式化信息。</p>
+<h3 id="relational-memory">Relational Memory</h3>
+<p>    使用一个矩阵M来存储之前的信息，大小为slots x dim，在生成过程中，矩阵通过融合前一个时间步的输出来逐步进行更新，即每输出一个字，矩阵M就要更新一次。<br>
+    在时间步$t$，上一步的矩阵$M_{t-1}$作为query，上一时间步的矩阵$M_{t-1}$和输出$y_{t-1}$的拼接作为key和value，输入到多头自注意力机制中，在经过残差链接和MLP，得到更新后的记忆矩阵$\tilde{M}_ {t}$。<br>
+    与 RNN 相似，由于 Memory 每一步都要更新，于是加入了门机制来防止梯度消失或梯度爆炸。门机制由遗忘门和输入门构成：
+$$
+G_{t}^{f}=Y_{t-1}W^{f}+tanh(M_{t-1})\cdot U^{f}
+$$
+$$
+G_{t}^{i}=Y_{t-1}W^{i}+tanh(M_{t-1})\cdot U^{i}
+$$
+    其中，$Y_{t-1}$为上一个时间步的输出$y_{t-1}$的扩展，确保可以计算。最终，RM模块的输出，即更新后的记忆矩阵为：
+$$
+M_{t}=\sigma (G_{t}^{f})\odot M_{t-1}+\sigma (G_{t}^{i})\odot \tilde{M}_ {t}
+$$</p>
+<p><img src="/img/MIRG-RM2.PNG" alt=""></p>
+<h3 id="memory-driven-conditional-layer-normalization">Memory-driven Conditional Layer Normalization</h3>
+<p>    MCLN 的目的是把 Memory 引入解码器中，影响解码过程。理论上不一定要使用 MCLN。论文作者尝试过将 Memory 与标准 Transformer 的解码器的输出进行拼接，性能也有所提升。MCLN 的思想与图像领域上的条件批归一化（Conditional Batch Normalization，CBN）相似，利用条件控制归一化操作中的条件和方差。<br>
+    在传统的变压器中，为了提高泛化性，$\gamma $和$\beta $分别是缩放和移动学习表示的两个关键参数，因此，将每一个时间步的记忆矩阵$M_{t}$展开成向量$m_{t}$，然后经过线性变化获得归一化层中的标准差和均值的偏差值，加到原来的均值方差上：
+$$
+\Delta \gamma _ {t}=f_{mlp}(m_{t})
+$$
+$$
+\Delta \beta  _ {t}=f_{mlp}(m_{t})
+$$
+$$
+\hat{\gamma }_ {t}=\gamma +\Delta \gamma _ {t}
+$$
+$$
+\hat{\beta }_ {t}=\beta +\Delta \beta _ {t}
+$$
+    用两个MLP来学习两个参数的变化量，而不直接学习这两个重要参数。可以使模型从关系记忆网络中受益，同时防止其影响过多的模型参数而影响一些核心信息的生成。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +289,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

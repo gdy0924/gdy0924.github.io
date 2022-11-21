@@ -6,7 +6,41 @@
     <description>Recent content on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 18 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 19 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>MIRG-Memory Driven Transformer</title>
+      <link>https://gdy0924.github.io/posts/mirg-memory-driven-transformer/</link>
+      <pubDate>Sat, 19 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/mirg-memory-driven-transformer/</guid>
+      <description>Generating Radiology Reports via Memory-driven Transformer
+ 使用memory-driven Transformer生成报告，提出了两个新模块：RM（relational memory）记录之前生成的信息；MCLN（memory-driven conditional layer normalization）将RM的信息融合到transformer中。
+The Proposed Method The Model Structure Visual Extractor  使用卷积网络（VGG/ResNet）提取图像的视觉特征。
+Encoder  医疗影像经过Visual Extractor后得到一个 width x height x dim 的特征，将二维图像特征 flatten 之后得到一个(width x height) x dim的序列特征作为encoder的输入，经过encoder得到输出序列。
+Decoder  将encoder得到的embedding作为decoder中的V和K，并在transformer中引入了提出的新模块memory module和MCLN。
+论文作者尝试后发现简单地使用 Transformer 不能完全解决生成报告长度短和生成内容准确性不足的问题，于是引入了 RelationalMemory 模块，改进了层归一化模块。
+Relational Memory 旨在学习影像报告的模式化信息，把 Relational Memory 引入层归一化，使得影像报告生成时，用 Memory 控制 Transformer 输出特征的均值和方差，从而深度利用了影像报告的模式化信息。
+Relational Memory  使用一个矩阵M来存储之前的信息，大小为slots x dim，在生成过程中，矩阵通过融合前一个时间步的输出来逐步进行更新，即每输出一个字，矩阵M就要更新一次。
+在时间步$t$，上一步的矩阵$M_{t-1}$作为query，上一时间步的矩阵$M_{t-1}$和输出$y_{t-1}$的拼接作为key和value，输入到多头自注意力机制中，在经过残差链接和MLP，得到更新后的记忆矩阵$\tilde{M}_ {t}$。
+与 RNN 相似，由于 Memory 每一步都要更新，于是加入了门机制来防止梯度消失或梯度爆炸。门机制由遗忘门和输入门构成： $$ G_{t}^{f}=Y_{t-1}W^{f}+tanh(M_{t-1})\cdot U^{f} $$ $$ G_{t}^{i}=Y_{t-1}W^{i}+tanh(M_{t-1})\cdot U^{i} $$ 其中，$Y_{t-1}$为上一个时间步的输出$y_{t-1}$的扩展，确保可以计算。最终，RM模块的输出，即更新后的记忆矩阵为： $$ M_{t}=\sigma (G_{t}^{f})\odot M_{t-1}+\sigma (G_{t}^{i})\odot \tilde{M}_ {t} $$</description>
+    </item>
+    
+    <item>
+      <title>MIRG-TranSQ</title>
+      <link>https://gdy0924.github.io/posts/mirg-transq/</link>
+      <pubDate>Sat, 19 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/mirg-transq/</guid>
+      <description>TranSQ: Transformer-Based Semantic Query for Medical Report Generation
+ TranSQ(Transformer-based Semantic Query)将医疗报告生成视为直接集预测问题，即生成一组语义特征，以匹配可能的临床问题，并通过句子检索和选择来生成医学报告。
+TranSQ对视觉特征进行语义查询，以逐句生成医学报告：首先提取输入图像的视觉特征；可训练的语义embedding通过语义encoder（基于Transformer）查询视觉特征以生成语义特征；最后通过检索生成句子，根据得到的语义特征和ground-truth的二分匹配动态标记输出选择。
+Method 医学报告生成分为三个步骤：视觉特征理解；为视觉特征标注观察结果；将每个观察结果描述成一个句子，并判断该句子是否值得输出。以上三个步骤分别对应该模型的三个主要模块：visual extractor、semantic encoder、report generator。
+visual extractor  使用ViT作为visual encoder，输入为图像分割成patch，得到patch embedding后加上位置embedding作为输入，输出为一系列的视觉特征$f^{v}=\left [ f_{1}^{v},&amp;hellip;,f_{N}^{v} \right ]$。
+Semantic Encoder  得到了视觉特征，使用一组可训练的semantic queries（$q=\left [ q_{1},&amp;hellip;,q_{K} \right ]$）来提取重要的有价值的图像区域特征，每一个query$q_{i}$对应一个潜在的topic。
+（Note that since the semantic queries are permutation-invariant, the diﬀerence of the outputs comes from the value of semantic query embeddings, which are obtained by the training process.）
+Semantic Encoder将语义query$q$转换为语义特征集合$f^{s}=\left [ f_{1}^{s},&amp;hellip;,f_{K}^{s} \right ]$。具体结构参考DETR，对于每一层，首先输入到多头自注意力，以得到潜在topic之间的相关性，接着将视觉特征和语义特征输入到多头交叉自注意力中，最后经过一个前馈层。</description>
+    </item>
+    
     <item>
       <title>MIRG-CDGPT2</title>
       <link>https://gdy0924.github.io/posts/mirg-cdgpt2/</link>
