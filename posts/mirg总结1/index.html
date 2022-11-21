@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/summary/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/summary/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/mirg%E6%80%BB%E7%BB%931/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/mirg%E6%80%BB%E7%BB%931/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Summary",
-      "headline" : "Summary",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "MIRG总结1",
+      "headline" : "MIRG总结1",
+      "description" : "数据集 IU X-ray  包含7470张胸部X射线图像，3955份报告，每个患者有2张图像（正面视图和侧视图）\nMIMIC-CXR  包含377110张胸部x光片图像，共计227835份报告。\nCX-CHR  包括35609名患者和45598张图像。每个患者都有一个或多个不同视角的胸片图像（如正面和外侧），以及相应的中文报告。\nPEIR Gross  PEIR Gross中的每个标题只包含一个句子，CoAtt使用这个数据集来评估我们的模型生成单句报告的能力。\n评价标准 BLEU METEOR ROUGE ROUGE-L\nCIDER  CIDEr 是 BLEU 和向量空间模型的结合\n创新点 CoAtt（2017）  On the Automatic Generation of Medical Imaging Reports （1）输入图像经过卷积网络提取视觉特征，并进行多标签分类得到预测tags；\n（2）选择M个概率最大的标签得到语义embedding；\n（3）视觉embedding和语义embedding进行注意力权重计算，加权后得到视觉和语义上下文向量（权重由sentence LSTM和embedding计算得到）；\n（4）视觉和语义上下文向量输入sentence LSTM输出topic向量；\n（5）起始符号输入word LSTM，topic输入到word LSTM，之后的输入为上一时刻的输出字符。\nHRGR-Agent（2018）  Hybrid Retrieval-Generation Reinforced Agent for Medical Image Report Generation 引入强化学习，使智能体自动生成句子；Sentence Decoder为RNN网络，输出为topic隐含状态q；Retrieval Policy Module通过q预测概率，即从模板库中选择某一个模板的概率和使用智能体生成新句子的概率；Generation Module依旧是RNN网络。如果是从模板中选择的，就用句子级的奖励，如果是新生成的，就用单词级的奖励。\nKERP（2019）  Knowledge-driven Encode, Retrieve, Paraphrase for Medical Image Report Generation 提出一种图转换方式Graph Transformer (GTR)，该模块的变体可以是一种图结构转换成另一种图结构，可以是将图像转换为图结构，可以是图结构转化为序列输出，可以是图结构和序列的输入转化为序列输出。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -69,15 +69,39 @@ code.has-jax {
       "copyrightYear" : "2022",
       "datePublished": "2022-11-21 00:00:00 \u002b0000 UTC",
       "dateModified" : "2022-11-21 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/summary\/",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/mirg%E6%80%BB%E7%BB%931\/",
       "keywords" : [  ]
   }
 </script>
-<title>Summary</title>
-  <meta property="og:title" content="Summary" />
+<title>MIRG总结1</title>
+  <meta property="og:title" content="MIRG总结1" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="数据集 IU X-ray  包含7470张胸部X射线图像，3955份报告，每个患者有2张图像（正面视图和侧视图）
+MIMIC-CXR  包含377110张胸部x光片图像，共计227835份报告。
+CX-CHR  包括35609名患者和45598张图像。每个患者都有一个或多个不同视角的胸片图像（如正面和外侧），以及相应的中文报告。
+PEIR Gross  PEIR Gross中的每个标题只包含一个句子，CoAtt使用这个数据集来评估我们的模型生成单句报告的能力。
+评价标准 BLEU METEOR ROUGE ROUGE-L
+CIDER  CIDEr 是 BLEU 和向量空间模型的结合
+创新点 CoAtt（2017）  On the Automatic Generation of Medical Imaging Reports （1）输入图像经过卷积网络提取视觉特征，并进行多标签分类得到预测tags；
+（2）选择M个概率最大的标签得到语义embedding；
+（3）视觉embedding和语义embedding进行注意力权重计算，加权后得到视觉和语义上下文向量（权重由sentence LSTM和embedding计算得到）；
+（4）视觉和语义上下文向量输入sentence LSTM输出topic向量；
+（5）起始符号输入word LSTM，topic输入到word LSTM，之后的输入为上一时刻的输出字符。
+HRGR-Agent（2018）  Hybrid Retrieval-Generation Reinforced Agent for Medical Image Report Generation 引入强化学习，使智能体自动生成句子；Sentence Decoder为RNN网络，输出为topic隐含状态q；Retrieval Policy Module通过q预测概率，即从模板库中选择某一个模板的概率和使用智能体生成新句子的概率；Generation Module依旧是RNN网络。如果是从模板中选择的，就用句子级的奖励，如果是新生成的，就用单词级的奖励。
+KERP（2019）  Knowledge-driven Encode, Retrieve, Paraphrase for Medical Image Report Generation 提出一种图转换方式Graph Transformer (GTR)，该模块的变体可以是一种图结构转换成另一种图结构，可以是将图像转换为图结构，可以是图结构转化为序列输出，可以是图结构和序列的输入转化为序列输出。" />
+  <meta name="description" content="数据集 IU X-ray  包含7470张胸部X射线图像，3955份报告，每个患者有2张图像（正面视图和侧视图）
+MIMIC-CXR  包含377110张胸部x光片图像，共计227835份报告。
+CX-CHR  包括35609名患者和45598张图像。每个患者都有一个或多个不同视角的胸片图像（如正面和外侧），以及相应的中文报告。
+PEIR Gross  PEIR Gross中的每个标题只包含一个句子，CoAtt使用这个数据集来评估我们的模型生成单句报告的能力。
+评价标准 BLEU METEOR ROUGE ROUGE-L
+CIDER  CIDEr 是 BLEU 和向量空间模型的结合
+创新点 CoAtt（2017）  On the Automatic Generation of Medical Imaging Reports （1）输入图像经过卷积网络提取视觉特征，并进行多标签分类得到预测tags；
+（2）选择M个概率最大的标签得到语义embedding；
+（3）视觉embedding和语义embedding进行注意力权重计算，加权后得到视觉和语义上下文向量（权重由sentence LSTM和embedding计算得到）；
+（4）视觉和语义上下文向量输入sentence LSTM输出topic向量；
+（5）起始符号输入word LSTM，topic输入到word LSTM，之后的输入为上一时刻的输出字符。
+HRGR-Agent（2018）  Hybrid Retrieval-Generation Reinforced Agent for Medical Image Report Generation 引入强化学习，使智能体自动生成句子；Sentence Decoder为RNN网络，输出为topic隐含状态q；Retrieval Policy Module通过q预测概率，即从模板库中选择某一个模板的概率和使用智能体生成新句子的概率；Generation Module依旧是RNN网络。如果是从模板中选择的，就用句子级的奖励，如果是新生成的，就用单词级的奖励。
+KERP（2019）  Knowledge-driven Encode, Retrieve, Paraphrase for Medical Image Report Generation 提出一种图转换方式Graph Transformer (GTR)，该模块的变体可以是一种图结构转换成另一种图结构，可以是将图像转换为图结构，可以是图结构转化为序列输出，可以是图结构和序列的输入转化为序列输出。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +127,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,242 +160,149 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term">Summary</h1>
-        <div id="posts-list">
-          <section>
-            <h1 class="site-date-catalog">2022</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-11-21 00:00:00 UTC">Nov 21</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/mirg%E6%80%BB%E7%BB%931/">MIRG总结1</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-11-02 00:00:00 UTC">Nov 02</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E4%BA%BA%E6%9C%BA%E6%B7%B7%E5%90%88%E7%9A%84%E6%99%BA%E8%83%BD%E6%8E%A7%E5%88%B6%E4%BA%BA%E5%9C%A8%E5%9B%9E%E8%B7%AF%E6%8E%A7%E5%88%B6/">人机混合的智能控制（人在回路控制）</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-11-01 00:00:00 UTC">Nov 01</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E5%9B%BE%E5%B5%8C%E5%85%A5%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93/">图嵌入简单总结</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-10-27 00:00:00 UTC">Oct 27</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/graph-embedding/">Graph Embedding</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-10-17 00:00:00 UTC">Oct 17</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E6%9C%BA%E5%99%A8%E7%BF%BB%E8%AF%91/">机器翻译</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-07-18 00:00:00 UTC">Jul 18</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/segmentation/">Segmentation</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-15 00:00:00 UTC">May 15</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E6%80%BB%E7%BB%93%E4%B8%80/">总结（一）</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-05-04 00:00:00 UTC">May 04</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E7%A9%BA%E6%B4%9E%E5%8D%B7%E7%A7%AF/">空洞卷积</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-26 00:00:00 UTC">Apr 26</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/upsampling/">Upsampling</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-25 00:00:00 UTC">Apr 25</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%BB%8F%E5%85%B8%E8%AE%BA%E6%96%87%E6%80%BB%E7%BB%93/">图像分割经典论文总结</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-25 00:00:00 UTC">Apr 25</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/transformer%E4%B8%AD%E7%9A%84%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81/">Transformer中的位置编码</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-12 00:00:00 UTC">Apr 12</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/r-cnn%E7%B3%BB%E5%88%97%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93/">R-CNN系列简单总结</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-11 00:00:00 UTC">Apr 11</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/iounms/">IoU&amp;NMS</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-08 00:00:00 UTC">Apr 08</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/attentionself-attention/">Attention&amp;Self-Attention</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-04-06 00:00:00 UTC">Apr 06</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E5%88%86%E7%BB%84%E5%8D%B7%E7%A7%AF%E5%8F%AF%E5%88%86%E7%A6%BB%E5%8D%B7%E7%A7%AF/">分组卷积&amp;可分离卷积</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2022-01-24 00:00:00 UTC">Jan 24</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/batchnormalization/">BatchNormalization</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          <section>
-            <h1 class="site-date-catalog">2021</h1>
-
-            
-            <div class="row posts-line">
-              <div class="posts-date col-xs-2">
-                <time datetime="2021-12-11 15:52:51 CST">Dec 11</time>
-              </div>
-              <div class="posts-title col-xs-10">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <a href="/posts/%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87/">模型评价指标</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </section>
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">MIRG总结1</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-21 00:00:00 UTC">
+                21 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <h2 id="数据集">数据集</h2>
+<h3 id="iu-x-ray">IU X-ray</h3>
+<p>    包含7470张胸部X射线图像，3955份报告，每个患者有2张图像（正面视图和侧视图）</p>
+<h3 id="mimic-cxr">MIMIC-CXR</h3>
+<p>    包含377110张胸部x光片图像，共计227835份报告。</p>
+<h3 id="cx-chr">CX-CHR</h3>
+<p>    包括35609名患者和45598张图像。每个患者都有一个或多个不同视角的胸片图像（如正面和外侧），以及相应的中文报告。</p>
+<h3 id="peir-gross">PEIR Gross</h3>
+<p>    PEIR Gross中的每个标题只包含一个句子，CoAtt使用这个数据集来评估我们的模型生成单句报告的能力。</p>
+<h2 id="评价标准">评价标准</h2>
+<h3 id="bleu">BLEU</h3>
+<h3 id="meteor">METEOR</h3>
+<h3 id="rouge">ROUGE</h3>
+<p>ROUGE-L</p>
+<h3 id="cider">CIDER</h3>
+<p>    CIDEr 是 BLEU 和向量空间模型的结合</p>
+<h2 id="创新点">创新点</h2>
+<h3 id="coatt2017">CoAtt（2017）</h3>
+<p>    On the Automatic Generation of Medical Imaging Reports
+<img src="/img/MIRG1.PNG" alt="">
+    （1）输入图像经过卷积网络提取视觉特征，并进行多标签分类得到预测tags；<br>
+    （2）选择M个概率最大的标签得到语义embedding；<br>
+    （3）视觉embedding和语义embedding进行<strong>注意力权重计算</strong>，加权后得到视觉和语义上下文向量（权重由sentence LSTM和embedding计算得到）；<br>
+    （4）视觉和语义上下文向量输入<strong>sentence LSTM</strong>输出topic向量；<br>
+    （5）起始符号输入<strong>word LSTM</strong>，topic输入到word LSTM，之后的输入为上一时刻的输出字符。</p>
+<h3 id="hrgr-agent2018">HRGR-Agent（2018）</h3>
+<p>    Hybrid Retrieval-Generation Reinforced Agent for Medical Image Report Generation
+<img src="/img/MIRG2.PNG" alt="">
+    引入<strong>强化学习</strong>，使智能体自动生成句子；Sentence Decoder为RNN网络，输出为topic隐含状态q；Retrieval Policy Module通过q预测概率，即从模板库中选择某一个模板的概率和使用智能体生成新句子的概率；Generation Module依旧是RNN网络。如果是从模板中选择的，就用句子级的奖励，如果是新生成的，就用单词级的奖励。</p>
+<h3 id="kerp2019">KERP（2019）</h3>
+<p>    Knowledge-driven Encode, Retrieve, Paraphrase for Medical Image Report Generation
+<img src="/img/MIRG3.PNG" alt="">
+    提出一种图转换方式<strong>Graph Transformer (GTR)</strong>，该模块的变体可以是一种图结构转换成另一种图结构，可以是将图像转换为图结构，可以是图结构转化为序列输出，可以是图结构和序列的输入转化为序列输出。<br>
+    首先将图像转化为图结构，每个像素视为图节点，将其转化成<strong>异常图</strong>结构（这一过程中，有预先搭建的异常图）；根据异常图检索<strong>模板</strong>，得到序列输出；将模板序列和异常图作为输入，输出<strong>重写并细化</strong>的文本报告；同时异常图会转换成<strong>疾病图</strong>，以得到更好的可解释性，可以作为医疗报告的结论信息。</p>
+<h3 id="memory-driven-transformer2020">Memory-Driven Transformer（2020）</h3>
+<p>    Generating Radiology Reports via Memory-driven Transformer
+<img src="/img/MIRG4.PNG" alt="">
+    提出了两个新的模块融入到decoder的transformer中，以更好的利用到之前时间步输出的信息。<br>
+    <strong>Relational Memory</strong>：记忆矩阵M，每一时间步都进行一次更新，存放之前输出的信息，输入两个：上一时间步的记忆矩阵，上一时间步的记忆矩阵与上一时间步的输出拼接，输出当前时间步的记忆矩阵，同时使用到了门控单元，输入门和遗忘门。<br>
+    <strong>Memory-driven Conditional Layer Normalization</strong>：将记忆矩阵M融入到transformer中，得到归一化的均值和方差偏差，加到归一化操作中。</p>
+<h3 id="kgae2021">KGAE（2021）</h3>
+<p>    Auto-Encoding Knowledge Graph for Unsupervised Medical Report Generation
+<img src="/img/MIRG5.PNG" alt="">
+    <strong>无监督</strong>方法，在训练的时候，只是用文本数据，encoder编码，decoder解码，以重建报告；在测试的时候，输入图像，将其映射到与文本相同的空间中，再利用decoder解码得到报告。（关键在于如何缩小图像与文本之间的空间差异）<br>
+    encoder使用二元交叉熵损失函数进行训练，得到的encoder可以在一个<strong>共同的潜在空间</strong>中提取图像和报告的知识表示，有效地连接了视觉和语言领域。<br>
+    预先搭建<strong>特定领域知识图谱</strong>，从知识图谱中可以分别得到视觉和语义的embedding，作为一个桥梁来关联视觉和文本领域的知识表示。</p>
+<h3 id="cdgpt22021">CDGPT2（2021）</h3>
+<p>    Automated radiology report generation using conditioned transformers
+<img src="/img/MIRG6.PNG" alt="">
+    输入图像提取特征并进行多标签预测，tags与预测概率相乘，得到语义embedding，视觉embedding和语义embedding作为x和y输入到<strong>Conditional</strong> transformer中。</p>
+<h2 id="结果">结果</h2>
+<h3 id="coatt">CoAtt：</h3>
+<p><img src="/img/MIRG7.PNG" alt=""></p>
+<h3 id="hrgr-agent">HRGR-Agent</h3>
+<p><img src="/img/MIRG8.PNG" alt="">
+    上图中，IU X-Ray数据集上， BLEU-1、BLEU-4和ROUGE结果，HRGR-Agent都不如CoAtt，但差别不大，CoAtt好像在CIDEr分数上差一点。
+<img src="/img/MIRG9.PNG" alt="">
+    提到说，CoAtt生成的段落太短。</p>
+<h3 id="kerp">KERP</h3>
+<p><img src="/img/MIRG10.PNG" alt="">
+    HRGR-Agent的CIDEr分数最高，论文提到说是因为将CIDEr作为奖励去优化智能体，因此得分高；CoAtt的ROUGE-L分数最高。</p>
+<h3 id="memory-driven-transformer">Memory-Driven Transformer</h3>
+<p><img src="/img/MIRG11.PNG" alt="">
+    Effect of Relational Memory：
+<img src="/img/MIRG12.PNG" alt="">
+    仅仅依靠RM模块，无法达到最好的精度，结果没有之前的工作好，增加了好的融合模块MCLN新能提升多。</p>
+<h3 id="kgae">KGAE</h3>
+<p><img src="/img/MIRG13.PNG" alt=""></p>
+<h3 id="cdgpt2">CDGPT2</h3>
+<p><img src="/img/MIRG14.PNG" alt="">
+    RNCM的BLUE-1得分高是因为他们只预测标签生成一个有限报告，因此BLUE-3和BLUE-4得分很低；在基于Transformer的工作中，CDGPT除了Cider分数，其他都优于RTMIC，但是都没有RM+MCLN好，因为它在输出报告之前利用了正面和侧胸视图的信息，而我们的模型可以在单一图像上工作；CDGPT2并没有超越层次循环模型（表1中的第二部分）和跨模式检索方法中的FFL+CFL（表1中的第三部分）。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -390,6 +322,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

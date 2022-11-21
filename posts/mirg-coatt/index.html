@@ -231,7 +231,7 @@ $$</p>
 <h3 id="sentence-lstm">Sentence LSTM</h3>
 <p>    sentence lstm是单层的lstm，输入为联合上下文向量，输出是topic向量$t\in \mathbb{R}^{K}$，并控制是否继续或停止生成topic向量。</p>
 <h4 id="topic-generator">Topic generator</h4>
-<p>    结合当前步的信函状态和上下文向量生成topic向量：
+<p>    结合当前步的隐含状态和上下文向量生成topic向量：
 $$
 t^{(s)}=tanh(W_{t,h_{sent}}h_{sent}^{(s)}+W_{t,ctx}ctx^{(s)})
 $$</p>
