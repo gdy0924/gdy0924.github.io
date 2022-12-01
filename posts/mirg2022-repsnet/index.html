@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/mirg2022-repsnet/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/mirg2022-repsnet/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "MIRG2022-Repsnet",
+      "headline" : "MIRG2022-Repsnet",
+      "description" : "本文结合视觉和语言模型，在VQA设置中解释医学图像，即使用一种新的encoder-decoder框架来预测给定图像和问题的答案。\nRepsNet通过对比对齐的方式将图像和问题特征融合，decoder学习条件概率分布生成描述： 1)编码图像和问题特征，2)从图像的最近邻报告中检索到上下文。 上图左边为RepsNet，输入为图像和问题，输出为分类结果和生成的自然语言；右边为一个医学报告生成例子，前两个为分类问题，最后一个为文本生成的答案。\nRepsNet: Proposed Approach Contrastive Image-Text Encoder  encoder由四部分组成：提取视觉特征的image encoder；提取问题和答案特征的text encoder；融合图像和问题特征的bilinear attention network；对其视觉特征和文本特征的contrastive alignment。\nImage Encoder  ResNeXt-101提取视觉特征，最终得到特征图大小为$14\\times 14\\times 2048$。\nText Encoder  使用Bert网络提取文本特征。\nBilinear Attention Network (BAN)  使用BAN来融合图像特征和问题特征（Kim, J.H., Jun, J., Zhang, B.T.: Bilinear attention networks. In: Advances in Neural Information Processing Systems. vol. 31 (2018)），输出$\\bar {X}$。\nContrastive Vision and Text Learning  通过双向对比学习将图像与自然语言描述对齐，输入$\\bar {X}$和回答特征$\\bar {Y}$，先将他们进行线性变换得到$\\hat{X}\\in \\mathbb{R}^{d},\\hat{Y}\\in \\mathbb{R}^{d}$。 训练期间，针对一个batch中的图像文本对$\\lbrace \\hat{x}_ {i},\\hat{y}_ {i}\\rbrace_{i=1}^{N_{T}}$，作为正样本，设定image-to-text loss如下： $$ L_{\\hat{x}\\rightarrow \\hat{y}}=-\\frac{1}{N_{T}}\\sum_{i=1}^{N_{T}}log\\frac{exp(\\left \\langle \\hat{x}_ {i},\\hat{y}_ {i} \\right \\rangle\/\\tau )}{\\sum_{j=1}^{N_{T}}exp(\\left \\langle \\hat{x}_ {i},\\hat{y}_ {i} \\right \\rangle\/\\tau )} $$ 其中，$\\left \\langle \\hat{x},\\hat{y} \\right \\rangle=\\frac{\\hat{x}^{T}\\hat{y}}{||\\hat{x}||; ||\\hat{y}||}$，同时定义text-to-image loss$L_{\\hat{y}\\rightarrow \\hat{x}}$，整体的bidirectional encoder loss为： $$ L_{enc}=\\alpha _ {l}(L_{\\hat{x}\\rightarrow \\hat{y}}\u002bL_{\\hat{y}\\rightarrow \\hat{x}}) $$",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,29 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-11-29 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-11-29 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "datePublished": "2022-11-28 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-11-28 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/mirg2022-repsnet\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>MIRG2022-Repsnet</title>
+  <meta property="og:title" content="MIRG2022-Repsnet" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="本文结合视觉和语言模型，在VQA设置中解释医学图像，即使用一种新的encoder-decoder框架来预测给定图像和问题的答案。
+RepsNet通过对比对齐的方式将图像和问题特征融合，decoder学习条件概率分布生成描述： 1)编码图像和问题特征，2)从图像的最近邻报告中检索到上下文。 上图左边为RepsNet，输入为图像和问题，输出为分类结果和生成的自然语言；右边为一个医学报告生成例子，前两个为分类问题，最后一个为文本生成的答案。
+RepsNet: Proposed Approach Contrastive Image-Text Encoder  encoder由四部分组成：提取视觉特征的image encoder；提取问题和答案特征的text encoder；融合图像和问题特征的bilinear attention network；对其视觉特征和文本特征的contrastive alignment。
+Image Encoder  ResNeXt-101提取视觉特征，最终得到特征图大小为$14\times 14\times 2048$。
+Text Encoder  使用Bert网络提取文本特征。
+Bilinear Attention Network (BAN)  使用BAN来融合图像特征和问题特征（Kim, J.H., Jun, J., Zhang, B.T.: Bilinear attention networks. In: Advances in Neural Information Processing Systems. vol. 31 (2018)），输出$\bar {X}$。
+Contrastive Vision and Text Learning  通过双向对比学习将图像与自然语言描述对齐，输入$\bar {X}$和回答特征$\bar {Y}$，先将他们进行线性变换得到$\hat{X}\in \mathbb{R}^{d},\hat{Y}\in \mathbb{R}^{d}$。 训练期间，针对一个batch中的图像文本对$\lbrace \hat{x}_ {i},\hat{y}_ {i}\rbrace_{i=1}^{N_{T}}$，作为正样本，设定image-to-text loss如下： $$ L_{\hat{x}\rightarrow \hat{y}}=-\frac{1}{N_{T}}\sum_{i=1}^{N_{T}}log\frac{exp(\left \langle \hat{x}_ {i},\hat{y}_ {i} \right \rangle/\tau )}{\sum_{j=1}^{N_{T}}exp(\left \langle \hat{x}_ {i},\hat{y}_ {i} \right \rangle/\tau )} $$ 其中，$\left \langle \hat{x},\hat{y} \right \rangle=\frac{\hat{x}^{T}\hat{y}}{||\hat{x}||; ||\hat{y}||}$，同时定义text-to-image loss$L_{\hat{y}\rightarrow \hat{x}}$，整体的bidirectional encoder loss为： $$ L_{enc}=\alpha _ {l}(L_{\hat{x}\rightarrow \hat{y}}&#43;L_{\hat{y}\rightarrow \hat{x}}) $$" />
+  <meta name="description" content="本文结合视觉和语言模型，在VQA设置中解释医学图像，即使用一种新的encoder-decoder框架来预测给定图像和问题的答案。
+RepsNet通过对比对齐的方式将图像和问题特征融合，decoder学习条件概率分布生成描述： 1)编码图像和问题特征，2)从图像的最近邻报告中检索到上下文。 上图左边为RepsNet，输入为图像和问题，输出为分类结果和生成的自然语言；右边为一个医学报告生成例子，前两个为分类问题，最后一个为文本生成的答案。
+RepsNet: Proposed Approach Contrastive Image-Text Encoder  encoder由四部分组成：提取视觉特征的image encoder；提取问题和答案特征的text encoder；融合图像和问题特征的bilinear attention network；对其视觉特征和文本特征的contrastive alignment。
+Image Encoder  ResNeXt-101提取视觉特征，最终得到特征图大小为$14\times 14\times 2048$。
+Text Encoder  使用Bert网络提取文本特征。
+Bilinear Attention Network (BAN)  使用BAN来融合图像特征和问题特征（Kim, J.H., Jun, J., Zhang, B.T.: Bilinear attention networks. In: Advances in Neural Information Processing Systems. vol. 31 (2018)），输出$\bar {X}$。
+Contrastive Vision and Text Learning  通过双向对比学习将图像与自然语言描述对齐，输入$\bar {X}$和回答特征$\bar {Y}$，先将他们进行线性变换得到$\hat{X}\in \mathbb{R}^{d},\hat{Y}\in \mathbb{R}^{d}$。 训练期间，针对一个batch中的图像文本对$\lbrace \hat{x}_ {i},\hat{y}_ {i}\rbrace_{i=1}^{N_{T}}$，作为正样本，设定image-to-text loss如下： $$ L_{\hat{x}\rightarrow \hat{y}}=-\frac{1}{N_{T}}\sum_{i=1}^{N_{T}}log\frac{exp(\left \langle \hat{x}_ {i},\hat{y}_ {i} \right \rangle/\tau )}{\sum_{j=1}^{N_{T}}exp(\left \langle \hat{x}_ {i},\hat{y}_ {i} \right \rangle/\tau )} $$ 其中，$\left \langle \hat{x},\hat{y} \right \rangle=\frac{\hat{x}^{T}\hat{y}}{||\hat{x}||; ||\hat{y}||}$，同时定义text-to-image loss$L_{\hat{y}\rightarrow \hat{x}}$，整体的bidirectional encoder loss为： $$ L_{enc}=\alpha _ {l}(L_{\hat{x}\rightarrow \hat{y}}&#43;L_{\hat{y}\rightarrow \hat{x}}) $$" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +115,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +148,110 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">MIRG2022-Repsnet</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-28 00:00:00 UTC">
+                28 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>    本文结合视觉和语言模型，在VQA设置中解释医学图像，即使用一种新的encoder-decoder框架来预测给定图像和问题的答案。<br>
+    RepsNet通过对比对齐的方式将图像和问题特征融合，decoder学习条件概率分布生成描述： 1)编码图像和问题特征，2)从图像的最近邻报告中检索到上下文。
+<img src="/img/MIRG-RepsNet1.PNG" alt="">
+    上图左边为RepsNet，输入为图像和问题，输出为分类结果和生成的自然语言；右边为一个医学报告生成例子，前两个为分类问题，最后一个为文本生成的答案。</p>
+<h2 id="repsnet-proposed-approach">RepsNet: Proposed Approach</h2>
+<p><img src="/img/MIRG-RepsNet2.PNG" alt=""></p>
+<h3 id="contrastive-image-text-encoder">Contrastive Image-Text Encoder</h3>
+<p>    encoder由四部分组成：提取视觉特征的image encoder；提取问题和答案特征的text encoder；融合图像和问题特征的bilinear attention network；对其视觉特征和文本特征的contrastive alignment。</p>
+<h4 id="image-encoder">Image Encoder</h4>
+<p>    ResNeXt-101提取视觉特征，最终得到特征图大小为$14\times 14\times 2048$。</p>
+<h4 id="text-encoder">Text Encoder</h4>
+<p>    使用Bert网络提取文本特征。</p>
+<h4 id="bilinear-attention-network-ban">Bilinear Attention Network (BAN)</h4>
+<p>    使用BAN来融合图像特征和问题特征（Kim, J.H., Jun, J., Zhang, B.T.: Bilinear attention networks. In: Advances in Neural Information Processing Systems. vol. 31 (2018)），输出$\bar {X}$。</p>
+<h4 id="contrastive-vision-and-text-learning">Contrastive Vision and Text Learning</h4>
+<p>    通过双向对比学习将图像与自然语言描述对齐，输入$\bar {X}$和回答特征$\bar {Y}$，先将他们进行线性变换得到$\hat{X}\in \mathbb{R}^{d},\hat{Y}\in \mathbb{R}^{d}$。
+    训练期间，针对一个batch中的图像文本对$\lbrace \hat{x}_ {i},\hat{y}_ {i}\rbrace_{i=1}^{N_{T}}$，作为正样本，设定image-to-text loss如下：
+$$
+L_{\hat{x}\rightarrow \hat{y}}=-\frac{1}{N_{T}}\sum_{i=1}^{N_{T}}log\frac{exp(\left \langle \hat{x}_ {i},\hat{y}_ {i} \right \rangle/\tau )}{\sum_{j=1}^{N_{T}}exp(\left \langle \hat{x}_ {i},\hat{y}_ {i} \right \rangle/\tau )}
+$$
+    其中，$\left \langle \hat{x},\hat{y} \right \rangle=\frac{\hat{x}^{T}\hat{y}}{||\hat{x}||; ||\hat{y}||}$，同时定义text-to-image loss$L_{\hat{y}\rightarrow \hat{x}}$，整体的bidirectional encoder loss为：
+$$
+L_{enc}=\alpha _ {l}(L_{\hat{x}\rightarrow \hat{y}}+L_{\hat{y}\rightarrow \hat{x}})
+$$</p>
+<h4 id="prior-context-knowledge">Prior Context Knowledge</h4>
+<p>    在模型训练过程中，存储了训练集$\hat{Y}_ {train}$中的自然语言答案，使用最邻近方法，从存储的答案集中查找top k个最相近的邻居，最大化cosine similarity距离，得到$\bar {C}$：
+$$
+\bar{C}=topk\left [ \underset{i\in \hat{Y}_ {train}}{max}\left \langle \hat{X},\hat{Y}_ {train}^{(i)} \right \rangle \right ]
+$$
+    prior context可以使decoder获得更加长的依赖范围，获得额外的细节信息。</p>
+<h3 id="conditional-language-decoder">Conditional Language Decoder</h3>
+<p>    使用GPT-2模型作为基本的预训练的语言decoder，条件transformer参考（Ziegler, Z.M., Melas-Kyriazi, L., Gehrmann, S., Rush, A.M.: Encoder-agnostic adaptation for conditional language generation. CoRR abs/1908.06938 (2019)）和（Alfarghaly, O., Khaled, R., Elkorany, A., Helal, M., Fahmy, A.: Automated radiology report generation using conditioned transformers. Informatics in Medicine Unlocked 24, 100557 (2021)）</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +271,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

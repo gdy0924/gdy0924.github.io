@@ -6,7 +6,106 @@
     <description>Recent content in Paper on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 19 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/paper/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 28 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/paper/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>MIRG2022-LGE</title>
+      <link>https://gdy0924.github.io/posts/mirg2022-lge/</link>
+      <pubDate>Mon, 28 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/mirg2022-lge/</guid>
+      <description>Lesion Guided Explainable Few Weak-shot Medical Report Generation
+ 目前的医学报告生成工作需要标注数据，并且在面对新的疾病时，效果会下降，有一些弱样本学习工作，需要新疾病的ground truth报告来对网络进行微调，但是ground truth报告可能获取不到。
+为了使模型能够识别以前未见过的类，提出了针对自然图像任务的zero-shot learning（ZSL）。在ZSL 中，学习映射函数将图像输入投射到语义空间，其中训练类和新的类别之间的关系从辅助属性中提取，例如单词嵌入。
+因此，本文通过学习共同属性来在已看到的训练疾病和新的测试疾病之间建立联系。
+以下图为例，虽然在训练阶段，该模型没有看到关于central retinal vein occlusion的报告，但可以使其学习从视觉特征到语义特征的映射，从而建立所见疾病与新疾病之间的相关性。
+当模型遇到新的疾病样本时，可以通过结合共同属性的描述，利用校准后的相关性来生成报告。
+Methods Problem Setting  $C=C^{seen}\cup C^{nov}$为疾病类型，对于每一个病例，包含多张图片$\lbrace I_{1},&amp;hellip;,I_{N}\rbrace$。
+对于每个seen classes，可解释的标包括一组标注的bounding box $B$（包括位置和类别），一个报告$R$。
+对于未知的类别，为每个类别采样K个样本组成support set $S$，包含弱标注，即只有bounding box。
+Method Overview 对于输入的图像，先提取全局特征Global Features，然后使用RPN网络生成region proposal，通过ROI Pooling提取局部视觉特征$F^{vis}$，接着被分到三个分支：
+（1）box regression branch（$f_{reg}$）：检测病变区域的位置和大小；
+（2）classification branch（$f_{cls}$）：预测区域类别；
+（3）semantic prediction branch（$f_{prj}$）：将视觉特征映射到语义特征$F^{sem}$空间中，并学习 seen疾病与novel疾病之间的关系。
+最终，将视觉特征及其embedding拼接起来输入到transformer中生成报告。
+Lesion-Centric Feature Extractor  从有病变的区域提取特征，以生成报告，使用Faster R-CNN来预测病变区域，回归分支预测位置，分类分支预测类别。
+Multi-view Embedding Ensemble  Fast R-CNN是针对seen疾病训练的，忽视了novel疾病的内容，因此，提出使用novel疾病的embedding来指导视觉特征学习。
+先创建一个语义特征空间，将视觉特征$F^{vis}$映射到该空间中： $$ F^{sem}=f_{prj}(F^{vis}) $$ 从预训练的BioBert中，提取到疾病的word embedding $W$，论文没有直接最大化视觉特征和对应的word embedding入之间的相似性，而是建立了一个soft label来创建seen疾病和novel疾病之间的语义关系： $$ L_{y}^{s}=\left [ l_{1}^{s},&amp;hellip;,l_{|C|}^{s}\right ]^{T},l_{c}^{s}=Sim(W_{y}^{emb},W_{c}^{emb}) $$ 因此，$L_{y}^{s}$捕获了类别y与所有类之间的相似性，包括seen疾病和novel疾病。</description>
+    </item>
+    
+    <item>
+      <title>MIRG2022-Repsnet</title>
+      <link>https://gdy0924.github.io/posts/mirg2022-repsnet/</link>
+      <pubDate>Mon, 28 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/mirg2022-repsnet/</guid>
+      <description>本文结合视觉和语言模型，在VQA设置中解释医学图像，即使用一种新的encoder-decoder框架来预测给定图像和问题的答案。
+RepsNet通过对比对齐的方式将图像和问题特征融合，decoder学习条件概率分布生成描述： 1)编码图像和问题特征，2)从图像的最近邻报告中检索到上下文。 上图左边为RepsNet，输入为图像和问题，输出为分类结果和生成的自然语言；右边为一个医学报告生成例子，前两个为分类问题，最后一个为文本生成的答案。
+RepsNet: Proposed Approach Contrastive Image-Text Encoder  encoder由四部分组成：提取视觉特征的image encoder；提取问题和答案特征的text encoder；融合图像和问题特征的bilinear attention network；对其视觉特征和文本特征的contrastive alignment。
+Image Encoder  ResNeXt-101提取视觉特征，最终得到特征图大小为$14\times 14\times 2048$。
+Text Encoder  使用Bert网络提取文本特征。
+Bilinear Attention Network (BAN)  使用BAN来融合图像特征和问题特征（Kim, J.H., Jun, J., Zhang, B.T.: Bilinear attention networks. In: Advances in Neural Information Processing Systems. vol. 31 (2018)），输出$\bar {X}$。
+Contrastive Vision and Text Learning  通过双向对比学习将图像与自然语言描述对齐，输入$\bar {X}$和回答特征$\bar {Y}$，先将他们进行线性变换得到$\hat{X}\in \mathbb{R}^{d},\hat{Y}\in \mathbb{R}^{d}$。 训练期间，针对一个batch中的图像文本对$\lbrace \hat{x}_ {i},\hat{y}_ {i}\rbrace_{i=1}^{N_{T}}$，作为正样本，设定image-to-text loss如下： $$ L_{\hat{x}\rightarrow \hat{y}}=-\frac{1}{N_{T}}\sum_{i=1}^{N_{T}}log\frac{exp(\left \langle \hat{x}_ {i},\hat{y}_ {i} \right \rangle/\tau )}{\sum_{j=1}^{N_{T}}exp(\left \langle \hat{x}_ {i},\hat{y}_ {i} \right \rangle/\tau )} $$ 其中，$\left \langle \hat{x},\hat{y} \right \rangle=\frac{\hat{x}^{T}\hat{y}}{||\hat{x}||; ||\hat{y}||}$，同时定义text-to-image loss$L_{\hat{y}\rightarrow \hat{x}}$，整体的bidirectional encoder loss为： $$ L_{enc}=\alpha _ {l}(L_{\hat{x}\rightarrow \hat{y}}+L_{\hat{y}\rightarrow \hat{x}}) $$</description>
+    </item>
+    
+    <item>
+      <title>MIRG2022-ITA</title>
+      <link>https://gdy0924.github.io/posts/mirg2022-ita/</link>
+      <pubDate>Fri, 25 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/mirg2022-ita/</guid>
+      <description>An Inclusive Task-Aware Framework for Radiology Report Generation
+ 医学图像报告生成是从图像字幕任务转移过来的，通常使用CNN提取视觉特征，循环网络（RNN或LSTM）来将视觉特征转换为报告，最近，注意力机制、记忆驱动等方式引入进来提高性能。以前的研究都忽略了医学报告的结构化特性，从而可能导致生成的报告中缺少某些异常区域的描述。
+论文提出一个Inclusive Task-Aware framework：
+（1）针对每个特定数据集，使用任务蒸馏（task distillation，TD）来提取数据集中的知识；
+（2）提出task-aware report generation（TRG）模块来生成每个结构的描述，而不是生成整个报告；
+（3） 引入用于识别每个结构异常的classiﬁcation token（CLT），作为监督信号。
+另一个问题是严重的数据偏差，不仅异常图像占所有图像的总体比例少，而且某些异常结构的描述与其他结构的描述的比例很小，导致不同类型异常之间的不平衡。通过引入autobalance mask loss (ABL)，以平衡数据偏差。
+Method Task Distillation Module  遵循（When Radiology Report Generation Meets Knowledge Graph）方法，将报告转化成结构化的表述，即每个句子对应特定的方面，例如，胸部X射线图像通常从七个方面描述：心脏、胸膜、骨、肺、空气空间、胸主动脉和异物(the chest X-ray images are usually described from seven aspects: heart, pleural, bone, lung, airspace, thoracic aorta, and foreign object.)。
+那么TD模块就是将报告中的描述句子进行分组，分到最用描述下的实体中，并使用先验知识确定关键字，确保涵盖所有描述方面。
+因此，就将报告R分解成了不同的任务：$\lbrace r_{1},r_{2},&amp;hellip;,r_{m}\rbrace$。
+上图为When Radiology Report Generation Meets Knowledge Graph工作中的图，可能与该工作中的图具体内容不同，但大致结构相似，即进行分组，分组结果为虚线方框。
+Task-Aware Report Generation Module  通过将描述进行分解（分组），就可以使用TRG模块，生成对应于特定方面的描述，所有描述结合起来形成报告。</description>
+    </item>
+    
+    <item>
+      <title>MIRG2022-MSAT</title>
+      <link>https://gdy0924.github.io/posts/mirg2022-msat/</link>
+      <pubDate>Tue, 22 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/mirg2022-msat/</guid>
+      <description>A Medical Semantic-Assisted Transformer for Radiographic Report Generation
+目前医学报告生成任务有一些困难：
+（1）输入图像许多非常相似，因此使用CNN作为视觉特征提取器很难捕捉细粒度的视觉差异，因此可以使用transformer提取视觉特征；
+（2）医疗报告之间的差异也是细粒度的，即报告主要由描述图像常见内容的相似句子所主导，而与疾病相关的单词可能被淹没，但是细粒度的语义信息是很重要的，但现有的方法往往不能捕捉并提供有效的细粒度医学语义特征。
+解决办法：
+（1）使用CLIP而不是ResNet作为视觉特征提取器，CLIP有两个优点：它是建立在ViT之上，提取区域视觉特征；它通过匹配图像-文本对进行训练，从而产生文本增强的视觉特征。
+（2）提出一个用于高阶特征交互的记忆增强稀疏注意力模块（memory-augmented sparse attention block），利用双线性池化操作实现，，嵌入到transformer中的encoder和decoder中，该模块可以捕捉输入图像之间的细粒度特征，产生稀疏注意力，记忆历史信息以生成长时间的报告。
+（3）提出一个轻量级医学概念生成网络（Medical Concepts Generation Network，MCGN），可以预测细粒度的语义概念，并将其融合到报告生成过程中。
+Methodology 该模型包括一个图像encoder，一个MCGN和一个报告decoder。
+Memory-augmented Sparse Attention of High-order Interaction  由于传统的自注意力模块，只利用到了输入向量的一节交互，即权重是通过输入的query和key中元素的线性融合得到的，难以捕捉到输入图像之间的细粒度差异，因此，将bilinear-pooling融入到自注意力机制中，以捕获输入细粒度视觉特征的第二阶甚至更高阶的交互信息。
+为了记录历史信息，使用额外的memory-slots来扩展key和value。定义：the global feature为Q，the regional features为K、V； memory-augment attention中的key和value为：$\hat{K}=\left [ K,M_{k} \right ]$、$\hat{V}=\left [ V,M_{v} \right ]$，$M_{k}$和$M_{v}$都是可训练的矩阵，接着用low-rank bilinear pooling的方式（bilinear pooling在细粒度图像分类任务中表现很好，因此在该工作中用这种方法来捕获细粒度特征）： $$ B_{k}=\sigma (W_{k}\hat{K})\odot \sigma (W_{q}^{k}Q),B_{v}=\sigma (W_{v}\hat{V})\odot \sigma (W_{q}^{v}Q) $$ 利用一个线性层： $$ {B}&#39;_ {k}=\sigma (W_{B}^{k}B_{k}) $$ 利用另一个线性层，将${B}&#39;_ {k}$的维度变换，得到空间注意力权重$\alpha _ {s}$，接着使用另一个ReLU层来去掉所有低相关性的负分数，确保注意力权值的稀疏性： $$ \beta _ {s}=\sigma (\alpha _ {s}) $$ 同时，为了得到通道注意力权重$\beta _ {c}$，将${B}&#39;_ {k}$进行平均池化得到$\bar{B}$： $$ \beta _ {c}=sigmoid(W_{c})\bar{B} $$ memory-augmented sparse attention得到的输出： $$ \hat{Q}=Attention(K,V,Q)=\beta _ {c}\odot LN(\beta _ {s}B_{v}) $$ 该模块有三个好处：</description>
+    </item>
+    
+    <item>
+      <title>MIRG2022-SGF</title>
+      <link>https://gdy0924.github.io/posts/mirg2022-sgf/</link>
+      <pubDate>Tue, 22 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/mirg2022-sgf/</guid>
+      <description>A Self-Guided Framework for Radiology Report Generation
+ 提出一种self-guided框架，用于从文本报告中获得潜在的医学知识，不使用额外的疾病标签，其可以帮助自己学习与文本相关的细粒度视觉细节，以缓解数据偏差问题。
+论文将无监督和监督学习的方式进行结合，包括：
+（1）Knowledge Distiller (KD)模拟人类从文本中获取知识的行为，使用一种无监督的方法从报告中提取潜在的知识；
+（2）利用KD提取到的知识，Knowledge Matched Visual Extractor (KMVE)学习并提取与文本相关的视觉特征，即将图像和文本进行匹配；
+（3）Report Generator (RG)根据视觉特征生成报告。
+Methods Knowledge Distiller (KD)  该模块负责从报告中提取潜在知识，由Report Embedding (RE)、Dimension Reduction (DR)和Knowledge Clustering (KC)三部分组成。
+Report Embedding  使用Sentence-Bert (SB)将医学报告转换成$E_{i}\in \mathbb{R}^{384}$。（选择SB作为embedding方法的原因是：SB使用了孪生网络，这种结构可以得到适合于聚类和相似度比较的具有语义含义的句子embedding向量；并且该网络已经在广泛的语料库上进行了预训练）
+Dimension Reduction  降低$E_{i}$的维度，利用Uniform Manifold Approximation and Projection (UMAP)算法，$Y_{i}=f_{UMAP}(E_{i}),Y_{i}\in \mathbb{R}^{2}$。
+Knowledge Clustering  在该模块中使用Hierarchical Density-Based Spatial Clustering of Applications with Noise(HDBSCAN)算法，对$Y_{i}$进行聚类，得到$T=\lbrace t_{1},t_{2},&amp;hellip;,t_{k}\rbrace,k=73$，聚类结果$T$可以看作报告中潜在的知识topic。
+Knowledge Matched Visual Extractor (KMVE)  该模块将图像对作为输入，利用KD模块中的得到的$T$作为图像的潜在伪标签，该任务就转换成了分类任务；卷积网络可以提取与文本相关的细粒度视觉特征，以缓解数据偏差问题。
+两个图像经过卷积网络得到的特征进行拼接之后，得到$V_{avg}$，再经过两个平均池化层，得到${V}&#39;_ {avg}$，以得到最终的分类结果。使用二分交叉熵损失函数作为训练多标签预测的目标函数；并且，由于$V_{avg}$比${V}&#39;_ {avg}$包含更多的信息，可以从图像中获得更多细粒度的视觉特征，将其作为报告生成的输入。</description>
+    </item>
+    
     <item>
       <title>MIRG-Memory Driven Transformer</title>
       <link>https://gdy0924.github.io/posts/mirg-memory-driven-transformer/</link>

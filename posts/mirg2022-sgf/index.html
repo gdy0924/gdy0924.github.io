@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/mirg2022-sgf/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/mirg2022-sgf/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "MIRG2022-SGF",
+      "headline" : "MIRG2022-SGF",
+      "description" : "A Self-Guided Framework for Radiology Report Generation\n 提出一种self-guided框架，用于从文本报告中获得潜在的医学知识，不使用额外的疾病标签，其可以帮助自己学习与文本相关的细粒度视觉细节，以缓解数据偏差问题。\n论文将无监督和监督学习的方式进行结合，包括：\n（1）Knowledge Distiller (KD)模拟人类从文本中获取知识的行为，使用一种无监督的方法从报告中提取潜在的知识；\n（2）利用KD提取到的知识，Knowledge Matched Visual Extractor (KMVE)学习并提取与文本相关的视觉特征，即将图像和文本进行匹配；\n（3）Report Generator (RG)根据视觉特征生成报告。\nMethods Knowledge Distiller (KD)  该模块负责从报告中提取潜在知识，由Report Embedding (RE)、Dimension Reduction (DR)和Knowledge Clustering (KC)三部分组成。\nReport Embedding  使用Sentence-Bert (SB)将医学报告转换成$E_{i}\\in \\mathbb{R}^{384}$。（选择SB作为embedding方法的原因是：SB使用了孪生网络，这种结构可以得到适合于聚类和相似度比较的具有语义含义的句子embedding向量；并且该网络已经在广泛的语料库上进行了预训练）\nDimension Reduction  降低$E_{i}$的维度，利用Uniform Manifold Approximation and Projection (UMAP)算法，$Y_{i}=f_{UMAP}(E_{i}),Y_{i}\\in \\mathbb{R}^{2}$。\nKnowledge Clustering  在该模块中使用Hierarchical Density-Based Spatial Clustering of Applications with Noise(HDBSCAN)算法，对$Y_{i}$进行聚类，得到$T=\\lbrace t_{1},t_{2},\u0026hellip;,t_{k}\\rbrace,k=73$，聚类结果$T$可以看作报告中潜在的知识topic。\nKnowledge Matched Visual Extractor (KMVE)  该模块将图像对作为输入，利用KD模块中的得到的$T$作为图像的潜在伪标签，该任务就转换成了分类任务；卷积网络可以提取与文本相关的细粒度视觉特征，以缓解数据偏差问题。\n两个图像经过卷积网络得到的特征进行拼接之后，得到$V_{avg}$，再经过两个平均池化层，得到${V}\u0027_ {avg}$，以得到最终的分类结果。使用二分交叉熵损失函数作为训练多标签预测的目标函数；并且，由于$V_{avg}$比${V}\u0027_ {avg}$包含更多的信息，可以从图像中获得更多细粒度的视觉特征，将其作为报告生成的输入。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,39 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-11-29 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-11-29 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "datePublished": "2022-11-22 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-11-22 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/mirg2022-sgf\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>MIRG2022-SGF</title>
+  <meta property="og:title" content="MIRG2022-SGF" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="A Self-Guided Framework for Radiology Report Generation
+ 提出一种self-guided框架，用于从文本报告中获得潜在的医学知识，不使用额外的疾病标签，其可以帮助自己学习与文本相关的细粒度视觉细节，以缓解数据偏差问题。
+论文将无监督和监督学习的方式进行结合，包括：
+（1）Knowledge Distiller (KD)模拟人类从文本中获取知识的行为，使用一种无监督的方法从报告中提取潜在的知识；
+（2）利用KD提取到的知识，Knowledge Matched Visual Extractor (KMVE)学习并提取与文本相关的视觉特征，即将图像和文本进行匹配；
+（3）Report Generator (RG)根据视觉特征生成报告。
+Methods Knowledge Distiller (KD)  该模块负责从报告中提取潜在知识，由Report Embedding (RE)、Dimension Reduction (DR)和Knowledge Clustering (KC)三部分组成。
+Report Embedding  使用Sentence-Bert (SB)将医学报告转换成$E_{i}\in \mathbb{R}^{384}$。（选择SB作为embedding方法的原因是：SB使用了孪生网络，这种结构可以得到适合于聚类和相似度比较的具有语义含义的句子embedding向量；并且该网络已经在广泛的语料库上进行了预训练）
+Dimension Reduction  降低$E_{i}$的维度，利用Uniform Manifold Approximation and Projection (UMAP)算法，$Y_{i}=f_{UMAP}(E_{i}),Y_{i}\in \mathbb{R}^{2}$。
+Knowledge Clustering  在该模块中使用Hierarchical Density-Based Spatial Clustering of Applications with Noise(HDBSCAN)算法，对$Y_{i}$进行聚类，得到$T=\lbrace t_{1},t_{2},&amp;hellip;,t_{k}\rbrace,k=73$，聚类结果$T$可以看作报告中潜在的知识topic。
+Knowledge Matched Visual Extractor (KMVE)  该模块将图像对作为输入，利用KD模块中的得到的$T$作为图像的潜在伪标签，该任务就转换成了分类任务；卷积网络可以提取与文本相关的细粒度视觉特征，以缓解数据偏差问题。
+两个图像经过卷积网络得到的特征进行拼接之后，得到$V_{avg}$，再经过两个平均池化层，得到${V}&#39;_ {avg}$，以得到最终的分类结果。使用二分交叉熵损失函数作为训练多标签预测的目标函数；并且，由于$V_{avg}$比${V}&#39;_ {avg}$包含更多的信息，可以从图像中获得更多细粒度的视觉特征，将其作为报告生成的输入。" />
+  <meta name="description" content="A Self-Guided Framework for Radiology Report Generation
+ 提出一种self-guided框架，用于从文本报告中获得潜在的医学知识，不使用额外的疾病标签，其可以帮助自己学习与文本相关的细粒度视觉细节，以缓解数据偏差问题。
+论文将无监督和监督学习的方式进行结合，包括：
+（1）Knowledge Distiller (KD)模拟人类从文本中获取知识的行为，使用一种无监督的方法从报告中提取潜在的知识；
+（2）利用KD提取到的知识，Knowledge Matched Visual Extractor (KMVE)学习并提取与文本相关的视觉特征，即将图像和文本进行匹配；
+（3）Report Generator (RG)根据视觉特征生成报告。
+Methods Knowledge Distiller (KD)  该模块负责从报告中提取潜在知识，由Report Embedding (RE)、Dimension Reduction (DR)和Knowledge Clustering (KC)三部分组成。
+Report Embedding  使用Sentence-Bert (SB)将医学报告转换成$E_{i}\in \mathbb{R}^{384}$。（选择SB作为embedding方法的原因是：SB使用了孪生网络，这种结构可以得到适合于聚类和相似度比较的具有语义含义的句子embedding向量；并且该网络已经在广泛的语料库上进行了预训练）
+Dimension Reduction  降低$E_{i}$的维度，利用Uniform Manifold Approximation and Projection (UMAP)算法，$Y_{i}=f_{UMAP}(E_{i}),Y_{i}\in \mathbb{R}^{2}$。
+Knowledge Clustering  在该模块中使用Hierarchical Density-Based Spatial Clustering of Applications with Noise(HDBSCAN)算法，对$Y_{i}$进行聚类，得到$T=\lbrace t_{1},t_{2},&amp;hellip;,t_{k}\rbrace,k=73$，聚类结果$T$可以看作报告中潜在的知识topic。
+Knowledge Matched Visual Extractor (KMVE)  该模块将图像对作为输入，利用KD模块中的得到的$T$作为图像的潜在伪标签，该任务就转换成了分类任务；卷积网络可以提取与文本相关的细粒度视觉特征，以缓解数据偏差问题。
+两个图像经过卷积网络得到的特征进行拼接之后，得到$V_{avg}$，再经过两个平均池化层，得到${V}&#39;_ {avg}$，以得到最终的分类结果。使用二分交叉熵损失函数作为训练多标签预测的目标函数；并且，由于$V_{avg}$比${V}&#39;_ {avg}$包含更多的信息，可以从图像中获得更多细粒度的视觉特征，将其作为报告生成的输入。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +125,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +158,101 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">MIRG2022-SGF</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-22 00:00:00 UTC">
+                22 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>A Self-Guided Framework for Radiology Report  Generation</p>
+<p>    提出一种self-guided框架，用于从文本报告中获得潜在的医学知识，不使用额外的疾病标签，其可以帮助自己学习与文本相关的细粒度视觉细节，以缓解数据偏差问题。<br>
+    论文将无监督和监督学习的方式进行结合，包括：<br>
+    （1）Knowledge Distiller (KD)模拟人类从文本中获取知识的行为，使用一种无监督的方法从报告中提取潜在的知识；<br>
+    （2）利用KD提取到的知识，Knowledge Matched Visual Extractor (KMVE)学习并提取与文本相关的视觉特征，即将图像和文本进行匹配；<br>
+    （3）Report Generator (RG)根据视觉特征生成报告。</p>
+<h2 id="methods">Methods</h2>
+<p><img src="/img/MIRG-SGF1.PNG" alt=""></p>
+<h3 id="knowledge-distiller-kd">Knowledge Distiller (KD)</h3>
+<p>    该模块负责从报告中提取潜在知识，由Report Embedding (RE)、Dimension Reduction (DR)和Knowledge Clustering (KC)三部分组成。</p>
+<h4 id="report-embedding">Report Embedding</h4>
+<p>    使用Sentence-Bert (SB)将医学报告转换成$E_{i}\in \mathbb{R}^{384}$。（选择SB作为embedding方法的原因是：SB使用了孪生网络，这种结构可以得到适合于聚类和相似度比较的具有语义含义的句子embedding向量；并且该网络已经在广泛的语料库上进行了预训练）</p>
+<h4 id="dimension-reduction">Dimension Reduction</h4>
+<p>    降低$E_{i}$的维度，利用Uniform Manifold Approximation and Projection (UMAP)算法，$Y_{i}=f_{UMAP}(E_{i}),Y_{i}\in \mathbb{R}^{2}$。</p>
+<h4 id="knowledge-clustering">Knowledge Clustering</h4>
+<p>    在该模块中使用Hierarchical Density-Based Spatial Clustering of Applications with Noise(HDBSCAN)算法，对$Y_{i}$进行聚类，得到$T=\lbrace t_{1},t_{2},&hellip;,t_{k}\rbrace,k=73$，聚类结果$T$可以看作报告中潜在的知识topic。</p>
+<h3 id="knowledge-matched-visual-extractor-kmve">Knowledge Matched Visual Extractor (KMVE)</h3>
+<p>    该模块将图像对作为输入，利用KD模块中的得到的$T$作为图像的潜在伪标签，该任务就转换成了分类任务；卷积网络可以提取与文本相关的细粒度视觉特征，以缓解数据偏差问题。<br>
+    两个图像经过卷积网络得到的特征进行拼接之后，得到$V_{avg}$，再经过两个平均池化层，得到${V}'_ {avg}$，以得到最终的分类结果。使用二分交叉熵损失函数作为训练多标签预测的目标函数；并且，由于$V_{avg}$比${V}'_ {avg}$包含更多的信息，可以从图像中获得更多细粒度的视觉特征，将其作为报告生成的输入。</p>
+<h3 id="report-generator-rg">Report Generator (RG)</h3>
+<p>    该模块中包含transformer(TF)和Similarity Comparer (SC)。其中transformer中encoder部分的输入就是$V_{avg}$，作为Q、K和V，经过多头自注意力机制、残差连接、LN和FFN；transformer中decoder的部分，将encoder的输出作为key和value，当前输入单词的embedding作为query，输入到多头自注意力中，经过FFN、LN等，得到输出$y_{t}$。<br>
+    由于报告中的句子长而复杂，仅通过TF模块很难生成多个语义句子，这是因为其只关注前面单词的局部语义，而忽略了整体的语义。因此，论文提出Similarity Comparer (SC)模块，来比较生成报告和ground truth之间的差异，帮助TF模块学习全局语义信息。<br>
+    SC模块也利用Sentence-Bert网络，得到句子embedding后，将ground truth和生成的报告转换成向量$y_{e}\in \mathbb{R}^{384}$和$p_{e}\in \mathbb{R}^{384}$，然后计算其余弦相似度(cosine similarities)，再经过ReLU激活，得到相似度得分$S=f_{relu}(f_{cs}(y_{e},p_{e}))$。SC模块的损失函数就为：$L_{sc}=-\sum_{i=1}^{N_{r}}log(S_{i})$。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +272,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

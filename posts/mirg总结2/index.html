@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/mirg%E6%80%BB%E7%BB%932/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/mirg%E6%80%BB%E7%BB%932/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "MIRG总结2",
+      "headline" : "MIRG总结2",
+      "description" : "SGF  A Self-Guided Framework for Radiology Report Generation\n关键点 多标签分类任务\u002b报告生成任务；多标签分类任务的伪标签是用无监督方式从报告中提取出来的，即对句子进行聚类，聚类结果作为图像的分类伪标签；Similarity Comparer模块是为了使生成的句子整体语义更加接近ground truth，因此引入句子的相似性度量作为损失函数，让模型生成语义更加类似的句子。\n结果  IU-Xray数据集：\nBLUE-4和ROUGE-L提升效果明显，即SC模块作用很大，使得生成的句子语义、连续性很好，生成了更多有意义的长短语。 从上边消融实验依旧可以看出来，当加入了KMVE后，与Base \u002b SC相比BLUE-1下降了一些，可能原因是KMVE模块可能会迫使SGF注意句子中的关键字，从而减少了无意义词的生成，导致单个词匹配的准确率低。\nMSAT  A Medical Semantic-Assisted Transformer for Radiographic Report Generation\n关键点 使用CLIP提取视觉特征；在transformer中引入双线性池化计算，以得到更加高阶的交互（在原来自注意力计算中，权重是通过q和k的线性融合得到的），同时引入额外的记忆矩阵（可训练）存储历史信息，有利于生成长文本；多标签分类的伪标签是通过Radgraph从报告中提取到的。\n结果  MIMIC-CXR数据集：\n在不使用强化学习的情况下，ROUGE和METEOR不如之前的最好结果，在加入了强化学习之后（CIDEr作为奖励分数），所有指标达到了最优的结果。\n从消融实验可以看出，提出的注意力模块能带来更大的提升。\nITA  An Inclusive Task-Aware Framework for Radiology Report Generation\n关键点 网络基础结构参考Memory Driven Transformer，引入两个额外的模块，知识蒸馏和分类token；知识蒸馏利用图结构从报告中提取信息，即报告中通常需要描述哪些方面、哪些部位，从而在decoder中，利用不同的头来生成相应部位的描述；分类token作为额外的监督信号，优化网络，伪标签是通过知识蒸馏提取到的异常实体；Auto-Balance Mask Loss解决样本不平衡问题。\n结果 在BLEU和ROUGE-L上实现了最优的结果，METEOR略有下降，可能是因为METEOR考虑到了一些同义词，但是针对医学图像，METEOR捕获到的缺少专业知识，因为是从自然语言中提取的，因此METEOR并不是很合适作为评价指标。 TRG与R2GEN相比，增加了知识蒸馏作为decoder的先验指导，可以看出带来的提升相对较大，引入的损失来解决不平衡问题，和分类token也带来一定的提升，但很小。\nRepsNet  RepsNet: Combining Vision with Language for Automated Medical Reports\n关键点 将报告生成视为VQA任务，问题为“What are the findings in the image ?",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -69,15 +69,41 @@ code.has-jax {
       "copyrightYear" : "2022",
       "datePublished": "2022-11-29 00:00:00 \u002b0000 UTC",
       "dateModified" : "2022-11-29 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/mirg%E6%80%BB%E7%BB%932\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>MIRG总结2</title>
+  <meta property="og:title" content="MIRG总结2" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="SGF  A Self-Guided Framework for Radiology Report Generation
+关键点 多标签分类任务&#43;报告生成任务；多标签分类任务的伪标签是用无监督方式从报告中提取出来的，即对句子进行聚类，聚类结果作为图像的分类伪标签；Similarity Comparer模块是为了使生成的句子整体语义更加接近ground truth，因此引入句子的相似性度量作为损失函数，让模型生成语义更加类似的句子。
+结果  IU-Xray数据集：
+BLUE-4和ROUGE-L提升效果明显，即SC模块作用很大，使得生成的句子语义、连续性很好，生成了更多有意义的长短语。 从上边消融实验依旧可以看出来，当加入了KMVE后，与Base &#43; SC相比BLUE-1下降了一些，可能原因是KMVE模块可能会迫使SGF注意句子中的关键字，从而减少了无意义词的生成，导致单个词匹配的准确率低。
+MSAT  A Medical Semantic-Assisted Transformer for Radiographic Report Generation
+关键点 使用CLIP提取视觉特征；在transformer中引入双线性池化计算，以得到更加高阶的交互（在原来自注意力计算中，权重是通过q和k的线性融合得到的），同时引入额外的记忆矩阵（可训练）存储历史信息，有利于生成长文本；多标签分类的伪标签是通过Radgraph从报告中提取到的。
+结果  MIMIC-CXR数据集：
+在不使用强化学习的情况下，ROUGE和METEOR不如之前的最好结果，在加入了强化学习之后（CIDEr作为奖励分数），所有指标达到了最优的结果。
+从消融实验可以看出，提出的注意力模块能带来更大的提升。
+ITA  An Inclusive Task-Aware Framework for Radiology Report Generation
+关键点 网络基础结构参考Memory Driven Transformer，引入两个额外的模块，知识蒸馏和分类token；知识蒸馏利用图结构从报告中提取信息，即报告中通常需要描述哪些方面、哪些部位，从而在decoder中，利用不同的头来生成相应部位的描述；分类token作为额外的监督信号，优化网络，伪标签是通过知识蒸馏提取到的异常实体；Auto-Balance Mask Loss解决样本不平衡问题。
+结果 在BLEU和ROUGE-L上实现了最优的结果，METEOR略有下降，可能是因为METEOR考虑到了一些同义词，但是针对医学图像，METEOR捕获到的缺少专业知识，因为是从自然语言中提取的，因此METEOR并不是很合适作为评价指标。 TRG与R2GEN相比，增加了知识蒸馏作为decoder的先验指导，可以看出带来的提升相对较大，引入的损失来解决不平衡问题，和分类token也带来一定的提升，但很小。
+RepsNet  RepsNet: Combining Vision with Language for Automated Medical Reports
+关键点 将报告生成视为VQA任务，问题为“What are the findings in the image ?" />
+  <meta name="description" content="SGF  A Self-Guided Framework for Radiology Report Generation
+关键点 多标签分类任务&#43;报告生成任务；多标签分类任务的伪标签是用无监督方式从报告中提取出来的，即对句子进行聚类，聚类结果作为图像的分类伪标签；Similarity Comparer模块是为了使生成的句子整体语义更加接近ground truth，因此引入句子的相似性度量作为损失函数，让模型生成语义更加类似的句子。
+结果  IU-Xray数据集：
+BLUE-4和ROUGE-L提升效果明显，即SC模块作用很大，使得生成的句子语义、连续性很好，生成了更多有意义的长短语。 从上边消融实验依旧可以看出来，当加入了KMVE后，与Base &#43; SC相比BLUE-1下降了一些，可能原因是KMVE模块可能会迫使SGF注意句子中的关键字，从而减少了无意义词的生成，导致单个词匹配的准确率低。
+MSAT  A Medical Semantic-Assisted Transformer for Radiographic Report Generation
+关键点 使用CLIP提取视觉特征；在transformer中引入双线性池化计算，以得到更加高阶的交互（在原来自注意力计算中，权重是通过q和k的线性融合得到的），同时引入额外的记忆矩阵（可训练）存储历史信息，有利于生成长文本；多标签分类的伪标签是通过Radgraph从报告中提取到的。
+结果  MIMIC-CXR数据集：
+在不使用强化学习的情况下，ROUGE和METEOR不如之前的最好结果，在加入了强化学习之后（CIDEr作为奖励分数），所有指标达到了最优的结果。
+从消融实验可以看出，提出的注意力模块能带来更大的提升。
+ITA  An Inclusive Task-Aware Framework for Radiology Report Generation
+关键点 网络基础结构参考Memory Driven Transformer，引入两个额外的模块，知识蒸馏和分类token；知识蒸馏利用图结构从报告中提取信息，即报告中通常需要描述哪些方面、哪些部位，从而在decoder中，利用不同的头来生成相应部位的描述；分类token作为额外的监督信号，优化网络，伪标签是通过知识蒸馏提取到的异常实体；Auto-Balance Mask Loss解决样本不平衡问题。
+结果 在BLEU和ROUGE-L上实现了最优的结果，METEOR略有下降，可能是因为METEOR考虑到了一些同义词，但是针对医学图像，METEOR捕获到的缺少专业知识，因为是从自然语言中提取的，因此METEOR并不是很合适作为评价指标。 TRG与R2GEN相比，增加了知识蒸馏作为decoder的先验指导，可以看出带来的提升相对较大，引入的损失来解决不平衡问题，和分类token也带来一定的提升，但很小。
+RepsNet  RepsNet: Combining Vision with Language for Automated Medical Reports
+关键点 将报告生成视为VQA任务，问题为“What are the findings in the image ?" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +129,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +162,125 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">MIRG总结2</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-29 00:00:00 UTC">
+                29 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <h2 id="sgf">SGF</h2>
+<p>    A Self-Guided Framework for Radiology Report Generation</p>
+<h3 id="关键点">关键点</h3>
+<p><img src="/img/MIRG15.PNG" alt="">
+    多标签分类任务+报告生成任务；多标签分类任务的伪标签是用无监督方式从报告中提取出来的，即对句子进行聚类，聚类结果作为图像的分类伪标签；Similarity Comparer模块是为了使生成的句子整体语义更加接近ground truth，因此引入句子的相似性度量作为损失函数，让模型生成语义更加类似的句子。</p>
+<h3 id="结果">结果</h3>
+<p>    IU-Xray数据集：</p>
+<p><img src="/img/MIRG20.PNG" alt="">
+    BLUE-4和ROUGE-L提升效果明显，即SC模块作用很大，使得生成的句子语义、连续性很好，生成了更多有意义的长短语。
+<img src="/img/MIRG21.PNG" alt="">
+    从上边消融实验依旧可以看出来，当加入了KMVE后，与Base + SC相比BLUE-1下降了一些，可能原因是KMVE模块可能会迫使SGF注意句子中的关键字，从而减少了无意义词的生成，导致单个词匹配的准确率低。</p>
+<h2 id="msat">MSAT</h2>
+<p>    A Medical Semantic-Assisted Transformer for Radiographic Report Generation</p>
+<h3 id="关键点-1">关键点</h3>
+<p><img src="/img/MIRG16.PNG" alt="">
+    使用CLIP提取视觉特征；在transformer中引入双线性池化计算，以得到更加高阶的交互（在原来自注意力计算中，权重是通过q和k的线性融合得到的），同时引入额外的记忆矩阵（可训练）存储历史信息，有利于生成长文本；多标签分类的伪标签是通过Radgraph从报告中提取到的。</p>
+<h3 id="结果-1">结果</h3>
+<p>    MIMIC-CXR数据集：</p>
+<p><img src="/img/MIRG22.PNG" alt="">
+    在不使用强化学习的情况下，ROUGE和METEOR不如之前的最好结果，在加入了强化学习之后（CIDEr作为奖励分数），所有指标达到了最优的结果。<br>
+    从消融实验可以看出，提出的注意力模块能带来更大的提升。</p>
+<h2 id="ita">ITA</h2>
+<p>    An Inclusive Task-Aware Framework for Radiology Report Generation</p>
+<h3 id="关键点-2">关键点</h3>
+<p><img src="/img/MIRG17.PNG" alt="">
+    网络基础结构参考Memory Driven Transformer，引入两个额外的模块，知识蒸馏和分类token；知识蒸馏利用图结构从报告中提取信息，即报告中通常需要描述哪些方面、哪些部位，从而在decoder中，利用不同的头来生成相应部位的描述；分类token作为额外的监督信号，优化网络，伪标签是通过知识蒸馏提取到的异常实体；Auto-Balance Mask Loss解决样本不平衡问题。</p>
+<h3 id="结果-2">结果</h3>
+<p><img src="/img/MIRG23.PNG" alt="">
+    在BLEU和ROUGE-L上实现了最优的结果，METEOR略有下降，可能是因为METEOR考虑到了一些同义词，但是针对医学图像，METEOR捕获到的缺少专业知识，因为是从自然语言中提取的，因此METEOR并不是很合适作为评价指标。
+<img src="/img/MIRG24.PNG" alt="">
+    TRG与R2GEN相比，增加了知识蒸馏作为decoder的先验指导，可以看出带来的提升相对较大，引入的损失来解决不平衡问题，和分类token也带来一定的提升，但很小。</p>
+<h2 id="repsnet">RepsNet</h2>
+<p>    RepsNet: Combining Vision with Language for Automated Medical Reports</p>
+<h3 id="关键点-3">关键点</h3>
+<p><img src="/img/MIRG18.PNG" alt="">
+    将报告生成视为VQA任务，问题为“What are the  findings in the image ?”；先对图像和文本进行多模态融合，利用BAN网络；对其图像和样本，通过对比学习的方式，图像样本对作为正样本，计算损失；训练集中的答案作为先验知识，存储在数据库中，编码好的特征从数据库中选择K个最相近的答案，作为条件transformer的条件之一；条件transformer将图像特征、文本特征（问题+从数据库中提取到的答案）作为条件，进行文本生成。</p>
+<h3 id="结果-3">结果</h3>
+<p>    IU-Xray数据集：
+<img src="/img/MIRG26.PNG" alt="">
+    在BLUE的所有指标中都达到了最好的结果，表明使用大规模预训练的语言视觉模型是有用的。
+<img src="/img/MIRG25.PNG" alt="">
+    消融实验可以看出所有模块都能带来提升，特别是在BLUE-1上提升非常明显。</p>
+<h2 id="lge">LGE</h2>
+<p>    Lesion Guided Explainable Few Weak-shot Medical Report Generation</p>
+<h3 id="关键点-4">关键点</h3>
+<p><img src="/img/MIRG19.PNG" alt="">
+    主要针对异常区域生成报告，需要对异常区域进行提取，即需要有异常区域的bounding box标签；并且利用文本和特征之间的相似性，可以得到未知疾病的属性、生成报告（提出了一种解决在测试集中出现训练集中不存在的疾病的方法），即相似的疾病可能有类似的描述文本。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +300,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

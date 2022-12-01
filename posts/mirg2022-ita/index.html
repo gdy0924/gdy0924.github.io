@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/mirg2022-ita/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/mirg2022-ita/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "MIRG2022-ITA",
+      "headline" : "MIRG2022-ITA",
+      "description" : "An Inclusive Task-Aware Framework for Radiology Report Generation\n 医学图像报告生成是从图像字幕任务转移过来的，通常使用CNN提取视觉特征，循环网络（RNN或LSTM）来将视觉特征转换为报告，最近，注意力机制、记忆驱动等方式引入进来提高性能。以前的研究都忽略了医学报告的结构化特性，从而可能导致生成的报告中缺少某些异常区域的描述。\n论文提出一个Inclusive Task-Aware framework：\n（1）针对每个特定数据集，使用任务蒸馏（task distillation，TD）来提取数据集中的知识；\n（2）提出task-aware report generation（TRG）模块来生成每个结构的描述，而不是生成整个报告；\n（3） 引入用于识别每个结构异常的classiﬁcation token（CLT），作为监督信号。\n另一个问题是严重的数据偏差，不仅异常图像占所有图像的总体比例少，而且某些异常结构的描述与其他结构的描述的比例很小，导致不同类型异常之间的不平衡。通过引入autobalance mask loss (ABL)，以平衡数据偏差。\nMethod Task Distillation Module  遵循（When Radiology Report Generation Meets Knowledge Graph）方法，将报告转化成结构化的表述，即每个句子对应特定的方面，例如，胸部X射线图像通常从七个方面描述：心脏、胸膜、骨、肺、空气空间、胸主动脉和异物(the chest X-ray images are usually described from seven aspects: heart, pleural, bone, lung, airspace, thoracic aorta, and foreign object.)。\n那么TD模块就是将报告中的描述句子进行分组，分到最用描述下的实体中，并使用先验知识确定关键字，确保涵盖所有描述方面。\n因此，就将报告R分解成了不同的任务：$\\lbrace r_{1},r_{2},\u0026hellip;,r_{m}\\rbrace$。\n上图为When Radiology Report Generation Meets Knowledge Graph工作中的图，可能与该工作中的图具体内容不同，但大致结构相似，即进行分组，分组结果为虚线方框。\nTask-Aware Report Generation Module  通过将描述进行分解（分组），就可以使用TRG模块，生成对应于特定方面的描述，所有描述结合起来形成报告。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,39 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-11-29 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-11-29 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "datePublished": "2022-11-25 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-11-25 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/mirg2022-ita\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>MIRG2022-ITA</title>
+  <meta property="og:title" content="MIRG2022-ITA" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="An Inclusive Task-Aware Framework for Radiology Report Generation
+ 医学图像报告生成是从图像字幕任务转移过来的，通常使用CNN提取视觉特征，循环网络（RNN或LSTM）来将视觉特征转换为报告，最近，注意力机制、记忆驱动等方式引入进来提高性能。以前的研究都忽略了医学报告的结构化特性，从而可能导致生成的报告中缺少某些异常区域的描述。
+论文提出一个Inclusive Task-Aware framework：
+（1）针对每个特定数据集，使用任务蒸馏（task distillation，TD）来提取数据集中的知识；
+（2）提出task-aware report generation（TRG）模块来生成每个结构的描述，而不是生成整个报告；
+（3） 引入用于识别每个结构异常的classiﬁcation token（CLT），作为监督信号。
+另一个问题是严重的数据偏差，不仅异常图像占所有图像的总体比例少，而且某些异常结构的描述与其他结构的描述的比例很小，导致不同类型异常之间的不平衡。通过引入autobalance mask loss (ABL)，以平衡数据偏差。
+Method Task Distillation Module  遵循（When Radiology Report Generation Meets Knowledge Graph）方法，将报告转化成结构化的表述，即每个句子对应特定的方面，例如，胸部X射线图像通常从七个方面描述：心脏、胸膜、骨、肺、空气空间、胸主动脉和异物(the chest X-ray images are usually described from seven aspects: heart, pleural, bone, lung, airspace, thoracic aorta, and foreign object.)。
+那么TD模块就是将报告中的描述句子进行分组，分到最用描述下的实体中，并使用先验知识确定关键字，确保涵盖所有描述方面。
+因此，就将报告R分解成了不同的任务：$\lbrace r_{1},r_{2},&amp;hellip;,r_{m}\rbrace$。
+上图为When Radiology Report Generation Meets Knowledge Graph工作中的图，可能与该工作中的图具体内容不同，但大致结构相似，即进行分组，分组结果为虚线方框。
+Task-Aware Report Generation Module  通过将描述进行分解（分组），就可以使用TRG模块，生成对应于特定方面的描述，所有描述结合起来形成报告。" />
+  <meta name="description" content="An Inclusive Task-Aware Framework for Radiology Report Generation
+ 医学图像报告生成是从图像字幕任务转移过来的，通常使用CNN提取视觉特征，循环网络（RNN或LSTM）来将视觉特征转换为报告，最近，注意力机制、记忆驱动等方式引入进来提高性能。以前的研究都忽略了医学报告的结构化特性，从而可能导致生成的报告中缺少某些异常区域的描述。
+论文提出一个Inclusive Task-Aware framework：
+（1）针对每个特定数据集，使用任务蒸馏（task distillation，TD）来提取数据集中的知识；
+（2）提出task-aware report generation（TRG）模块来生成每个结构的描述，而不是生成整个报告；
+（3） 引入用于识别每个结构异常的classiﬁcation token（CLT），作为监督信号。
+另一个问题是严重的数据偏差，不仅异常图像占所有图像的总体比例少，而且某些异常结构的描述与其他结构的描述的比例很小，导致不同类型异常之间的不平衡。通过引入autobalance mask loss (ABL)，以平衡数据偏差。
+Method Task Distillation Module  遵循（When Radiology Report Generation Meets Knowledge Graph）方法，将报告转化成结构化的表述，即每个句子对应特定的方面，例如，胸部X射线图像通常从七个方面描述：心脏、胸膜、骨、肺、空气空间、胸主动脉和异物(the chest X-ray images are usually described from seven aspects: heart, pleural, bone, lung, airspace, thoracic aorta, and foreign object.)。
+那么TD模块就是将报告中的描述句子进行分组，分到最用描述下的实体中，并使用先验知识确定关键字，确保涵盖所有描述方面。
+因此，就将报告R分解成了不同的任务：$\lbrace r_{1},r_{2},&amp;hellip;,r_{m}\rbrace$。
+上图为When Radiology Report Generation Meets Knowledge Graph工作中的图，可能与该工作中的图具体内容不同，但大致结构相似，即进行分组，分组结果为虚线方框。
+Task-Aware Report Generation Module  通过将描述进行分解（分组），就可以使用TRG模块，生成对应于特定方面的描述，所有描述结合起来形成报告。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +125,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +158,136 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">MIRG2022-ITA</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-25 00:00:00 UTC">
+                25 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>An Inclusive Task-Aware Framework for Radiology Report Generation</p>
+<p>    医学图像报告生成是从图像字幕任务转移过来的，通常使用CNN提取视觉特征，循环网络（RNN或LSTM）来将视觉特征转换为报告，最近，注意力机制、记忆驱动等方式引入进来提高性能。以前的研究都忽略了医学报告的结构化特性，从而可能导致生成的报告中缺少某些异常区域的描述。<br>
+    论文提出一个Inclusive Task-Aware framework：<br>
+    （1）针对每个特定数据集，使用任务蒸馏（task distillation，TD）来提取数据集中的知识；<br>
+    （2）提出task-aware report generation（TRG）模块来生成每个结构的描述，而不是生成整个报告；<br>
+    （3） 引入用于识别每个结构异常的classiﬁcation token（CLT），作为监督信号。<br>
+    另一个问题是严重的数据偏差，不仅异常图像占所有图像的总体比例少，而且某些异常结构的描述与其他结构的描述的比例很小，导致不同类型异常之间的不平衡。通过引入autobalance mask loss (ABL)，以平衡数据偏差。</p>
+<h2 id="method">Method</h2>
+<p><img src="/img/MIRG-ITA1.PNG" alt=""></p>
+<h3 id="task-distillation-module">Task Distillation Module</h3>
+<p>    遵循（When Radiology Report Generation Meets Knowledge Graph）方法，将报告转化成结构化的表述，即每个句子对应特定的方面，例如，胸部X射线图像通常从七个方面描述：心脏、胸膜、骨、肺、空气空间、胸主动脉和异物(the chest X-ray images are usually described from seven aspects: heart, pleural, bone, lung, airspace, thoracic aorta, and foreign object.)。<br>
+    那么TD模块就是将报告中的描述句子进行分组，分到最用描述下的实体中，并使用先验知识确定关键字，确保涵盖所有描述方面。<br>
+    因此，就将报告R分解成了不同的任务：$\lbrace r_{1},r_{2},&hellip;,r_{m}\rbrace$。</p>
+<p><img src="/img/MIRG-ITA2.jpg" alt="">
+    上图为When Radiology Report Generation Meets Knowledge Graph工作中的图，可能与该工作中的图具体内容不同，但大致结构相似，即进行分组，分组结果为虚线方框。</p>
+<h3 id="task-aware-report-generation-module">Task-Aware Report Generation Module</h3>
+<p>    通过将描述进行分解（分组），就可以使用TRG模块，生成对应于特定方面的描述，所有描述结合起来形成报告。<br>
+    TRG module由embedding generator和task-aware multi-head Transformer组成。<br>
+    embedding generator其实就是一个基于CNN的特征提取器V加一个线性层P：
+$$
+\lbrace e_{1},e_{2},&hellip;,e_{n}\rbrace=f_{P}(f_{V}(X))
+$$
+    task-aware multi-head Transformer由共享参数的encoder和多头decoder组成，encoder由标准的transformer block堆叠而成，输入为视觉embedding，输出为隐含状态：
+$$
+\lbrace h_{1},h_{2},&hellip;,h_{n}\rbrace=f_{E}(\lbrace e_{1},e_{2},&hellip;,e_{n}\rbrace)
+$$
+    与之前的工作一次性生成一整个报告不同，我们使用多头decoder，使得每个头只负责生成特定方面的描述，并且使用Memory Driven Transformer的方式，即引入了RM和MCLN模块：
+$$
+y_{i}=f_{D}^{i}(\lbrace h_{1},h_{2},&hellip;,h_{n}\rbrace),i\in 1,&hellip;,m
+$$
+    TRG的输出就由m个句子组成，$Y=\lbrace y_{1},y_{2},&hellip;,y_{m}\rbrace$，最终的损失为：
+$$
+L_{GEN}(R,Y)=-\sum_{i=1}^{m}\sum_{j=1}^{l_{i}}r_{ij}log(y_{ij})
+$$</p>
+<h3 id="classification-token">Classification Token</h3>
+<p>    在撰写报告时，医生通常会观察是否存在异常，判断是何种异常，因此，引入额外的classiﬁcation embedding来进行异常类型的分类任务：
+$$
+\lbrace h_{1},h_{2},&hellip;,h_{n}\rbrace,\lbrace t_{1},t_{2},&hellip;,t_{m}\rbrace=f_{E}(\lbrace e_{1},e_{2},&hellip;,e_{n}\rbrace,\lbrace c_{1},c_{2},&hellip;,c_{m}\rbrace)
+$$
+    其中，$t_{i}$为encoder输出的classiﬁcation token，与隐含状态一起输入到decoder中：
+$$
+y_{i}=f_{D}^{i}(\lbrace h_{1},h_{2},&hellip;,e_{n}\rbrace,\lbrace t_{1},t_{2},&hellip;,t_{m}\rbrace),i\in 1,&hellip;,m
+$$
+    使用TD模块提取到的标签，得到分类任务的监督信号：
+$$
+L_{CLS}(g,p)=-\sum_{i=1}^{m}g_{i}log(p_{i}),p_{i}=MLP(t_{i})
+$$</p>
+<h3 id="auto-balance-mask-loss">Auto-Balance Mask Loss</h3>
+<p>    为了分别平衡每个描述方面的异常样本和正常样本，考虑在训练期间使用一定的概率$p_{i}$丢弃区域$i$的正常样本：
+$$
+p_{i}=max(1-\alpha \ast \frac{N_{a}^{i}}{N_{n}^{i}},0)
+$$
+    其中，$N_{n}^{i}$和$N_{a}^{i}$分别表示区域$i$的正常样本数量和异常样本数量，$\alpha$设置为2，即正常样本越多，异常样本越少$p_{i}$就越接近1。<br>
+    最终的损失函数为：
+$$
+L_{ABL}=-\sum_{i=1}^{m}max(\delta (r_{i}),1-Rand(p_{i}))\ast (L_{GEN}+\lambda L_{CLS})
+$$
+    当$r_{i}$为异常样本时，$\delta (r_{i})$为1，那么损失函数没变化，前边max取得值就是1；当$r_{i}$为正常样本时，$\delta (r_{i})$为0，$Rand(p_{i})$为一个二进制随机数生成器，即生成1或0，生成1个概率为$p_{i}$，即$p_{i}$越大，生成1的概率越大，那么前边max取0个概率就越大，取0就表示当前样本不影响损失，因此，就相当于把正常样本给扔掉了。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +307,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

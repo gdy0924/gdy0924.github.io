@@ -6,7 +6,29 @@
     <description>Recent content in Summary on XY&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 21 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/summary/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 29 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://gdy0924.github.io/categories/summary/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>MIRG总结2</title>
+      <link>https://gdy0924.github.io/posts/mirg%E6%80%BB%E7%BB%932/</link>
+      <pubDate>Tue, 29 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://gdy0924.github.io/posts/mirg%E6%80%BB%E7%BB%932/</guid>
+      <description>SGF  A Self-Guided Framework for Radiology Report Generation
+关键点 多标签分类任务+报告生成任务；多标签分类任务的伪标签是用无监督方式从报告中提取出来的，即对句子进行聚类，聚类结果作为图像的分类伪标签；Similarity Comparer模块是为了使生成的句子整体语义更加接近ground truth，因此引入句子的相似性度量作为损失函数，让模型生成语义更加类似的句子。
+结果  IU-Xray数据集：
+BLUE-4和ROUGE-L提升效果明显，即SC模块作用很大，使得生成的句子语义、连续性很好，生成了更多有意义的长短语。 从上边消融实验依旧可以看出来，当加入了KMVE后，与Base + SC相比BLUE-1下降了一些，可能原因是KMVE模块可能会迫使SGF注意句子中的关键字，从而减少了无意义词的生成，导致单个词匹配的准确率低。
+MSAT  A Medical Semantic-Assisted Transformer for Radiographic Report Generation
+关键点 使用CLIP提取视觉特征；在transformer中引入双线性池化计算，以得到更加高阶的交互（在原来自注意力计算中，权重是通过q和k的线性融合得到的），同时引入额外的记忆矩阵（可训练）存储历史信息，有利于生成长文本；多标签分类的伪标签是通过Radgraph从报告中提取到的。
+结果  MIMIC-CXR数据集：
+在不使用强化学习的情况下，ROUGE和METEOR不如之前的最好结果，在加入了强化学习之后（CIDEr作为奖励分数），所有指标达到了最优的结果。
+从消融实验可以看出，提出的注意力模块能带来更大的提升。
+ITA  An Inclusive Task-Aware Framework for Radiology Report Generation
+关键点 网络基础结构参考Memory Driven Transformer，引入两个额外的模块，知识蒸馏和分类token；知识蒸馏利用图结构从报告中提取信息，即报告中通常需要描述哪些方面、哪些部位，从而在decoder中，利用不同的头来生成相应部位的描述；分类token作为额外的监督信号，优化网络，伪标签是通过知识蒸馏提取到的异常实体；Auto-Balance Mask Loss解决样本不平衡问题。
+结果 在BLEU和ROUGE-L上实现了最优的结果，METEOR略有下降，可能是因为METEOR考虑到了一些同义词，但是针对医学图像，METEOR捕获到的缺少专业知识，因为是从自然语言中提取的，因此METEOR并不是很合适作为评价指标。 TRG与R2GEN相比，增加了知识蒸馏作为decoder的先验指导，可以看出带来的提升相对较大，引入的损失来解决不平衡问题，和分类token也带来一定的提升，但很小。
+RepsNet  RepsNet: Combining Vision with Language for Automated Medical Reports
+关键点 将报告生成视为VQA任务，问题为“What are the findings in the image ?</description>
+    </item>
+    
     <item>
       <title>MIRG总结1</title>
       <link>https://gdy0924.github.io/posts/mirg%E6%80%BB%E7%BB%931/</link>

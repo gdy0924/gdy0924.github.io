@@ -45,8 +45,8 @@ code.has-jax {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="author" content="Gao dy" />
-  <meta property="og:url" content="https://gdy0924.github.io/categories/" />
-  <link rel="canonical" href="https://gdy0924.github.io/categories/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+  <meta property="og:url" content="https://gdy0924.github.io/posts/mirg2022-lge/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/mirg2022-lge/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
 
   <script type="application/ld+json">
   {
@@ -56,10 +56,10 @@ code.has-jax {
            "@type": "WebPage",
            "@id": "https:\/\/gdy0924.github.io\/"
       },
-      "articleSection" : "categories",
-      "name" : "Categories",
-      "headline" : "Categories",
-      "description" : "",
+      "articleSection" : "posts",
+      "name" : "MIRG2022-LGE",
+      "headline" : "MIRG2022-LGE",
+      "description" : "Lesion Guided Explainable Few Weak-shot Medical Report Generation\n 目前的医学报告生成工作需要标注数据，并且在面对新的疾病时，效果会下降，有一些弱样本学习工作，需要新疾病的ground truth报告来对网络进行微调，但是ground truth报告可能获取不到。\n为了使模型能够识别以前未见过的类，提出了针对自然图像任务的zero-shot learning（ZSL）。在ZSL 中，学习映射函数将图像输入投射到语义空间，其中训练类和新的类别之间的关系从辅助属性中提取，例如单词嵌入。\n因此，本文通过学习共同属性来在已看到的训练疾病和新的测试疾病之间建立联系。\n以下图为例，虽然在训练阶段，该模型没有看到关于central retinal vein occlusion的报告，但可以使其学习从视觉特征到语义特征的映射，从而建立所见疾病与新疾病之间的相关性。\n当模型遇到新的疾病样本时，可以通过结合共同属性的描述，利用校准后的相关性来生成报告。\nMethods Problem Setting  $C=C^{seen}\\cup C^{nov}$为疾病类型，对于每一个病例，包含多张图片$\\lbrace I_{1},\u0026hellip;,I_{N}\\rbrace$。\n对于每个seen classes，可解释的标包括一组标注的bounding box $B$（包括位置和类别），一个报告$R$。\n对于未知的类别，为每个类别采样K个样本组成support set $S$，包含弱标注，即只有bounding box。\nMethod Overview 对于输入的图像，先提取全局特征Global Features，然后使用RPN网络生成region proposal，通过ROI Pooling提取局部视觉特征$F^{vis}$，接着被分到三个分支：\n（1）box regression branch（$f_{reg}$）：检测病变区域的位置和大小；\n（2）classification branch（$f_{cls}$）：预测区域类别；\n（3）semantic prediction branch（$f_{prj}$）：将视觉特征映射到语义特征$F^{sem}$空间中，并学习 seen疾病与novel疾病之间的关系。\n最终，将视觉特征及其embedding拼接起来输入到transformer中生成报告。\nLesion-Centric Feature Extractor  从有病变的区域提取特征，以生成报告，使用Faster R-CNN来预测病变区域，回归分支预测位置，分类分支预测类别。\nMulti-view Embedding Ensemble  Fast R-CNN是针对seen疾病训练的，忽视了novel疾病的内容，因此，提出使用novel疾病的embedding来指导视觉特征学习。\n先创建一个语义特征空间，将视觉特征$F^{vis}$映射到该空间中： $$ F^{sem}=f_{prj}(F^{vis}) $$ 从预训练的BioBert中，提取到疾病的word embedding $W$，论文没有直接最大化视觉特征和对应的word embedding入之间的相似性，而是建立了一个soft label来创建seen疾病和novel疾病之间的语义关系： $$ L_{y}^{s}=\\left [ l_{1}^{s},\u0026hellip;,l_{|C|}^{s}\\right ]^{T},l_{c}^{s}=Sim(W_{y}^{emb},W_{c}^{emb}) $$ 因此，$L_{y}^{s}$捕获了类别y与所有类之间的相似性，包括seen疾病和novel疾病。",
       "inLanguage" : "en-US",
       "author" : "Gao dy",
       "creator" : "Gao dy",
@@ -67,17 +67,49 @@ code.has-jax {
       "accountablePerson" : "Gao dy",
       "copyrightHolder" : "Gao dy",
       "copyrightYear" : "2022",
-      "datePublished": "2022-11-29 00:00:00 \u002b0000 UTC",
-      "dateModified" : "2022-11-29 00:00:00 \u002b0000 UTC",
-      "url" : "https:\/\/gdy0924.github.io\/categories\/",
+      "datePublished": "2022-11-28 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-11-28 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/mirg2022-lge\/",
       "keywords" : [  ]
   }
 </script>
-<title>Categories</title>
-  <meta property="og:title" content="Categories" />
+<title>MIRG2022-LGE</title>
+  <meta property="og:title" content="MIRG2022-LGE" />
   <meta property="og:type" content="article" />
-  <meta property="og:description" content="" />
-  <meta name="description" content="" />
+  <meta property="og:description" content="Lesion Guided Explainable Few Weak-shot Medical Report Generation
+ 目前的医学报告生成工作需要标注数据，并且在面对新的疾病时，效果会下降，有一些弱样本学习工作，需要新疾病的ground truth报告来对网络进行微调，但是ground truth报告可能获取不到。
+为了使模型能够识别以前未见过的类，提出了针对自然图像任务的zero-shot learning（ZSL）。在ZSL 中，学习映射函数将图像输入投射到语义空间，其中训练类和新的类别之间的关系从辅助属性中提取，例如单词嵌入。
+因此，本文通过学习共同属性来在已看到的训练疾病和新的测试疾病之间建立联系。
+以下图为例，虽然在训练阶段，该模型没有看到关于central retinal vein occlusion的报告，但可以使其学习从视觉特征到语义特征的映射，从而建立所见疾病与新疾病之间的相关性。
+当模型遇到新的疾病样本时，可以通过结合共同属性的描述，利用校准后的相关性来生成报告。
+Methods Problem Setting  $C=C^{seen}\cup C^{nov}$为疾病类型，对于每一个病例，包含多张图片$\lbrace I_{1},&amp;hellip;,I_{N}\rbrace$。
+对于每个seen classes，可解释的标包括一组标注的bounding box $B$（包括位置和类别），一个报告$R$。
+对于未知的类别，为每个类别采样K个样本组成support set $S$，包含弱标注，即只有bounding box。
+Method Overview 对于输入的图像，先提取全局特征Global Features，然后使用RPN网络生成region proposal，通过ROI Pooling提取局部视觉特征$F^{vis}$，接着被分到三个分支：
+（1）box regression branch（$f_{reg}$）：检测病变区域的位置和大小；
+（2）classification branch（$f_{cls}$）：预测区域类别；
+（3）semantic prediction branch（$f_{prj}$）：将视觉特征映射到语义特征$F^{sem}$空间中，并学习 seen疾病与novel疾病之间的关系。
+最终，将视觉特征及其embedding拼接起来输入到transformer中生成报告。
+Lesion-Centric Feature Extractor  从有病变的区域提取特征，以生成报告，使用Faster R-CNN来预测病变区域，回归分支预测位置，分类分支预测类别。
+Multi-view Embedding Ensemble  Fast R-CNN是针对seen疾病训练的，忽视了novel疾病的内容，因此，提出使用novel疾病的embedding来指导视觉特征学习。
+先创建一个语义特征空间，将视觉特征$F^{vis}$映射到该空间中： $$ F^{sem}=f_{prj}(F^{vis}) $$ 从预训练的BioBert中，提取到疾病的word embedding $W$，论文没有直接最大化视觉特征和对应的word embedding入之间的相似性，而是建立了一个soft label来创建seen疾病和novel疾病之间的语义关系： $$ L_{y}^{s}=\left [ l_{1}^{s},&amp;hellip;,l_{|C|}^{s}\right ]^{T},l_{c}^{s}=Sim(W_{y}^{emb},W_{c}^{emb}) $$ 因此，$L_{y}^{s}$捕获了类别y与所有类之间的相似性，包括seen疾病和novel疾病。" />
+  <meta name="description" content="Lesion Guided Explainable Few Weak-shot Medical Report Generation
+ 目前的医学报告生成工作需要标注数据，并且在面对新的疾病时，效果会下降，有一些弱样本学习工作，需要新疾病的ground truth报告来对网络进行微调，但是ground truth报告可能获取不到。
+为了使模型能够识别以前未见过的类，提出了针对自然图像任务的zero-shot learning（ZSL）。在ZSL 中，学习映射函数将图像输入投射到语义空间，其中训练类和新的类别之间的关系从辅助属性中提取，例如单词嵌入。
+因此，本文通过学习共同属性来在已看到的训练疾病和新的测试疾病之间建立联系。
+以下图为例，虽然在训练阶段，该模型没有看到关于central retinal vein occlusion的报告，但可以使其学习从视觉特征到语义特征的映射，从而建立所见疾病与新疾病之间的相关性。
+当模型遇到新的疾病样本时，可以通过结合共同属性的描述，利用校准后的相关性来生成报告。
+Methods Problem Setting  $C=C^{seen}\cup C^{nov}$为疾病类型，对于每一个病例，包含多张图片$\lbrace I_{1},&amp;hellip;,I_{N}\rbrace$。
+对于每个seen classes，可解释的标包括一组标注的bounding box $B$（包括位置和类别），一个报告$R$。
+对于未知的类别，为每个类别采样K个样本组成support set $S$，包含弱标注，即只有bounding box。
+Method Overview 对于输入的图像，先提取全局特征Global Features，然后使用RPN网络生成region proposal，通过ROI Pooling提取局部视觉特征$F^{vis}$，接着被分到三个分支：
+（1）box regression branch（$f_{reg}$）：检测病变区域的位置和大小；
+（2）classification branch（$f_{cls}$）：预测区域类别；
+（3）semantic prediction branch（$f_{prj}$）：将视觉特征映射到语义特征$F^{sem}$空间中，并学习 seen疾病与novel疾病之间的关系。
+最终，将视觉特征及其embedding拼接起来输入到transformer中生成报告。
+Lesion-Centric Feature Extractor  从有病变的区域提取特征，以生成报告，使用Faster R-CNN来预测病变区域，回归分支预测位置，分类分支预测类别。
+Multi-view Embedding Ensemble  Fast R-CNN是针对seen疾病训练的，忽视了novel疾病的内容，因此，提出使用novel疾病的embedding来指导视觉特征学习。
+先创建一个语义特征空间，将视觉特征$F^{vis}$映射到该空间中： $$ F^{sem}=f_{prj}(F^{vis}) $$ 从预训练的BioBert中，提取到疾病的word embedding $W$，论文没有直接最大化视觉特征和对应的word embedding入之间的相似性，而是建立了一个soft label来创建seen疾病和novel疾病之间的语义关系： $$ L_{y}^{s}=\left [ l_{1}^{s},&amp;hellip;,l_{|C|}^{s}\right ]^{T},l_{c}^{s}=Sim(W_{y}^{emb},W_{c}^{emb}) $$ 因此，$L_{y}^{s}$捕获了类别y与所有类之间的相似性，包括seen疾病和novel疾病。" />
   <meta property="og:locale" content="en-us" />
 
   
@@ -103,10 +135,11 @@ code.has-jax {
 
 
 <body>
-  <article class="posts">
+  <article class="post Chinese" id="article">
     <div class="row">
       <div class="col-xs-12">
-        
+        <div class="site-header">
+          
 <header>
   <div class="header-title">
     <a href="/"
@@ -135,11 +168,115 @@ code.has-jax {
 </div>
 <div class="header-line"></div>
 
-
-        <h1 class="taxonomy-term"></h1>
-        <div id="posts-list">
-          
         </div>
+        <header class="post-header">
+          <h1 class="post-title">MIRG2022-LGE</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-28 00:00:00 UTC">
+                28 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>Lesion Guided Explainable Few Weak-shot Medical Report Generation</p>
+<p>    目前的医学报告生成工作需要标注数据，并且在面对新的疾病时，效果会下降，有一些弱样本学习工作，需要新疾病的ground truth报告来对网络进行微调，但是ground truth报告可能获取不到。<br>
+    为了使模型能够识别以前未见过的类，提出了针对自然图像任务的zero-shot learning（ZSL）。在ZSL 中，学习映射函数将图像输入投射到语义空间，其中训练类和新的类别之间的关系从辅助属性中提取，例如单词嵌入。<br>
+    因此，本文通过学习共同属性来在已看到的训练疾病和新的测试疾病之间建立联系。<br>
+    以下图为例，虽然在训练阶段，该模型没有看到关于central retinal vein occlusion的报告，但可以使其学习从视觉特征到语义特征的映射，从而建立所见疾病与新疾病之间的相关性。</p>
+<p><img src="/img/MIRG-LGE2.PNG" alt="">
+    当模型遇到新的疾病样本时，可以通过结合共同属性的描述，利用校准后的相关性来生成报告。</p>
+<h2 id="methods">Methods</h2>
+<h3 id="problem-setting">Problem Setting</h3>
+<p>    $C=C^{seen}\cup C^{nov}$为疾病类型，对于每一个病例，包含多张图片$\lbrace I_{1},&hellip;,I_{N}\rbrace$。<br>
+    对于每个seen classes，可解释的标包括一组标注的bounding box $B$（包括位置和类别），一个报告$R$。<br>
+    对于未知的类别，为每个类别采样K个样本组成support set $S$，包含弱标注，即只有bounding box。</p>
+<h3 id="method-overview">Method Overview</h3>
+<p><img src="/img/MIRG-LGE1.PNG" alt="">
+    对于输入的图像，先提取全局特征Global Features，然后使用RPN网络生成region proposal，通过ROI Pooling提取局部视觉特征$F^{vis}$，接着被分到三个分支：<br>
+    （1）box regression branch（$f_{reg}$）：检测病变区域的位置和大小；<br>
+    （2）classification branch（$f_{cls}$）：预测区域类别；<br>
+    （3）semantic prediction branch（$f_{prj}$）：将视觉特征映射到语义特征$F^{sem}$空间中，并学习 seen疾病与novel疾病之间的关系。<br>
+    最终，将视觉特征及其embedding拼接起来输入到transformer中生成报告。</p>
+<h3 id="lesion-centric-feature-extractor">Lesion-Centric Feature Extractor</h3>
+<p>    从有病变的区域提取特征，以生成报告，使用Faster R-CNN来预测病变区域，回归分支预测位置，分类分支预测类别。</p>
+<h3 id="multi-view-embedding-ensemble">Multi-view Embedding Ensemble</h3>
+<p>    Fast R-CNN是针对seen疾病训练的，忽视了novel疾病的内容，因此，提出使用novel疾病的embedding来指导视觉特征学习。<br>
+    先创建一个语义特征空间，将视觉特征$F^{vis}$映射到该空间中：
+$$
+F^{sem}=f_{prj}(F^{vis})
+$$
+    从预训练的BioBert中，提取到疾病的word embedding $W$，论文没有直接最大化视觉特征和对应的word embedding入之间的相似性，而是建立了一个soft label来创建seen疾病和novel疾病之间的语义关系：
+$$
+L_{y}^{s}=\left [  l_{1}^{s},&hellip;,l_{|C|}^{s}\right ]^{T},l_{c}^{s}=Sim(W_{y}^{emb},W_{c}^{emb})
+$$
+    因此，$L_{y}^{s}$捕获了类别y与所有类之间的相似性，包括seen疾病和novel疾病。</p>
+<h3 id="lesion-guided-report-generation">Lesion Guided Report Generation</h3>
+<p>    之前的报告通过异常区域和非异常区域同时生成报告，但本文只是用病变区域生成报告。即报告生成模块的输入为$F^{mult}=\left [ F^{vis},W_{\hat{y}}^{emb} \right ]$，再进行加权求和，权重为 proposal的预测概率。报告生成使用标准的transformer架构。</p>
+<h3 id="few-weak-shot-report-generation-for-novel-diseases">Few Weak-Shot Report Generation for Novel Diseases</h3>
+<p>    在推理阶段，为了确保模型能够通过support set $S$中只有少数弱标记的样本来准确识别以前未见过的新疾病，我们采用了weight imprinting scheme。<br>
+    首先将样本按照bounding box进行剪裁，将剪裁后的图像输入到网络中（不使用rpn和roipooling），提取视觉特征$F^{vis}$，进行类别预测。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
 
         <div class="site-footer">
   
@@ -159,6 +296,8 @@ code.has-jax {
     
   
 </script>
+
+  
 
 </body>
 

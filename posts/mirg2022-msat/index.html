@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Hugo 0.89.4" />
+  <script type="text/javascript"
+        async
+        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[\[','\]\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+
+MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<style>
+code.has-jax {
+    font: inherit;
+    font-size: 100%;
+    background: inherit;
+    border: inherit;
+    color: #515151;
+}
+</style>
+  <link href="https://cdn.bootcss.com/highlight.js/8.0/styles/Googlecode.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Gao dy" />
+  <meta property="og:url" content="https://gdy0924.github.io/posts/mirg2022-msat/" />
+  <link rel="canonical" href="https://gdy0924.github.io/posts/mirg2022-msat/" /><link rel="alternate" type="application/atom+xml" href="https://gdy0924.github.io/index.xml" title="XY&#39;s Blog">
+
+  <script type="application/ld+json">
+  {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+           "@type": "WebPage",
+           "@id": "https:\/\/gdy0924.github.io\/"
+      },
+      "articleSection" : "posts",
+      "name" : "MIRG2022-MSAT",
+      "headline" : "MIRG2022-MSAT",
+      "description" : "A Medical Semantic-Assisted Transformer for Radiographic Report Generation\n目前医学报告生成任务有一些困难：\n（1）输入图像许多非常相似，因此使用CNN作为视觉特征提取器很难捕捉细粒度的视觉差异，因此可以使用transformer提取视觉特征；\n（2）医疗报告之间的差异也是细粒度的，即报告主要由描述图像常见内容的相似句子所主导，而与疾病相关的单词可能被淹没，但是细粒度的语义信息是很重要的，但现有的方法往往不能捕捉并提供有效的细粒度医学语义特征。\n解决办法：\n（1）使用CLIP而不是ResNet作为视觉特征提取器，CLIP有两个优点：它是建立在ViT之上，提取区域视觉特征；它通过匹配图像-文本对进行训练，从而产生文本增强的视觉特征。\n（2）提出一个用于高阶特征交互的记忆增强稀疏注意力模块（memory-augmented sparse attention block），利用双线性池化操作实现，，嵌入到transformer中的encoder和decoder中，该模块可以捕捉输入图像之间的细粒度特征，产生稀疏注意力，记忆历史信息以生成长时间的报告。\n（3）提出一个轻量级医学概念生成网络（Medical Concepts Generation Network，MCGN），可以预测细粒度的语义概念，并将其融合到报告生成过程中。\nMethodology 该模型包括一个图像encoder，一个MCGN和一个报告decoder。\nMemory-augmented Sparse Attention of High-order Interaction  由于传统的自注意力模块，只利用到了输入向量的一节交互，即权重是通过输入的query和key中元素的线性融合得到的，难以捕捉到输入图像之间的细粒度差异，因此，将bilinear-pooling融入到自注意力机制中，以捕获输入细粒度视觉特征的第二阶甚至更高阶的交互信息。\n为了记录历史信息，使用额外的memory-slots来扩展key和value。定义：the global feature为Q，the regional features为K、V； memory-augment attention中的key和value为：$\\hat{K}=\\left [ K,M_{k} \\right ]$、$\\hat{V}=\\left [ V,M_{v} \\right ]$，$M_{k}$和$M_{v}$都是可训练的矩阵，接着用low-rank bilinear pooling的方式（bilinear pooling在细粒度图像分类任务中表现很好，因此在该工作中用这种方法来捕获细粒度特征）： $$ B_{k}=\\sigma (W_{k}\\hat{K})\\odot \\sigma (W_{q}^{k}Q),B_{v}=\\sigma (W_{v}\\hat{V})\\odot \\sigma (W_{q}^{v}Q) $$ 利用一个线性层： $$ {B}\u0027_ {k}=\\sigma (W_{B}^{k}B_{k}) $$ 利用另一个线性层，将${B}\u0027_ {k}$的维度变换，得到空间注意力权重$\\alpha _ {s}$，接着使用另一个ReLU层来去掉所有低相关性的负分数，确保注意力权值的稀疏性： $$ \\beta _ {s}=\\sigma (\\alpha _ {s}) $$ 同时，为了得到通道注意力权重$\\beta _ {c}$，将${B}\u0027_ {k}$进行平均池化得到$\\bar{B}$： $$ \\beta _ {c}=sigmoid(W_{c})\\bar{B} $$ memory-augmented sparse attention得到的输出： $$ \\hat{Q}=Attention(K,V,Q)=\\beta _ {c}\\odot LN(\\beta _ {s}B_{v}) $$ 该模块有三个好处：",
+      "inLanguage" : "en-US",
+      "author" : "Gao dy",
+      "creator" : "Gao dy",
+      "publisher": "Gao dy",
+      "accountablePerson" : "Gao dy",
+      "copyrightHolder" : "Gao dy",
+      "copyrightYear" : "2022",
+      "datePublished": "2022-11-22 00:00:00 \u002b0000 UTC",
+      "dateModified" : "2022-11-22 00:00:00 \u002b0000 UTC",
+      "url" : "https:\/\/gdy0924.github.io\/posts\/mirg2022-msat\/",
+      "keywords" : [  ]
+  }
+</script>
+<title>MIRG2022-MSAT</title>
+  <meta property="og:title" content="MIRG2022-MSAT" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="A Medical Semantic-Assisted Transformer for Radiographic Report Generation
+目前医学报告生成任务有一些困难：
+（1）输入图像许多非常相似，因此使用CNN作为视觉特征提取器很难捕捉细粒度的视觉差异，因此可以使用transformer提取视觉特征；
+（2）医疗报告之间的差异也是细粒度的，即报告主要由描述图像常见内容的相似句子所主导，而与疾病相关的单词可能被淹没，但是细粒度的语义信息是很重要的，但现有的方法往往不能捕捉并提供有效的细粒度医学语义特征。
+解决办法：
+（1）使用CLIP而不是ResNet作为视觉特征提取器，CLIP有两个优点：它是建立在ViT之上，提取区域视觉特征；它通过匹配图像-文本对进行训练，从而产生文本增强的视觉特征。
+（2）提出一个用于高阶特征交互的记忆增强稀疏注意力模块（memory-augmented sparse attention block），利用双线性池化操作实现，，嵌入到transformer中的encoder和decoder中，该模块可以捕捉输入图像之间的细粒度特征，产生稀疏注意力，记忆历史信息以生成长时间的报告。
+（3）提出一个轻量级医学概念生成网络（Medical Concepts Generation Network，MCGN），可以预测细粒度的语义概念，并将其融合到报告生成过程中。
+Methodology 该模型包括一个图像encoder，一个MCGN和一个报告decoder。
+Memory-augmented Sparse Attention of High-order Interaction  由于传统的自注意力模块，只利用到了输入向量的一节交互，即权重是通过输入的query和key中元素的线性融合得到的，难以捕捉到输入图像之间的细粒度差异，因此，将bilinear-pooling融入到自注意力机制中，以捕获输入细粒度视觉特征的第二阶甚至更高阶的交互信息。
+为了记录历史信息，使用额外的memory-slots来扩展key和value。定义：the global feature为Q，the regional features为K、V； memory-augment attention中的key和value为：$\hat{K}=\left [ K,M_{k} \right ]$、$\hat{V}=\left [ V,M_{v} \right ]$，$M_{k}$和$M_{v}$都是可训练的矩阵，接着用low-rank bilinear pooling的方式（bilinear pooling在细粒度图像分类任务中表现很好，因此在该工作中用这种方法来捕获细粒度特征）： $$ B_{k}=\sigma (W_{k}\hat{K})\odot \sigma (W_{q}^{k}Q),B_{v}=\sigma (W_{v}\hat{V})\odot \sigma (W_{q}^{v}Q) $$ 利用一个线性层： $$ {B}&#39;_ {k}=\sigma (W_{B}^{k}B_{k}) $$ 利用另一个线性层，将${B}&#39;_ {k}$的维度变换，得到空间注意力权重$\alpha _ {s}$，接着使用另一个ReLU层来去掉所有低相关性的负分数，确保注意力权值的稀疏性： $$ \beta _ {s}=\sigma (\alpha _ {s}) $$ 同时，为了得到通道注意力权重$\beta _ {c}$，将${B}&#39;_ {k}$进行平均池化得到$\bar{B}$： $$ \beta _ {c}=sigmoid(W_{c})\bar{B} $$ memory-augmented sparse attention得到的输出： $$ \hat{Q}=Attention(K,V,Q)=\beta _ {c}\odot LN(\beta _ {s}B_{v}) $$ 该模块有三个好处：" />
+  <meta name="description" content="A Medical Semantic-Assisted Transformer for Radiographic Report Generation
+目前医学报告生成任务有一些困难：
+（1）输入图像许多非常相似，因此使用CNN作为视觉特征提取器很难捕捉细粒度的视觉差异，因此可以使用transformer提取视觉特征；
+（2）医疗报告之间的差异也是细粒度的，即报告主要由描述图像常见内容的相似句子所主导，而与疾病相关的单词可能被淹没，但是细粒度的语义信息是很重要的，但现有的方法往往不能捕捉并提供有效的细粒度医学语义特征。
+解决办法：
+（1）使用CLIP而不是ResNet作为视觉特征提取器，CLIP有两个优点：它是建立在ViT之上，提取区域视觉特征；它通过匹配图像-文本对进行训练，从而产生文本增强的视觉特征。
+（2）提出一个用于高阶特征交互的记忆增强稀疏注意力模块（memory-augmented sparse attention block），利用双线性池化操作实现，，嵌入到transformer中的encoder和decoder中，该模块可以捕捉输入图像之间的细粒度特征，产生稀疏注意力，记忆历史信息以生成长时间的报告。
+（3）提出一个轻量级医学概念生成网络（Medical Concepts Generation Network，MCGN），可以预测细粒度的语义概念，并将其融合到报告生成过程中。
+Methodology 该模型包括一个图像encoder，一个MCGN和一个报告decoder。
+Memory-augmented Sparse Attention of High-order Interaction  由于传统的自注意力模块，只利用到了输入向量的一节交互，即权重是通过输入的query和key中元素的线性融合得到的，难以捕捉到输入图像之间的细粒度差异，因此，将bilinear-pooling融入到自注意力机制中，以捕获输入细粒度视觉特征的第二阶甚至更高阶的交互信息。
+为了记录历史信息，使用额外的memory-slots来扩展key和value。定义：the global feature为Q，the regional features为K、V； memory-augment attention中的key和value为：$\hat{K}=\left [ K,M_{k} \right ]$、$\hat{V}=\left [ V,M_{v} \right ]$，$M_{k}$和$M_{v}$都是可训练的矩阵，接着用low-rank bilinear pooling的方式（bilinear pooling在细粒度图像分类任务中表现很好，因此在该工作中用这种方法来捕获细粒度特征）： $$ B_{k}=\sigma (W_{k}\hat{K})\odot \sigma (W_{q}^{k}Q),B_{v}=\sigma (W_{v}\hat{V})\odot \sigma (W_{q}^{v}Q) $$ 利用一个线性层： $$ {B}&#39;_ {k}=\sigma (W_{B}^{k}B_{k}) $$ 利用另一个线性层，将${B}&#39;_ {k}$的维度变换，得到空间注意力权重$\alpha _ {s}$，接着使用另一个ReLU层来去掉所有低相关性的负分数，确保注意力权值的稀疏性： $$ \beta _ {s}=\sigma (\alpha _ {s}) $$ 同时，为了得到通道注意力权重$\beta _ {c}$，将${B}&#39;_ {k}$进行平均池化得到$\bar{B}$： $$ \beta _ {c}=sigmoid(W_{c})\bar{B} $$ memory-augmented sparse attention得到的输出： $$ \hat{Q}=Attention(K,V,Q)=\beta _ {c}\odot LN(\beta _ {s}B_{v}) $$ 该模块有三个好处：" />
+  <meta property="og:locale" content="en-us" />
+
+  
+    <style>body{font-family:bree serif,sans-serif;-webkit-font-smoothing:antialiased;margin:0 20px}article{max-width:800px;margin-left:auto;margin-right:auto}a{color:#000;text-decoration:none}a:hover{font-weight:600;text-decoration:underline}.post-ads{margin:50px 0}.markdown-body{font-size:18px;max-width:100%}.markdown-body a{text-decoration:underline;text-decoration-color:#000}.markdown-body pre{padding:16px;overflow:auto;border-radius:10px}.markdown-body code{padding:.2em .4em;font-size:85%;background-color:#f6f8fa;border-radius:6px}.markdown-body pre>code{padding:0;font-size:100%;background-color:inherit;border:0}.Chinese .markdown-body{line-height:200%}.site-date-catalog{font-size:2rem}.header-title{font-size:2rem;font-weight:700;margin-top:32px;font-family:bungee shade,sans-serif}.header-title a{text-decoration:none}.header-subtitle{color:#666}.header-items{margin:10px 0}.header-item{margin:0 5px}.header-line{width:100%;border-width:2px;border-color:#482936;border-style:solid none none none}.lang-switch{font-weight:600}#posts-list{min-height:600px}.posts-line{font-size:1.2rem;margin:12px 0}.posts-categories{font-size:.8rem;margin:auto;text-align:center}.posts-category{padding:3px 0;border:#000 2px solid;border-radius:5px}.site-footer{margin-top:50px}.site-footer-item{margin-right:12px}.post-content img{max-width:100%;display:block;margin-right:auto;margin-top:12px}.post-header{margin-bottom:50px}.post-title{font-size:2rem;font-weight:600}.post-tags{display:inline;font-weight:600;padding:2px 5px;margin-right:6px;border:#000 2px solid;border-radius:5px}.post-date{font-weight:800;font-style:italic}.post-author{float:right;font-weight:600}.page-content{min-height:60%}.post-content{margin-bottom:50px}.post-content p{hyphens:auto;line-height:1.8;text-justify:ideographic;margin-bottom:1em}.related-content{border-width:3px;border-style:solid;border-color:#000;padding:0 10px;margin-bottom:50px;margin-top:100px}.related-content li{margin:5px 0}.taxonomy-term{font-size:3rem}.gallery-img{text-align:center}.gallery-img span{text-align:center}.gallery-img-desc{font-size:.8em;font-weight:800}#disqus_thread{position:relative}#disqus_thread:after{content:"";display:block;height:55px;width:100%;position:absolute;bottom:0;background:#fff}@media screen and (max-width:600px){.header-title,.header-subtitle,.header-items{text-align:center}.posts-line{font-size:16px}.markdown-body{font-size:16px}.post-title{font-size:2rem}.post-content p{letter-spacing:.05em}}@media screen and (max-width:48em){.posts-category{display:none}}</style>
+  
+  
+    <style>.container,.container-fluid{margin-right:auto;margin-left:auto}.container-fluid{padding-right:2rem;padding-left:2rem}.row{box-sizing:border-box;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:0;-ms-flex:0 1 auto;flex:initial;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-.5rem;margin-left:-.5rem}.row.reverse{-webkit-box-orient:horizontal;-webkit-box-direction:reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse}.col.reverse{-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.col-xs,.col-xs-1,.col-xs-10,.col-xs-11,.col-xs-12,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-offset-0,.col-xs-offset-1,.col-xs-offset-10,.col-xs-offset-11,.col-xs-offset-12,.col-xs-offset-2,.col-xs-offset-3,.col-xs-offset-4,.col-xs-offset-5,.col-xs-offset-6,.col-xs-offset-7,.col-xs-offset-8,.col-xs-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-xs{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-xs-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-xs-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-xs-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-xs-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-xs-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-xs-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-xs-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-xs-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-xs-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-xs-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-xs-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-xs-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-xs-offset-0{margin-left:0}.col-xs-offset-1{margin-left:8.33333333%}.col-xs-offset-2{margin-left:16.66666667%}.col-xs-offset-3{margin-left:25%}.col-xs-offset-4{margin-left:33.33333333%}.col-xs-offset-5{margin-left:41.66666667%}.col-xs-offset-6{margin-left:50%}.col-xs-offset-7{margin-left:58.33333333%}.col-xs-offset-8{margin-left:66.66666667%}.col-xs-offset-9{margin-left:75%}.col-xs-offset-10{margin-left:83.33333333%}.col-xs-offset-11{margin-left:91.66666667%}.start-xs{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-xs{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-xs{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-xs{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-xs{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-xs{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-xs{-ms-flex-pack:distribute;justify-content:space-around}.between-xs{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-xs{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-xs{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}@media only screen and (min-width:48em){.container{width:49rem}.col-sm,.col-sm-1,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-offset-0,.col-sm-offset-1,.col-sm-offset-10,.col-sm-offset-11,.col-sm-offset-12,.col-sm-offset-2,.col-sm-offset-3,.col-sm-offset-4,.col-sm-offset-5,.col-sm-offset-6,.col-sm-offset-7,.col-sm-offset-8,.col-sm-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-sm{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-sm-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-sm-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-sm-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-sm-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-sm-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-sm-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-sm-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-sm-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-sm-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-sm-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-sm-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-sm-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-sm-offset-0{margin-left:0}.col-sm-offset-1{margin-left:8.33333333%}.col-sm-offset-2{margin-left:16.66666667%}.col-sm-offset-3{margin-left:25%}.col-sm-offset-4{margin-left:33.33333333%}.col-sm-offset-5{margin-left:41.66666667%}.col-sm-offset-6{margin-left:50%}.col-sm-offset-7{margin-left:58.33333333%}.col-sm-offset-8{margin-left:66.66666667%}.col-sm-offset-9{margin-left:75%}.col-sm-offset-10{margin-left:83.33333333%}.col-sm-offset-11{margin-left:91.66666667%}.start-sm{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-sm{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-sm{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-sm{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-sm{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-sm{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-sm{-ms-flex-pack:distribute;justify-content:space-around}.between-sm{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-sm{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-sm{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:64em){.container{width:65rem}.col-md,.col-md-1,.col-md-10,.col-md-11,.col-md-12,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-offset-0,.col-md-offset-1,.col-md-offset-10,.col-md-offset-11,.col-md-offset-12,.col-md-offset-2,.col-md-offset-3,.col-md-offset-4,.col-md-offset-5,.col-md-offset-6,.col-md-offset-7,.col-md-offset-8,.col-md-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-md{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-md-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-md-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-md-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-md-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-md-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-md-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-md-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-md-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-md-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-md-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-md-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-md-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-md-offset-0{margin-left:0}.col-md-offset-1{margin-left:8.33333333%}.col-md-offset-2{margin-left:16.66666667%}.col-md-offset-3{margin-left:25%}.col-md-offset-4{margin-left:33.33333333%}.col-md-offset-5{margin-left:41.66666667%}.col-md-offset-6{margin-left:50%}.col-md-offset-7{margin-left:58.33333333%}.col-md-offset-8{margin-left:66.66666667%}.col-md-offset-9{margin-left:75%}.col-md-offset-10{margin-left:83.33333333%}.col-md-offset-11{margin-left:91.66666667%}.start-md{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-md{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-md{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-md{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-md{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-md{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-md{-ms-flex-pack:distribute;justify-content:space-around}.between-md{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-md{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-md{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}@media only screen and (min-width:75em){.container{width:76rem}.col-lg,.col-lg-1,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-offset-0,.col-lg-offset-1,.col-lg-offset-10,.col-lg-offset-11,.col-lg-offset-12,.col-lg-offset-2,.col-lg-offset-3,.col-lg-offset-4,.col-lg-offset-5,.col-lg-offset-6,.col-lg-offset-7,.col-lg-offset-8,.col-lg-offset-9{box-sizing:border-box;-webkit-box-flex:0;-ms-flex:0 0 auto;flex:none;padding-right:.5rem;padding-left:.5rem}.col-lg{-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;-ms-flex-preferred-size:0;flex-basis:0;max-width:100%}.col-lg-1{-ms-flex-preferred-size:8.33333333%;flex-basis:8.33333333%;max-width:8.33333333%}.col-lg-2{-ms-flex-preferred-size:16.66666667%;flex-basis:16.66666667%;max-width:16.66666667%}.col-lg-3{-ms-flex-preferred-size:25%;flex-basis:25%;max-width:25%}.col-lg-4{-ms-flex-preferred-size:33.33333333%;flex-basis:33.33333333%;max-width:33.33333333%}.col-lg-5{-ms-flex-preferred-size:41.66666667%;flex-basis:41.66666667%;max-width:41.66666667%}.col-lg-6{-ms-flex-preferred-size:50%;flex-basis:50%;max-width:50%}.col-lg-7{-ms-flex-preferred-size:58.33333333%;flex-basis:58.33333333%;max-width:58.33333333%}.col-lg-8{-ms-flex-preferred-size:66.66666667%;flex-basis:66.66666667%;max-width:66.66666667%}.col-lg-9{-ms-flex-preferred-size:75%;flex-basis:75%;max-width:75%}.col-lg-10{-ms-flex-preferred-size:83.33333333%;flex-basis:83.33333333%;max-width:83.33333333%}.col-lg-11{-ms-flex-preferred-size:91.66666667%;flex-basis:91.66666667%;max-width:91.66666667%}.col-lg-12{-ms-flex-preferred-size:100%;flex-basis:100%;max-width:100%}.col-lg-offset-0{margin-left:0}.col-lg-offset-1{margin-left:8.33333333%}.col-lg-offset-2{margin-left:16.66666667%}.col-lg-offset-3{margin-left:25%}.col-lg-offset-4{margin-left:33.33333333%}.col-lg-offset-5{margin-left:41.66666667%}.col-lg-offset-6{margin-left:50%}.col-lg-offset-7{margin-left:58.33333333%}.col-lg-offset-8{margin-left:66.66666667%}.col-lg-offset-9{margin-left:75%}.col-lg-offset-10{margin-left:83.33333333%}.col-lg-offset-11{margin-left:91.66666667%}.start-lg{-webkit-box-pack:start;-ms-flex-pack:start;justify-content:flex-start;text-align:start}.center-lg{-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;text-align:center}.end-lg{-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;text-align:end}.top-lg{-webkit-box-align:start;-ms-flex-align:start;align-items:flex-start}.middle-lg{-webkit-box-align:center;-ms-flex-align:center;align-items:center}.bottom-lg{-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end}.around-lg{-ms-flex-pack:distribute;justify-content:space-around}.between-lg{-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between}.first-lg{-webkit-box-ordinal-group:0;-ms-flex-order:-1;order:-1}.last-lg{-webkit-box-ordinal-group:2;-ms-flex-order:1;order:1}}</style>
+  
+
+  
+
+  <link href="/index.xml" rel="alternate" type="application/rss+xml"
+    title="XY&#39;s Blog">
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Bungee+Shade" rel="stylesheet">
+  
+  
+
+  
+  
+</head>
+
+
+<body>
+  <article class="post Chinese" id="article">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="site-header">
+          
+<header>
+  <div class="header-title">
+    <a href="/"
+      >Gao dy</a
+    >
+  </div>
+  <div class="header-subtitle"></div>
+</header>
+<div class="row end-md center-xs header-items">
+  
+  <div class="header-item">
+    <a href="/index.xml" target="_blank">RSS</a>
+  </div>
+  
+  <div class="header-item">
+    <a href="https://github.com/gdy0924" target="_blank">About</a>
+  </div>
+  
+</div>
+<div class="row end-xs">
+  
+  <div class="lang-switch col-xs-3 col-xs-offset-9">
+    <a href="/en/">English</a>
+  </div>
+    
+</div>
+<div class="header-line"></div>
+
+        </div>
+        <header class="post-header">
+          <h1 class="post-title">MIRG2022-MSAT</h1>
+          
+          <div class="row post-desc">
+            <div class="col-xs-6">
+              
+              <time class="post-date" datetime="2022-11-22 00:00:00 UTC">
+                22 Nov 2022
+              </time>
+              
+            </div>
+            <div class="col-xs-6">
+              
+              <div class="post-author">
+                <a target="_blank" href="https://gdy0924.github.io/">@Gao dy</a>
+              </div>
+              
+            </div>
+          </div>
+          
+        </header>
+
+        <div class="post-content markdown-body">
+          
+          <p>A Medical Semantic-Assisted Transformer for Radiographic Report Generation<br>
+    目前医学报告生成任务有一些困难：<br>
+    （1）输入图像许多非常相似，因此使用CNN作为视觉特征提取器很难捕捉细粒度的视觉差异，因此可以使用transformer提取视觉特征；<br>
+    （2）医疗报告之间的差异也是细粒度的，即报告主要由描述图像常见内容的相似句子所主导，而与疾病相关的单词可能被淹没，但是细粒度的语义信息是很重要的，但现有的方法往往不能捕捉并提供有效的细粒度医学语义特征。<br>
+    解决办法：<br>
+    （1）使用<strong>CLIP</strong>而不是ResNet作为视觉特征提取器，CLIP有两个优点：它是建立在ViT之上，提取区域视觉特征；它通过匹配图像-文本对进行训练，从而产生文本增强的视觉特征。<br>
+    （2）提出一个用于高阶特征交互的记忆增强稀疏注意力模块（<strong>memory-augmented sparse attention block</strong>），利用双线性池化操作实现，，嵌入到transformer中的encoder和decoder中，该模块可以捕捉输入图像之间的<strong>细粒度特征</strong>，产生稀疏注意力，<strong>记忆历史信息</strong>以生成长时间的报告。<br>
+    （3）提出一个轻量级医学概念生成网络（<strong>Medical Concepts Generation Network，MCGN</strong>），可以预测<strong>细粒度的语义概念</strong>，并将其融合到报告生成过程中。</p>
+<h2 id="methodology">Methodology</h2>
+<p><img src="/img/MIRG-MSAT1.PNG" alt="">
+    该模型包括一个图像encoder，一个MCGN和一个报告decoder。</p>
+<h3 id="memory-augmented-sparse-attention-of-high-order-interaction">Memory-augmented Sparse Attention of High-order Interaction</h3>
+<p>    由于传统的自注意力模块，只利用到了输入向量的一节交互，即权重是通过输入的query和key中元素的线性融合得到的，难以捕捉到输入图像之间的细粒度差异，因此，将bilinear-pooling融入到自注意力机制中，以捕获输入细粒度视觉特征的第二阶甚至更高阶的交互信息。<br>
+    为了记录历史信息，使用额外的memory-slots来扩展key和value。定义：the global feature为Q，the regional features为K、V； memory-augment attention中的key和value为：$\hat{K}=\left [ K,M_{k} \right ]$、$\hat{V}=\left [ V,M_{v} \right ]$，$M_{k}$和$M_{v}$都是可训练的矩阵，接着用low-rank bilinear pooling的方式（bilinear pooling在细粒度图像分类任务中表现很好，因此在该工作中用这种方法来捕获细粒度特征）：
+$$
+B_{k}=\sigma (W_{k}\hat{K})\odot \sigma (W_{q}^{k}Q),B_{v}=\sigma (W_{v}\hat{V})\odot \sigma (W_{q}^{v}Q)
+$$
+    利用一个线性层：
+$$
+{B}'_ {k}=\sigma (W_{B}^{k}B_{k})
+$$
+    利用另一个线性层，将${B}'_ {k}$的维度变换，得到空间注意力权重$\alpha _ {s}$，接着使用另一个ReLU层来去掉所有低相关性的负分数，确保注意力权值的稀疏性：
+$$
+\beta _ {s}=\sigma (\alpha _ {s})
+$$
+    同时，为了得到通道注意力权重$\beta _ {c}$，将${B}'_ {k}$进行平均池化得到$\bar{B}$：
+$$
+\beta _ {c}=sigmoid(W_{c})\bar{B}
+$$
+    memory-augmented sparse attention得到的输出：
+$$
+\hat{Q}=Attention(K,V,Q)=\beta _ {c}\odot LN(\beta _ {s}B_{v})
+$$
+    该模块有三个好处：<br>
+    （1）在encoder中，可以输入 single-model，在decoder中可以输入multi-model，探索输入之间的高阶交互；<br>
+    （2）memory可以存储历史信息，这对于生成长报告很有价值；<br>
+    （3）不使用softmax而是使用ReLU以得到稀疏注意力，效率更高。</p>
+<h3 id="image-encoder">Image Encoder</h3>
+<p>    对于输入图像$I$先经过预训练模型CLIP，得到regional features：$f=CLIP(I)$，作为初始化的$K^{(0)}$和$V^{(0)}$，对$f$进行平均池化得到初始化的$Q^{(0)}=\frac{1}{N_{c}}\sum_{i=1}^{N_{c}}f_{i}$，将其输入到encoder层中。<br>
+    对于第$m$层，其输入是经过上一层计算得到的$\hat{Q}^{(m-1)}$、$K^{m-1}=\lbrace k_{i}^{(m-1)}\rbrace_{i=1}^{N}$和$V^{m-1}=\lbrace v_{i}^{(m-1)}\rbrace_{i=1}^{N}$，输出为：$\hat{Q}^{(m)}=Attention(K^{(m-1)},V^{(m-1)},\hat{Q}^{(m-1)})$，由上一节介绍的本文提出的注意力计算方式计算得到；同时key和value也要进行相应的更新，即$k_{i}^{(m)}=LN(\sigma (W_{m}^{k}\left [ \hat{Q}^{(m)},k_{i}^{(m-1)} \right ])+k_{i}^{(m-1)} )$，v同理可得，也就是说，key和value都要与得到的新特征$\hat{Q}^{(m)}$进行融合。</p>
+<h3 id="medical-concepts-generation-network">Medical Concepts Generation Network</h3>
+<p>    该网络提取细粒度医学概念，利用RadGraph提取伪医学概念作为多标签分类（MLC）的ground truth；RadGraph是基于文本胸部X光报告的临床实体与关系的知识图谱；我们将这些实体作为医学语义概念，最后根据它们的出现频率选择了768个概念。<br>
+    MCGN由一个MSA模块组成，其输出$V_{c}=Attention(K^{(m-1)},V^{(m-1)},\hat{Q}^{(m-1)})$，然后利用一个线性层将$V_{c}$的维度投影到$K$维，$K$为医学概念的数量，进行多标签预测任务。</p>
+<h3 id="report-decoder">Report Decoder</h3>
+<p>    该模块的输入是视觉特征和医学概念embedding，输出为医学报告。首先将输入进行融合：
+$$
+v_{f}=W_{f}\left [ \hat{Q}^{(0)} ,\hat{Q}^{(1)},&hellip;,\hat{Q}^{(M)}  \right ]+V_{c}
+$$
+    得到decoder的输入，输入还包括由图像encoder的输出the regional features$K^{(M)}$和$V^{(M)}$，和文字$w_{t}$。<br>
+    第一个稀疏注意力子层将$v_{f}$作为query，单词$w_{t}$的embedding作为key和value获得视觉增强的单词embedding；作为Q输入到下一个稀疏注意力子层中，这时的K和V是regional features$K^{(M)}$和$V^{(M)}$，重复上述过程，并且在每次注意力层后又残差连接和LN。<br>
+    该模块使用交叉熵损失函数。</p>
+
+        </div>
+
+        <div class="row middle-xs">
+          <div class="col-xs-12">
+            
+          </div>
+        </div>
+        
+          <div class="row">
+            <div class="col-xs-12">
+              
+            </div>
+          </div>
+
+          
+
+
+
+          
+          
+          <div style="height: 50px;"></div>
+          
+          <div class="post-comments">
+            <div id="disqus_thread"></div>
+<script>
+  window.addEventListener("load", () => {
+    (function() {
+      
+      var d = document,
+        s = d.createElement("script");
+      s.src = "https://joway.disqus.com/embed.js";
+      s.setAttribute("data-timestamp", +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  });
+</script>
+<noscript
+  >Please enable JavaScript to view the
+  <a href="https://disqus.com/?ref_noscript"
+    >comments powered by Disqus.</a
+  ></noscript
+>
+
+          </div>
+          
+        
+
+        <div class="site-footer">
+  
+  
+</div>
+
+      </div>
+    </div>
+  </article>
+
+  
+
+<script>
+  
+  
+    
+    
+  
+</script>
+
+  
+
+</body>
+
+</html>
